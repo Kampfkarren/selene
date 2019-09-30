@@ -1,4 +1,4 @@
-use super::Rule;
+use super::{Rule, RuleConfig};
 use std::{
     fs,
     io::Write,
@@ -17,7 +17,7 @@ lazy_static::lazy_static! {
 }
 
 pub fn test_lint<
-    C: serde::de::DeserializeOwned + Default,
+    C: RuleConfig,
     E: std::error::Error,
     R: Rule<Config = C, Error = E>,
 >(
