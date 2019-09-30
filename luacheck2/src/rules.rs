@@ -136,8 +136,11 @@ impl RuleConfig for () {
     fn merge_with(&mut self, _: ()) {}
 }
 
-impl<K: DeserializeOwned + Eq + std::hash::Hash, V: DeserializeOwned>
-    RuleConfig for HashMap<K, V>
+impl<K, V, S> RuleConfig for HashMap<K, V, S>
+where
+    K: DeserializeOwned + Eq + std::hash::Hash,
+    V: DeserializeOwned,
+    S: Default + std::hash::BuildHasher,
 {
     fn merge_with(&mut self, other: Self) {
         self.extend(other);

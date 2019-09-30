@@ -16,11 +16,7 @@ lazy_static::lazy_static! {
         { Path::new(env!("CARGO_MANIFEST_DIR")).join("tests").join("lints") };
 }
 
-pub fn test_lint<
-    C: RuleConfig,
-    E: std::error::Error,
-    R: Rule<Config = C, Error = E>,
->(
+pub fn test_lint<C: RuleConfig, E: std::error::Error, R: Rule<Config = C, Error = E>>(
     rule: R,
     lint_name: &'static str,
     test_name: &'static str,
