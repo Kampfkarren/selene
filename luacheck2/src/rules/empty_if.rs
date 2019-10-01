@@ -4,7 +4,7 @@ use std::convert::Infallible;
 use full_moon::{
     ast::{self, Ast},
     node::Node,
-    tokenizer::{Token, TokenReference, TokenKind},
+    tokenizer::{Token, TokenKind, TokenReference},
     visitors::Visitor,
 };
 use serde::Deserialize;
@@ -32,9 +32,7 @@ impl Rule for EmptyIfLint {
     type Error = Infallible;
 
     fn new(config: EmptyIfLintConfig) -> Result<Self, Self::Error> {
-        Ok(EmptyIfLint {
-            config,
-        })
+        Ok(EmptyIfLint { config })
     }
 
     fn pass(&self, ast: &Ast) -> Vec<Diagnostic> {
@@ -144,8 +142,9 @@ impl Visitor<'_> for EmptyIfVisitor {
     fn visit_token(&mut self, token: &TokenReference<'_>) {
         match token.token_kind() {
             TokenKind::MultiLineComment | TokenKind::SingleLineComment => {
-                self.comment_positions.push(Token::end_position(token).bytes() as u32);
-            },
+                self.comment_positions
+                    .push(Token::end_position(token).bytes() as u32);
+            }
 
             _ => {}
         }
@@ -164,17 +163,22 @@ mod tests {
 
     #[test]
     fn test_empty_if() {
-        test_lint(EmptyIfLint::new(
-            EmptyIfLintConfig::default()
-        ).unwrap(), "empty_if", "empty_if");
+        test_lint(
+            EmptyIfLint::new(EmptyIfLintConfig::default()).unwrap(),
+            "empty_if",
+            "empty_if",
+        );
     }
 
     #[test]
     fn test_empty_if_comments() {
-        test_lint(EmptyIfLint::new(
-            EmptyIfLintConfig {
+        test_lint(
+            EmptyIfLint::new(EmptyIfLintConfig {
                 comments_count: true,
-            }
-        ).unwrap(), "empty_if", "empty_if_comments");
+            })
+            .unwrap(),
+            "empty_if",
+            "empty_if_comments",
+        );
     }
 }
