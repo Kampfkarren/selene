@@ -37,7 +37,7 @@ impl Rule for EmptyIfLint {
         })
     }
 
-    fn pass(self, ast: &Ast<'static>) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast) -> Vec<Diagnostic> {
         let mut visitor = EmptyIfVisitor {
             comment_positions: Vec::new(),
             positions: Vec::new(),

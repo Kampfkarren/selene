@@ -1,10 +1,11 @@
 use std::{collections::HashMap, error::Error};
 
+use full_moon::ast::Ast;
 use serde::de::{Deserialize, Deserializer};
 
 pub mod rules;
 
-use rules::Rule;
+use rules::{Diagnostic, Rule};
 
 // TODO: Implement Display, Error
 #[derive(Debug)]
@@ -25,7 +26,7 @@ macro_rules! use_rules {
             $rule_name:ident: $rule_path:ty,
         )+
     } => {
-        struct Checker {
+        pub struct Checker {
             $(
                 $rule_name: $rule_path,
             )+
@@ -33,7 +34,7 @@ macro_rules! use_rules {
 
         impl Checker {
             // TODO: Be more strict about config? Make sure all keys exist
-            fn from_config<V: 'static>(
+            pub fn from_config<V: 'static>(
                 mut config: HashMap<String, V>,
             ) -> Result<Self, CheckerError> where V: for<'de> Deserialize<'de> + for<'de> Deserializer<'de> {
                 Ok(Self {
@@ -62,20 +63,20 @@ macro_rules! use_rules {
                     )+
                 })
             }
+
+            pub fn test_on(&self, ast: &Ast<'static>) -> Vec<Diagnostic> {
+                let mut diagnostics = Vec::new();
+
+                $(
+                    diagnostics.extend(&mut (&self.$rule_name).pass(ast).into_iter());
+                )+
+
+                diagnostics
+            }
         }
     };
 }
 
 use_rules! {
     empty_if: rules::empty_if::EmptyIfLint,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn can_create() {
-        Checker::from_config::<serde_json::Value>(HashMap::new()).unwrap();
-    }
 }
