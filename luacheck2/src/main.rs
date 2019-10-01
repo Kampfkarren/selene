@@ -1,11 +1,12 @@
 use std::{env::current_dir, fs, path::Path};
 
+use codespan_reporting::diagnostic::Severity as CodespanSeverity;
 use clap::{App, Arg};
 use full_moon::ast::owned::Owned;
 use log::error;
-use luacheck2_lib::*;
+use luacheck2_lib::{*, rules::Severity};
 
-fn read_file(checker: &Checker, filename: &Path) {
+fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     let contents = match fs::read_to_string(filename) {
         Ok(contents) => contents,
         Err(error) => {
@@ -28,7 +29,7 @@ fn read_file(checker: &Checker, filename: &Path) {
     };
 
     let mut diagnostics = checker.test_on(&ast);
-    diagnostics.sort_by_key(|diagnostic| diagnostic.start_position());
+    diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.start_position());
 
     let mut files = codespan::Files::new();
     let source_id = files.add(filename.to_string_lossy(), contents);
@@ -38,7 +39,11 @@ fn read_file(checker: &Checker, filename: &Path) {
     // TODO: Use severity from config/Rule::severity()
     for diagnostic in diagnostics.into_iter().map(|diagnostic| {
         diagnostic
-            .into_codespan_diagnostic(source_id, codespan_reporting::diagnostic::Severity::Warning)
+            .diagnostic
+            .into_codespan_diagnostic(source_id, match diagnostic.severity {
+                Severity::Error => CodespanSeverity::Error,
+                Severity::Warning => CodespanSeverity::Warning,
+            })
     }) {
         codespan_reporting::term::emit(
             &mut stdout,

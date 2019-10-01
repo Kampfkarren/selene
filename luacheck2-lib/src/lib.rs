@@ -1,11 +1,11 @@
 use std::{collections::HashMap, error::Error, fmt};
 
 use full_moon::ast::Ast;
-use serde::{de::Deserializer, Deserialize};
+use serde::{de::{Deserializer, DeserializeOwned}, Deserialize};
 
 pub mod rules;
 
-use rules::{Diagnostic, Rule};
+use rules::{Diagnostic, Rule, Severity};
 
 #[derive(Debug)]
 pub struct CheckerError {
@@ -69,15 +69,17 @@ macro_rules! use_rules {
             $rule_name:ident: $rule_path:ty,
         )+
     } => {
-        pub struct Checker {
+        pub struct Checker<V: 'static + DeserializeOwned> {
+            config: CheckerConfig<V>,
+
             $(
                 $rule_name: Option<$rule_path>,
             )+
         }
 
-        impl Checker {
+        impl<V: 'static + DeserializeOwned> Checker<V> {
             // TODO: Be more strict about config? Make sure all keys exist
-            pub fn from_config<V: 'static>(
+            pub fn from_config(
                 mut config: CheckerConfig<V>,
             ) -> Result<Self, CheckerError> where V: for<'de> Deserializer<'de> {
                 Ok(Self {
@@ -113,15 +115,26 @@ macro_rules! use_rules {
                             }
                         },
                     )+
+                    config,
                 })
             }
 
-            pub fn test_on(&self, ast: &Ast<'static>) -> Vec<Diagnostic> {
+            pub fn test_on(&self, ast: &Ast<'static>) -> Vec<CheckerDiagnostic> {
                 let mut diagnostics = Vec::new();
 
                 $(
                     if let Some(rule) = &self.$rule_name {
-                        diagnostics.extend(&mut rule.pass(ast).into_iter());
+                        diagnostics.extend(&mut rule.pass(ast).into_iter().map(|diagnostic| {
+                            CheckerDiagnostic {
+                                diagnostic,
+                                severity: match self.config.rules.get(stringify!($rule_name)) {
+                                    None => rule.severity(),
+                                    Some(RuleVariation::Deny) => Severity::Error,
+                                    Some(RuleVariation::Warn) => Severity::Warning,
+                                    Some(RuleVariation::Allow) => unreachable!(),
+                                }
+                            }
+                        }));
                     }
                 )+
 
@@ -129,6 +142,11 @@ macro_rules! use_rules {
             }
         }
     };
+}
+
+pub struct CheckerDiagnostic {
+    pub diagnostic: Diagnostic,
+    pub severity: Severity,
 }
 
 use_rules! {

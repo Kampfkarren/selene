@@ -36,6 +36,7 @@ pub enum RuleType {
     Style,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Severity {
     Error,
     Warning,
