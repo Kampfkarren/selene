@@ -1,10 +1,30 @@
-use std::{env::current_dir, fs, path::Path};
+use std::{env::current_dir, fmt, fs, io::{self, Write}, path::Path, sync::Arc};
 
 use clap::{App, Arg};
 use codespan_reporting::diagnostic::Severity as CodespanSeverity;
 use full_moon::ast::owned::Owned;
-use log::error;
 use luacheck2_lib::{rules::Severity, *};
+use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
+use threadpool::ThreadPool;
+
+macro_rules! error {
+    ($fmt:expr) => {
+        error(fmt::format(format_args!($fmt))).unwrap();
+    };
+
+    ($fmt:expr, $($args:tt)*) => {
+        error(fmt::format(format_args!($fmt, $($args)*))).unwrap();
+    };
+}
+
+fn error(text: String) -> io::Result<()> {
+    let mut stderr = StandardStream::stderr(ColorChoice::Auto);
+    stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
+    write!(&mut stderr, "ERROR: ")?;
+    stderr.set_color(ColorSpec::new().set_fg(None))?;
+    writeln!(&mut stderr, "{}", text)?;
+    Ok(())
+}
 
 fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     let contents = match fs::read_to_string(filename) {
@@ -34,7 +54,8 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     let mut files = codespan::Files::new();
     let source_id = files.add(filename.to_string_lossy(), contents);
 
-    let mut stdout = termcolor::StandardStream::stderr(termcolor::ColorChoice::Auto);
+    let stderr = termcolor::StandardStream::stderr(termcolor::ColorChoice::Auto);
+    let mut stderr = stderr.lock();
 
     for diagnostic in diagnostics.into_iter().map(|diagnostic| {
         diagnostic.diagnostic.into_codespan_diagnostic(
@@ -46,7 +67,7 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
         )
     }) {
         codespan_reporting::term::emit(
-            &mut stdout,
+            &mut stderr,
             &codespan_reporting::term::Config::default(),
             &files,
             &diagnostic,
@@ -56,6 +77,8 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
 }
 
 fn main() {
+    let num_cpus = num_cpus::get().to_string();
+
     let matches = App::new(env!("CARGO_PKG_NAME"))
         .version(env!("CARGO_PKG_VERSION"))
         .author("Kampfkarren")
@@ -76,6 +99,14 @@ fn main() {
                 .takes_value(true),
         )
         .arg(
+            Arg::with_name("num-threads")
+                .long("num-threads")
+                .help(
+                    "Number of threads to run on, default to the numbers of logical cores on your system"
+                )
+                .default_value(&num_cpus)
+        )
+        .arg(
             Arg::with_name("files")
                 .index(1)
                 .min_values(1)
@@ -83,8 +114,6 @@ fn main() {
                 .required(true),
         )
         .get_matches();
-
-    simple_logger::init().expect("couldn't initialize logger");
 
     let config: CheckerConfig<toml::value::Value> = match matches.value_of("config") {
         Some(config_file) => {
@@ -118,24 +147,38 @@ fn main() {
         },
     };
 
-    let checker = match Checker::from_config(config) {
+    let checker = Arc::new(match Checker::from_config(config) {
         Ok(checker) => checker,
         Err(error) => {
             error!("{}", error);
+            return;
+        }
+    });
+
+    let num_threads: usize = match &matches.value_of("num-threads").unwrap().parse() {
+        Ok(num_threads) => *num_threads,
+        Err(error) => {
+            error!("Couldn't parse num-threads: {}", error);
             return;
         }
     };
 
     let pattern = matches.value_of("pattern").unwrap();
 
+    let pool = ThreadPool::new(num_threads);
+
     for filename in matches.values_of_os("files").unwrap() {
         match fs::metadata(filename) {
             Ok(metadata) => {
                 if metadata.is_file() {
-                    read_file(
-                        &checker,
-                        &current_dir().expect("Failed to get current directory"),
-                    );
+                    let checker = Arc::clone(&checker);
+
+                    pool.execute(move || {
+                        read_file(
+                            &checker,
+                            &current_dir().expect("Failed to get current directory"),
+                        )
+                    });
                 } else if metadata.is_dir() {
                     let glob =
                         match glob::glob(&format!("{}/{}", filename.to_string_lossy(), pattern)) {
@@ -149,7 +192,9 @@ fn main() {
                     for entry in glob {
                         match entry {
                             Ok(path) => {
-                                read_file(&checker, &path);
+                                let checker = Arc::clone(&checker);
+
+                                pool.execute(move || read_file(&checker, &path));
                             }
 
                             Err(error) => {
@@ -175,4 +220,6 @@ fn main() {
             }
         };
     }
+
+    pool.join();
 }
