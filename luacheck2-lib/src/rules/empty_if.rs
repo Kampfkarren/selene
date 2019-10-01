@@ -82,6 +82,10 @@ impl Rule for EmptyIfLint {
     }
 }
 
+fn block_is_empty(block: &ast::Block) -> bool {
+    block.last_stmts().is_none() && block.iter_stmts().next().is_none()
+}
+
 struct EmptyIfVisitor {
     comment_positions: Vec<u32>,
     positions: Vec<((u32, u32), EmptyIfKind)>,
@@ -89,7 +93,7 @@ struct EmptyIfVisitor {
 
 impl Visitor<'_> for EmptyIfVisitor {
     fn visit_if(&mut self, if_block: &ast::If<'_>) {
-        if if_block.block().iter_stmts().next().is_none() {
+        if block_is_empty(if_block.block()) {
             self.positions.push((
                 if_block
                     .range()
@@ -103,7 +107,7 @@ impl Visitor<'_> for EmptyIfVisitor {
             let mut else_ifs = else_ifs.iter().peekable();
 
             while let Some(else_if) = else_ifs.next() {
-                if else_if.block().iter_stmts().next().is_none() {
+                if block_is_empty(else_if.block()) {
                     let next_token_position = match else_ifs.peek() {
                         Some(next_else_if) => next_else_if.start_position().unwrap().bytes() as u32,
                         None => {
@@ -127,7 +131,7 @@ impl Visitor<'_> for EmptyIfVisitor {
         }
 
         if let Some(else_block) = if_block.else_block() {
-            if else_block.iter_stmts().next().is_none() {
+            if block_is_empty(else_block) {
                 self.positions.push((
                     (
                         if_block.else_token().start_position().unwrap().bytes() as u32,

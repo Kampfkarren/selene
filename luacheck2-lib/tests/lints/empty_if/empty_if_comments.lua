@@ -30,4 +30,7 @@ else
     print(3)
 end
 
+if true then
+    return
+end
 -- comment here shouldn't break anything
