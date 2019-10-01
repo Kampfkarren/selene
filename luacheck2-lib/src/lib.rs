@@ -1,4 +1,4 @@
-use std::{collections::HashMap, error::Error};
+use std::{collections::HashMap, error::Error, fmt};
 
 use full_moon::ast::Ast;
 use serde::{de::Deserializer, Deserialize};
@@ -7,7 +7,6 @@ pub mod rules;
 
 use rules::{Diagnostic, Rule};
 
-// TODO: Implement Display, Error
 #[derive(Debug)]
 pub struct CheckerError {
     pub name: &'static str,
@@ -20,15 +19,44 @@ pub enum CheckerErrorProblem {
     RuleNewError(Box<dyn Error>),
 }
 
-#[derive(Default, Deserialize)]
+impl fmt::Display for CheckerError {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        use CheckerErrorProblem::*;
+
+        write!(formatter, "[{}] ", self.name)?;
+
+        match &self.problem {
+            ConfigDeserializeError(error) => write!(
+                formatter,
+                "Configuration was incorrectly formatted: {}",
+                error
+            ),
+            RuleNewError(error) => write!(formatter, "{}", error),
+        }
+    }
+}
+
+impl Error for CheckerError {}
+
+#[derive(Deserialize)]
 #[serde(default)]
 pub struct CheckerConfig<V> {
     pub config: HashMap<String, V>,
     pub rules: HashMap<String, RuleVariation>,
 }
 
+// #[derive(Default)] cannot be used since it binds V to Default
+impl<V> Default for CheckerConfig<V> {
+    fn default() -> Self {
+        CheckerConfig {
+            config: HashMap::new(),
+            rules: HashMap::new(),
+        }
+    }
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, Deserialize)]
-#[serde(rename = "lowercase")]
+#[serde(rename_all = "kebab-case")]
 pub enum RuleVariation {
     Allow,
     Deny,

@@ -95,6 +95,10 @@ impl Diagnostic {
                 .collect(),
         }
     }
+
+    pub fn start_position(&self) -> u32 {
+        self.primary_label.position.0
+    }
 }
 
 pub struct Label {
