@@ -10,8 +10,8 @@ use rules::{Diagnostic, Rule};
 // TODO: Implement Display, Error
 #[derive(Debug)]
 pub struct CheckerError {
-    name: &'static str,
-    problem: CheckerErrorProblem,
+    pub name: &'static str,
+    pub problem: CheckerErrorProblem,
 }
 
 #[derive(Debug)]
