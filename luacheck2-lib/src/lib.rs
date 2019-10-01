@@ -1,7 +1,10 @@
 use std::{collections::HashMap, error::Error, fmt};
 
 use full_moon::ast::Ast;
-use serde::{de::{Deserializer, DeserializeOwned}, Deserialize};
+use serde::{
+    de::{DeserializeOwned, Deserializer},
+    Deserialize,
+};
 
 pub mod rules;
 

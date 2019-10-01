@@ -1,10 +1,10 @@
 use std::{env::current_dir, fs, path::Path};
 
-use codespan_reporting::diagnostic::Severity as CodespanSeverity;
 use clap::{App, Arg};
+use codespan_reporting::diagnostic::Severity as CodespanSeverity;
 use full_moon::ast::owned::Owned;
 use log::error;
-use luacheck2_lib::{*, rules::Severity};
+use luacheck2_lib::{rules::Severity, *};
 
 fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     let contents = match fs::read_to_string(filename) {
@@ -38,12 +38,13 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
 
     // TODO: Use severity from config/Rule::severity()
     for diagnostic in diagnostics.into_iter().map(|diagnostic| {
-        diagnostic
-            .diagnostic
-            .into_codespan_diagnostic(source_id, match diagnostic.severity {
+        diagnostic.diagnostic.into_codespan_diagnostic(
+            source_id,
+            match diagnostic.severity {
                 Severity::Error => CodespanSeverity::Error,
                 Severity::Warning => CodespanSeverity::Warning,
-            })
+            },
+        )
     }) {
         codespan_reporting::term::emit(
             &mut stdout,
