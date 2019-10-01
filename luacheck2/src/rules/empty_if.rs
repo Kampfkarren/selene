@@ -4,28 +4,62 @@ use std::convert::Infallible;
 use full_moon::{
     ast::{self, Ast},
     node::Node,
+    tokenizer::{Token, TokenReference, TokenKind},
     visitors::Visitor,
 };
+use serde::Deserialize;
 
-pub struct EmptyIfLint;
+#[derive(Clone, Copy, Deserialize)]
+#[serde(default)]
+pub struct EmptyIfLintConfig {
+    comments_count: bool,
+}
+
+impl Default for EmptyIfLintConfig {
+    fn default() -> Self {
+        Self {
+            comments_count: false,
+        }
+    }
+}
+
+pub struct EmptyIfLint {
+    config: EmptyIfLintConfig,
+}
 
 impl Rule for EmptyIfLint {
-    type Config = ();
+    type Config = EmptyIfLintConfig;
     type Error = Infallible;
 
-    fn new(_: ()) -> Result<Self, Self::Error> {
-        Ok(EmptyIfLint)
+    fn new(config: EmptyIfLintConfig) -> Result<Self, Self::Error> {
+        Ok(EmptyIfLint {
+            config,
+        })
     }
 
     fn pass(self, ast: &Ast<'static>) -> Vec<Diagnostic> {
         let mut visitor = EmptyIfVisitor {
+            comment_positions: Vec::new(),
             positions: Vec::new(),
         };
 
         visitor.visit_ast(&ast);
+
+        let comment_positions = visitor.comment_positions.clone();
+
         visitor
             .positions
             .into_iter()
+            .filter(|(position, _)| {
+                // OPTIMIZE: This is O(n^2), can we optimize this?
+                if self.config.comments_count {
+                    !comment_positions.iter().any(|comment_position| {
+                        position.0 <= *comment_position && position.1 >= *comment_position
+                    })
+                } else {
+                    true
+                }
+            })
             .map(|position| {
                 Diagnostic::new(
                     "empty_if",
@@ -51,6 +85,7 @@ impl Rule for EmptyIfLint {
 }
 
 struct EmptyIfVisitor {
+    comment_positions: Vec<u32>,
     positions: Vec<((u32, u32), EmptyIfKind)>,
 }
 
@@ -105,6 +140,16 @@ impl Visitor<'_> for EmptyIfVisitor {
             }
         }
     }
+
+    fn visit_token(&mut self, token: &TokenReference<'_>) {
+        match token.token_kind() {
+            TokenKind::MultiLineComment | TokenKind::SingleLineComment => {
+                self.comment_positions.push(Token::end_position(token).bytes() as u32);
+            },
+
+            _ => {}
+        }
+    }
 }
 
 enum EmptyIfKind {
@@ -119,6 +164,17 @@ mod tests {
 
     #[test]
     fn test_empty_if() {
-        test_lint(EmptyIfLint::new(()).unwrap(), "empty_if", "empty_if");
+        test_lint(EmptyIfLint::new(
+            EmptyIfLintConfig::default()
+        ).unwrap(), "empty_if", "empty_if");
+    }
+
+    #[test]
+    fn test_empty_if_comments() {
+        test_lint(EmptyIfLint::new(
+            EmptyIfLintConfig {
+                comments_count: true,
+            }
+        ).unwrap(), "empty_if", "empty_if_comments");
     }
 }

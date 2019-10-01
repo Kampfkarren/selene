@@ -4,7 +4,7 @@ use serde::de::{Deserialize, Deserializer};
 
 pub mod rules;
 
-use rules::{Rule, RuleConfig};
+use rules::Rule;
 
 // TODO: Implement Display, Error
 #[derive(Debug)]
@@ -41,21 +41,18 @@ macro_rules! use_rules {
                         $rule_name: <$rule_path>::new({
                             match config.remove(stringify!($rule_name)) {
                                 Some(entry_generic) => {
-                                    let mut entry = <$rule_path as Rule>::Config::deserialize(entry_generic).map_err(|error| {
+                                    <$rule_path as Rule>::Config::deserialize(entry_generic).map_err(|error| {
                                         CheckerError {
                                             name: stringify!($rule_name),
                                             problem: CheckerErrorProblem::ConfigDeserializeError(Box::new(error)),
                                         }
-                                    })?;
-
-                                    entry.merge_with(<$rule_path as Rule>::Config::default());
-                                    entry
+                                    })?
                                 }
 
                                 None => {
                                     <$rule_path as Rule>::Config::default()
                                 }
-                            };
+                            }
                         }).map_err(|error| {
                             CheckerError {
                                 name: stringify!($rule_name),

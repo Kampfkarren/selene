@@ -1,4 +1,4 @@
-use super::{Rule, RuleConfig};
+use super::Rule;
 use std::{
     fs,
     io::Write,
@@ -10,13 +10,14 @@ use codespan_reporting::{
 };
 
 use full_moon::ast::owned::Owned;
+use serde::de::DeserializeOwned;
 
 lazy_static::lazy_static! {
     static ref TEST_PROJECTS_ROOT: PathBuf =
         { Path::new(env!("CARGO_MANIFEST_DIR")).join("tests").join("lints") };
 }
 
-pub fn test_lint<C: RuleConfig, E: std::error::Error, R: Rule<Config = C, Error = E>>(
+pub fn test_lint<C: DeserializeOwned, E: std::error::Error, R: Rule<Config = C, Error = E>>(
     rule: R,
     lint_name: &'static str,
     test_name: &'static str,

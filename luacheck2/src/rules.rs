@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use codespan_reporting::diagnostic::{
     Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
 };
@@ -11,7 +9,7 @@ pub mod empty_if;
 mod test_util;
 
 pub trait Rule {
-    type Config: RuleConfig;
+    type Config: DeserializeOwned;
     type Error: std::error::Error;
 
     fn new(config: Self::Config) -> Result<Self, Self::Error>
@@ -125,24 +123,5 @@ impl Label {
             codespan::Span::new(self.position.0, self.position.1),
             self.message.as_ref().unwrap_or(&"".to_owned()).to_owned(),
         )
-    }
-}
-
-pub trait RuleConfig: DeserializeOwned + Default {
-    fn merge_with(&mut self, other: Self);
-}
-
-impl RuleConfig for () {
-    fn merge_with(&mut self, _: ()) {}
-}
-
-impl<K, V, S> RuleConfig for HashMap<K, V, S>
-where
-    K: DeserializeOwned + Eq + std::hash::Hash,
-    V: DeserializeOwned,
-    S: Default + std::hash::BuildHasher,
-{
-    fn merge_with(&mut self, other: Self) {
-        self.extend(other);
     }
 }
