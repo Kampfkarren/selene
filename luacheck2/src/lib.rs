@@ -1,7 +1,7 @@
 use std::{collections::HashMap, error::Error};
 
 use full_moon::ast::Ast;
-use serde::de::{Deserialize, Deserializer};
+use serde::{Deserialize, de::Deserializer};
 
 pub mod rules;
 
@@ -20,6 +20,21 @@ pub enum CheckerErrorProblem {
     RuleNewError(Box<dyn Error>),
 }
 
+#[derive(Default, Deserialize)]
+#[serde(default)]
+pub struct CheckerConfig<V> {
+    pub config: HashMap<String, V>,
+    pub rules: HashMap<String, RuleVariation>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename = "lowercase")]
+pub enum RuleVariation {
+    Allow,
+    Deny,
+    Warn,
+}
+
 macro_rules! use_rules {
     {
         $(
@@ -35,12 +50,12 @@ macro_rules! use_rules {
         impl Checker {
             // TODO: Be more strict about config? Make sure all keys exist
             pub fn from_config<V: 'static>(
-                mut config: HashMap<String, V>,
+                mut config: CheckerConfig<V>,
             ) -> Result<Self, CheckerError> where V: for<'de> Deserialize<'de> + for<'de> Deserializer<'de> {
                 Ok(Self {
                     $(
                         $rule_name: <$rule_path>::new({
-                            match config.remove(stringify!($rule_name)) {
+                            match config.config.remove(stringify!($rule_name)) {
                                 Some(entry_generic) => {
                                     <$rule_path as Rule>::Config::deserialize(entry_generic).map_err(|error| {
                                         CheckerError {
