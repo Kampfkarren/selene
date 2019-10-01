@@ -36,7 +36,6 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
 
     let mut stdout = termcolor::StandardStream::stderr(termcolor::ColorChoice::Auto);
 
-    // TODO: Use severity from config/Rule::severity()
     for diagnostic in diagnostics.into_iter().map(|diagnostic| {
         diagnostic.diagnostic.into_codespan_diagnostic(
             source_id,
