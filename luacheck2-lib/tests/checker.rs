@@ -1,7 +1,7 @@
 // FIXME: These tests rely on nothing but empty_if triggering on them
 use std::collections::HashMap;
 
-use luacheck2::*;
+use luacheck2_lib::*;
 
 use full_moon::parse;
 use serde_json::json;
