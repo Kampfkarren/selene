@@ -49,7 +49,7 @@ impl Rule for UnusedVariableLint {
         let mut diagnostics = Vec::new();
         let mut scopes: Vec<Vec<Variable>> = Vec::new();
 
-        for instruction in dbg!(visitor.instructions.into_sorted_vec()) {
+        for instruction in visitor.instructions.into_sorted_vec() {
             match instruction.instruction {
                 InstructionType::ScopeBegin => {
                     scopes.push(Vec::new());

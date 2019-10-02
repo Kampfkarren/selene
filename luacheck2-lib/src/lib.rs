@@ -154,4 +154,5 @@ pub struct CheckerDiagnostic {
 
 use_rules! {
     empty_if: rules::empty_if::EmptyIfLint,
+    unused_variable: rules::unused_variable::UnusedVariableLint,
 }
