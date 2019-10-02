@@ -1,0 +1,8 @@
+error[unused_variable]: foo is unused
+
+   ┌── edge_cases.lua:2:7 ───
+   │
+ 2 │ local foo = foo + 1
+   │       ^^^
+   │
+

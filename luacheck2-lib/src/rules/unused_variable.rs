@@ -237,6 +237,20 @@ impl UnusedVariableVisitor {
             instruction: InstructionType::MutateVariable(name.to_string()),
         });
     }
+
+    fn read_block<N: Node>(&mut self, node: N) {
+        if let Some((start, end)) = node.range() {
+            self.instructions.push(Instruction {
+                position: (start.bytes() as u32, 0),
+                instruction: InstructionType::ScopeBegin,
+            });
+
+            self.instructions.push(Instruction {
+                position: (end.bytes() as u32, 0),
+                instruction: InstructionType::ScopeEnd,
+            });
+        }
+    }
 }
 
 impl Visitor<'_> for UnusedVariableVisitor {
@@ -264,7 +278,12 @@ impl Visitor<'_> for UnusedVariableVisitor {
         }
     }
 
+    fn visit_do(&mut self, do_block: &ast::Do) {
+        self.read_block(do_block.block());
+    }
+
     fn visit_else_if(&mut self, else_if: &ast::ElseIf) {
+        self.read_block(else_if.block());
         self.read_expression(else_if.condition());
     }
 
@@ -284,6 +303,8 @@ impl Visitor<'_> for UnusedVariableVisitor {
                 }
             }
         }
+
+        self.read_block(body.block());
     }
 
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
@@ -315,10 +336,17 @@ impl Visitor<'_> for UnusedVariableVisitor {
         for expression in generic_for.expr_list().iter() {
             self.read_expression(expression);
         }
+
+        self.read_block(generic_for.block());
     }
 
     fn visit_if(&mut self, if_block: &ast::If) {
         self.read_expression(if_block.condition());
+        self.read_block(if_block.block());
+
+        if let Some(block) = if_block.else_block() {
+            self.read_block(block);
+        }
     }
 
     fn visit_local_assignment(&mut self, node: &ast::LocalAssignment) {
@@ -333,6 +361,7 @@ impl Visitor<'_> for UnusedVariableVisitor {
 
     fn visit_local_function(&mut self, local_function: &ast::LocalFunction) {
         self.declare_name(local_function.name());
+        self.read_block(local_function.func_body().block());
     }
 
     fn visit_numeric_for(&mut self, numeric_for: &ast::NumericFor) {
@@ -343,10 +372,16 @@ impl Visitor<'_> for UnusedVariableVisitor {
         if let Some(step) = numeric_for.step() {
             self.read_expression(step);
         }
+
+        self.read_block(numeric_for.block());
     }
 
     fn visit_repeat(&mut self, repeat: &ast::Repeat) {
         self.read_expression(repeat.until());
+
+        // Variables inside the read block are accessible in the until
+        // So we read the entire statement, not just repeat.block()
+        self.read_block(repeat);
     }
 
     fn visit_return(&mut self, return_stmt: &ast::Return) {
@@ -372,6 +407,7 @@ impl Visitor<'_> for UnusedVariableVisitor {
 
     fn visit_while(&mut self, while_loop: &ast::While) {
         self.read_expression(while_loop.condition());
+        self.read_block(while_loop.block());
     }
 }
 
@@ -423,6 +459,15 @@ mod tests {
             UnusedVariableLint::new(()).unwrap(),
             "unused_variable",
             "locals",
+        );
+    }
+
+    #[test]
+    fn test_edge_cases() {
+        test_lint(
+            UnusedVariableLint::new(()).unwrap(),
+            "unused_variable",
+            "edge_cases",
         );
     }
 }
