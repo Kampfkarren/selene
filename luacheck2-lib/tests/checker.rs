@@ -22,7 +22,7 @@ macro_rules! map {
 
 #[test]
 fn can_create() {
-    Checker::from_config::<serde_json::Value>(CheckerConfig::default()).unwrap();
+    Checker::<serde_json::Value>::from_config(CheckerConfig::default()).unwrap();
 }
 
 #[test]
@@ -47,7 +47,7 @@ fn errors_with_bad_config() {
 
 #[test]
 fn uses_rule_variation_allow() {
-    let checker = Checker::from_config::<serde_json::Value>(CheckerConfig {
+    let checker: Checker<serde_json::Value> = Checker::from_config(CheckerConfig {
         rules: map! {
             "empty_if".to_owned() => RuleVariation::Allow,
         },
