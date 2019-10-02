@@ -4,6 +4,7 @@ use codespan_reporting::diagnostic::{
 use serde::de::DeserializeOwned;
 
 pub mod empty_if;
+pub mod unused_variable;
 
 #[cfg(test)]
 mod test_util;

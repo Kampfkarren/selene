@@ -31,7 +31,7 @@ impl Rule for EmptyIfLint {
     type Config = EmptyIfLintConfig;
     type Error = Infallible;
 
-    fn new(config: EmptyIfLintConfig) -> Result<Self, Self::Error> {
+    fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(EmptyIfLint { config })
     }
 
