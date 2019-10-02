@@ -13,3 +13,9 @@ local function overridesIt()
 end
 
 overridesIt()
+
+-- Anonymous functions
+local a = 1
+print(function()
+    _G.foo = a
+end)

@@ -1,5 +1,5 @@
 use super::*;
-use std::{cmp::Ordering, collections::BinaryHeap, convert::Infallible};
+use std::{collections::BinaryHeap, convert::Infallible};
 
 use full_moon::{
     ast::{self, Ast},
@@ -268,7 +268,7 @@ impl Visitor<'_> for UnusedVariableVisitor {
         }
 
         for expression in assignment.expr_list() {
-            self.visit_expression(expression);
+            self.read_expression(expression);
         }
     }
 
@@ -411,33 +411,20 @@ impl Visitor<'_> for UnusedVariableVisitor {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 struct Instruction {
     position: (u32, u32),
     instruction: InstructionType,
 }
 
-// We don't use #[derive(PartialOrd, Ord)] because then InstructionType would dictate order
-impl PartialOrd for Instruction {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(&other))
-    }
-}
-
-impl Ord for Instruction {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.position.0.cmp(&other.position.0)
-    }
-}
-
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 enum InstructionType {
+    ScopeBegin,
+    ScopeEnd,
+
     DeclareVariable(String),
     MutateVariable(String),
     ReadVariable(String),
-
-    ScopeBegin,
-    ScopeEnd,
 }
 
 #[cfg(test)]
