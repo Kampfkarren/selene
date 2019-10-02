@@ -4,7 +4,7 @@ use std::{cmp::Ordering, collections::BinaryHeap, convert::Infallible};
 use full_moon::{
     ast::{self, Ast},
     node::Node,
-    tokenizer::{self, Token, TokenKind, TokenReference},
+    tokenizer::{self, Token, TokenReference},
     visitors::Visitor,
 };
 
@@ -23,19 +23,22 @@ impl Rule for UnusedVariableLint {
         let block = ast.nodes();
 
         instructions.push(Instruction {
-            position: 0,
+            position: (0, 0),
             instruction: InstructionType::ScopeBegin,
         });
 
         instructions.push(Instruction {
             position: match block.last_stmts() {
-                Some(last) => last.end_position().unwrap().bytes(),
-                None => block
-                    .iter_stmts()
-                    .last()
-                    .and_then(|stmt| stmt.end_position())
-                    .map(tokenizer::Position::bytes)
-                    .unwrap_or(0),
+                Some(last) => (last.end_position().unwrap().bytes() as u32, 0),
+                None => (
+                    block
+                        .iter_stmts()
+                        .last()
+                        .and_then(|stmt| stmt.end_position())
+                        .map(tokenizer::Position::bytes)
+                        .unwrap_or(0) as u32,
+                    0,
+                ),
             },
             instruction: InstructionType::ScopeEnd,
         });
@@ -43,10 +46,80 @@ impl Rule for UnusedVariableLint {
         let mut visitor = UnusedVariableVisitor { instructions };
         visitor.visit_ast(ast);
 
-        let instructions = visitor.instructions.into_sorted_vec();
+        let mut diagnostics = Vec::new();
+        let mut scopes: Vec<Vec<Variable>> = Vec::new();
 
-        println!("{:#?}", instructions);
-        unimplemented!();
+        for instruction in dbg!(visitor.instructions.into_sorted_vec()) {
+            match instruction.instruction {
+                InstructionType::ScopeBegin => {
+                    scopes.push(Vec::new());
+                }
+
+                InstructionType::ScopeEnd => {
+                    for variable in scopes.pop().unwrap() {
+                        match (variable.read, variable.mutated) {
+                            (Some(read), Some(mutated)) => {
+                                if mutated > read {
+                                    // We mutated it after the last time we read it
+                                    diagnostics.push(Diagnostic::new(
+                                        "unused_variable",
+                                        format!(
+                                            "assignment to {} is overriden before it can be read",
+                                            variable.name
+                                        ),
+                                        Label::new(mutated),
+                                    ));
+                                }
+                            }
+
+                            (None, Some(_)) => {
+                                diagnostics.push(Diagnostic::new(
+                                    "unused_variable",
+                                    format!("{} is mutated, but never used", variable.name),
+                                    Label::new(variable.position),
+                                ));
+                            }
+
+                            // Constant variable
+                            (Some(_), None) => {}
+
+                            (None, None) => {
+                                diagnostics.push(Diagnostic::new(
+                                    "unused_variable",
+                                    format!("{} is unused", variable.name),
+                                    Label::new(variable.position),
+                                ));
+                            }
+                        };
+                    }
+                }
+
+                InstructionType::DeclareVariable(name) => {
+                    scopes.last_mut().unwrap().push(Variable {
+                        position: instruction.position,
+                        name,
+                        mutated: None,
+                        read: None,
+                    });
+                }
+
+                InstructionType::MutateVariable(name) => {
+                    // TODO: Undefined variable
+                    if let Some(variable) = get_variable_from_scopes(&mut scopes, &name) {
+                        variable.mutated = Some(instruction.position);
+                    }
+                }
+
+                InstructionType::ReadVariable(name) => {
+                    // TODO: Undefined variable
+                    if let Some(variable) = get_variable_from_scopes(&mut scopes, &name) {
+                        variable.read = Some(instruction.position);
+                    }
+                }
+            }
+        }
+
+        diagnostics
     }
 
     fn severity(&self) -> Severity {
@@ -56,6 +129,35 @@ impl Rule for UnusedVariableLint {
     fn rule_type(&self) -> RuleType {
         RuleType::Style
     }
+}
+
+struct Variable {
+    name: String,
+    position: (u32, u32),
+    mutated: Option<(u32, u32)>,
+    read: Option<(u32, u32)>,
+}
+
+fn get_variable_from_scopes<'a>(
+    scopes: &'a mut Vec<Vec<Variable>>,
+    name: &str,
+) -> Option<&'a mut Variable> {
+    for scope in scopes.iter_mut().rev() {
+        for variable in scope.iter_mut() {
+            if variable.name == name {
+                return Some(variable);
+            }
+        }
+    }
+
+    None
+}
+
+fn range(token: &TokenReference) -> (u32, u32) {
+    (
+        Token::start_position(&*token).bytes() as u32,
+        Token::end_position(&*token).bytes() as u32,
+    )
 }
 
 struct UnusedVariableVisitor {
@@ -102,7 +204,7 @@ impl UnusedVariableVisitor {
 
     fn read_name(&mut self, name: &TokenReference) {
         self.instructions.push(Instruction {
-            position: Token::start_position(&*name).bytes(),
+            position: range(name),
             instruction: InstructionType::ReadVariable(name.to_string()),
         });
     }
@@ -114,7 +216,7 @@ impl UnusedVariableVisitor {
     }
 
     // TODO: Unused fields
-    fn read_suffix(&mut self, suffix: &ast::Suffix) {
+    fn read_suffix(&mut self, _suffix: &ast::Suffix) {
         // if let ast::Suffix::Index(index) = suffix {
         //     if let ast::Index::Dot { name, .. } = index {
         //         self.read_name(name);
@@ -124,14 +226,14 @@ impl UnusedVariableVisitor {
 
     fn declare_name(&mut self, name: &TokenReference) {
         self.instructions.push(Instruction {
-            position: Token::start_position(&*name).bytes(),
+            position: range(name),
             instruction: InstructionType::DeclareVariable(name.to_string()),
         });
     }
 
     fn mutate_name(&mut self, name: &TokenReference) {
         self.instructions.push(Instruction {
-            position: Token::start_position(&*name).bytes(),
+            position: range(name),
             instruction: InstructionType::MutateVariable(name.to_string()),
         });
     }
@@ -149,6 +251,10 @@ impl Visitor<'_> for UnusedVariableVisitor {
                     self.mutate_name(name);
                 }
             };
+        }
+
+        for expression in assignment.expr_list() {
+            self.visit_expression(expression);
         }
     }
 
@@ -271,7 +377,7 @@ impl Visitor<'_> for UnusedVariableVisitor {
 
 #[derive(Debug, PartialEq, Eq)]
 struct Instruction {
-    position: usize,
+    position: (u32, u32),
     instruction: InstructionType,
 }
 
@@ -284,7 +390,7 @@ impl PartialOrd for Instruction {
 
 impl Ord for Instruction {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.position.cmp(&other.position)
+        self.position.0.cmp(&other.position.0)
     }
 }
 
