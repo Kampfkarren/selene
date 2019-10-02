@@ -190,8 +190,15 @@ impl Visitor<'_> for UnusedVariableVisitor {
 
     fn visit_function_declaration(&mut self, declaration: &ast::FunctionDeclaration) {
         let name = declaration.name();
-        let name = name.names().iter().next().unwrap();
-        self.declare_name(name);
+
+        let mut names = name.names().iter();
+        let base = names.next().unwrap();
+
+        if names.next().is_some() {
+            self.mutate_name(base);
+        } else {
+            self.read_name(base);
+        }
     }
 
     fn visit_generic_for(&mut self, generic_for: &ast::GenericFor) {
@@ -294,6 +301,15 @@ enum InstructionType {
 #[cfg(test)]
 mod tests {
     use super::{super::test_util::test_lint, *};
+
+    #[test]
+    fn test_unused_blocks() {
+        test_lint(
+            UnusedVariableLint::new(()).unwrap(),
+            "unused_variable",
+            "blocks",
+        );
+    }
 
     #[test]
     fn test_unused_locals() {
