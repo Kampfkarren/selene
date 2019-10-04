@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use full_moon::{
     ast,
     node::Node,
@@ -59,6 +61,9 @@ struct Variable {
 struct ScopeVisitor {
     scope_manager: ScopeManager,
     scope_stack: Vec<Id<Scope>>,
+
+    // sigh
+    else_blocks: HashSet<Range>,
 }
 
 fn create_scope<N: Node>(node: N) -> Option<Scope> {
@@ -91,6 +96,7 @@ impl ScopeVisitor {
                 },
 
                 scope_stack: vec![id],
+                ..ScopeVisitor::default()
             };
 
             output.visit_ast(ast);
@@ -302,6 +308,19 @@ impl Visitor<'_> for ScopeVisitor {
         }
     }
 
+    fn visit_block(&mut self, block: &ast::Block) {
+        if self.else_blocks.contains(&range(block)) {
+            self.close_scope(); // close the if or last elseif's scope
+            self.open_scope(block);
+        }
+    }
+
+    fn visit_block_end(&mut self, block: &ast::Block) {
+        if self.else_blocks.contains(&range(block)) {
+            self.close_scope();
+        }
+    }
+
     fn visit_call(&mut self, call: &ast::Call) {
         if let ast::Call::MethodCall(method_call) = call {
             self.read_name(method_call.name());
@@ -317,6 +336,7 @@ impl Visitor<'_> for ScopeVisitor {
     }
 
     fn visit_else_if(&mut self, else_if: &ast::ElseIf) {
+        self.close_scope(); // close the if or other elseif blocks' scope
         self.read_expression(else_if.condition());
         self.open_scope(else_if);
     }
@@ -385,6 +405,10 @@ impl Visitor<'_> for ScopeVisitor {
     fn visit_if(&mut self, if_block: &ast::If) {
         self.read_expression(if_block.condition());
         self.open_scope(if_block.block());
+
+        if let Some(else_block) = if_block.else_block() {
+            self.else_blocks.insert(range(else_block));
+        }
     }
 
     fn visit_local_function(&mut self, local_function: &ast::LocalFunction) {
