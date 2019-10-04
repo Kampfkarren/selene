@@ -420,6 +420,11 @@ impl Visitor<'_> for ScopeVisitor {
 
     fn visit_local_function(&mut self, local_function: &ast::LocalFunction) {
         self.write_name(local_function.name(), Some(range(local_function.name())));
+        self.open_scope(local_function.func_body());
+    }
+
+    fn visit_local_function_end(&mut self, _: &ast::LocalFunction) {
+        self.close_scope();
     }
 
     fn visit_numeric_for(&mut self, numeric_for: &ast::NumericFor) {
@@ -444,6 +449,12 @@ impl Visitor<'_> for ScopeVisitor {
         if let Some(step) = numeric_for.step() {
             self.read_expression(step);
         }
+
+        self.open_scope(numeric_for.block());
+    }
+
+    fn visit_numeric_for_end(&mut self, _: &ast::NumericFor) {
+        self.close_scope();
     }
 
     fn visit_repeat(&mut self, repeat: &ast::Repeat) {
@@ -475,5 +486,10 @@ impl Visitor<'_> for ScopeVisitor {
 
     fn visit_while(&mut self, while_loop: &ast::While) {
         self.read_expression(while_loop.condition());
+        self.open_scope(while_loop.block());
+    }
+
+    fn visit_while_end(&mut self, _: &ast::While) {
+        self.close_scope();
     }
 }
