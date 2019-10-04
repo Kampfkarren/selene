@@ -1,0 +1,448 @@
+use full_moon::{
+    ast,
+    node::Node,
+    tokenizer::{TokenKind, TokenReference},
+    visitors::Visitor,
+};
+use id_arena::{Arena, Id};
+
+type Range = (usize, usize);
+
+#[derive(Default)]
+struct ScopeManager {
+    scopes: Arena<Scope>,
+    references: Arena<Reference>,
+    variables: Arena<Variable>,
+}
+
+impl ScopeManager {
+    fn variable_in_scope(&self, scope: Id<Scope>, variable_name: &str) -> Option<Id<Variable>> {
+        if let Some(scope) = self.scopes.get(scope) {
+            for variable_id in &scope.variables {
+                let variable = &self.variables[*variable_id];
+                if variable.name == variable_name {
+                    return Some(*variable_id);
+                }
+            }
+        }
+
+        None
+    }
+}
+
+#[derive(Default)]
+struct Scope {
+    block: Range,
+    references: Vec<Id<Reference>>,
+    variables: Vec<Id<Variable>>,
+}
+
+#[derive(Default)]
+struct Reference {
+    identifier: Range,
+    resolved: Option<Id<Variable>>,
+    // TODO: Does this matter even?
+    write_expr: Option<Range>,
+    read: bool,
+    write: bool,
+}
+
+#[derive(Default)]
+struct Variable {
+    definitions: Vec<Range>,
+    identifiers: Vec<Range>,
+    name: String,
+    references: Vec<Id<Reference>>,
+}
+
+#[derive(Default)]
+struct ScopeVisitor {
+    scope_manager: ScopeManager,
+    scope_stack: Vec<Id<Scope>>,
+}
+
+fn create_scope<N: Node>(node: N) -> Option<Scope> {
+    if let Some((start, end)) = node.range() {
+        Some(Scope {
+            block: (start.bytes(), end.bytes()),
+            references: Vec::new(),
+            variables: Vec::new(),
+        })
+    } else {
+        None
+    }
+}
+
+fn range<N: Node>(node: N) -> (usize, usize) {
+    let (start, end) = node.range().unwrap();
+    (start.bytes(), end.bytes())
+}
+
+impl ScopeVisitor {
+    fn from_ast(ast: &ast::Ast) -> Self {
+        if let Some(scope) = create_scope(ast.nodes()) {
+            let mut scopes = Arena::new();
+            let id = scopes.alloc(scope);
+
+            let mut output = ScopeVisitor {
+                scope_manager: ScopeManager {
+                    scopes,
+                    ..ScopeManager::default()
+                },
+
+                scope_stack: vec![id],
+            };
+
+            output.visit_ast(ast);
+            output
+        } else {
+            ScopeVisitor::default()
+        }
+    }
+
+    fn current_scope_id(&self) -> Id<Scope> {
+        *self.scope_stack.last().unwrap()
+    }
+
+    fn current_scope(&mut self) -> &mut Scope {
+        self.scope_manager
+            .scopes
+            .get_mut(self.current_scope_id())
+            .unwrap()
+    }
+
+    fn find_variable(&self, variable_name: &str) -> Option<(Id<Variable>, Id<Scope>)> {
+        for (scope_id, _) in self.scope_manager.scopes.iter().rev() {
+            if let Some(id) = self
+                .scope_manager
+                .variable_in_scope(scope_id, variable_name)
+            {
+                return Some((id, scope_id));
+            }
+        }
+
+        None
+    }
+
+    fn read_expression(&mut self, expression: &ast::Expression) {
+        match expression {
+            ast::Expression::Parentheses { expression, .. }
+            | ast::Expression::UnaryOperator { expression, .. } => {
+                self.read_expression(expression);
+            }
+
+            ast::Expression::Value { value, binop } => {
+                if let Some(binop) = binop {
+                    self.read_expression(binop.rhs());
+                }
+
+                match &**value {
+                    ast::Value::Function((name, _)) => {
+                        self.read_name(name);
+                    }
+
+                    ast::Value::FunctionCall(call) => self.read_prefix(call.prefix()),
+
+                    ast::Value::TableConstructor(table) => {
+                        for (field, _) in table.iter_fields() {
+                            match field {
+                                ast::Field::ExpressionKey { key, value, .. } => {
+                                    self.read_expression(key);
+                                    self.read_expression(value);
+                                }
+
+                                ast::Field::NameKey { key, value, .. } => {
+                                    self.read_name(key);
+                                    self.read_expression(value);
+                                }
+
+                                ast::Field::NoKey(expression) => self.read_expression(expression),
+                            }
+                        }
+                    }
+
+                    ast::Value::ParseExpression(expression) => self.read_expression(expression),
+
+                    ast::Value::Var(var) => match var {
+                        ast::Var::Expression(var_expr) => self.read_prefix(var_expr.prefix()),
+                        ast::Var::Name(name) => self.read_name(name),
+                    },
+
+                    _ => {}
+                }
+            }
+        }
+    }
+
+    fn read_prefix(&mut self, prefix: &ast::Prefix) {
+        match prefix {
+            ast::Prefix::Expression(expression) => self.read_expression(expression),
+            ast::Prefix::Name(name) => self.read_name(name),
+        }
+    }
+
+    fn read_name(&mut self, token: &TokenReference) {
+        if token.token_kind() == TokenKind::Identifier {
+            self.reference_variable(
+                &token.to_string(),
+                Reference {
+                    identifier: range(token),
+                    read: true,
+                    ..Reference::default()
+                },
+            );
+        }
+    }
+
+    fn write_name(&mut self, token: &TokenReference, write_expr: Option<Range>) {
+        if token.token_kind() == TokenKind::Identifier {
+            self.reference_variable(
+                &token.to_string(),
+                Reference {
+                    identifier: range(token),
+                    write: true,
+                    write_expr,
+                    ..Reference::default()
+                },
+            );
+        }
+    }
+
+    fn define_name(&mut self, token: &TokenReference, definition_range: Range) {
+        let name = token.to_string();
+
+        let id = if let Some(index) = self
+            .scope_manager
+            .variable_in_scope(self.current_scope_id(), &name)
+        {
+            index
+        } else {
+            let id = self.scope_manager.variables.alloc(Variable {
+                name: name.to_owned(),
+                ..Variable::default()
+            });
+
+            self.current_scope().variables.push(id);
+            id
+        };
+
+        let variable = &mut self.scope_manager.variables[id];
+
+        variable.definitions.push(definition_range);
+        variable.identifiers.push(range(token));
+    }
+
+    fn reference_variable(&mut self, name: &str, mut reference: Reference) {
+        let reference_id = if let Some((variable, _)) = self.find_variable(name) {
+            reference.resolved = Some(variable);
+
+            let reference_id = self.scope_manager.references.alloc(reference);
+
+            self.scope_manager
+                .variables
+                .get_mut(variable)
+                .unwrap()
+                .references
+                .push(reference_id);
+
+            reference_id
+        } else {
+            self.scope_manager.references.alloc(reference)
+        };
+
+        self.current_scope().references.push(reference_id);
+    }
+
+    fn open_scope<N: Node>(&mut self, node: N) {
+        let scope = create_scope(node).unwrap_or_else(Default::default);
+        let scope_id = self.scope_manager.scopes.alloc(scope);
+        self.scope_stack.push(scope_id);
+    }
+
+    fn close_scope(&mut self) {
+        self.scope_stack.pop();
+    }
+}
+
+impl Visitor<'_> for ScopeVisitor {
+    fn visit_assignment(&mut self, assignment: &ast::Assignment) {
+        let mut expressions = assignment.expr_list().iter();
+
+        for var in assignment.var_list() {
+            let expression = expressions.next();
+
+            let name = match var {
+                ast::Var::Expression(var_expr) => match var_expr.prefix() {
+                    ast::Prefix::Expression(expression) => {
+                        self.read_expression(expression);
+                        continue;
+                    }
+                    ast::Prefix::Name(name) => name,
+                },
+
+                ast::Var::Name(name) => name,
+            };
+
+            self.write_name(&name, expression.map(range));
+        }
+    }
+
+    fn visit_local_assignment(&mut self, local_assignment: &ast::LocalAssignment) {
+        let mut expressions = local_assignment.expr_list().iter();
+
+        for name_token in local_assignment.name_list() {
+            let name = name_token.to_string();
+            let expression = expressions.next();
+
+            self.define_name(name_token, range(local_assignment));
+
+            if let Some(expression) = expression {
+                self.write_name(&name_token, Some(range(expression)));
+            }
+        }
+    }
+
+    fn visit_call(&mut self, call: &ast::Call) {
+        if let ast::Call::MethodCall(method_call) = call {
+            self.read_name(method_call.name());
+        }
+    }
+
+    fn visit_do(&mut self, do_block: &ast::Do) {
+        self.open_scope(do_block);
+    }
+
+    fn visit_do_end(&mut self, _: &ast::Do) {
+        self.close_scope();
+    }
+
+    fn visit_else_if(&mut self, else_if: &ast::ElseIf) {
+        self.read_expression(else_if.condition());
+        self.open_scope(else_if);
+    }
+
+    fn visit_else_if_end(&mut self, _: &ast::ElseIf) {
+        self.close_scope();
+    }
+
+    fn visit_function_args(&mut self, args: &ast::FunctionArgs) {
+        if let ast::FunctionArgs::Parentheses { arguments, .. } = args {
+            for argument in arguments {
+                self.read_expression(argument);
+            }
+        }
+    }
+
+    fn visit_function_body(&mut self, body: &ast::FunctionBody) {
+        self.open_scope(body);
+
+        for parameter in body.iter_parameters() {
+            match parameter {
+                ast::Parameter::Ellipse(token) | ast::Parameter::Name(token) => {
+                    self.define_name(token, range(token));
+                }
+            }
+        }
+    }
+
+    fn visit_function_body_end(&mut self, _: &ast::FunctionBody) {
+        self.close_scope();
+    }
+
+    fn visit_function_call(&mut self, call: &ast::FunctionCall) {
+        self.read_prefix(call.prefix());
+    }
+
+    fn visit_function_declaration(&mut self, declaration: &ast::FunctionDeclaration) {
+        let name = declaration.name();
+
+        let mut names = name.names().iter();
+        let base = names.next().unwrap();
+
+        if names.next().is_some() {
+            self.write_name(base, Some(range(declaration.name())));
+        } else {
+            self.read_name(base);
+        }
+    }
+
+    fn visit_generic_for(&mut self, generic_for: &ast::GenericFor) {
+        self.open_scope(generic_for.block());
+
+        for name in generic_for.names() {
+            self.write_name(name, Some(range(name)));
+        }
+
+        for expression in generic_for.expr_list().iter() {
+            self.read_expression(expression);
+        }
+    }
+
+    fn visit_generic_for_end(&mut self, _: &ast::GenericFor) {
+        self.close_scope();
+    }
+
+    fn visit_if(&mut self, if_block: &ast::If) {
+        self.read_expression(if_block.condition());
+        self.open_scope(if_block.block());
+    }
+
+    fn visit_local_function(&mut self, local_function: &ast::LocalFunction) {
+        self.write_name(local_function.name(), Some(range(local_function.name())));
+    }
+
+    fn visit_numeric_for(&mut self, numeric_for: &ast::NumericFor) {
+        self.write_name(
+            numeric_for.index_variable(),
+            Some((
+                numeric_for
+                    .index_variable()
+                    .start_position()
+                    .unwrap()
+                    .bytes(),
+                numeric_for
+                    .start_end_comma()
+                    .start_position()
+                    .unwrap()
+                    .bytes(),
+            )),
+        );
+        self.read_expression(numeric_for.start());
+        self.read_expression(numeric_for.end());
+
+        if let Some(step) = numeric_for.step() {
+            self.read_expression(step);
+        }
+    }
+
+    fn visit_repeat(&mut self, repeat: &ast::Repeat) {
+        // Variables inside the read block are accessible in the until
+        // So we read the entire statement, not just repeat.block()
+        self.read_expression(repeat.until());
+    }
+
+    fn visit_return(&mut self, return_stmt: &ast::Return) {
+        for value in return_stmt.returns() {
+            self.read_expression(value);
+        }
+    }
+
+    fn visit_table_constructor(&mut self, table: &ast::TableConstructor) {
+        for (field, _) in table.iter_fields() {
+            match field {
+                ast::Field::ExpressionKey { key, value, .. } => {
+                    self.read_expression(key);
+                    self.read_expression(value);
+                }
+
+                ast::Field::NameKey { value, .. } | ast::Field::NoKey(value) => {
+                    self.read_expression(value);
+                }
+            }
+        }
+    }
+
+    fn visit_while(&mut self, while_loop: &ast::While) {
+        self.read_expression(while_loop.condition());
+    }
+}

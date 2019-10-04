@@ -6,6 +6,7 @@ use serde::{
     Deserialize,
 };
 
+mod ast_util;
 pub mod rules;
 
 use rules::{Diagnostic, Rule, Severity};
