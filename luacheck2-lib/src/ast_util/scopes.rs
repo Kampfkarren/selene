@@ -411,6 +411,13 @@ impl Visitor<'_> for ScopeVisitor {
         }
     }
 
+    fn visit_if_end(&mut self, if_block: &ast::If) {
+        // elseif and else clean themselves up
+        if if_block.else_if().is_none() && if_block.else_block().is_none() {
+            self.close_scope();
+        }
+    }
+
     fn visit_local_function(&mut self, local_function: &ast::LocalFunction) {
         self.write_name(local_function.name(), Some(range(local_function.name())));
     }
