@@ -297,7 +297,6 @@ impl Visitor<'_> for ScopeVisitor {
         let mut expressions = local_assignment.expr_list().iter();
 
         for name_token in local_assignment.name_list() {
-            let name = name_token.to_string();
             let expression = expressions.next();
 
             self.define_name(name_token, range(local_assignment));
