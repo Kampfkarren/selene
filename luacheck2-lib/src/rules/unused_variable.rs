@@ -2,12 +2,7 @@ use super::*;
 use crate::ast_util::scopes;
 use std::convert::Infallible;
 
-use full_moon::{
-    ast::{self, Ast},
-    node::Node,
-    tokenizer::{self, Token, TokenReference},
-    visitors::Visitor,
-};
+use full_moon::ast::Ast;
 
 pub struct UnusedVariableLint;
 
@@ -92,6 +87,15 @@ mod tests {
             UnusedVariableLint::new(()).unwrap(),
             "unused_variable",
             "if",
+        );
+    }
+
+    #[test]
+    fn test_objects() {
+        test_lint(
+            UnusedVariableLint::new(()).unwrap(),
+            "unused_variable",
+            "objects",
         );
     }
 

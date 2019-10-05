@@ -286,7 +286,13 @@ impl Visitor<'_> for ScopeVisitor {
                         self.read_expression(expression);
                         continue;
                     }
-                    ast::Prefix::Name(name) => name,
+                    ast::Prefix::Name(name) => {
+                        if var_expr.iter_suffixes().next().is_some() {
+                            self.read_name(name);
+                        }
+
+                        name
+                    }
                 },
 
                 ast::Var::Name(name) => name,
