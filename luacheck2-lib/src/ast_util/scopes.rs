@@ -160,21 +160,7 @@ impl ScopeVisitor {
                     }
 
                     ast::Value::TableConstructor(table) => {
-                        for (field, _) in table.iter_fields() {
-                            match field {
-                                ast::Field::ExpressionKey { key, value, .. } => {
-                                    self.read_expression(key);
-                                    self.read_expression(value);
-                                }
-
-                                ast::Field::NameKey { key, value, .. } => {
-                                    self.read_name(key);
-                                    self.read_expression(value);
-                                }
-
-                                ast::Field::NoKey(expression) => self.read_expression(expression),
-                            }
-                        }
+                        self.read_table_constructor(table);
                     }
 
                     ast::Value::ParseExpression(expression) => self.read_expression(expression),
@@ -235,6 +221,26 @@ impl ScopeVisitor {
                     ..Reference::default()
                 },
             );
+        }
+    }
+
+    fn read_table_constructor(&mut self, table: &ast::TableConstructor) {
+        for (field, _) in table.iter_fields() {
+            match field {
+                ast::Field::ExpressionKey { key, value, .. } => {
+                    self.read_expression(key);
+                    self.read_expression(value);
+                }
+
+                ast::Field::NameKey { key, value, .. } => {
+                    self.read_name(key);
+                    self.read_expression(value);
+                }
+
+                ast::Field::NoKey(value) => {
+                    self.read_expression(value);
+                }
+            }
         }
     }
 
@@ -367,6 +373,29 @@ impl Visitor<'_> for ScopeVisitor {
     }
 
     fn visit_call(&mut self, call: &ast::Call) {
+        let arguments = match call {
+            ast::Call::AnonymousCall(args) => args,
+
+            ast::Call::MethodCall(method_call) => {
+                self.read_name(method_call.name());
+                method_call.args()
+            }
+        };
+
+        match arguments {
+            ast::FunctionArgs::Parentheses { arguments, .. } => {
+                for argument in arguments {
+                    self.read_expression(&argument);
+                }
+            }
+
+            ast::FunctionArgs::TableConstructor(table_constructor) => {
+                self.read_table_constructor(&table_constructor);
+            }
+
+            _ => {}
+        }
+
         if let ast::Call::MethodCall(method_call) = call {
             self.read_name(method_call.name());
         }
@@ -524,21 +553,6 @@ impl Visitor<'_> for ScopeVisitor {
     fn visit_return(&mut self, return_stmt: &ast::Return) {
         for value in return_stmt.returns() {
             self.read_expression(value);
-        }
-    }
-
-    fn visit_table_constructor(&mut self, table: &ast::TableConstructor) {
-        for (field, _) in table.iter_fields() {
-            match field {
-                ast::Field::ExpressionKey { key, value, .. } => {
-                    self.read_expression(key);
-                    self.read_expression(value);
-                }
-
-                ast::Field::NameKey { value, .. } | ast::Field::NoKey(value) => {
-                    self.read_expression(value);
-                }
-            }
         }
     }
 

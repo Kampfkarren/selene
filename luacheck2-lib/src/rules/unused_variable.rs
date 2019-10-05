@@ -105,6 +105,15 @@ mod tests {
     }
 
     #[test]
+    fn test_generic_for_shadowing() {
+        test_lint(
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
+            "unused_variable",
+            "generic_for_shadowing",
+        );
+    }
+
+    #[test]
     fn test_if() {
         test_lint(
             UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
