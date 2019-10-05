@@ -10,14 +10,19 @@ use id_arena::{Arena, Id};
 
 type Range = (usize, usize);
 
-#[derive(Default)]
-struct ScopeManager {
+#[derive(Debug, Default)]
+pub struct ScopeManager {
     scopes: Arena<Scope>,
     references: Arena<Reference>,
-    variables: Arena<Variable>,
+    pub variables: Arena<Variable>,
 }
 
 impl ScopeManager {
+    pub fn new(ast: &ast::Ast) -> Self {
+        let scope_visitor = ScopeVisitor::from_ast(ast);
+        scope_visitor.scope_manager
+    }
+
     fn variable_in_scope(&self, scope: Id<Scope>, variable_name: &str) -> Option<Id<Variable>> {
         if let Some(scope) = self.scopes.get(scope) {
             for variable_id in &scope.variables {
@@ -32,14 +37,14 @@ impl ScopeManager {
     }
 }
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 struct Scope {
     block: Range,
     references: Vec<Id<Reference>>,
     variables: Vec<Id<Variable>>,
 }
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 struct Reference {
     identifier: Range,
     resolved: Option<Id<Variable>>,
@@ -49,8 +54,8 @@ struct Reference {
     write: bool,
 }
 
-#[derive(Default)]
-struct Variable {
+#[derive(Debug, Default)]
+pub struct Variable {
     definitions: Vec<Range>,
     identifiers: Vec<Range>,
     name: String,
@@ -389,7 +394,8 @@ impl Visitor<'_> for ScopeVisitor {
         self.open_scope(generic_for.block());
 
         for name in generic_for.names() {
-            self.write_name(name, Some(range(name)));
+            self.define_name(name, range(name));
+            self.write_name(name, None);
         }
 
         for expression in generic_for.expr_list().iter() {
@@ -418,7 +424,7 @@ impl Visitor<'_> for ScopeVisitor {
     }
 
     fn visit_local_function(&mut self, local_function: &ast::LocalFunction) {
-        self.write_name(local_function.name(), Some(range(local_function.name())));
+        self.define_name(local_function.name(), range(local_function.name()));
         self.open_scope(local_function.func_body());
     }
 
@@ -427,9 +433,7 @@ impl Visitor<'_> for ScopeVisitor {
     }
 
     fn visit_numeric_for(&mut self, numeric_for: &ast::NumericFor) {
-        self.write_name(
-            numeric_for.index_variable(),
-            Some((
+        let variable_range = (
                 numeric_for
                     .index_variable()
                     .start_position()
@@ -440,8 +444,18 @@ impl Visitor<'_> for ScopeVisitor {
                     .start_position()
                     .unwrap()
                     .bytes(),
-            )),
+            );
+
+        self.define_name(
+            numeric_for.index_variable(),
+            variable_range,
         );
+
+        self.write_name(
+            numeric_for.index_variable(),
+            Some(range(numeric_for.start())),
+        );
+
         self.read_expression(numeric_for.start());
         self.read_expression(numeric_for.end());
 
