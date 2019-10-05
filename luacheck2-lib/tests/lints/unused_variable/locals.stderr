@@ -1,4 +1,4 @@
-error[unused_variable]: localA is unused
+error[unused_variable]: localA is defined, but never used
 
    ┌── locals.lua:2:7 ───
    │
@@ -6,7 +6,7 @@ error[unused_variable]: localA is unused
    │       ^^^^^^
    │
 
-error[unused_variable]: localB is unused
+error[unused_variable]: localB is defined, but never used
 
    ┌── locals.lua:2:15 ───
    │
@@ -14,7 +14,7 @@ error[unused_variable]: localB is unused
    │               ^^^^^^
    │
 
-error[unused_variable]: localD is mutated, but never used
+error[unused_variable]: localD is assigned a value, but never used
 
    ┌── locals.lua:9:7 ───
    │
@@ -22,15 +22,7 @@ error[unused_variable]: localD is mutated, but never used
    │       ^^^^^^
    │
 
-error[unused_variable]: assignment to localF is overriden before it can be read
-
-    ┌── locals.lua:22:1 ───
-    │
- 22 │ localF = 2
-    │ ^^^^^^
-    │
-
-error[unused_variable]: localI is unused
+error[unused_variable]: localI is assigned a value, but never used
 
     ┌── locals.lua:30:7 ───
     │

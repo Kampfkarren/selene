@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 use codespan_reporting::diagnostic::{
     Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
 };
@@ -109,7 +111,18 @@ pub struct Label {
 }
 
 impl Label {
-    pub fn new(position: (u32, u32)) -> Label {
+    pub fn new<P: TryInto<u32>>(position: (P, P)) -> Label {
+        let position = (
+            position
+                .0
+                .try_into()
+                .unwrap_or_else(|_| panic!("TryInto failed for Label::new position")),
+            position
+                .1
+                .try_into()
+                .unwrap_or_else(|_| panic!("TryInto failed for Label::new position")),
+        );
+
         Label {
             position,
             message: None,

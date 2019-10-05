@@ -12,8 +12,8 @@ type Range = (usize, usize);
 
 #[derive(Debug, Default)]
 pub struct ScopeManager {
-    scopes: Arena<Scope>,
-    references: Arena<Reference>,
+    pub scopes: Arena<Scope>,
+    pub references: Arena<Reference>,
     pub variables: Arena<Variable>,
 }
 
@@ -38,28 +38,28 @@ impl ScopeManager {
 }
 
 #[derive(Debug, Default)]
-struct Scope {
+pub struct Scope {
     block: Range,
     references: Vec<Id<Reference>>,
     variables: Vec<Id<Variable>>,
 }
 
 #[derive(Debug, Default)]
-struct Reference {
-    identifier: Range,
-    resolved: Option<Id<Variable>>,
+pub struct Reference {
+    pub identifier: Range,
+    pub resolved: Option<Id<Variable>>,
     // TODO: Does this matter even?
-    write_expr: Option<Range>,
-    read: bool,
-    write: bool,
+    pub write_expr: Option<Range>,
+    pub read: bool,
+    pub write: bool,
 }
 
 #[derive(Debug, Default)]
 pub struct Variable {
-    definitions: Vec<Range>,
-    identifiers: Vec<Range>,
-    name: String,
-    references: Vec<Id<Reference>>,
+    pub definitions: Vec<Range>,
+    pub identifiers: Vec<Range>,
+    pub name: String,
+    pub references: Vec<Id<Reference>>,
 }
 
 #[derive(Default)]
@@ -123,7 +123,7 @@ impl ScopeVisitor {
     }
 
     fn find_variable(&self, variable_name: &str) -> Option<(Id<Variable>, Id<Scope>)> {
-        for (scope_id, _) in self.scope_manager.scopes.iter().rev() {
+        for scope_id in self.scope_stack.iter().rev().copied() {
             if let Some(id) = self
                 .scope_manager
                 .variable_in_scope(scope_id, variable_name)
@@ -221,21 +221,12 @@ impl ScopeVisitor {
 
     fn define_name(&mut self, token: &TokenReference, definition_range: Range) {
         let name = token.to_string();
+        let id = self.scope_manager.variables.alloc(Variable {
+            name: name.to_owned(),
+            ..Variable::default()
+        });
 
-        let id = if let Some(index) = self
-            .scope_manager
-            .variable_in_scope(self.current_scope_id(), &name)
-        {
-            index
-        } else {
-            let id = self.scope_manager.variables.alloc(Variable {
-                name: name.to_owned(),
-                ..Variable::default()
-            });
-
-            self.current_scope().variables.push(id);
-            id
-        };
+        self.current_scope().variables.push(id);
 
         let variable = &mut self.scope_manager.variables[id];
 
@@ -281,6 +272,9 @@ impl Visitor<'_> for ScopeVisitor {
 
         for var in assignment.var_list() {
             let expression = expressions.next();
+            if let Some(expression) = expression {
+                self.read_expression(expression);
+            }
 
             let name = match var {
                 ast::Var::Expression(var_expr) => match var_expr.prefix() {
@@ -304,6 +298,10 @@ impl Visitor<'_> for ScopeVisitor {
         for name_token in local_assignment.name_list() {
             let expression = expressions.next();
 
+            if let Some(expression) = expression {
+                self.read_expression(expression);
+            }
+
             self.define_name(name_token, range(local_assignment));
 
             if let Some(expression) = expression {
@@ -313,14 +311,14 @@ impl Visitor<'_> for ScopeVisitor {
     }
 
     fn visit_block(&mut self, block: &ast::Block) {
-        if self.else_blocks.contains(&range(block)) {
+        if block.range().is_some() && self.else_blocks.contains(&range(block)) {
             self.close_scope(); // close the if or last elseif's scope
             self.open_scope(block);
         }
     }
 
     fn visit_block_end(&mut self, block: &ast::Block) {
-        if self.else_blocks.contains(&range(block)) {
+        if block.range().is_some() && self.else_blocks.contains(&range(block)) {
             self.close_scope();
         }
     }
@@ -434,22 +432,19 @@ impl Visitor<'_> for ScopeVisitor {
 
     fn visit_numeric_for(&mut self, numeric_for: &ast::NumericFor) {
         let variable_range = (
-                numeric_for
-                    .index_variable()
-                    .start_position()
-                    .unwrap()
-                    .bytes(),
-                numeric_for
-                    .start_end_comma()
-                    .start_position()
-                    .unwrap()
-                    .bytes(),
-            );
-
-        self.define_name(
-            numeric_for.index_variable(),
-            variable_range,
+            numeric_for
+                .index_variable()
+                .start_position()
+                .unwrap()
+                .bytes(),
+            numeric_for
+                .start_end_comma()
+                .start_position()
+                .unwrap()
+                .bytes(),
         );
+
+        self.define_name(numeric_for.index_variable(), variable_range);
 
         self.write_name(
             numeric_for.index_variable(),
@@ -473,7 +468,12 @@ impl Visitor<'_> for ScopeVisitor {
     fn visit_repeat(&mut self, repeat: &ast::Repeat) {
         // Variables inside the read block are accessible in the until
         // So we read the entire statement, not just repeat.block()
+        self.open_scope(repeat.block());
+    }
+
+    fn visit_repeat_end(&mut self, repeat: &ast::Repeat) {
         self.read_expression(repeat.until());
+        self.close_scope();
     }
 
     fn visit_return(&mut self, return_stmt: &ast::Return) {
