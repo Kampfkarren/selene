@@ -152,7 +152,12 @@ impl ScopeVisitor {
                         self.read_name(name);
                     }
 
-                    ast::Value::FunctionCall(call) => self.read_prefix(call.prefix()),
+                    ast::Value::FunctionCall(call) => {
+                        self.read_prefix(call.prefix());
+                        for suffix in call.iter_suffixes() {
+                            self.read_suffix(suffix);
+                        }
+                    }
 
                     ast::Value::TableConstructor(table) => {
                         for (field, _) in table.iter_fields() {
@@ -185,7 +190,13 @@ impl ScopeVisitor {
                     }
 
                     ast::Value::Var(var) => match var {
-                        ast::Var::Expression(var_expr) => self.read_prefix(var_expr.prefix()),
+                        ast::Var::Expression(var_expr) => {
+                            self.read_prefix(var_expr.prefix());
+                            for suffix in var_expr.iter_suffixes() {
+                                self.read_suffix(suffix);
+                            }
+                        }
+
                         ast::Var::Name(name) => self.read_name(name),
                     },
 
@@ -199,6 +210,13 @@ impl ScopeVisitor {
         match prefix {
             ast::Prefix::Expression(expression) => self.read_expression(expression),
             ast::Prefix::Name(name) => self.read_name(name),
+        }
+    }
+
+    fn read_suffix(&mut self, suffix: &ast::Suffix) {
+        match suffix {
+            ast::Suffix::Call(call) => self.visit_call(call),
+            ast::Suffix::Index(index) => self.visit_index(index),
         }
     }
 
@@ -410,15 +428,15 @@ impl Visitor<'_> for ScopeVisitor {
     }
 
     fn visit_generic_for(&mut self, generic_for: &ast::GenericFor) {
+        for expression in generic_for.expr_list().iter() {
+            self.read_expression(expression);
+        }
+
         self.open_scope(generic_for.block());
 
         for name in generic_for.names() {
             self.define_name(name, range(name));
             self.write_name(name, None);
-        }
-
-        for expression in generic_for.expr_list().iter() {
-            self.read_expression(expression);
         }
     }
 
