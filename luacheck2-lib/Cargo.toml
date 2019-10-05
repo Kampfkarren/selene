@@ -11,8 +11,8 @@ codespan-reporting = "0.4"
 full_moon = "0.4.0-rc.7"
 id-arena = "2.2"
 lazy_static = "1.4"
-serde = "1.0"
 regex = "1"
+serde = "1.0"
 
 [dev-dependencies]
 serde_json = "1.0"
