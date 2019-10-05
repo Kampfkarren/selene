@@ -405,6 +405,12 @@ impl Visitor<'_> for ScopeVisitor {
         self.close_scope();
     }
 
+    fn visit_index(&mut self, index: &ast::Index) {
+        if let ast::Index::Brackets { expression, .. } = index {
+            self.read_expression(expression);
+        }
+    }
+
     fn visit_if(&mut self, if_block: &ast::If) {
         self.read_expression(if_block.condition());
         self.open_scope(if_block.block());
