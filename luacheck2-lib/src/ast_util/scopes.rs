@@ -263,6 +263,10 @@ impl ScopeVisitor {
 
     fn close_scope(&mut self) {
         self.scope_stack.pop();
+        assert!(
+            !self.scope_stack.is_empty(),
+            "close_scope popped off the last of the stack"
+        );
     }
 }
 
@@ -311,14 +315,14 @@ impl Visitor<'_> for ScopeVisitor {
     }
 
     fn visit_block(&mut self, block: &ast::Block) {
-        if block.range().is_some() && self.else_blocks.contains(&range(block)) {
-            self.close_scope(); // close the if or last elseif's scope
+        if block.range().is_some() && self.else_blocks.get(&range(block)).is_some() {
+            self.close_scope(); // close the if or elseif's block
             self.open_scope(block);
         }
     }
 
     fn visit_block_end(&mut self, block: &ast::Block) {
-        if block.range().is_some() && self.else_blocks.contains(&range(block)) {
+        if block.range().is_some() && self.else_blocks.get(&range(block)).is_some() {
             self.close_scope();
         }
     }
@@ -341,10 +345,6 @@ impl Visitor<'_> for ScopeVisitor {
         self.close_scope(); // close the if or other elseif blocks' scope
         self.read_expression(else_if.condition());
         self.open_scope(else_if);
-    }
-
-    fn visit_else_if_end(&mut self, _: &ast::ElseIf) {
-        self.close_scope();
     }
 
     fn visit_function_args(&mut self, args: &ast::FunctionArgs) {

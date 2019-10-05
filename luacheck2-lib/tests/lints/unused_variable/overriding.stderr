@@ -1,0 +1,8 @@
+error[unused_variable]: foo is defined, but never used
+
+   ┌── overriding.lua:4:16 ───
+   │
+ 4 │ local function foo()
+   │                ^^^
+   │
+

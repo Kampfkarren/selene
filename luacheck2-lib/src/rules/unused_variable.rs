@@ -85,4 +85,22 @@ mod tests {
             "edge_cases",
         );
     }
+
+    #[test]
+    fn test_if() {
+        test_lint(
+            UnusedVariableLint::new(()).unwrap(),
+            "unused_variable",
+            "if",
+        );
+    }
+
+    #[test]
+    fn test_overriding() {
+        test_lint(
+            UnusedVariableLint::new(()).unwrap(),
+            "unused_variable",
+            "overriding",
+        );
+    }
 }
