@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use full_moon::{
     ast,
     node::Node,
-    tokenizer::{TokenKind, TokenReference},
+    tokenizer::{Symbol, TokenKind, TokenReference, TokenType},
     visitors::Visitor,
 };
 use id_arena::{Arena, Id};
@@ -174,6 +174,16 @@ impl ScopeVisitor {
 
                     ast::Value::ParseExpression(expression) => self.read_expression(expression),
 
+                    ast::Value::Symbol(symbol) => {
+                        if *symbol.token_type()
+                            == (TokenType::Symbol {
+                                symbol: Symbol::Ellipse,
+                            })
+                        {
+                            self.read_name(symbol);
+                        }
+                    }
+
                     ast::Value::Var(var) => match var {
                         ast::Var::Expression(var_expr) => self.read_prefix(var_expr.prefix()),
                         ast::Var::Name(name) => self.read_name(name),
@@ -193,7 +203,12 @@ impl ScopeVisitor {
     }
 
     fn read_name(&mut self, token: &TokenReference) {
-        if token.token_kind() == TokenKind::Identifier {
+        if token.token_kind() == TokenKind::Identifier
+            || *token.token_type()
+                == (TokenType::Symbol {
+                    symbol: Symbol::Ellipse,
+                })
+        {
             self.reference_variable(
                 &token.to_string(),
                 Reference {

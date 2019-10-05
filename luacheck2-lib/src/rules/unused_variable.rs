@@ -107,4 +107,13 @@ mod tests {
             "overriding",
         );
     }
+
+    #[test]
+    fn test_varargs() {
+        test_lint(
+            UnusedVariableLint::new(()).unwrap(),
+            "unused_variable",
+            "varargs",
+        );
+    }
 }
