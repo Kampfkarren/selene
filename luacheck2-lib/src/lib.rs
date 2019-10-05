@@ -6,6 +6,7 @@ use serde::{
     Deserialize,
 };
 
+mod ast_util;
 pub mod rules;
 
 use rules::{Diagnostic, Rule, Severity};
@@ -154,4 +155,5 @@ pub struct CheckerDiagnostic {
 
 use_rules! {
     empty_if: rules::empty_if::EmptyIfLint,
+    unused_variable: rules::unused_variable::UnusedVariableLint,
 }

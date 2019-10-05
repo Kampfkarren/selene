@@ -1,0 +1,8 @@
+error[unused_variable]: bar is defined, but never used
+
+   ┌── varargs.lua:5:16 ───
+   │
+ 5 │ local function bar(...)
+   │                ^^^
+   │
+

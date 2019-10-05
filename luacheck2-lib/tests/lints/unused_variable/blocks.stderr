@@ -1,0 +1,32 @@
+error[unused_variable]: unusedFunction is defined, but never used
+
+   ┌── blocks.lua:2:16 ───
+   │
+ 2 │ local function unusedFunction()
+   │                ^^^^^^^^^^^^^^
+   │
+
+error[unused_variable]: unusedVariableA is assigned a value, but never used
+
+   ┌── blocks.lua:3:11 ───
+   │
+ 3 │     local unusedVariableA = 1
+   │           ^^^^^^^^^^^^^^^
+   │
+
+error[unused_variable]: unusedVariableB is assigned a value, but never used
+
+   ┌── blocks.lua:4:11 ───
+   │
+ 4 │     local unusedVariableB = 1
+   │           ^^^^^^^^^^^^^^^
+   │
+
+error[unused_variable]: overidden is assigned a value, but never used
+
+   ┌── blocks.lua:8:7 ───
+   │
+ 8 │ local overidden = true
+   │       ^^^^^^^^^
+   │
+

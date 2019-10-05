@@ -1,4 +1,10 @@
-use std::{env::current_dir, fmt, fs, io::{self, Write}, path::Path, sync::Arc};
+use std::{
+    env::current_dir,
+    fmt, fs,
+    io::{self, Write},
+    path::Path,
+    sync::Arc,
+};
 
 use clap::{App, Arg};
 use codespan_reporting::diagnostic::Severity as CodespanSeverity;
