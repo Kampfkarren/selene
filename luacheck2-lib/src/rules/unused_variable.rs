@@ -1,24 +1,47 @@
 use super::*;
 use crate::ast_util::scopes;
-use std::convert::Infallible;
 
 use full_moon::ast::Ast;
+use regex::Regex;
+use serde::Deserialize;
 
-pub struct UnusedVariableLint;
+#[derive(Clone, Deserialize)]
+#[serde(default)]
+pub struct UnusedVariableConfig {
+    ignore_pattern: String,
+}
+
+impl Default for UnusedVariableConfig {
+    fn default() -> Self {
+        Self {
+            ignore_pattern: "^_".to_owned(),
+        }
+    }
+}
+
+pub struct UnusedVariableLint {
+    ignore_pattern: Regex,
+}
 
 impl Rule for UnusedVariableLint {
-    type Config = ();
-    type Error = Infallible;
+    type Config = UnusedVariableConfig;
+    type Error = regex::Error;
 
-    fn new(_: Self::Config) -> Result<Self, Self::Error> {
-        Ok(UnusedVariableLint)
+    fn new(config: Self::Config) -> Result<Self, Self::Error> {
+        Ok(Self {
+            ignore_pattern: Regex::new(&config.ignore_pattern)?,
+        })
     }
 
     fn pass(&self, ast: &Ast) -> Vec<Diagnostic> {
         let scope_manager = scopes::ScopeManager::new(ast);
         let mut diagnostics = Vec::new();
 
-        for (_, variable) in &scope_manager.variables {
+        for (_, variable) in scope_manager
+            .variables
+            .iter()
+            .filter(|(_, variable)| !self.ignore_pattern.is_match(&variable.name))
+        {
             let mut references = variable
                 .references
                 .iter()
@@ -55,18 +78,18 @@ mod tests {
     use super::{super::test_util::test_lint, *};
 
     #[test]
-    fn test_unused_blocks() {
+    fn test_blocks() {
         test_lint(
-            UnusedVariableLint::new(()).unwrap(),
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "blocks",
         );
     }
 
     #[test]
-    fn test_unused_locals() {
+    fn test_locals() {
         test_lint(
-            UnusedVariableLint::new(()).unwrap(),
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "locals",
         );
@@ -75,7 +98,7 @@ mod tests {
     #[test]
     fn test_edge_cases() {
         test_lint(
-            UnusedVariableLint::new(()).unwrap(),
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "edge_cases",
         );
@@ -84,16 +107,25 @@ mod tests {
     #[test]
     fn test_if() {
         test_lint(
-            UnusedVariableLint::new(()).unwrap(),
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "if",
         );
     }
 
     #[test]
+    fn test_ignore() {
+        test_lint(
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
+            "unused_variable",
+            "ignore",
+        );
+    }
+
+    #[test]
     fn test_objects() {
         test_lint(
-            UnusedVariableLint::new(()).unwrap(),
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "objects",
         );
@@ -102,7 +134,7 @@ mod tests {
     #[test]
     fn test_overriding() {
         test_lint(
-            UnusedVariableLint::new(()).unwrap(),
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "overriding",
         );
@@ -111,9 +143,17 @@ mod tests {
     #[test]
     fn test_varargs() {
         test_lint(
-            UnusedVariableLint::new(()).unwrap(),
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "varargs",
         );
+    }
+
+    #[test]
+    fn test_invalid_regex() {
+        assert!(UnusedVariableLint::new(UnusedVariableConfig {
+            ignore_pattern: "(".to_owned(),
+        })
+        .is_err());
     }
 }
