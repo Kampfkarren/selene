@@ -150,6 +150,15 @@ mod tests {
     }
 
     #[test]
+    fn test_shadowing() {
+        test_lint(
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
+            "unused_variable",
+            "shadowing",
+        );
+    }
+
+    #[test]
     fn test_varargs() {
         test_lint(
             UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
