@@ -360,15 +360,27 @@ impl Visitor<'_> for ScopeVisitor {
     }
 
     fn visit_block(&mut self, block: &ast::Block) {
-        if block.range().is_some() && self.else_blocks.get(&range(block)).is_some() {
-            self.close_scope(); // close the if or elseif's block
-            self.open_scope(block);
+        if let Some((start, end)) = block.range() {
+            if self
+                .else_blocks
+                .get(&(start.bytes(), end.bytes()))
+                .is_some()
+            {
+                self.close_scope(); // close the if or elseif's block
+                self.open_scope(block);
+            }
         }
     }
 
     fn visit_block_end(&mut self, block: &ast::Block) {
-        if block.range().is_some() && self.else_blocks.get(&range(block)).is_some() {
-            self.close_scope();
+        if let Some((start, end)) = block.range() {
+            if self
+                .else_blocks
+                .get(&(start.bytes(), end.bytes()))
+                .is_some()
+            {
+                self.close_scope();
+            }
         }
     }
 
