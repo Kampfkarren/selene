@@ -43,7 +43,7 @@ pub fn test_lint<C: DeserializeOwned, E: std::error::Error, R: Rule<Config = C, 
     let mut files = codespan::Files::new();
     let source_id = files.add(format!("{}.lua", test_name), lua_source);
 
-    diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.position);
+    diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.range);
 
     let mut output = termcolor::NoColor::new(Vec::new());
 

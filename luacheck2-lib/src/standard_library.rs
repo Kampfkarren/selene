@@ -12,7 +12,7 @@ pub struct StandardLibrary {
 }
 
 impl StandardLibrary {
-    pub fn find_global(&self, names: Vec<String>) -> Option<&Field> {
+    pub fn find_global(&self, names: &[String]) -> Option<&Field> {
         assert!(!names.is_empty());
         let mut current = &self.globals;
 
@@ -59,6 +59,7 @@ impl<'de> Deserialize<'de> for Field {
         }
 
         if let Some(args) = field_raw.args {
+            // TODO: Don't allow vararg in the middle
             return Ok(Field::Function(args));
         }
 
@@ -79,17 +80,39 @@ struct FieldSerde {
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
 pub struct Argument {
     #[serde(default)]
-    required: Required,
+    pub required: Required,
     #[serde(rename = "type")]
-    argument_type: ArgumentType,
+    pub argument_type: ArgumentType,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "lowercase")]
+// TODO: Nilable types
 pub enum ArgumentType {
+    Bool,
+    // TODO: Optionally specify parameters,
+    Function,
+    Nil,
     Number,
+    String,
+    // TODO: Types for tables
+    Table,
     #[serde(rename = "...")]
     Vararg,
+}
+
+impl fmt::Display for ArgumentType {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            ArgumentType::Bool => write!(formatter, "bool"),
+            ArgumentType::Function => write!(formatter, "function"),
+            ArgumentType::Nil => write!(formatter, "nil"),
+            ArgumentType::Number => write!(formatter, "number"),
+            ArgumentType::String => write!(formatter, "string"),
+            ArgumentType::Table => write!(formatter, "table"),
+            ArgumentType::Vararg => write!(formatter, "..."),
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
