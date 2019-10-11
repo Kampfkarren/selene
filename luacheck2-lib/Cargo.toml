@@ -8,7 +8,7 @@ edition = "2018"
 [dependencies]
 codespan = "0.4"
 codespan-reporting = "0.4"
-full_moon = "0.4.0-rc.8"
+full_moon = "0.4.0-rc.9"
 id-arena = "2.2"
 lazy_static = "1.4"
 regex = "1"
