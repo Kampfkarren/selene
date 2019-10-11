@@ -53,7 +53,23 @@ type = "number"
 required = true
 type = "number"
 
+[[math.frexp.args]]
+required = true
+type = "number"
+
+[[math.ldexp.args]]
+required = true
+type = "number"
+
+[[math.ldexp.args]]
+required = true
+type = "number"
+
 [[math.log.args]]
+required = true
+type = "number"
+
+[[math.log10.args]]
 required = true
 type = "number"
 
@@ -77,6 +93,14 @@ type = "..."
 required = true
 type = "number"
 
+[[math.pow.args]]
+required = true
+type = "number"
+
+[[math.pow.args]]
+required = true
+type = "number"
+
 [[math.rad.args]]
 required = true
 type = "number"
@@ -95,10 +119,18 @@ type = "number"
 required = true
 type = "number"
 
+[[math.sinh.args]]
+required = true
+type = "number"
+
 [[math.sqrt.args]]
 required = true
 type = "number"
 
 [[math.tan.args]]
+required = true
+type = "number"
+
+[[math.tanh.args]]
 required = true
 type = "number"
