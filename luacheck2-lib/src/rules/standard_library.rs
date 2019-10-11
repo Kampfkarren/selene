@@ -208,8 +208,12 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                         }
                     }
 
-                    let mut expected_args = arguments.len();
-                    let mut last_is_vararg = false;
+                    let mut expected_args = arguments.iter().filter(|arg| {
+                        arg.required != Required::NotRequired
+                    }).count();
+
+                    let mut vararg = false;
+                    let mut max_args = arguments.len();
 
                     if let Some(last) = arguments.last() {
                         if last.argument_type == ArgumentType::Vararg {
@@ -228,16 +232,16 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                                         Vec::new(),
                                     ));
                                 }
+
+                                expected_args -= 1;
+                                max_args -= 1;
                             }
 
-                            expected_args -= 1;
-                            last_is_vararg = true;
+                            vararg = true;
                         }
                     }
 
-                    if argument_types.len() != expected_args
-                        && (!last_is_vararg || argument_types.len() < expected_args)
-                    {
+                    if argument_types.len() < expected_args || (!vararg && argument_types.len() > max_args) {
                         self.diagnostics.push(Diagnostic::new(
                             "standard_library_types",
                             format!(
@@ -263,11 +267,8 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                                 self.diagnostics.push(Diagnostic::new(
                                     "standard_library_types",
                                     format!(
-                                        // TODO: This message isn't great
-                                        "standard library function `{}` requires {} parameters, {} passed",
+                                        "use of standard_library function `{}` is incorrect",
                                         name_path.join("."),
-                                        expected_args,
-                                        argument_types.len(),
                                     ),
                                     Label::new_with_message(
                                         (range.0.bytes() as u32, range.1.bytes() as u32),

@@ -1,40 +1,40 @@
-error[standard_library_types]: standard library function `math.sin` requires 1 parameters, 1 passed
+error[standard_library_types]: use of standard_library function `math.sin` is incorrect
 
-   ┌── bad_call_signatures.lua:7:10 ───
+   ┌── bad_call_signatures.lua:9:10 ───
    │
- 7 │ math.sin("i'd like the sine of three, please")
+ 9 │ math.sin("i'd like the sine of three, please")
    │          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `number`, received `string`
    │
 
 error[standard_library_types]: standard library function `math.floor` requires 1 parameters, 2 passed
 
-   ┌── bad_call_signatures.lua:8:11 ───
-   │
- 8 │ math.floor(3.5, "remember to make sure it's 3 :)")
-   │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │
+    ┌── bad_call_signatures.lua:10:11 ───
+    │
+ 10 │ math.floor(3.5, "remember to make sure it's 3 :)")
+    │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    │
 
-error[standard_library_types]: standard library function `math.sin` requires 1 parameters, 1 passed
+error[standard_library_types]: use of standard_library function `math.sin` is incorrect
 
-   ┌── bad_call_signatures.lua:9:10 ───
-   │
- 9 │ math.sin "pi"
-   │          ^^^^ expected `number`, received `string`
-   │
+    ┌── bad_call_signatures.lua:11:10 ───
+    │
+ 11 │ math.sin "pi"
+    │          ^^^^ expected `number`, received `string`
+    │
 
 error[standard_library_types]: standard library function `math.sin` requires 1 parameters, 2 passed
 
-    ┌── bad_call_signatures.lua:13:9 ───
+    ┌── bad_call_signatures.lua:15:9 ───
     │
- 13 │ math.sin(variable, variable)
+ 15 │ math.sin(variable, variable)
     │         ^^^^^^^^^^^^^^^^^^^^
     │
 
 error[standard_library_types]: standard library function `math.max` requires use of the vararg
 
-    ┌── bad_call_signatures.lua:15:9 ───
+    ┌── bad_call_signatures.lua:17:9 ───
     │
- 15 │ math.max(2)
+ 17 │ math.max(2)
     │         ^^^
     │
     = use of max only makes sense with more than 1 parameter
