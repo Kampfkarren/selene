@@ -5,10 +5,32 @@ use serde::{
     Deserialize,
 };
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize)]
 pub struct StandardLibrary {
     #[serde(flatten)]
     globals: HashMap<String, Field>,
+}
+
+impl StandardLibrary {
+    pub fn find_global(&self, names: Vec<String>) -> Option<&Field> {
+        assert!(!names.is_empty());
+        let mut current = &self.globals;
+
+        // Traverse through `foo.bar` in `foo.bar.baz`
+        for name in names.iter().take(names.len() - 1) {
+            if let Some(child) = current.get(name) {
+                if let Field::Table(children) = child {
+                    current = children;
+                } else {
+                    return None;
+                }
+            } else {
+                return None;
+            }
+        }
+
+        current.get(names.last().unwrap())
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

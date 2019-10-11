@@ -33,7 +33,7 @@ impl Rule for UnusedVariableLint {
         })
     }
 
-    fn pass(&self, ast: &Ast) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, _: &Context) -> Vec<Diagnostic> {
         let scope_manager = scopes::ScopeManager::new(ast);
         let mut diagnostics = Vec::new();
 

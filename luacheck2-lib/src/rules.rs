@@ -1,3 +1,4 @@
+use crate::standard_library::StandardLibrary;
 use std::convert::TryInto;
 
 use codespan_reporting::diagnostic::{
@@ -6,6 +7,7 @@ use codespan_reporting::diagnostic::{
 use serde::de::DeserializeOwned;
 
 pub mod empty_if;
+pub mod standard_library;
 pub mod unused_variable;
 
 #[cfg(test)]
@@ -18,7 +20,7 @@ pub trait Rule {
     fn new(config: Self::Config) -> Result<Self, Self::Error>
     where
         Self: Sized;
-    fn pass(&self, ast: &full_moon::ast::Ast<'static>) -> Vec<Diagnostic>;
+    fn pass(&self, ast: &full_moon::ast::Ast<'static>, context: &Context) -> Vec<Diagnostic>;
 
     fn severity(&self) -> Severity;
     fn rule_type(&self) -> RuleType;
@@ -143,4 +145,9 @@ impl Label {
             self.message.as_ref().unwrap_or(&"".to_owned()).to_owned(),
         )
     }
+}
+
+#[derive(Clone, Debug)]
+pub struct Context {
+    pub standard_library: StandardLibrary,
 }

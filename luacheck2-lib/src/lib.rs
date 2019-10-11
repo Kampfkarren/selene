@@ -10,7 +10,8 @@ mod ast_util;
 pub mod rules;
 pub mod standard_library;
 
-use rules::{Diagnostic, Rule, Severity};
+use rules::{Context, Diagnostic, Rule, Severity};
+use standard_library::StandardLibrary;
 
 #[derive(Debug)]
 pub struct CheckerError {
@@ -76,6 +77,7 @@ macro_rules! use_rules {
     } => {
         pub struct Checker<V: 'static + DeserializeOwned> {
             config: CheckerConfig<V>,
+            context: Context,
 
             $(
                 $rule_name: Option<$rule_path>,
@@ -84,8 +86,9 @@ macro_rules! use_rules {
 
         impl<V: 'static + DeserializeOwned> Checker<V> {
             // TODO: Be more strict about config? Make sure all keys exist
-            pub fn from_config(
+            pub fn new(
                 mut config: CheckerConfig<V>,
+                standard_library: StandardLibrary,
             ) -> Result<Self, CheckerError> where V: for<'de> Deserializer<'de> {
                 Ok(Self {
                     $(
@@ -121,6 +124,9 @@ macro_rules! use_rules {
                         },
                     )+
                     config,
+                    context: Context {
+                        standard_library,
+                    },
                 })
             }
 
@@ -129,7 +135,7 @@ macro_rules! use_rules {
 
                 $(
                     if let Some(rule) = &self.$rule_name {
-                        diagnostics.extend(&mut rule.pass(ast).into_iter().map(|diagnostic| {
+                        diagnostics.extend(&mut rule.pass(ast, &self.context).into_iter().map(|diagnostic| {
                             CheckerDiagnostic {
                                 diagnostic,
                                 severity: match self.config.rules.get(stringify!($rule_name)) {

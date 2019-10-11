@@ -1,4 +1,4 @@
-use super::Rule;
+use super::{super::StandardLibrary, Context, Rule};
 use std::{
     fs,
     io::Write,
@@ -30,7 +30,15 @@ pub fn test_lint<C: DeserializeOwned, E: std::error::Error, R: Rule<Config = C, 
     let ast = full_moon::parse(&lua_source)
         .expect("Cannot parse lua file")
         .owned();
-    let mut diagnostics = rule.pass(&ast);
+    let mut diagnostics = rule.pass(
+        &ast,
+        &Context {
+            standard_library: toml::from_str::<StandardLibrary>(include_str!(
+                "../../../luacheck2/standards/lua51.toml"
+            ))
+            .unwrap(),
+        },
+    );
 
     let mut files = codespan::Files::new();
     let source_id = files.add(format!("{}.lua", test_name), lua_source);
