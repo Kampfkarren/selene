@@ -12,6 +12,31 @@ pub struct StandardLibrary {
 }
 
 impl StandardLibrary {
+    pub fn from_name(name: &str) -> Option<StandardLibrary> {
+        macro_rules! names {
+            {$($name:expr => $path:expr,)+} => {
+                match name {
+                    $(
+                        $name => Some(toml::from_str::<StandardLibrary>(
+                            include_str!($path)
+                        ).unwrap_or_else(|_| {
+                            panic!(
+                                "default standard library '{}' failed deserialization",
+                                name
+                            )
+                        })),
+                    )+
+
+                    _ => None
+                }
+            };
+        }
+
+        names! {
+            "lua51" => "../default_std/lua51.toml",
+        }
+    }
+
     pub fn find_global(&self, names: &[String]) -> Option<&Field> {
         assert!(!names.is_empty());
         let mut current = &self.globals;
@@ -161,7 +186,6 @@ mod tests {
 
     #[test]
     fn valid_serde() {
-        toml::from_str::<StandardLibrary>(include_str!("../../luacheck2/standards/lua51.toml"))
-            .expect("lua51.toml did not deserialize as StandardLibrary");
+        StandardLibrary::from_name("lua51").expect("lua51.toml wasn't found");
     }
 }

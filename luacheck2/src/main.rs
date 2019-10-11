@@ -9,7 +9,7 @@ use std::{
 use clap::{App, Arg};
 use codespan_reporting::diagnostic::Severity as CodespanSeverity;
 use full_moon::ast::owned::Owned;
-use luacheck2_lib::{rules::Severity, *};
+use luacheck2_lib::{rules::Severity, standard_library::StandardLibrary, *};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
 
@@ -153,7 +153,14 @@ fn main() {
         },
     };
 
-    let checker = Arc::new(match Checker::from_config(config) {
+    let standard_library = match StandardLibrary::from_name(&config.std) {
+        Some(std) => std,
+        None => {
+            unimplemented!("non-default std");
+        }
+    };
+
+    let checker = Arc::new(match Checker::new(config, standard_library) {
         Ok(checker) => checker,
         Err(error) => {
             error!("{}", error);

@@ -49,6 +49,7 @@ impl Error for CheckerError {}
 pub struct CheckerConfig<V> {
     pub config: HashMap<String, V>,
     pub rules: HashMap<String, RuleVariation>,
+    pub std: String,
 }
 
 // #[derive(Default)] cannot be used since it binds V to Default
@@ -57,6 +58,7 @@ impl<V> Default for CheckerConfig<V> {
         CheckerConfig {
             config: HashMap::new(),
             rules: HashMap::new(),
+            std: "lua51".to_owned(),
         }
     }
 }
@@ -162,5 +164,6 @@ pub struct CheckerDiagnostic {
 
 use_rules! {
     empty_if: rules::empty_if::EmptyIfLint,
+    standard_library_types: rules::standard_library::StandardLibraryLint,
     unused_variable: rules::unused_variable::UnusedVariableLint,
 }

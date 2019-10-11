@@ -33,10 +33,7 @@ pub fn test_lint<C: DeserializeOwned, E: std::error::Error, R: Rule<Config = C, 
     let mut diagnostics = rule.pass(
         &ast,
         &Context {
-            standard_library: toml::from_str::<StandardLibrary>(include_str!(
-                "../../../luacheck2/standards/lua51.toml"
-            ))
-            .unwrap(),
+            standard_library: StandardLibrary::from_name("lua51").unwrap(),
         },
     );
 
