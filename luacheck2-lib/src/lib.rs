@@ -8,6 +8,7 @@ use serde::{
 
 mod ast_util;
 pub mod rules;
+pub mod standard_library;
 
 use rules::{Diagnostic, Rule, Severity};
 

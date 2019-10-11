@@ -1,0 +1,104 @@
+# globals
+[[print.args]]
+type = "..."
+
+# math
+[math.huge]
+property = true
+
+[math.pi]
+property = true
+
+[[math.abs.args]]
+required = true
+type = "number"
+
+[[math.acos.args]]
+required = true
+type = "number"
+
+[[math.asin.args]]
+required = true
+type = "number"
+
+[[math.atan.args]]
+required = true
+type = "number"
+
+[[math.ceil.args]]
+required = true
+type = "number"
+
+[[math.cos.args]]
+required = true
+type = "number"
+
+[[math.deg.args]]
+required = true
+type = "number"
+
+[[math.exp.args]]
+required = true
+type = "number"
+
+[[math.floor.args]]
+required = true
+type = "number"
+
+[[math.fmod.args]]
+required = true
+type = "number"
+
+[[math.fmod.args]]
+required = true
+type = "number"
+
+[[math.log.args]]
+required = true
+type = "number"
+
+[[math.max.args]]
+required = true
+type = "number"
+
+[[math.max.args]]
+required = "use of max only makes sense with more than 1 parameter"
+type = "..."
+
+[[math.min.args]]
+required = true
+type = "number"
+
+[[math.min.args]]
+required = "use of min only makes sense with more than 1 parameter"
+type = "..."
+
+[[math.modf.args]]
+required = true
+type = "number"
+
+[[math.rad.args]]
+required = true
+type = "number"
+
+[[math.random.args]]
+type = "number"
+
+[[math.random.args]]
+type = "number"
+
+[[math.randomseed.args]]
+required = true
+type = "number"
+
+[[math.sin.args]]
+required = true
+type = "number"
+
+[[math.sqrt.args]]
+required = true
+type = "number"
+
+[[math.tan.args]]
+required = true
+type = "number"
