@@ -1,0 +1,16 @@
+error[unused_variable]: foo is assigned a value, but never used
+
+   ┌── edge_cases.lua:2:7 ───
+   │
+ 2 │ local foo = foo + 1
+   │       ^^^
+   │
+
+error[unused_variable]: bar is assigned a value, but never used
+
+   ┌── edge_cases.lua:3:7 ───
+   │
+ 3 │ local bar = bar
+   │       ^^^
+   │
+
