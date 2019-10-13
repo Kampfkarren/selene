@@ -1,4 +1,5 @@
 use super::{super::standard_library::*, *};
+use crate::ast_util::scopes::ScopeManager;
 use std::convert::Infallible;
 
 use full_moon::{
@@ -21,6 +22,7 @@ impl Rule for StandardLibraryLint {
     fn pass(&self, ast: &Ast, context: &Context) -> Vec<Diagnostic> {
         let mut visitor = StandardLibraryVisitor {
             diagnostics: Vec::new(),
+            scope_manager: ScopeManager::new(ast),
             standard_library: &context.standard_library,
         };
 
@@ -103,7 +105,9 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                 ast::Value::FunctionCall(_) => None,
                 ast::Value::Number(_) => Some(ArgumentType::Number.into()),
                 ast::Value::ParseExpression(expression) => get_argument_type(expression),
-                ast::Value::String(token) => Some(PassedArgumentType::from_string(token.to_string())),
+                ast::Value::String(token) => {
+                    Some(PassedArgumentType::from_string(token.to_string()))
+                }
                 ast::Value::Symbol(symbol) => match *symbol.token_type() {
                     TokenType::Symbol { symbol } => match symbol {
                         Symbol::False => Some(ArgumentType::Bool.into()),
@@ -156,8 +160,9 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
 }
 
 pub struct StandardLibraryVisitor<'std> {
-    standard_library: &'std StandardLibrary,
     diagnostics: Vec<Diagnostic>,
+    scope_manager: ScopeManager,
+    standard_library: &'std StandardLibrary,
 }
 
 // TODO: Test shadowing
@@ -170,6 +175,12 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
             Some(name_path) => name_path,
             None => return,
         };
+
+        if let Some(reference) = self.scope_manager.reference_at_byte(call.start_position().unwrap().bytes()) {
+            if reference.resolved.is_some() {
+                return;
+            }
+        }
 
         let field = match self.standard_library.find_global(&name_path) {
             Some(field) => field,
@@ -292,7 +303,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                 }
             }
 
-            _ => unreachable!(),
+            _ => unimplemented!(),
         };
     }
 }
@@ -386,6 +397,15 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "constants",
+        );
+    }
+
+    #[test]
+    fn test_shadowing() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "shadowing",
         );
     }
 }

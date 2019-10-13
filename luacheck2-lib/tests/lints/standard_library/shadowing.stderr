@@ -1,0 +1,8 @@
+error[standard_library_types]: standard library function `table.insert` requires 2 parameters, 0 passed
+
+    ┌── shadowing.lua:11:13 ───
+    │
+ 11 │ table.insert()
+    │             ^^
+    │
+

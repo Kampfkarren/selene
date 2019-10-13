@@ -23,6 +23,16 @@ impl ScopeManager {
         scope_visitor.scope_manager
     }
 
+    pub fn reference_at_byte(&self, byte: usize) -> Option<&Reference> {
+        for (_, reference) in &self.references {
+            if byte >= reference.identifier.0 && byte <= reference.identifier.1 {
+                return Some(reference)
+            }
+        }
+
+        None
+    }
+
     fn variable_in_scope(&self, scope: Id<Scope>, variable_name: &str) -> Option<Id<Variable>> {
         if let Some(scope) = self.scopes.get(scope) {
             for variable_id in scope.variables.iter().rev() {

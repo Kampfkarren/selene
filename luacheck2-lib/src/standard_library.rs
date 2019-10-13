@@ -154,7 +154,9 @@ impl<'de> Visitor<'de> for ArgumentTypeVisitor {
         if let Some(display) = map.remove("display") {
             Ok(ArgumentType::Display(display))
         } else {
-            Err(de::Error::custom("map value must have a `display` property"))
+            Err(de::Error::custom(
+                "map value must have a `display` property",
+            ))
         }
     }
 
