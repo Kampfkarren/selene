@@ -93,7 +93,7 @@ impl<'de> Deserialize<'de> for Field {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 struct FieldSerde {
     #[serde(default)]
     property: bool,
@@ -117,13 +117,15 @@ pub enum ArgumentType {
     Any,
     Bool,
     Constant(Vec<String>),
-    // TODO: Optionally specify parameters,
+    Display(String),
+    // TODO: Optionally specify parameters
     Function,
     Nil,
     Number,
     String,
     // TODO: Types for tables
     Table,
+    // TODO: Support repeating types (like for string.char)
     Vararg,
 }
 
@@ -140,6 +142,20 @@ impl<'de> Visitor<'de> for ArgumentTypeVisitor {
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         formatter.write_str("an argument type or an array of constant strings")
+    }
+
+    fn visit_map<A: de::MapAccess<'de>>(self, mut access: A) -> Result<Self::Value, A::Error> {
+        let mut map: HashMap<String, String> = HashMap::new();
+
+        while let Some((key, value)) = access.next_entry()? {
+            map.insert(key, value);
+        }
+
+        if let Some(display) = map.remove("display") {
+            Ok(ArgumentType::Display(display))
+        } else {
+            Err(de::Error::custom("map value must have a `display` property"))
+        }
     }
 
     fn visit_seq<A: de::SeqAccess<'de>>(self, mut seq: A) -> Result<Self::Value, A::Error> {
@@ -182,6 +198,7 @@ impl fmt::Display for ArgumentType {
                     .collect::<Vec<_>>()
                     .join(", ")
             ),
+            ArgumentType::Display(display) => write!(formatter, "{}", display),
             ArgumentType::Function => write!(formatter, "function"),
             ArgumentType::Nil => write!(formatter, "nil"),
             ArgumentType::Number => write!(formatter, "number"),
