@@ -263,7 +263,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                         }
 
                         if let Some(passed_type) = passed_type {
-                            if passed_type != &expected.argument_type {
+                            if expected.argument_type != ArgumentType::Any && passed_type != &expected.argument_type {
                                 self.diagnostics.push(Diagnostic::new(
                                     "standard_library_types",
                                     format!(

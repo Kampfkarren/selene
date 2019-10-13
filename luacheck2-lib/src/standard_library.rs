@@ -114,6 +114,7 @@ pub struct Argument {
 #[serde(rename_all = "lowercase")]
 // TODO: Nilable types
 pub enum ArgumentType {
+    Any,
     Bool,
     // TODO: Optionally specify parameters,
     Function,
@@ -129,6 +130,7 @@ pub enum ArgumentType {
 impl fmt::Display for ArgumentType {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         match self {
+            ArgumentType::Any => write!(formatter, "any"),
             ArgumentType::Bool => write!(formatter, "bool"),
             ArgumentType::Function => write!(formatter, "function"),
             ArgumentType::Nil => write!(formatter, "nil"),
@@ -148,7 +150,7 @@ pub enum Required {
 
 impl Default for Required {
     fn default() -> Self {
-        Required::NotRequired
+        Required::Required(None)
     }
 }
 

@@ -1,5 +1,13 @@
 # globals
+[[assert.args]]
+type = "any"
+
+[[assert.args]]
+type = "any"
+required = "false"
+
 [[print.args]]
+required = false
 type = "..."
 
 # math
@@ -10,71 +18,54 @@ property = true
 property = true
 
 [[math.abs.args]]
-required = true
 type = "number"
 
 [[math.acos.args]]
-required = true
 type = "number"
 
 [[math.asin.args]]
-required = true
 type = "number"
 
 [[math.atan.args]]
-required = true
 type = "number"
 
 [[math.ceil.args]]
-required = true
 type = "number"
 
 [[math.cos.args]]
-required = true
 type = "number"
 
 [[math.deg.args]]
-required = true
 type = "number"
 
 [[math.exp.args]]
-required = true
 type = "number"
 
 [[math.floor.args]]
-required = true
 type = "number"
 
 [[math.fmod.args]]
-required = true
 type = "number"
 
 [[math.fmod.args]]
-required = true
 type = "number"
 
 [[math.frexp.args]]
-required = true
 type = "number"
 
 [[math.ldexp.args]]
-required = true
 type = "number"
 
 [[math.ldexp.args]]
-required = true
 type = "number"
 
 [[math.log.args]]
-required = true
 type = "number"
 
 [[math.log10.args]]
-required = true
 type = "number"
 
 [[math.max.args]]
-required = true
 type = "number"
 
 [[math.max.args]]
@@ -82,7 +73,6 @@ required = "use of max only makes sense with more than 1 parameter"
 type = "..."
 
 [[math.min.args]]
-required = true
 type = "number"
 
 [[math.min.args]]
@@ -90,47 +80,39 @@ required = "use of min only makes sense with more than 1 parameter"
 type = "..."
 
 [[math.modf.args]]
-required = true
 type = "number"
 
 [[math.pow.args]]
-required = true
 type = "number"
 
 [[math.pow.args]]
-required = true
 type = "number"
 
 [[math.rad.args]]
-required = true
 type = "number"
 
 [[math.random.args]]
+required = false
 type = "number"
 
 [[math.random.args]]
+required = false
 type = "number"
 
 [[math.randomseed.args]]
-required = true
 type = "number"
 
 [[math.sin.args]]
-required = true
 type = "number"
 
 [[math.sinh.args]]
-required = true
 type = "number"
 
 [[math.sqrt.args]]
-required = true
 type = "number"
 
 [[math.tan.args]]
-required = true
 type = "number"
 
 [[math.tanh.args]]
-required = true
 type = "number"
