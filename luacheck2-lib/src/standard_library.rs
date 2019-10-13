@@ -19,10 +19,11 @@ impl StandardLibrary {
                     $(
                         $name => Some(toml::from_str::<StandardLibrary>(
                             include_str!($path)
-                        ).unwrap_or_else(|_| {
+                        ).unwrap_or_else(|error| {
                             panic!(
-                                "default standard library '{}' failed deserialization",
-                                name
+                                "default standard library '{}' failed deserialization: {}",
+                                name,
+                                error,
                             )
                         })),
                     )+
@@ -110,12 +111,12 @@ pub struct Argument {
     pub argument_type: ArgumentType,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 // TODO: Nilable types
 pub enum ArgumentType {
     Any,
     Bool,
+    Constant(Vec<String>),
     // TODO: Optionally specify parameters,
     Function,
     Nil,
@@ -123,8 +124,47 @@ pub enum ArgumentType {
     String,
     // TODO: Types for tables
     Table,
-    #[serde(rename = "...")]
     Vararg,
+}
+
+impl<'de> Deserialize<'de> for ArgumentType {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        deserializer.deserialize_any(ArgumentTypeVisitor)
+    }
+}
+
+struct ArgumentTypeVisitor;
+
+impl<'de> Visitor<'de> for ArgumentTypeVisitor {
+    type Value = ArgumentType;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("an argument type or an array of constant strings")
+    }
+
+    fn visit_seq<A: de::SeqAccess<'de>>(self, mut seq: A) -> Result<Self::Value, A::Error> {
+        let mut constants = Vec::new();
+
+        while let Some(value) = seq.next_element()? {
+            constants.push(value);
+        }
+
+        Ok(ArgumentType::Constant(constants))
+    }
+
+    fn visit_str<E: de::Error>(self, value: &str) -> Result<Self::Value, E> {
+        match value {
+            "any" => Ok(ArgumentType::Any),
+            "bool" => Ok(ArgumentType::Bool),
+            "function" => Ok(ArgumentType::Function),
+            "nil" => Ok(ArgumentType::Nil),
+            "number" => Ok(ArgumentType::Number),
+            "string" => Ok(ArgumentType::String),
+            "table" => Ok(ArgumentType::Table),
+            "..." => Ok(ArgumentType::Vararg),
+            other => Err(de::Error::custom(format!("unknown type {}", other))),
+        }
+    }
 }
 
 impl fmt::Display for ArgumentType {
@@ -132,6 +172,16 @@ impl fmt::Display for ArgumentType {
         match self {
             ArgumentType::Any => write!(formatter, "any"),
             ArgumentType::Bool => write!(formatter, "bool"),
+            ArgumentType::Constant(options) => write!(
+                formatter,
+                "{}",
+                // TODO: This gets pretty ugly with a lot of variants
+                options
+                    .iter()
+                    .map(|string| format!("\"{}\"", string))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            ),
             ArgumentType::Function => write!(formatter, "function"),
             ArgumentType::Nil => write!(formatter, "nil"),
             ArgumentType::Number => write!(formatter, "number"),

@@ -4,7 +4,18 @@ type = "any"
 
 [[assert.args]]
 type = "any"
-required = "false"
+required = false
+
+[[collectgarbage.args]]
+type = [
+    "collect",
+    "count",
+    "restart",
+    "setpause",
+    "setstepmul",
+    "step",
+    "stop",
+]
 
 [[print.args]]
 required = false

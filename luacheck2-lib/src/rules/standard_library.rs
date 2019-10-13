@@ -83,7 +83,7 @@ fn name_path<'a, 'ast>(expression: &'a ast::Expression<'ast>) -> Option<Vec<Stri
 // Returns the argument type of the expression if it can be constantly resolved
 // Otherwise, returns None
 // Only attempts to resolve constants
-fn get_argument_type(expression: &ast::Expression) -> Option<ArgumentType> {
+fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType> {
     match expression {
         ast::Expression::Parentheses { expression, .. } => get_argument_type(expression),
 
@@ -91,30 +91,30 @@ fn get_argument_type(expression: &ast::Expression) -> Option<ArgumentType> {
             match unop {
                 // CAVEAT: If you're overriding __len on a userdata and then making it not return a number
                 // ...sorry, but I don't care about your code :)
-                ast::UnOp::Hash(_) => Some(ArgumentType::Number),
+                ast::UnOp::Hash(_) => Some(ArgumentType::Number.into()),
                 ast::UnOp::Minus(_) => get_argument_type(expression),
-                ast::UnOp::Not(_) => Some(ArgumentType::Bool),
+                ast::UnOp::Not(_) => Some(ArgumentType::Bool.into()),
             }
         }
 
         ast::Expression::Value { binop: rhs, value } => {
             let base = match &**value {
-                ast::Value::Function(_) => Some(ArgumentType::Function),
+                ast::Value::Function(_) => Some(ArgumentType::Function.into()),
                 ast::Value::FunctionCall(_) => None,
-                ast::Value::Number(_) => Some(ArgumentType::Number),
+                ast::Value::Number(_) => Some(ArgumentType::Number.into()),
                 ast::Value::ParseExpression(expression) => get_argument_type(expression),
-                ast::Value::String(_) => Some(ArgumentType::String),
+                ast::Value::String(token) => Some(PassedArgumentType::from_string(token.to_string())),
                 ast::Value::Symbol(symbol) => match *symbol.token_type() {
                     TokenType::Symbol { symbol } => match symbol {
-                        Symbol::False => Some(ArgumentType::Bool),
-                        Symbol::True => Some(ArgumentType::Bool),
-                        Symbol::Nil => Some(ArgumentType::Nil),
+                        Symbol::False => Some(ArgumentType::Bool.into()),
+                        Symbol::True => Some(ArgumentType::Bool.into()),
+                        Symbol::Nil => Some(ArgumentType::Nil.into()),
                         _ => unreachable!(),
                     },
 
                     _ => unreachable!(),
                 },
-                ast::Value::TableConstructor(_) => Some(ArgumentType::Table),
+                ast::Value::TableConstructor(_) => Some(ArgumentType::Table.into()),
                 ast::Value::Var(_) => None,
             };
 
@@ -122,14 +122,14 @@ fn get_argument_type(expression: &ast::Expression) -> Option<ArgumentType> {
                 // Nearly all of these will return wrong results if you have a non-idiomatic metatable
                 // I intentionally omitted common metamethod re-typings, like __mul
                 match rhs.bin_op() {
-                    ast::BinOp::Caret(_) => Some(ArgumentType::Number),
+                    ast::BinOp::Caret(_) => Some(ArgumentType::Number.into()),
 
                     ast::BinOp::GreaterThan(_)
                     | ast::BinOp::GreaterThanEqual(_)
                     | ast::BinOp::LessThan(_)
                     | ast::BinOp::LessThanEqual(_)
                     | ast::BinOp::TwoEqual(_)
-                    | ast::BinOp::TildeEqual(_) => Some(ArgumentType::Bool),
+                    | ast::BinOp::TildeEqual(_) => Some(ArgumentType::Bool.into()),
 
                     // Basic types will often re-implement these (e.g. Roblox's Vector3)
                     ast::BinOp::Plus(_)
@@ -137,9 +137,9 @@ fn get_argument_type(expression: &ast::Expression) -> Option<ArgumentType> {
                     | ast::BinOp::Star(_)
                     | ast::BinOp::Slash(_) => base,
 
-                    ast::BinOp::Percent(_) => Some(ArgumentType::Number),
+                    ast::BinOp::Percent(_) => Some(ArgumentType::Number.into()),
 
-                    ast::BinOp::TwoDots(_) => Some(ArgumentType::String),
+                    ast::BinOp::TwoDots(_) => Some(ArgumentType::String.into()),
 
                     ast::BinOp::And(_) | ast::BinOp::Or(_) => {
                         // We could potentially support union types here
@@ -198,19 +198,22 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                         }
 
                         ast::FunctionArgs::String(token) => {
-                            argument_types
-                                .push((token.range().unwrap(), Some(ArgumentType::String)));
+                            argument_types.push((
+                                token.range().unwrap(),
+                                Some(PassedArgumentType::from_string(token.to_string())),
+                            ));
                         }
 
                         ast::FunctionArgs::TableConstructor(table) => {
                             argument_types
-                                .push((table.range().unwrap(), Some(ArgumentType::Table)));
+                                .push((table.range().unwrap(), Some(ArgumentType::Table.into())));
                         }
                     }
 
-                    let mut expected_args = arguments.iter().filter(|arg| {
-                        arg.required != Required::NotRequired
-                    }).count();
+                    let mut expected_args = arguments
+                        .iter()
+                        .filter(|arg| arg.required != Required::NotRequired)
+                        .count();
 
                     let mut vararg = false;
                     let mut max_args = arguments.len();
@@ -241,7 +244,9 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                         }
                     }
 
-                    if argument_types.len() < expected_args || (!vararg && argument_types.len() > max_args) {
+                    if argument_types.len() < expected_args
+                        || (!vararg && argument_types.len() > max_args)
+                    {
                         self.diagnostics.push(Diagnostic::new(
                             "standard_library_types",
                             format!(
@@ -263,7 +268,9 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                         }
 
                         if let Some(passed_type) = passed_type {
-                            if expected.argument_type != ArgumentType::Any && passed_type != &expected.argument_type {
+                            let matches = passed_type.matches(&expected.argument_type);
+
+                            if !matches {
                                 self.diagnostics.push(Diagnostic::new(
                                     "standard_library_types",
                                     format!(
@@ -272,7 +279,11 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                                     ),
                                     Label::new_with_message(
                                         (range.0.bytes() as u32, range.1.bytes() as u32),
-                                        format!("expected `{}`, received `{}`", expected.argument_type, passed_type),
+                                        format!(
+                                            "expected `{}`, received `{}`",
+                                            expected.argument_type,
+                                            passed_type.type_name()
+                                        ),
                                     ),
                                 ));
                             }
@@ -283,6 +294,46 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
 
             _ => unreachable!(),
         };
+    }
+}
+
+enum PassedArgumentType {
+    Primitive(ArgumentType),
+    String(String),
+}
+
+impl PassedArgumentType {
+    fn from_string(mut string: String) -> PassedArgumentType {
+        string.pop();
+        PassedArgumentType::String(string.chars().skip(1).collect())
+    }
+
+    fn matches(&self, argument_type: &ArgumentType) -> bool {
+        if argument_type == &ArgumentType::Any {
+            return true;
+        }
+
+        match self {
+            PassedArgumentType::Primitive(us) => us == argument_type,
+            PassedArgumentType::String(text) => match argument_type {
+                ArgumentType::Constant(constants) => constants.contains(text),
+                ArgumentType::String => true,
+                _ => false,
+            },
+        }
+    }
+
+    fn type_name(&self) -> String {
+        match self {
+            PassedArgumentType::Primitive(argument_type) => argument_type.to_string(),
+            PassedArgumentType::String(_) => ArgumentType::String.to_string(),
+        }
+    }
+}
+
+impl From<ArgumentType> for PassedArgumentType {
+    fn from(argument_type: ArgumentType) -> Self {
+        PassedArgumentType::Primitive(argument_type)
     }
 }
 
@@ -326,6 +377,15 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "bad_call_signatures",
+        );
+    }
+
+    #[test]
+    fn test_constants() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "constants",
         );
     }
 }
