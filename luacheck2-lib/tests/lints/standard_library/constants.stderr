@@ -1,4 +1,4 @@
-error[standard_library_types]: use of standard_library function `collectgarbage` is incorrect
+error[incorrect_standard_library_use]: use of standard_library function `collectgarbage` is incorrect
 
    ┌── constants.lua:4:16 ───
    │
@@ -6,7 +6,7 @@ error[standard_library_types]: use of standard_library function `collectgarbage`
    │                ^^^^^^ expected `"collect", "count", "restart", "setpause", "setstepmul", "step", "stop"`, received `string`
    │
 
-error[standard_library_types]: use of standard_library function `collectgarbage` is incorrect
+error[incorrect_standard_library_use]: use of standard_library function `collectgarbage` is incorrect
 
    ┌── constants.lua:5:16 ───
    │

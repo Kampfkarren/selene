@@ -164,6 +164,6 @@ pub struct CheckerDiagnostic {
 
 use_rules! {
     empty_if: rules::empty_if::EmptyIfLint,
-    standard_library_types: rules::standard_library::StandardLibraryLint,
+    incorrect_standard_library_use: rules::standard_library::StandardLibraryLint,
     unused_variable: rules::unused_variable::UnusedVariableLint,
 }

@@ -235,7 +235,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                                 // Functions like math.ceil where not using the vararg is wrong
                                 if arguments.len() > argument_types.len() {
                                     self.diagnostics.push(Diagnostic::new_complete(
-                                        "standard_library_types",
+                                        "incorrect_standard_library_use",
                                         format!(
                                             // TODO: This message isn't great
                                             "standard library function `{}` requires use of the vararg",
@@ -259,7 +259,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                         || (!vararg && argument_types.len() > max_args)
                     {
                         self.diagnostics.push(Diagnostic::new(
-                            "standard_library_types",
+                            "incorrect_standard_library_use",
                             format!(
                                 // TODO: This message isn't great
                                 "standard library function `{}` requires {} parameters, {} passed",
@@ -283,7 +283,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
 
                             if !matches {
                                 self.diagnostics.push(Diagnostic::new(
-                                    "standard_library_types",
+                                    "incorrect_standard_library_use",
                                     format!(
                                         "use of standard_library function `{}` is incorrect",
                                         name_path.join("."),
