@@ -369,6 +369,12 @@ type = "number"
 [[math.atan.args]]
 type = "number"
 
+[[math.atan2.args]]
+type = "number"
+
+[[math.atan2.args]]
+type = "number"
+
 [[math.ceil.args]]
 type = "number"
 
