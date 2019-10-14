@@ -60,8 +60,8 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     let mut files = codespan::Files::new();
     let source_id = files.add(filename.to_string_lossy(), contents);
 
-    let stderr = termcolor::StandardStream::stderr(termcolor::ColorChoice::Auto);
-    let mut stderr = stderr.lock();
+    let stdout = termcolor::StandardStream::stdout(termcolor::ColorChoice::Auto);
+    let mut stdout = stdout.lock();
 
     for diagnostic in diagnostics.into_iter().map(|diagnostic| {
         diagnostic.diagnostic.into_codespan_diagnostic(
@@ -73,7 +73,7 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
         )
     }) {
         codespan_reporting::term::emit(
-            &mut stderr,
+            &mut stdout,
             &codespan_reporting::term::Config::default(),
             &files,
             &diagnostic,
