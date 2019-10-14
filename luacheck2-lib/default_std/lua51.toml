@@ -114,7 +114,7 @@ type = "any"
 type = "string"
 
 [[select.args]]
-type = "number"
+type = "any" # TODO: "#" | number
 
 [[select.args]]
 type = "..."
