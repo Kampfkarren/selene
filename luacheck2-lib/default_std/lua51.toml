@@ -34,6 +34,7 @@ required = "Erroring without a message is unhelpful to users."
 
 [[error.args]]
 type = "number"
+required = false
 
 [[getfenv.args]]
 type = "function"
@@ -170,6 +171,7 @@ type = { display = "coroutine" }
 
 [[coroutine.resume.args]]
 type = "..."
+required = false
 
 [coroutine.running]
 args = []
@@ -182,6 +184,7 @@ type = "function"
 
 [[coroutine.yield.args]]
 type = { display = "coroutine" }
+required = false
 
 # debug
 [debug.debug]

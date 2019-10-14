@@ -40,6 +40,16 @@ impl Rule for StandardLibraryLint {
     }
 }
 
+fn take_while_keep_going(suffix: &ast::Suffix, keep_going: &mut bool) -> bool {
+    let result = *keep_going;
+    *keep_going = if let ast::Suffix::Call(_) = suffix {
+        false
+    } else {
+        true
+    };
+    result
+}
+
 fn name_path_from_prefix_suffix<'a, 'ast, S: Iterator<Item = &'a ast::Suffix<'ast>>>(
     prefix: &'a ast::Prefix<'ast>,
     suffixes: S,
@@ -48,7 +58,9 @@ fn name_path_from_prefix_suffix<'a, 'ast, S: Iterator<Item = &'a ast::Suffix<'as
         let mut names = Vec::new();
         names.push(name.to_string());
 
-        for suffix in suffixes {
+        let mut keep_going = true;
+
+        for suffix in suffixes.take_while(|suffix| take_while_keep_going(suffix, &mut keep_going)) {
             match suffix {
                 ast::Suffix::Call(call) => {
                     if let ast::Call::MethodCall(method_call) = call {
@@ -322,7 +334,11 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
             }
         }
 
-        let mut suffixes: Vec<&ast::Suffix> = call.iter_suffixes().collect();
+        let mut keep_going = true;
+        let mut suffixes: Vec<&ast::Suffix> = call
+            .iter_suffixes()
+            .take_while(|suffix| take_while_keep_going(suffix, &mut keep_going))
+            .collect();
 
         let mut name_path =
             match name_path_from_prefix_suffix(call.prefix(), suffixes.iter().copied()) {
@@ -591,6 +607,15 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "bad_call_signatures",
+        );
+    }
+
+    #[test]
+    fn test_complex() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "complex",
         );
     }
 
