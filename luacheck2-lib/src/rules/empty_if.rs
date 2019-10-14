@@ -35,7 +35,7 @@ impl Rule for EmptyIfLint {
         Ok(EmptyIfLint { config })
     }
 
-    fn pass(&self, ast: &Ast) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, _: &Context) -> Vec<Diagnostic> {
         let mut visitor = EmptyIfVisitor {
             comment_positions: Vec::new(),
             positions: Vec::new(),

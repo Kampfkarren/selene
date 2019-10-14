@@ -1,4 +1,4 @@
-use super::Rule;
+use super::{super::StandardLibrary, Context, Rule};
 use std::{
     fs,
     io::Write,
@@ -17,10 +17,30 @@ lazy_static::lazy_static! {
         { Path::new(env!("CARGO_MANIFEST_DIR")).join("tests").join("lints") };
 }
 
-pub fn test_lint<C: DeserializeOwned, E: std::error::Error, R: Rule<Config = C, Error = E>>(
+pub struct TestUtilConfig {
+    pub standard_library: StandardLibrary,
+    #[doc(hidden)]
+    pub __non_exhaustive: (),
+}
+
+impl Default for TestUtilConfig {
+    fn default() -> Self {
+        TestUtilConfig {
+            standard_library: StandardLibrary::from_name("lua51").unwrap(),
+            __non_exhaustive: (),
+        }
+    }
+}
+
+pub fn test_lint_config<
+    C: DeserializeOwned,
+    E: std::error::Error,
+    R: Rule<Config = C, Error = E>,
+>(
     rule: R,
     lint_name: &'static str,
     test_name: &'static str,
+    config: TestUtilConfig,
 ) {
     let path_base = TEST_PROJECTS_ROOT.join(lint_name).join(test_name);
 
@@ -30,12 +50,17 @@ pub fn test_lint<C: DeserializeOwned, E: std::error::Error, R: Rule<Config = C, 
     let ast = full_moon::parse(&lua_source)
         .expect("Cannot parse lua file")
         .owned();
-    let mut diagnostics = rule.pass(&ast);
+    let mut diagnostics = rule.pass(
+        &ast,
+        &Context {
+            standard_library: config.standard_library,
+        },
+    );
 
     let mut files = codespan::Files::new();
     let source_id = files.add(format!("{}.lua", test_name), lua_source);
 
-    diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.position);
+    diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.range);
 
     let mut output = termcolor::NoColor::new(Vec::new());
 
@@ -63,4 +88,12 @@ pub fn test_lint<C: DeserializeOwned, E: std::error::Error, R: Rule<Config = C, 
             .write_all(output.get_ref())
             .expect("couldn't write to output file");
     }
+}
+
+pub fn test_lint<C: DeserializeOwned, E: std::error::Error, R: Rule<Config = C, Error = E>>(
+    rule: R,
+    lint_name: &'static str,
+    test_name: &'static str,
+) {
+    test_lint_config(rule, lint_name, test_name, TestUtilConfig::default());
 }

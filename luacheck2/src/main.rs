@@ -9,7 +9,7 @@ use std::{
 use clap::{App, Arg};
 use codespan_reporting::diagnostic::Severity as CodespanSeverity;
 use full_moon::ast::owned::Owned;
-use luacheck2_lib::{rules::Severity, *};
+use luacheck2_lib::{rules::Severity, standard_library::StandardLibrary, *};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
 
@@ -153,7 +153,28 @@ fn main() {
         },
     };
 
-    let checker = Arc::new(match Checker::from_config(config) {
+    let standard_library = match fs::read_to_string(format!("{}.toml", &config.std)) {
+        Ok(contents) => match toml::from_str(&contents) {
+            Ok(standard_library) => standard_library,
+            Err(error) => {
+                error!(
+                    "Custom standard library wasn't formatted properly: {}",
+                    error
+                );
+                return;
+            }
+        },
+
+        Err(_) => match StandardLibrary::from_name(&config.std) {
+            Some(std) => std,
+            None => {
+                error!("Unknown standard library '{}'", config.std);
+                return;
+            }
+        },
+    };
+
+    let checker = Arc::new(match Checker::new(config, standard_library) {
         Ok(checker) => checker,
         Err(error) => {
             error!("{}", error);

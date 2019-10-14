@@ -1,0 +1,18 @@
+base = "lua51"
+
+[getfenv]
+removed = true
+
+[setfenv]
+removed = true
+
+[[table.unpack.args]]
+type = "table"
+
+[[table.unpack.args]]
+type = "number"
+required = false
+
+[[table.unpack.args]]
+type = "number"
+required = false

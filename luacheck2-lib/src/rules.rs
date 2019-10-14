@@ -1,11 +1,14 @@
+use crate::standard_library::StandardLibrary;
 use std::convert::TryInto;
 
 use codespan_reporting::diagnostic::{
     Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
 };
+use full_moon::node::Node;
 use serde::de::DeserializeOwned;
 
 pub mod empty_if;
+pub mod standard_library;
 pub mod unused_variable;
 
 #[cfg(test)]
@@ -18,7 +21,7 @@ pub trait Rule {
     fn new(config: Self::Config) -> Result<Self, Self::Error>
     where
         Self: Sized;
-    fn pass(&self, ast: &full_moon::ast::Ast<'static>) -> Vec<Diagnostic>;
+    fn pass(&self, ast: &full_moon::ast::Ast<'static>, context: &Context) -> Vec<Diagnostic>;
 
     fn severity(&self) -> Severity;
     fn rule_type(&self) -> RuleType;
@@ -101,37 +104,46 @@ impl Diagnostic {
     }
 
     pub fn start_position(&self) -> u32 {
-        self.primary_label.position.0
+        self.primary_label.range.0
     }
 }
 
 pub struct Label {
     message: Option<String>,
-    position: (u32, u32),
+    range: (u32, u32),
 }
 
 impl Label {
-    pub fn new<P: TryInto<u32>>(position: (P, P)) -> Label {
-        let position = (
-            position
+    pub fn new<P: TryInto<u32>>(range: (P, P)) -> Label {
+        let range = (
+            range
                 .0
                 .try_into()
-                .unwrap_or_else(|_| panic!("TryInto failed for Label::new position")),
-            position
+                .unwrap_or_else(|_| panic!("TryInto failed for Label::new range")),
+            range
                 .1
                 .try_into()
-                .unwrap_or_else(|_| panic!("TryInto failed for Label::new position")),
+                .unwrap_or_else(|_| panic!("TryInto failed for Label::new range")),
         );
 
         Label {
-            position,
+            range,
             message: None,
         }
     }
 
-    pub fn new_with_message(position: (u32, u32), message: String) -> Label {
+    pub fn from_node<N: Node>(node: N, message: Option<String>) -> Label {
+        let (start, end) = node.range().expect("node passed returned a None range");
+
         Label {
-            position,
+            message,
+            range: (start.bytes() as u32, end.bytes() as u32),
+        }
+    }
+
+    pub fn new_with_message(range: (u32, u32), message: String) -> Label {
+        Label {
+            range,
             message: Some(message),
         }
     }
@@ -139,8 +151,13 @@ impl Label {
     pub fn codespan_label(&self, file_id: codespan::FileId) -> CodespanLabel {
         CodespanLabel::new(
             file_id.to_owned(),
-            codespan::Span::new(self.position.0, self.position.1),
+            codespan::Span::new(self.range.0, self.range.1),
             self.message.as_ref().unwrap_or(&"".to_owned()).to_owned(),
         )
     }
+}
+
+#[derive(Clone, Debug)]
+pub struct Context {
+    pub standard_library: StandardLibrary,
 }

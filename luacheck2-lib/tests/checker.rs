@@ -1,7 +1,7 @@
 // FIXME: These tests rely on nothing but empty_if triggering on them
 use std::collections::HashMap;
 
-use luacheck2_lib::*;
+use luacheck2_lib::{standard_library::StandardLibrary, *};
 
 use full_moon::parse;
 use serde_json::json;
@@ -22,17 +22,21 @@ macro_rules! map {
 
 #[test]
 fn can_create() {
-    Checker::<serde_json::Value>::from_config(CheckerConfig::default()).unwrap();
+    Checker::<serde_json::Value>::new(CheckerConfig::default(), StandardLibrary::default())
+        .unwrap();
 }
 
 #[test]
 fn errors_with_bad_config() {
-    match Checker::from_config(CheckerConfig {
-        config: map! {
-            "empty_if".to_owned() => json!("oh no"),
+    match Checker::new(
+        CheckerConfig {
+            config: map! {
+                "empty_if".to_owned() => json!("oh no"),
+            },
+            ..CheckerConfig::default()
         },
-        ..CheckerConfig::default()
-    }) {
+        StandardLibrary::default(),
+    ) {
         Err(error) => {
             assert_eq!(error.name, "empty_if");
             match error.problem {
@@ -41,18 +45,21 @@ fn errors_with_bad_config() {
             }
         }
 
-        _ => panic!("from_config returned Ok"),
+        _ => panic!("new returned Ok"),
     }
 }
 
 #[test]
 fn uses_rule_variation_allow() {
-    let checker: Checker<serde_json::Value> = Checker::from_config(CheckerConfig {
-        rules: map! {
-            "empty_if".to_owned() => RuleVariation::Allow,
+    let checker: Checker<serde_json::Value> = Checker::new(
+        CheckerConfig {
+            rules: map! {
+                "empty_if".to_owned() => RuleVariation::Allow,
+            },
+            ..CheckerConfig::default()
         },
-        ..CheckerConfig::default()
-    })
+        StandardLibrary::default(),
+    )
     .unwrap();
 
     assert!(checker
