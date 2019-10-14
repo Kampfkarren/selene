@@ -133,8 +133,9 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                         Symbol::False => Some(ArgumentType::Bool.into()),
                         Symbol::True => Some(ArgumentType::Bool.into()),
                         Symbol::Nil => Some(ArgumentType::Nil.into()),
+                        Symbol::Ellipse => Some(ArgumentType::Vararg.into()),
                         ref other => {
-                            unreachable!("TokenType::Symbol was not true/false/nil ({:?})", other)
+                            unreachable!("TokenType::Symbol was not expected ({:?})", other)
                         }
                     },
 
@@ -498,7 +499,11 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
             }
         }
 
-        if argument_types.len() < expected_args || (!vararg && argument_types.len() > max_args) {
+        if (!argument_types.iter().any(|(_, argument_type)| {
+            argument_type.as_ref() == Some(&PassedArgumentType::Primitive(ArgumentType::Vararg))
+        }) && argument_types.len() < expected_args)
+            || (!vararg && argument_types.len() > max_args)
+        {
             self.diagnostics.push(Diagnostic::new(
                 "incorrect_standard_library_use",
                 format!(
@@ -541,6 +546,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
     }
 }
 
+#[derive(PartialEq, Eq)]
 enum PassedArgumentType {
     Primitive(ArgumentType),
     String(String),
@@ -558,7 +564,7 @@ impl PassedArgumentType {
         }
 
         match self {
-            PassedArgumentType::Primitive(us) => us == argument_type,
+            PassedArgumentType::Primitive(us) => us == &ArgumentType::Vararg || us == argument_type,
             PassedArgumentType::String(text) => match argument_type {
                 ArgumentType::Constant(constants) => constants.contains(text),
                 ArgumentType::String => true,
@@ -708,6 +714,15 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "unknown_property",
+        );
+    }
+
+    #[test]
+    fn test_vararg() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "vararg",
         );
     }
 
