@@ -8,10 +8,10 @@ error[incorrect_standard_library_use]: use of standard_library function `math.si
 
 error[incorrect_standard_library_use]: standard library function `math.floor` requires 1 parameters, 2 passed
 
-    ┌── bad_call_signatures.lua:10:11 ───
+    ┌── bad_call_signatures.lua:10:1 ───
     │
  10 │ math.floor(3.5, "remember to make sure it's 3 :)")
-    │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     │
 
 error[incorrect_standard_library_use]: use of standard_library function `math.sin` is incorrect
@@ -24,18 +24,18 @@ error[incorrect_standard_library_use]: use of standard_library function `math.si
 
 error[incorrect_standard_library_use]: standard library function `math.sin` requires 1 parameters, 2 passed
 
-    ┌── bad_call_signatures.lua:15:9 ───
+    ┌── bad_call_signatures.lua:15:1 ───
     │
  15 │ math.sin(variable, variable)
-    │         ^^^^^^^^^^^^^^^^^^^^
+    │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     │
 
 error[incorrect_standard_library_use]: standard library function `math.max` requires use of the vararg
 
-    ┌── bad_call_signatures.lua:17:9 ───
+    ┌── bad_call_signatures.lua:17:1 ───
     │
  17 │ math.max(2)
-    │         ^^^
+    │ ^^^^^^^^^^^
     │
     = use of max only makes sense with more than 1 parameter
 

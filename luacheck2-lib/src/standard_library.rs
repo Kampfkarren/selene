@@ -8,7 +8,7 @@ use serde::{
 #[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize)]
 pub struct StandardLibrary {
     #[serde(flatten)]
-    globals: HashMap<String, Field>,
+    pub globals: HashMap<String, Field>,
 }
 
 impl StandardLibrary {
@@ -61,8 +61,13 @@ impl StandardLibrary {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Field {
-    Function(Vec<Argument>),
-    Property { writable: Option<Writable> },
+    Function {
+        arguments: Vec<Argument>,
+        method: bool,
+    },
+    Property {
+        writable: Option<Writable>,
+    },
     Table(HashMap<String, Field>),
 }
 
@@ -70,13 +75,15 @@ impl<'de> Deserialize<'de> for Field {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let field_raw = FieldSerde::deserialize(deserializer)?;
 
-        if !field_raw.property && field_raw.args.is_none() && field_raw.children.is_empty() {
+        let is_function = field_raw.args.is_some() || field_raw.method;
+
+        if !field_raw.property && !is_function && field_raw.children.is_empty() {
             return Err(de::Error::custom(
                 "can't determine what kind of field this is",
             ));
         }
 
-        if field_raw.property && field_raw.args.is_some() {
+        if field_raw.property && is_function {
             return Err(de::Error::custom("field is both a property and a function"));
         }
 
@@ -86,9 +93,12 @@ impl<'de> Deserialize<'de> for Field {
             });
         }
 
-        if let Some(args) = field_raw.args {
+        if is_function {
             // TODO: Don't allow vararg in the middle
-            return Ok(Field::Function(args));
+            return Ok(Field::Function {
+                arguments: field_raw.args.unwrap_or_else(Vec::new),
+                method: field_raw.method,
+            });
         }
 
         Ok(Field::Table(field_raw.children))
@@ -110,6 +120,8 @@ pub enum Writable {
 struct FieldSerde {
     #[serde(default)]
     property: bool,
+    #[serde(default)]
+    method: bool,
     #[serde(default)]
     writable: Option<Writable>,
     #[serde(default)]

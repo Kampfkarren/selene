@@ -49,11 +49,19 @@ fn name_path_from_prefix_suffix<'a, 'ast, S: Iterator<Item = &'a ast::Suffix<'as
         names.push(name.to_string());
 
         for suffix in suffixes {
-            if let ast::Suffix::Index(index) = suffix {
-                if let ast::Index::Dot { name, .. } = index {
-                    names.push(name.to_string());
-                } else {
-                    return None;
+            match suffix {
+                ast::Suffix::Call(call) => {
+                    if let ast::Call::MethodCall(method_call) = call {
+                        names.push(method_call.name().to_string());
+                    }
+                }
+
+                ast::Suffix::Index(index) => {
+                    if let ast::Index::Dot { name, .. } = index {
+                        names.push(name.to_string());
+                    } else {
+                        return None;
+                    }
                 }
             }
         }
@@ -315,13 +323,14 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
         }
 
         let mut suffixes: Vec<&ast::Suffix> = call.iter_suffixes().collect();
-        let call_suffix = suffixes.pop().unwrap();
 
-        let name_path = match name_path_from_prefix_suffix(call.prefix(), suffixes.iter().copied())
-        {
-            Some(name_path) => name_path,
-            None => return,
-        };
+        let mut name_path =
+            match name_path_from_prefix_suffix(call.prefix(), suffixes.iter().copied()) {
+                Some(name_path) => name_path,
+                None => return,
+            };
+
+        let call_suffix = suffixes.pop().unwrap();
 
         let field = match self.standard_library.find_global(&name_path) {
             Some(field) => field,
@@ -330,18 +339,22 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                     name_path,
                     (
                         call.prefix().start_position().unwrap(),
-                        suffixes
-                            .last()
-                            .and_then(|suffix| suffix.end_position())
-                            .unwrap_or_else(|| call.prefix().end_position().unwrap()),
+                        if let ast::Suffix::Call(ast::Call::MethodCall(method_call)) = call_suffix {
+                            method_call.name().end_position().unwrap()
+                        } else {
+                            suffixes
+                                .last()
+                                .and_then(|suffix| suffix.end_position())
+                                .unwrap_or_else(|| call.prefix().end_position().unwrap())
+                        },
                     ),
                 );
                 return;
             }
         };
 
-        let arguments = match &field {
-            standard_library::Field::Function(arguments) => arguments,
+        let (arguments, expecting_method) = match &field {
+            standard_library::Field::Function { arguments, method } => (arguments, method),
             _ => {
                 self.diagnostics.push(Diagnostic::new(
                     "incorrect_standard_library_use",
@@ -358,115 +371,142 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
         };
 
         // TODO: Support method calling
-        match call_suffix {
-            ast::Suffix::Call(call) => {
-                if let ast::Call::AnonymousCall(args) = call {
-                    let mut argument_types = Vec::new();
+        let (function_args, call_is_method) = match call_suffix {
+            ast::Suffix::Call(call) => match call {
+                ast::Call::AnonymousCall(args) => (args, false),
+                ast::Call::MethodCall(method_call) => (method_call.args(), true),
+            },
 
-                    match args {
-                        ast::FunctionArgs::Parentheses { arguments, .. } => {
-                            for argument in arguments {
-                                argument_types
-                                    .push((argument.range().unwrap(), get_argument_type(argument)));
-                            }
-                        }
+            _ => unreachable!(),
+        };
 
-                        ast::FunctionArgs::String(token) => {
-                            argument_types.push((
-                                token.range().unwrap(),
-                                Some(PassedArgumentType::from_string(token.to_string())),
-                            ));
-                        }
+        if *expecting_method != call_is_method {
+            let problem = if call_is_method {
+                "is not a method"
+            } else {
+                "is a method"
+            };
 
-                        ast::FunctionArgs::TableConstructor(table) => {
-                            argument_types
-                                .push((table.range().unwrap(), Some(ArgumentType::Table.into())));
-                        }
-                    }
+            let use_instead = if call_is_method { "." } else { ":" };
 
-                    let mut expected_args = arguments
-                        .iter()
-                        .filter(|arg| arg.required != Required::NotRequired)
-                        .count();
+            let name = name_path.pop().unwrap();
 
-                    let mut vararg = false;
-                    let mut max_args = arguments.len();
+            self.diagnostics.push(Diagnostic::new_complete(
+                "incorrect_standard_library_use",
+                format!(
+                    // TODO: This message isn't great
+                    "standard library function `{}` {}",
+                    name_path.join("."),
+                    problem,
+                ),
+                Label::from_node(call, None),
+                vec![format!(
+                    "try: {}{}{}(...)",
+                    name_path.join("."),
+                    use_instead,
+                    name
+                )],
+                Vec::new(),
+            ));
 
-                    if let Some(last) = arguments.last() {
-                        if last.argument_type == ArgumentType::Vararg {
-                            if let Required::Required(message) = &last.required {
-                                // Functions like math.ceil where not using the vararg is wrong
-                                if arguments.len() > argument_types.len() {
-                                    self.diagnostics.push(Diagnostic::new_complete(
-                                        "incorrect_standard_library_use",
-                                        format!(
-                                            // TODO: This message isn't great
-                                            "standard library function `{}` requires use of the vararg",
-                                            name_path.join("."),
-                                        ),
-                                        Label::from_node(call, None),
-                                        message.iter().cloned().collect(),
-                                        Vec::new(),
-                                    ));
-                                }
+            return;
+        }
 
-                                expected_args -= 1;
-                                max_args -= 1;
-                            }
+        let mut argument_types = Vec::new();
 
-                            vararg = true;
-                        }
-                    }
-
-                    if argument_types.len() < expected_args
-                        || (!vararg && argument_types.len() > max_args)
-                    {
-                        self.diagnostics.push(Diagnostic::new(
-                            "incorrect_standard_library_use",
-                            format!(
-                                "standard library function `{}` requires {} parameters, {} passed",
-                                name_path.join("."),
-                                expected_args,
-                                argument_types.len(),
-                            ),
-                            Label::from_node(call, None),
-                        ));
-                    }
-
-                    for ((range, passed_type), expected) in
-                        argument_types.iter().zip(arguments.iter())
-                    {
-                        if expected.argument_type == ArgumentType::Vararg {
-                            continue;
-                        }
-
-                        if let Some(passed_type) = passed_type {
-                            let matches = passed_type.matches(&expected.argument_type);
-
-                            if !matches {
-                                self.diagnostics.push(Diagnostic::new(
-                                    "incorrect_standard_library_use",
-                                    format!(
-                                        "use of standard_library function `{}` is incorrect",
-                                        name_path.join("."),
-                                    ),
-                                    Label::new_with_message(
-                                        (range.0.bytes() as u32, range.1.bytes() as u32),
-                                        format!(
-                                            "expected `{}`, received `{}`",
-                                            expected.argument_type,
-                                            passed_type.type_name()
-                                        ),
-                                    ),
-                                ));
-                            }
-                        }
-                    }
+        match function_args {
+            ast::FunctionArgs::Parentheses { arguments, .. } => {
+                for argument in arguments {
+                    argument_types.push((argument.range().unwrap(), get_argument_type(argument)));
                 }
             }
 
-            _ => unimplemented!(),
-        };
+            ast::FunctionArgs::String(token) => {
+                argument_types.push((
+                    token.range().unwrap(),
+                    Some(PassedArgumentType::from_string(token.to_string())),
+                ));
+            }
+
+            ast::FunctionArgs::TableConstructor(table) => {
+                argument_types.push((table.range().unwrap(), Some(ArgumentType::Table.into())));
+            }
+        }
+
+        let mut expected_args = arguments
+            .iter()
+            .filter(|arg| arg.required != Required::NotRequired)
+            .count();
+
+        let mut vararg = false;
+        let mut max_args = arguments.len();
+
+        if let Some(last) = arguments.last() {
+            if last.argument_type == ArgumentType::Vararg {
+                if let Required::Required(message) = &last.required {
+                    // Functions like math.ceil where not using the vararg is wrong
+                    if arguments.len() > argument_types.len() {
+                        self.diagnostics.push(Diagnostic::new_complete(
+                            "incorrect_standard_library_use",
+                            format!(
+                                // TODO: This message isn't great
+                                "standard library function `{}` requires use of the vararg",
+                                name_path.join("."),
+                            ),
+                            Label::from_node(call, None),
+                            message.iter().cloned().collect(),
+                            Vec::new(),
+                        ));
+                    }
+
+                    expected_args -= 1;
+                    max_args -= 1;
+                }
+
+                vararg = true;
+            }
+        }
+
+        if argument_types.len() < expected_args || (!vararg && argument_types.len() > max_args) {
+            self.diagnostics.push(Diagnostic::new(
+                "incorrect_standard_library_use",
+                format!(
+                    "standard library function `{}` requires {} parameters, {} passed",
+                    name_path.join("."),
+                    expected_args,
+                    argument_types.len(),
+                ),
+                Label::from_node(call, None),
+            ));
+        }
+
+        for ((range, passed_type), expected) in argument_types.iter().zip(arguments.iter()) {
+            if expected.argument_type == ArgumentType::Vararg {
+                continue;
+            }
+
+            if let Some(passed_type) = passed_type {
+                let matches = passed_type.matches(&expected.argument_type);
+
+                if !matches {
+                    self.diagnostics.push(Diagnostic::new(
+                        "incorrect_standard_library_use",
+                        format!(
+                            "use of standard_library function `{}` is incorrect",
+                            name_path.join("."),
+                        ),
+                        Label::new_with_message(
+                            (range.0.bytes() as u32, range.1.bytes() as u32),
+                            format!(
+                                "expected `{}`, received `{}`",
+                                expected.argument_type,
+                                passed_type.type_name()
+                            ),
+                        ),
+                    ));
+                }
+            }
+        }
     }
 }
 
@@ -512,7 +552,8 @@ impl From<ArgumentType> for PassedArgumentType {
 
 #[cfg(test)]
 mod tests {
-    use super::{super::test_util::test_lint, *};
+    use super::{super::test_util::*, *};
+    use std::collections::HashMap;
 
     #[test]
     fn test_name_path() {
@@ -559,6 +600,40 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "constants",
+        );
+    }
+
+    #[test]
+    fn test_method_call() {
+        let mut globals = HashMap::new();
+
+        globals.insert(
+            "foo".to_owned(),
+            Field::Table({
+                let mut map = HashMap::new();
+                map.insert(
+                    "bar".to_owned(),
+                    Field::Function {
+                        arguments: vec![Argument {
+                            required: Required::Required(None),
+                            argument_type: ArgumentType::Number,
+                        }],
+
+                        method: true,
+                    },
+                );
+                map
+            }),
+        );
+
+        test_lint_config(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "method_call",
+            TestUtilConfig {
+                standard_library: StandardLibrary { globals },
+                ..TestUtilConfig::default()
+            },
         );
     }
 
