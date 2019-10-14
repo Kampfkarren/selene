@@ -499,9 +499,11 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
             }
         }
 
-        if (!argument_types.iter().any(|(_, argument_type)| {
+        let any_are_vararg = argument_types.iter().any(|(_, argument_type)| {
             argument_type.as_ref() == Some(&PassedArgumentType::Primitive(ArgumentType::Vararg))
-        }) && argument_types.len() < expected_args)
+        });
+
+        if (!any_are_vararg && argument_types.len() < expected_args)
             || (!vararg && argument_types.len() > max_args)
         {
             self.diagnostics.push(Diagnostic::new(
