@@ -248,6 +248,17 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
 
             match var {
                 ast::Var::Expression(var_expr) => {
+                    let mut keep_going = true;
+                    if var_expr
+                        .iter_suffixes()
+                        .take_while(|suffix| take_while_keep_going(suffix, &mut keep_going))
+                        .count()
+                        != var_expr.iter_suffixes().count()
+                    {
+                        // Modifying the return value, which we don't lint yet
+                        continue;
+                    }
+
                     if let Some(name_path) =
                         name_path_from_prefix_suffix(var_expr.prefix(), var_expr.iter_suffixes())
                     {
