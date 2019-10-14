@@ -133,10 +133,15 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                         Symbol::False => Some(ArgumentType::Bool.into()),
                         Symbol::True => Some(ArgumentType::Bool.into()),
                         Symbol::Nil => Some(ArgumentType::Nil.into()),
-                        _ => unreachable!(),
+                        ref other => {
+                            unreachable!("TokenType::Symbol was not true/false/nil ({:?})", other)
+                        }
                     },
 
-                    _ => unreachable!(),
+                    ref other => unreachable!(
+                        "ast::Value::Symbol token_type != TokenType::Symbol ({:?})",
+                        other
+                    ),
                 },
                 ast::Value::TableConstructor(_) => Some(ArgumentType::Table.into()),
                 ast::Value::Var(_) => None,
@@ -397,14 +402,13 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
             }
         };
 
-        // TODO: Support method calling
         let (function_args, call_is_method) = match call_suffix {
             ast::Suffix::Call(call) => match call {
                 ast::Call::AnonymousCall(args) => (args, false),
                 ast::Call::MethodCall(method_call) => (method_call.args(), true),
             },
 
-            _ => unreachable!(),
+            _ => unreachable!("function_call.call_suffix != ast::Suffix::Call"),
         };
 
         if *expecting_method != call_is_method {
