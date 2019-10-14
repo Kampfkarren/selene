@@ -7,6 +7,7 @@ use serde::{
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize)]
 pub struct StandardLibrary {
+    pub base: Option<String>,
     #[serde(flatten)]
     pub globals: HashMap<String, Field>,
 }
@@ -17,15 +18,21 @@ impl StandardLibrary {
             {$($name:expr => $path:expr,)+} => {
                 match name {
                     $(
-                        $name => Some(toml::from_str::<StandardLibrary>(
-                            include_str!($path)
-                        ).unwrap_or_else(|error| {
-                            panic!(
-                                "default standard library '{}' failed deserialization: {}",
-                                name,
-                                error,
-                            )
-                        })),
+                        $name => {
+                            let mut std = toml::from_str::<StandardLibrary>(
+                                include_str!($path)
+                            ).unwrap_or_else(|error| {
+                                panic!(
+                                    "default standard library '{}' failed deserialization: {}",
+                                    name,
+                                    error,
+                                )
+                            });
+
+                            std.inflate();
+
+                            Some(std)
+                        },
                     )+
 
                     _ => None
@@ -35,6 +42,7 @@ impl StandardLibrary {
 
         names! {
             "lua51" => "../default_std/lua51.toml",
+            "lua52" => "../default_std/lua52.toml",
         }
     }
 
@@ -57,6 +65,38 @@ impl StandardLibrary {
 
         current.get(names.last().unwrap())
     }
+
+    fn inflate(&mut self) {
+        fn merge(into: &mut HashMap<String, Field>, other: &mut HashMap<String, Field>) {
+            for (k, mut v) in other.drain() {
+                if v == Field::Removed {
+                    into.remove(&k);
+                    continue;
+                }
+
+                if let Some(conflict) = into.get_mut(&k) {
+                    if let Field::Table(ref mut from_children) = v {
+                        if let Field::Table(into_children) = conflict {
+                            merge(into_children, from_children);
+                            continue;
+                        }
+                    }
+                }
+
+                into.insert(k, v);
+            }
+        }
+
+        if let Some(base) = &self.base {
+            let base = StandardLibrary::from_name(base).unwrap_or_else(|| {
+                panic!("standard library based on '{}', which does not exist", base)
+            });
+
+            let mut globals = base.globals.clone();
+            merge(&mut globals, &mut self.globals);
+            self.globals = globals;
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -69,11 +109,16 @@ pub enum Field {
         writable: Option<Writable>,
     },
     Table(HashMap<String, Field>),
+    Removed,
 }
 
 impl<'de> Deserialize<'de> for Field {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let field_raw = FieldSerde::deserialize(deserializer)?;
+
+        if field_raw.removed {
+            return Ok(Field::Removed);
+        }
 
         let is_function = field_raw.args.is_some() || field_raw.method;
 
@@ -122,6 +167,8 @@ struct FieldSerde {
     property: bool,
     #[serde(default)]
     method: bool,
+    #[serde(default)]
+    removed: bool,
     #[serde(default)]
     writable: Option<Writable>,
     #[serde(default)]
@@ -285,5 +332,6 @@ mod tests {
     #[test]
     fn valid_serde() {
         StandardLibrary::from_name("lua51").expect("lua51.toml wasn't found");
+        StandardLibrary::from_name("lua52").expect("lua52.toml wasn't found");
     }
 }

@@ -604,6 +604,19 @@ mod tests {
     }
 
     #[test]
+    fn test_lua52() {
+        test_lint_config(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "lua52",
+            TestUtilConfig {
+                standard_library: StandardLibrary::from_name("lua52").unwrap(),
+                ..TestUtilConfig::default()
+            },
+        );
+    }
+
+    #[test]
     fn test_method_call() {
         let mut globals = HashMap::new();
 
@@ -631,7 +644,7 @@ mod tests {
             "standard_library",
             "method_call",
             TestUtilConfig {
-                standard_library: StandardLibrary { globals },
+                standard_library: StandardLibrary { base: None, globals },
                 ..TestUtilConfig::default()
             },
         );
