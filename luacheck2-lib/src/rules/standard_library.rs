@@ -343,7 +343,17 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
         let arguments = match &field {
             standard_library::Field::Function(arguments) => arguments,
             _ => {
-                unimplemented!("calling a property/table");
+                self.diagnostics.push(Diagnostic::new(
+                    "incorrect_standard_library_use",
+                    format!(
+                        // TODO: This message isn't great
+                        "standard library function `{}` is not a function",
+                        name_path.join("."),
+                    ),
+                    Label::from_node(call, None),
+                ));
+
+                return;
             }
         };
 
@@ -414,7 +424,6 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                         self.diagnostics.push(Diagnostic::new(
                             "incorrect_standard_library_use",
                             format!(
-                                // TODO: This message isn't great
                                 "standard library function `{}` requires {} parameters, {} passed",
                                 name_path.join("."),
                                 expected_args,

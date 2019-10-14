@@ -15,3 +15,4 @@ math.sin(variable)
 math.sin(variable, variable)
 
 math.max(2)
+math.pi()
