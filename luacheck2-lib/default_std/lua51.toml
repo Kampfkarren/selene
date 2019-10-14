@@ -551,7 +551,7 @@ type = "number"
 required = false
 
 [[string.find.args]]
-type = "number"
+type = "bool"
 required = false
 
 [[string.format.args]]
