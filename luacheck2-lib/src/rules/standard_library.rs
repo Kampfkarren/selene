@@ -181,6 +181,22 @@ impl StandardLibraryVisitor<'_> {
             let field = name_path.pop().unwrap();
             assert!(!name_path.is_empty(), "name_path is empty");
 
+            // check if it's writable
+            for bound in 1..=name_path.len() {
+                let path = &name_path[0..bound];
+                match self.standard_library.find_global(path) {
+                    Some(field) => {
+                        if let Field::Property { writable } = field {
+                            if *writable == Some(Writable::NewFields) {
+                                return;
+                            }
+                        }
+                    }
+
+                    None => break,
+                }
+            }
+
             self.diagnostics.push(Diagnostic::new_complete(
                 "incorrect_standard_library_use",
                 format!(
@@ -199,6 +215,53 @@ impl StandardLibraryVisitor<'_> {
 
 // TODO: Test shadowing
 impl Visitor<'_> for StandardLibraryVisitor<'_> {
+    fn visit_assignment(&mut self, assignment: &ast::Assignment) {
+        for var in assignment.var_list() {
+            if let Some(reference) = self
+                .scope_manager
+                .reference_at_byte(var.start_position().unwrap().bytes())
+            {
+                if reference.resolved.is_some() {
+                    return;
+                }
+            }
+
+            if let ast::Var::Expression(var_expr) = var {
+                if let Some(name_path) =
+                    name_path_from_prefix_suffix(var_expr.prefix(), var_expr.iter_suffixes())
+                {
+                    match self.standard_library.find_global(&name_path) {
+                        Some(field) => {
+                            if let Field::Property { writable } = field {
+                                if *writable == Some(Writable::NewFields) {
+                                    continue;
+                                }
+                            }
+
+                            let range = var_expr.range().unwrap();
+
+                            self.diagnostics.push(Diagnostic::new_complete(
+                                "incorrect_standard_library_use",
+                                format!(
+                                    // TODO: This message isn't great
+                                    "standard library global `{}` is not writable",
+                                    name_path.join("."),
+                                ),
+                                Label::new((range.0.bytes(), range.1.bytes())),
+                                Vec::new(),
+                                Vec::new(),
+                            ));
+                        }
+
+                        None => {
+                            self.lint_invalid_field_access(name_path, var_expr.range().unwrap());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     fn visit_expression(&mut self, expression: &ast::Expression) {
         if let Some(reference) = self
             .scope_manager
@@ -227,11 +290,11 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
         let mut suffixes: Vec<&ast::Suffix> = call.iter_suffixes().collect();
         let call_suffix = suffixes.pop().unwrap();
 
-        let name_path =
-            match name_path_from_prefix_suffix(call.prefix(), suffixes.iter().copied()) {
-                Some(name_path) => name_path,
-                None => return,
-            };
+        let name_path = match name_path_from_prefix_suffix(call.prefix(), suffixes.iter().copied())
+        {
+            Some(name_path) => name_path,
+            None => return,
+        };
 
         let field = match self.standard_library.find_global(&name_path) {
             Some(field) => field,
@@ -478,6 +541,15 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "unknown_property",
+        );
+    }
+
+    #[test]
+    fn test_writing() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "writing",
         );
     }
 }

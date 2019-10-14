@@ -62,7 +62,7 @@ impl StandardLibrary {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Field {
     Function(Vec<Argument>),
-    Property,
+    Property { writable: Option<Writable> },
     Table(HashMap<String, Field>),
 }
 
@@ -81,7 +81,9 @@ impl<'de> Deserialize<'de> for Field {
         }
 
         if field_raw.property {
-            return Ok(Field::Property);
+            return Ok(Field::Property {
+                writable: field_raw.writable,
+            });
         }
 
         if let Some(args) = field_raw.args {
@@ -93,10 +95,19 @@ impl<'de> Deserialize<'de> for Field {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum Writable {
+    // New fields can be added and set, but variable itself cannot be redefined
+    NewFields,
+}
+
 #[derive(Debug, Deserialize)]
 struct FieldSerde {
     #[serde(default)]
     property: bool,
+    #[serde(default)]
+    writable: Option<Writable>,
     #[serde(default)]
     args: Option<Vec<Argument>>,
     #[serde(flatten)]

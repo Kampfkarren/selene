@@ -1,6 +1,7 @@
 # globals
 [_G]
 property = true
+writable = "new-fields"
 
 [_VERSION]
 property = true
