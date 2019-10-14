@@ -153,11 +153,25 @@ fn main() {
         },
     };
 
-    let standard_library = match StandardLibrary::from_name(&config.std) {
-        Some(std) => std,
-        None => {
-            unimplemented!("non-default std");
-        }
+    let standard_library = match fs::read_to_string(format!("{}.toml", &config.std)) {
+        Ok(contents) => match toml::from_str(&contents) {
+            Ok(standard_library) => standard_library,
+            Err(error) => {
+                error!(
+                    "Custom standard library wasn't formatted properly: {}",
+                    error
+                );
+                return;
+            }
+        },
+
+        Err(_) => match StandardLibrary::from_name(&config.std) {
+            Some(std) => std,
+            None => {
+                error!("Unknown standard library '{}'", config.std);
+                return;
+            }
+        },
     };
 
     let checker = Arc::new(match Checker::new(config, standard_library) {
