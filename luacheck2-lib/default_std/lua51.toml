@@ -105,7 +105,7 @@ type = "any"
 type = "table"
 
 [[rawset.args]]
-type = "number"
+type = "any"
 
 [[rawset.args]]
 type = "any"
