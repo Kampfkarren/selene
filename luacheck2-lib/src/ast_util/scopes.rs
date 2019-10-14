@@ -57,6 +57,7 @@ pub struct Scope {
 #[derive(Debug, Default)]
 pub struct Reference {
     pub identifier: Range,
+    pub name: String,
     pub resolved: Option<Id<Variable>>,
     // TODO: Does this matter even?
     pub write_expr: Option<Range>,
@@ -227,6 +228,7 @@ impl ScopeVisitor {
                 &token.to_string(),
                 Reference {
                     identifier: range(token),
+                    name: token.to_string(),
                     read: true,
                     ..Reference::default()
                 },
@@ -260,6 +262,7 @@ impl ScopeVisitor {
                 &token.to_string(),
                 Reference {
                     identifier: range(token),
+                    name: token.to_string(),
                     write: true,
                     write_expr,
                     ..Reference::default()

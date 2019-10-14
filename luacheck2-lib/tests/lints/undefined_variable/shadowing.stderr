@@ -1,0 +1,16 @@
+error[undefined_variable]: `foo` is not defined
+
+   ┌── shadowing.lua:1:7 ───
+   │
+ 1 │ print(foo)
+   │       ^^^
+   │
+
+error[undefined_variable]: `foo` is not defined
+
+   ┌── shadowing.lua:2:13 ───
+   │
+ 2 │ local foo = foo + 1
+   │             ^^^
+   │
+

@@ -9,6 +9,7 @@ use serde::de::DeserializeOwned;
 
 pub mod empty_if;
 pub mod standard_library;
+pub mod undefined_variable;
 pub mod unused_variable;
 
 #[cfg(test)]

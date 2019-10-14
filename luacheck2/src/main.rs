@@ -3,7 +3,10 @@ use std::{
     fmt, fs,
     io::{self, Write},
     path::Path,
-    sync::{Arc, atomic::{AtomicBool, Ordering}},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
 };
 
 use clap::{App, Arg};

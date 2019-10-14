@@ -1,0 +1,16 @@
+error[undefined_variable]: `bar` is not defined
+
+   ┌── basic.lua:4:7 ───
+   │
+ 4 │ print(bar)
+   │       ^^^
+   │
+
+error[undefined_variable]: `baz` is not defined
+
+    ┌── basic.lua:10:6 ───
+    │
+ 10 │ call(baz)
+    │      ^^^
+    │
+
