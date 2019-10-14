@@ -37,7 +37,7 @@ type = "number"
 required = false
 
 [[getfenv.args]]
-type = "function"
+type = "any" # TODO: function | number
 required = false
 
 [[getmetatable.args]]
