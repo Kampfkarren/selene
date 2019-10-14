@@ -100,6 +100,10 @@ impl<'de> Deserialize<'de> for Field {
 pub enum Writable {
     // New fields can be added and set, but variable itself cannot be redefined
     NewFields,
+    // New fields can't be added, but entire variable can be overridden
+    Overridden,
+    // New fields can be added and entire variable can be overridden
+    Full,
 }
 
 #[derive(Debug, Deserialize)]

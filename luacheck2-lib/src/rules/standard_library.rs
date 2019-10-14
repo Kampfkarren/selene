@@ -187,7 +187,7 @@ impl StandardLibraryVisitor<'_> {
                 match self.standard_library.find_global(path) {
                     Some(field) => {
                         if let Field::Property { writable } = field {
-                            if *writable == Some(Writable::NewFields) {
+                            if writable.is_some() && *writable != Some(Writable::Overridden) {
                                 return;
                             }
                         }
@@ -226,36 +226,63 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                 }
             }
 
-            if let ast::Var::Expression(var_expr) = var {
-                if let Some(name_path) =
-                    name_path_from_prefix_suffix(var_expr.prefix(), var_expr.iter_suffixes())
-                {
-                    match self.standard_library.find_global(&name_path) {
-                        Some(field) => {
-                            if let Field::Property { writable } = field {
-                                if *writable == Some(Writable::NewFields) {
-                                    continue;
+            match var {
+                ast::Var::Expression(var_expr) => {
+                    if let Some(name_path) =
+                        name_path_from_prefix_suffix(var_expr.prefix(), var_expr.iter_suffixes())
+                    {
+                        match self.standard_library.find_global(&name_path) {
+                            Some(field) => {
+                                if let Field::Property { writable } = field {
+                                    if writable.is_some() && *writable != Some(Writable::NewFields)
+                                    {
+                                        continue;
+                                    }
                                 }
+
+                                let range = var_expr.range().unwrap();
+
+                                self.diagnostics.push(Diagnostic::new_complete(
+                                    "incorrect_standard_library_use",
+                                    format!(
+                                        "standard library global `{}` is not writable",
+                                        name_path.join("."),
+                                    ),
+                                    Label::new((range.0.bytes(), range.1.bytes())),
+                                    Vec::new(),
+                                    Vec::new(),
+                                ));
                             }
 
-                            let range = var_expr.range().unwrap();
+                            None => {
+                                self.lint_invalid_field_access(
+                                    name_path,
+                                    var_expr.range().unwrap(),
+                                );
+                            }
+                        }
+                    }
+                }
 
-                            self.diagnostics.push(Diagnostic::new_complete(
-                                "incorrect_standard_library_use",
-                                format!(
-                                    // TODO: This message isn't great
-                                    "standard library global `{}` is not writable",
-                                    name_path.join("."),
-                                ),
-                                Label::new((range.0.bytes(), range.1.bytes())),
-                                Vec::new(),
-                                Vec::new(),
-                            ));
+                ast::Var::Name(name_token) => {
+                    let name = name_token.to_string();
+
+                    if let Some(global) = self.standard_library.find_global(&[name.to_owned()]) {
+                        if let Field::Property { writable } = global {
+                            if writable.is_some() && *writable != Some(Writable::NewFields) {
+                                continue;
+                            }
                         }
 
-                        None => {
-                            self.lint_invalid_field_access(name_path, var_expr.range().unwrap());
-                        }
+                        let range = name_token.range().unwrap();
+
+                        self.diagnostics.push(Diagnostic::new_complete(
+                            "incorrect_standard_library_use",
+                            format!("standard library global `{}` is not overridable", name,),
+                            Label::new((range.0.bytes(), range.1.bytes())),
+                            Vec::new(),
+                            Vec::new(),
+                        ));
                     }
                 }
             }
