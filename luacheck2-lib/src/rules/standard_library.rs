@@ -5,7 +5,7 @@ use std::convert::Infallible;
 use full_moon::{
     ast::{self, Ast},
     node::Node,
-    tokenizer::{Symbol, TokenType},
+    tokenizer::{Position, Symbol, TokenType},
     visitors::Visitor,
 };
 
@@ -165,26 +165,89 @@ pub struct StandardLibraryVisitor<'std> {
     standard_library: &'std StandardLibrary,
 }
 
+impl StandardLibraryVisitor<'_> {
+    fn lint_invalid_field_access(
+        &mut self,
+        mut name_path: Vec<String>,
+        range: (Position, Position),
+    ) {
+        if self.standard_library.find_global(&name_path).is_none()
+            && self
+                .standard_library
+                .find_global(&[name_path[0].to_owned()])
+                .is_some()
+        // Make sure it's not just `bad()`
+        {
+            let field = name_path.pop().unwrap();
+            assert!(!name_path.is_empty(), "name_path is empty");
+
+            self.diagnostics.push(Diagnostic::new_complete(
+                "incorrect_standard_library_use",
+                format!(
+                    // TODO: This message isn't great
+                    "standard library global `{}` does not contain the field `{}`",
+                    name_path.join("."),
+                    field,
+                ),
+                Label::new((range.0.bytes(), range.1.bytes())),
+                Vec::new(),
+                Vec::new(),
+            ));
+        }
+    }
+}
+
 // TODO: Test shadowing
 impl Visitor<'_> for StandardLibraryVisitor<'_> {
-    fn visit_function_call(&mut self, call: &ast::FunctionCall) {
-        let mut suffixes: Vec<&ast::Suffix> = call.iter_suffixes().collect();
-        let call_suffix = suffixes.pop().unwrap();
-
-        let name_path = match name_path_from_prefix_suffix(call.prefix(), suffixes.into_iter()) {
-            Some(name_path) => name_path,
-            None => return,
-        };
-
-        if let Some(reference) = self.scope_manager.reference_at_byte(call.start_position().unwrap().bytes()) {
+    fn visit_expression(&mut self, expression: &ast::Expression) {
+        if let Some(reference) = self
+            .scope_manager
+            .reference_at_byte(expression.start_position().unwrap().bytes())
+        {
             if reference.resolved.is_some() {
                 return;
             }
         }
 
+        if let Some(name_path) = name_path(expression) {
+            self.lint_invalid_field_access(name_path, expression.range().unwrap());
+        }
+    }
+
+    fn visit_function_call(&mut self, call: &ast::FunctionCall) {
+        if let Some(reference) = self
+            .scope_manager
+            .reference_at_byte(call.start_position().unwrap().bytes())
+        {
+            if reference.resolved.is_some() {
+                return;
+            }
+        }
+
+        let mut suffixes: Vec<&ast::Suffix> = call.iter_suffixes().collect();
+        let call_suffix = suffixes.pop().unwrap();
+
+        let name_path =
+            match name_path_from_prefix_suffix(call.prefix(), suffixes.iter().copied()) {
+                Some(name_path) => name_path,
+                None => return,
+            };
+
         let field = match self.standard_library.find_global(&name_path) {
             Some(field) => field,
-            None => return,
+            None => {
+                self.lint_invalid_field_access(
+                    name_path,
+                    (
+                        call.prefix().start_position().unwrap(),
+                        suffixes
+                            .last()
+                            .and_then(|suffix| suffix.end_position())
+                            .unwrap_or_else(|| call.prefix().end_position().unwrap()),
+                    ),
+                );
+                return;
+            }
         };
 
         let arguments = match &field {
@@ -406,6 +469,15 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "shadowing",
+        );
+    }
+
+    #[test]
+    fn test_unknown_property() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "unknown_property",
         );
     }
 }

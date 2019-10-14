@@ -26,7 +26,7 @@ impl ScopeManager {
     pub fn reference_at_byte(&self, byte: usize) -> Option<&Reference> {
         for (_, reference) in &self.references {
             if byte >= reference.identifier.0 && byte <= reference.identifier.1 {
-                return Some(reference)
+                return Some(reference);
             }
         }
 
