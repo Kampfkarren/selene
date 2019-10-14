@@ -644,7 +644,10 @@ mod tests {
             "standard_library",
             "method_call",
             TestUtilConfig {
-                standard_library: StandardLibrary { base: None, globals },
+                standard_library: StandardLibrary {
+                    base: None,
+                    globals,
+                },
                 ..TestUtilConfig::default()
             },
         );
