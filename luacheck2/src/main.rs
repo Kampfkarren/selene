@@ -3,11 +3,11 @@ use std::{
     fmt, fs,
     io::{self, Write},
     path::Path,
-    sync::Arc,
+    sync::{Arc, atomic::{AtomicBool, Ordering}},
 };
 
 use clap::{App, Arg};
-use codespan_reporting::diagnostic::Severity as CodespanSeverity;
+use codespan_reporting::{diagnostic::Severity as CodespanSeverity, term::DisplayStyle};
 use full_moon::ast::owned::Owned;
 use luacheck2_lib::{rules::Severity, standard_library::StandardLibrary, *};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
@@ -22,6 +22,8 @@ macro_rules! error {
         error(fmt::format(format_args!($fmt, $($args)*))).unwrap();
     };
 }
+
+static QUIET: AtomicBool = AtomicBool::new(false);
 
 fn error(text: String) -> io::Result<()> {
     let mut stderr = StandardStream::stderr(ColorChoice::Auto);
@@ -74,7 +76,14 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     }) {
         codespan_reporting::term::emit(
             &mut stdout,
-            &codespan_reporting::term::Config::default(),
+            &codespan_reporting::term::Config {
+                display_style: if QUIET.load(Ordering::Relaxed) {
+                    DisplayStyle::Rich
+                } else {
+                    DisplayStyle::Short
+                },
+                ..Default::default()
+            },
             &files,
             &diagnostic,
         )
@@ -113,6 +122,11 @@ fn main() {
                 .default_value(&num_cpus)
         )
         .arg(
+            Arg::with_name("quiet")
+                .short("q")
+                .help("Display only the necessary information")
+        )
+        .arg(
             Arg::with_name("files")
                 .index(1)
                 .min_values(1)
@@ -120,6 +134,8 @@ fn main() {
                 .required(true),
         )
         .get_matches();
+
+    QUIET.store(!matches.is_present("quiet"), Ordering::Relaxed);
 
     let config: CheckerConfig<toml::value::Value> = match matches.value_of("config") {
         Some(config_file) => {
