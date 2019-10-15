@@ -1,0 +1,8 @@
+error[undefined_variable]: `z` is not defined
+
+   ┌── hoisting.lua:4:5 ───
+   │
+ 4 │     z()
+   │     ^
+   │
+

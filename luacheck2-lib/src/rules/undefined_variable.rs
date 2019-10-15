@@ -17,6 +17,7 @@ impl Rule for UndefinedVariableLint {
     fn pass(&self, ast: &Ast, context: &Context) -> Vec<Diagnostic> {
         // ScopeManager repeats references, and I just don't want to fix it right now
         let mut read = HashSet::new();
+
         let mut diagnostics = Vec::new();
         let scope_manager = ScopeManager::new(ast);
 
@@ -61,6 +62,15 @@ mod tests {
             UndefinedVariableLint::new(()).unwrap(),
             "undefined_variable",
             "basic",
+        );
+    }
+
+    #[test]
+    fn test_hoisting() {
+        test_lint(
+            UndefinedVariableLint::new(()).unwrap(),
+            "undefined_variable",
+            "hoisting",
         );
     }
 

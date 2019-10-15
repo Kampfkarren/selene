@@ -272,7 +272,10 @@ impl ScopeVisitor {
     }
 
     fn define_name(&mut self, token: &TokenReference, definition_range: Range) {
-        let name = token.to_string();
+        self.define_name_full(&token.to_string(), range(token), definition_range);
+    }
+
+    fn define_name_full(&mut self, name: &str, range: Range, definition_range: Range) -> Id<Variable> {
         let id = self.scope_manager.variables.alloc(Variable {
             name: name.to_owned(),
             ..Variable::default()
@@ -283,7 +286,36 @@ impl ScopeVisitor {
         let variable = &mut self.scope_manager.variables[id];
 
         variable.definitions.push(definition_range);
-        variable.identifiers.push(range(token));
+        variable.identifiers.push(range);
+
+        id
+    }
+
+    fn try_hoist(&mut self) {
+        let latest_reference_id = *self.current_scope().references.last().unwrap();
+        let (name, identifier, write_expr) = {
+            let reference = self
+                .scope_manager
+                .references
+                .get(latest_reference_id)
+                .unwrap();
+
+            (
+                reference.name.to_owned(),
+                reference.identifier,
+                reference.identifier, // This is the write_expr, but it's not great
+            )
+        };
+
+        if self.find_variable(&name).is_none() {
+            let id = self.define_name_full(&name, identifier, write_expr);
+
+            for (_, reference) in &mut self.scope_manager.references {
+                if reference.read && reference.name == name && reference.resolved.is_none() {
+                    reference.resolved = Some(id);
+                }
+            }
+        }
     }
 
     fn reference_variable(&mut self, name: &str, mut reference: Reference) {
@@ -338,6 +370,7 @@ impl Visitor<'_> for ScopeVisitor {
                         self.read_expression(expression);
                         continue;
                     }
+
                     ast::Prefix::Name(name) => {
                         if var_expr.iter_suffixes().next().is_some() {
                             self.read_name(name);
@@ -351,6 +384,9 @@ impl Visitor<'_> for ScopeVisitor {
             };
 
             self.write_name(&name, expression.map(range));
+            if let ast::Var::Name(_) = var {
+                self.try_hoist();
+            }
         }
     }
 
@@ -478,6 +514,7 @@ impl Visitor<'_> for ScopeVisitor {
             self.write_name(base, Some(range(declaration.name())));
         } else {
             self.read_name(base);
+            self.try_hoist();
         }
     }
 
