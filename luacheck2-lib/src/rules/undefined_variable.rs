@@ -75,6 +75,15 @@ mod tests {
     }
 
     #[test]
+    fn test_self() {
+        test_lint(
+            UndefinedVariableLint::new(()).unwrap(),
+            "undefined_variable",
+            "self",
+        );
+    }
+
+    #[test]
     fn test_shadowing() {
         test_lint(
             UndefinedVariableLint::new(()).unwrap(),

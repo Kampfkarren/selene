@@ -8,18 +8,21 @@ use serde::Deserialize;
 #[derive(Clone, Deserialize)]
 #[serde(default)]
 pub struct UnusedVariableConfig {
+    allow_unused_self: bool,
     ignore_pattern: String,
 }
 
 impl Default for UnusedVariableConfig {
     fn default() -> Self {
         Self {
+            allow_unused_self: false,
             ignore_pattern: "^_".to_owned(),
         }
     }
 }
 
 pub struct UnusedVariableLint {
+    allow_unused_self: bool,
     ignore_pattern: Regex,
 }
 
@@ -29,6 +32,7 @@ impl Rule for UnusedVariableLint {
 
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(Self {
+            allow_unused_self: config.allow_unused_self,
             ignore_pattern: Regex::new(&config.ignore_pattern)?,
         })
     }
@@ -49,7 +53,19 @@ impl Rule for UnusedVariableLint {
                 .map(|id| &scope_manager.references[id]);
 
             if !references.clone().any(|reference| reference.read) {
-                diagnostics.push(Diagnostic::new(
+                let mut notes = Vec::new();
+
+                if variable.name == "self" {
+                    if self.allow_unused_self {
+                        continue;
+                    }
+
+                    notes.push("`self` is implicitly defined when defining a method".to_owned());
+                    notes
+                        .push("if you don't need it, consider using `.` instead of `:`".to_owned());
+                }
+
+                diagnostics.push(Diagnostic::new_complete(
                     "unused_variable",
                     if references.any(|reference| reference.write) {
                         format!("{} is assigned a value, but never used", variable.name)
@@ -57,6 +73,8 @@ impl Rule for UnusedVariableLint {
                         format!("{} is defined, but never used", variable.name)
                     },
                     Label::new(variable.identifiers[0]),
+                    notes,
+                    Vec::new(),
                 ));
             };
         }
@@ -150,6 +168,27 @@ mod tests {
     }
 
     #[test]
+    fn test_self() {
+        test_lint(
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
+            "unused_variable",
+            "self",
+        );
+    }
+
+    #[test]
+    fn test_self_ignored() {
+        test_lint(
+            UnusedVariableLint::new(UnusedVariableConfig {
+                allow_unused_self: true,
+                ..UnusedVariableConfig::default()
+            }).unwrap(),
+            "unused_variable",
+            "self_ignored",
+        );
+    }
+
+    #[test]
     fn test_shadowing() {
         test_lint(
             UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
@@ -171,6 +210,7 @@ mod tests {
     fn test_invalid_regex() {
         assert!(UnusedVariableLint::new(UnusedVariableConfig {
             ignore_pattern: "(".to_owned(),
+            ..UnusedVariableConfig::default()
         })
         .is_err());
     }

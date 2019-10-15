@@ -513,6 +513,17 @@ impl Visitor<'_> for ScopeVisitor {
             self.read_name(base);
             self.try_hoist();
         }
+
+        if let Some(name) = name.method_name() {
+            self.open_scope(declaration.body());
+            self.define_name_full("self", range(name), range(name));
+        }
+    }
+
+    fn visit_function_declaration_end(&mut self, declaration: &ast::FunctionDeclaration) {
+        if declaration.name().method_name().is_some() {
+            self.close_scope();
+        }
     }
 
     fn visit_generic_for(&mut self, generic_for: &ast::GenericFor) {
