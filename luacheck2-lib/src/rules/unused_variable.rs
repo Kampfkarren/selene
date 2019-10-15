@@ -182,7 +182,8 @@ mod tests {
             UnusedVariableLint::new(UnusedVariableConfig {
                 allow_unused_self: true,
                 ..UnusedVariableConfig::default()
-            }).unwrap(),
+            })
+            .unwrap(),
             "unused_variable",
             "self_ignored",
         );
