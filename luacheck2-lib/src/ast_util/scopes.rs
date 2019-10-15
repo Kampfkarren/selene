@@ -244,8 +244,7 @@ impl ScopeVisitor {
                     self.read_expression(value);
                 }
 
-                ast::Field::NameKey { key, value, .. } => {
-                    self.read_name(key);
+                ast::Field::NameKey { value, .. } => {
                     self.read_expression(value);
                 }
 
@@ -275,7 +274,12 @@ impl ScopeVisitor {
         self.define_name_full(&token.to_string(), range(token), definition_range);
     }
 
-    fn define_name_full(&mut self, name: &str, range: Range, definition_range: Range) -> Id<Variable> {
+    fn define_name_full(
+        &mut self,
+        name: &str,
+        range: Range,
+        definition_range: Range,
+    ) -> Id<Variable> {
         let id = self.scope_manager.variables.alloc(Variable {
             name: name.to_owned(),
             ..Variable::default()
@@ -437,10 +441,7 @@ impl Visitor<'_> for ScopeVisitor {
         let arguments = match call {
             ast::Call::AnonymousCall(args) => args,
 
-            ast::Call::MethodCall(method_call) => {
-                self.read_name(method_call.name());
-                method_call.args()
-            }
+            ast::Call::MethodCall(method_call) => method_call.args(),
         };
 
         match arguments {
@@ -455,10 +456,6 @@ impl Visitor<'_> for ScopeVisitor {
             }
 
             _ => {}
-        }
-
-        if let ast::Call::MethodCall(method_call) = call {
-            self.read_name(method_call.name());
         }
     }
 
