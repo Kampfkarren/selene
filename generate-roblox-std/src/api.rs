@@ -56,6 +56,8 @@ pub enum ApiMember {
         tags: Option<Vec<String>>,
         #[serde(rename = "Security")]
         security: ApiPropertySecurity,
+        #[serde(rename = "ValueType")]
+        value_type: ApiValueType,
     },
 }
 
@@ -68,6 +70,7 @@ pub struct ApiParameter {
 }
 
 pub enum ApiValueType {
+    Class { name: String },
     DataType { value: ApiDataType },
     Group { value: ApiGroupType },
     Primitive { value: ApiPrimitiveType },
@@ -105,6 +108,8 @@ impl<'de> Visitor<'de> for ApiValueTypeVisitor {
             .ok_or_else(|| serde::de::Error::custom("api value type did not contain a `Name`"))?;
 
         Ok(match category.as_str() {
+            "Class" => ApiValueType::Class { name },
+
             "DataType" => ApiValueType::DataType {
                 value: ApiDataType::deserialize(name.into_deserializer())?,
             },

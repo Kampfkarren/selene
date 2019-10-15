@@ -35,17 +35,25 @@ fn event_field() -> Field {
 }
 
 fn write_class(std: &mut StandardLibrary, api: &api::ApiDump, global_name: &str, class_name: &str) {
-    let class = api.classes.iter().find(|c| c.name == class_name).unwrap();
+    let mut mutate = BTreeMap::new();
+    write_class_members(std, api, &mut mutate, class_name);
+
     let global_field = std
         .globals
         .entry(global_name.to_owned())
         .or_insert_with(|| Field::Table(BTreeMap::new()));
 
-    let global_table = if let Field::Table(table) = global_field {
+    let table = if let Field::Table(table) = global_field {
         table
     } else {
         unreachable!();
     };
+
+    table.extend(&mut mutate.into_iter());
+}
+
+fn write_class_members(std: &mut StandardLibrary, api: &api::ApiDump, table: &mut BTreeMap<String, Field>, class_name: &str) {
+    let class = api.classes.iter().find(|c| c.name == class_name).unwrap();
 
     for member in &class.members {
         let (name, tags, field) = match &member {
@@ -76,6 +84,10 @@ fn write_class(std: &mut StandardLibrary, api: &api::ApiDump, global_name: &str,
                                 Required::Required(None)
                             },
                             argument_type: match &param.parameter_type {
+                                ApiValueType::Class { name } => {
+                                    ArgumentType::Display(name.to_owned())
+                                }
+
                                 ApiValueType::DataType { value } => match value {
                                     ApiDataType::Content => ArgumentType::String,
                                     ApiDataType::Other(other) => {
@@ -112,6 +124,7 @@ fn write_class(std: &mut StandardLibrary, api: &api::ApiDump, global_name: &str,
                 name,
                 tags,
                 security,
+                value_type,
             } => (name, tags, {
                 if *security == ApiPropertySecurity::default() {
                     let empty = Vec::new();
@@ -120,13 +133,20 @@ fn write_class(std: &mut StandardLibrary, api: &api::ApiDump, global_name: &str,
                         None => &empty,
                     };
 
-                    Some(Field::Property {
-                        writable: if tags.contains(&"ReadOnly".to_string()) {
-                            None
-                        } else {
-                            Some(Writable::Overridden)
-                        },
-                    })
+                    if let ApiValueType::Class { .. } = value_type {
+                        // TODO: Lint to make sure you're using class properties/methods right
+                        Some(Field::Property {
+                            writable: Some(Writable::Full),
+                        })
+                    } else {
+                        Some(Field::Property {
+                            writable: if tags.contains(&"ReadOnly".to_string()) {
+                                None
+                            } else {
+                                Some(Writable::Overridden)
+                            },
+                        })
+                    }
                 } else {
                     None
                 }
@@ -144,12 +164,12 @@ fn write_class(std: &mut StandardLibrary, api: &api::ApiDump, global_name: &str,
         }
 
         if let Some(field) = field {
-            global_table.insert(name.to_owned(), field);
+            table.insert(name.to_owned(), field);
         }
     }
 
     if class.superclass != "<<<ROOT>>>" {
-        write_class(std, api, global_name, &class.superclass);
+        write_class_members(std, api, table, &class.superclass);
     }
 }
 
