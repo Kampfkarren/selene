@@ -2,4 +2,6 @@
 
 members = [
 	"luacheck2",
+    "luacheck2-lib",
+    "generate-roblox-std",
 ]

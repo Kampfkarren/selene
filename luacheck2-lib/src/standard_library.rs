@@ -1,15 +1,19 @@
-use std::{collections::HashMap, fmt};
+use std::{
+    collections::{BTreeMap, HashMap},
+    fmt,
+};
 
 use serde::{
     de::{self, Deserializer, Visitor},
-    Deserialize,
+    ser::{SerializeMap, SerializeSeq, Serializer},
+    Deserialize, Serialize,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
 pub struct StandardLibrary {
     pub base: Option<String>,
     #[serde(flatten)]
-    pub globals: HashMap<String, Field>,
+    pub globals: BTreeMap<String, Field>,
 }
 
 impl StandardLibrary {
@@ -66,9 +70,11 @@ impl StandardLibrary {
         current.get(names.last().unwrap())
     }
 
-    fn inflate(&mut self) {
-        fn merge(into: &mut HashMap<String, Field>, other: &mut HashMap<String, Field>) {
-            for (k, mut v) in other.drain() {
+    pub fn inflate(&mut self) {
+        fn merge(into: &mut BTreeMap<String, Field>, other: &mut BTreeMap<String, Field>) {
+            for (k, v) in other {
+                let (k, mut v) = (k.to_owned(), v.to_owned());
+
                 if v == Field::Removed {
                     into.remove(&k);
                     continue;
@@ -108,7 +114,7 @@ pub enum Field {
     Property {
         writable: Option<Writable>,
     },
-    Table(HashMap<String, Field>),
+    Table(BTreeMap<String, Field>),
     Removed,
 }
 
@@ -150,7 +156,42 @@ impl<'de> Deserialize<'de> for Field {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+impl Serialize for Field {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        match self {
+            Field::Function { arguments, method } => {
+                let mut map = serializer.serialize_map(None)?;
+                map.serialize_entry("args", arguments)?;
+                if *method {
+                    map.serialize_entry("method", &true)?;
+                }
+                map.end()
+            }
+
+            Field::Property { writable } => {
+                let mut map = serializer.serialize_map(None)?;
+                map.serialize_entry("property", &true)?;
+                if let Some(writable) = writable {
+                    map.serialize_entry("writable", writable)?;
+                }
+                map.end()
+            }
+
+            Field::Table(table) => {
+                // TODO: Can this be generic?
+                toml::Value::try_from(table).unwrap().serialize(serializer)
+            }
+
+            Field::Removed => {
+                let mut map = serializer.serialize_map(Some(1))?;
+                map.serialize_entry("removed", &true)?;
+                map.end()
+            }
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum Writable {
     // New fields can be added and set, but variable itself cannot be redefined
@@ -174,12 +215,13 @@ struct FieldSerde {
     #[serde(default)]
     args: Option<Vec<Argument>>,
     #[serde(flatten)]
-    children: HashMap<String, Field>,
+    children: BTreeMap<String, Field>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Argument {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Required::required_no_message")]
     pub required: Required,
     #[serde(rename = "type")]
     pub argument_type: ArgumentType,
@@ -201,6 +243,35 @@ pub enum ArgumentType {
     Table,
     // TODO: Support repeating types (like for string.char)
     Vararg,
+}
+
+impl Serialize for ArgumentType {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        match self {
+            &ArgumentType::Any
+            | &ArgumentType::Bool
+            | &ArgumentType::Function
+            | &ArgumentType::Nil
+            | &ArgumentType::Number
+            | &ArgumentType::String
+            | &ArgumentType::Table
+            | &ArgumentType::Vararg => serializer.serialize_str(&self.to_string()),
+
+            ArgumentType::Constant(constants) => {
+                let mut seq = serializer.serialize_seq(Some(constants.len()))?;
+                for constant in constants {
+                    seq.serialize_element(constant)?;
+                }
+                seq.end()
+            }
+
+            ArgumentType::Display(display) => {
+                let mut map = serializer.serialize_map(Some(1))?;
+                map.serialize_entry("display", display)?;
+                map.end()
+            }
+        }
+    }
 }
 
 impl<'de> Deserialize<'de> for ArgumentType {
@@ -291,6 +362,12 @@ pub enum Required {
     Required(Option<String>),
 }
 
+impl Required {
+    fn required_no_message(&self) -> bool {
+        self == &Required::Required(None)
+    }
+}
+
 impl Default for Required {
     fn default() -> Self {
         Required::Required(None)
@@ -300,6 +377,16 @@ impl Default for Required {
 impl<'de> Deserialize<'de> for Required {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         deserializer.deserialize_any(RequiredVisitor)
+    }
+}
+
+impl Serialize for Required {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        match self {
+            Required::NotRequired => serializer.serialize_bool(false),
+            Required::Required(None) => serializer.serialize_bool(true),
+            Required::Required(Some(message)) => serializer.serialize_str(message),
+        }
     }
 }
 

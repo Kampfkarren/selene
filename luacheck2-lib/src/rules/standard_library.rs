@@ -592,7 +592,7 @@ impl From<ArgumentType> for PassedArgumentType {
 #[cfg(test)]
 mod tests {
     use super::{super::test_util::*, *};
-    use std::collections::HashMap;
+    use std::collections::BTreeMap;
 
     #[test]
     fn test_name_path() {
@@ -666,12 +666,12 @@ mod tests {
 
     #[test]
     fn test_method_call() {
-        let mut globals = HashMap::new();
+        let mut globals = BTreeMap::new();
 
         globals.insert(
             "foo".to_owned(),
             Field::Table({
-                let mut map = HashMap::new();
+                let mut map = BTreeMap::new();
                 map.insert(
                     "bar".to_owned(),
                     Field::Function {
