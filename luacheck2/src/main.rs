@@ -1,5 +1,4 @@
 use std::{
-    env::current_dir,
     fmt, fs,
     io::{self, Write},
     path::Path,
@@ -221,11 +220,12 @@ fn main() {
             Ok(metadata) => {
                 if metadata.is_file() {
                     let checker = Arc::clone(&checker);
+                    let filename = filename.to_owned();
 
                     pool.execute(move || {
                         read_file(
                             &checker,
-                            &current_dir().expect("Failed to get current directory"),
+                            Path::new(&filename),
                         )
                     });
                 } else if metadata.is_dir() {
