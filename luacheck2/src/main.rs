@@ -222,12 +222,7 @@ fn main() {
                     let checker = Arc::clone(&checker);
                     let filename = filename.to_owned();
 
-                    pool.execute(move || {
-                        read_file(
-                            &checker,
-                            Path::new(&filename),
-                        )
-                    });
+                    pool.execute(move || read_file(&checker, Path::new(&filename)));
                 } else if metadata.is_dir() {
                     let glob =
                         match glob::glob(&format!("{}/{}", filename.to_string_lossy(), pattern)) {

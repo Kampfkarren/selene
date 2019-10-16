@@ -163,6 +163,7 @@ pub struct CheckerDiagnostic {
 }
 
 use_rules! {
+    divide_by_zero: rules::divide_by_zero::DivideByZeroLint,
     empty_if: rules::empty_if::EmptyIfLint,
     incorrect_standard_library_use: rules::standard_library::StandardLibraryLint,
     undefined_variable: rules::undefined_variable::UndefinedVariableLint,
