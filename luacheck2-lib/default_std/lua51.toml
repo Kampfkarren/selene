@@ -101,8 +101,14 @@ type = "any"
 [[rawequal.args]]
 type = "any"
 
+[[rawget.args]]
+type = "any"
+
+[[rawget.args]]
+type = "any"
+
 [[rawset.args]]
-type = "table"
+type = "any"
 
 [[rawset.args]]
 type = "any"
