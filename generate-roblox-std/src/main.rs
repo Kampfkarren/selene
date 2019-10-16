@@ -266,7 +266,7 @@ fn write_get_service(std: &mut StandardLibrary, api: &api::ApiDump) {
             argument_type: ArgumentType::Constant(service_names),
             required: Required::Required(None),
         }],
-        method: false,
+        method: true,
     };
 }
 

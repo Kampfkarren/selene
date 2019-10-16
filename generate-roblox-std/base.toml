@@ -10,6 +10,48 @@ property = true
 [luacheck2.structs.Instance."*"]
 any = true
 
+[[BrickColor.new.args]]
+type = "any"
+
+[[BrickColor.new.args]]
+type = "number"
+required = false
+
+[[BrickColor.new.args]]
+type = "number"
+required = false
+
+[[BrickColor.palette.args]]
+type = "number"
+
+[BrickColor.random]
+args = []
+
+# BrickColor colors
+[BrickColor.Black]
+args = []
+
+[BrickColor.Blue]
+args = []
+
+[BrickColor.DarkGray]
+args = []
+
+[BrickColor.Gray]
+args = []
+
+[BrickColor.Green]
+args = []
+
+[BrickColor.Red]
+args = []
+
+[BrickColor.White]
+args = []
+
+[BrickColor.Yellow]
+args = []
+
 [[CFrame.Angles.args]]
 type = "number"
 required = false
