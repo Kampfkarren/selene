@@ -426,3 +426,82 @@ required = false
 [[wait.args]]
 type = "number"
 required = false
+
+# Removed stuff
+[[collectgarbage.args]]
+type = ["count"]
+
+[dofile]
+removed = true
+
+[load]
+removed = true
+
+[loadfile]
+removed = true
+
+[module]
+removed = true
+
+[debug.debug]
+removed = true
+
+[debug.getfenv]
+removed = true
+
+[debug.gethook]
+removed = true
+
+[debug.getinfo]
+removed = true
+
+[debug.getmetatable]
+removed = true
+
+[debug.getregistry]
+removed = true
+
+[debug.getupvalue]
+removed = true
+
+[debug.setfenv]
+removed = true
+
+[debug.sethook]
+removed = true
+
+[debug.setlocal]
+removed = true
+
+[debug.setmetatable]
+removed = true
+
+[debug.setupvalue]
+removed = true
+
+[io]
+removed = true
+
+[os.clock]
+removed = true
+
+[os.execute]
+removed = true
+
+[os.exit]
+removed = true
+
+[os.getenv]
+removed = true
+
+[os.remove]
+removed = true
+
+[os.rename]
+removed = true
+
+[os.setlocale]
+removed = true
+
+[os.tmpname]
+removed = true
