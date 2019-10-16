@@ -554,7 +554,9 @@ impl Visitor<'_> for ScopeVisitor {
         self.open_scope(if_block.block());
 
         if let Some(else_block) = if_block.else_block() {
-            self.else_blocks.insert(range(else_block));
+            if else_block.range().is_some() {
+                self.else_blocks.insert(range(else_block));
+            }
         }
     }
 
