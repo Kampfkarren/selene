@@ -1,0 +1,14 @@
+name: Generate Roblox standard library
+on: [push]
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Generate
+      run: cargo run --bin generate-roblox-std --verbose > roblox.toml
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        name: roblox
+        path: roblox.toml

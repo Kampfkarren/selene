@@ -1,0 +1,13 @@
+[luacheck2]
+base = "lua51"
+
+[script.ClassName]
+property = true
+
+[script.Name]
+property = true
+writable = "overridden"
+
+[script."*"."*"]
+property = true
+writable = "full"

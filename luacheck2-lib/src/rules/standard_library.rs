@@ -212,11 +212,17 @@ impl StandardLibraryVisitor<'_> {
                 let path = &name_path[0..bound];
                 match self.standard_library.find_global(path) {
                     Some(field) => {
-                        if let Field::Property { writable } = field {
-                            if writable.is_some() && *writable != Some(Writable::Overridden) {
-                                return;
+                        match field {
+                            Field::Any => return,
+
+                            Field::Property { writable } => {
+                                if writable.is_some() && *writable != Some(Writable::Overridden) {
+                                    return;
+                                }
                             }
-                        }
+
+                            _ => {}
+                        };
                     }
 
                     None => break,
@@ -270,12 +276,17 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                     {
                         match self.standard_library.find_global(&name_path) {
                             Some(field) => {
-                                if let Field::Property { writable } = field {
-                                    if writable.is_some() && *writable != Some(Writable::NewFields)
-                                    {
-                                        continue;
+                                match field {
+                                    Field::Property { writable } => {
+                                        if writable.is_some()
+                                            && *writable != Some(Writable::NewFields)
+                                        {
+                                            continue;
+                                        }
                                     }
-                                }
+                                    Field::Any => continue,
+                                    _ => {}
+                                };
 
                                 let range = var_expr.range().unwrap();
 
@@ -305,11 +316,15 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                     let name = name_token.to_string();
 
                     if let Some(global) = self.standard_library.find_global(&[name.to_owned()]) {
-                        if let Field::Property { writable } = global {
-                            if writable.is_some() && *writable != Some(Writable::NewFields) {
-                                continue;
+                        match global {
+                            Field::Property { writable } => {
+                                if writable.is_some() && *writable != Some(Writable::NewFields) {
+                                    continue;
+                                }
                             }
-                        }
+                            Field::Any => continue,
+                            _ => {}
+                        };
 
                         let range = name_token.range().unwrap();
 
@@ -387,6 +402,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
         };
 
         let (arguments, expecting_method) = match &field {
+            standard_library::Field::Any => return,
             standard_library::Field::Function { arguments, method } => (arguments, method),
             _ => {
                 self.diagnostics.push(Diagnostic::new(
@@ -419,6 +435,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                 "is a method"
             };
 
+            let using = if call_is_method { ":" } else { "." };
             let use_instead = if call_is_method { "." } else { ":" };
 
             let name = name_path.pop().unwrap();
@@ -426,9 +443,10 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
             self.diagnostics.push(Diagnostic::new_complete(
                 "incorrect_standard_library_use",
                 format!(
-                    // TODO: This message isn't great
-                    "standard library function `{}` {}",
+                    "standard library function `{}{}{}` {}",
                     name_path.join("."),
+                    using,
+                    name,
                     problem,
                 ),
                 Label::from_node(call, None),
@@ -592,7 +610,6 @@ impl From<ArgumentType> for PassedArgumentType {
 #[cfg(test)]
 mod tests {
     use super::{super::test_util::*, *};
-    use std::collections::HashMap;
 
     #[test]
     fn test_name_path() {
@@ -621,6 +638,15 @@ mod tests {
                 vec!["foo".to_owned()],
                 vec!["foo".to_owned(), "bar".to_owned(), "baz".to_owned()],
             ]
+        );
+    }
+
+    #[test]
+    fn test_any() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "any",
         );
     }
 
@@ -666,38 +692,10 @@ mod tests {
 
     #[test]
     fn test_method_call() {
-        let mut globals = HashMap::new();
-
-        globals.insert(
-            "foo".to_owned(),
-            Field::Table({
-                let mut map = HashMap::new();
-                map.insert(
-                    "bar".to_owned(),
-                    Field::Function {
-                        arguments: vec![Argument {
-                            required: Required::Required(None),
-                            argument_type: ArgumentType::Number,
-                        }],
-
-                        method: true,
-                    },
-                );
-                map
-            }),
-        );
-
-        test_lint_config(
+        test_lint(
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "method_call",
-            TestUtilConfig {
-                standard_library: StandardLibrary {
-                    base: None,
-                    globals,
-                },
-                ..TestUtilConfig::default()
-            },
         );
     }
 
@@ -725,6 +723,24 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "vararg",
+        );
+    }
+
+    #[test]
+    fn test_wildcard() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "wildcard",
+        );
+    }
+
+    #[test]
+    fn test_wildcard_structs() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "wildcard_structs",
         );
     }
 

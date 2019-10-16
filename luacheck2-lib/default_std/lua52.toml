@@ -1,3 +1,4 @@
+[luacheck2]
 base = "lua51"
 
 [getfenv]

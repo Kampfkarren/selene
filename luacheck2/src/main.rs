@@ -173,8 +173,11 @@ fn main() {
     };
 
     let standard_library = match fs::read_to_string(format!("{}.toml", &config.std)) {
-        Ok(contents) => match toml::from_str(&contents) {
-            Ok(standard_library) => standard_library,
+        Ok(contents) => match toml::from_str::<StandardLibrary>(&contents) {
+            Ok(mut standard_library) => {
+                standard_library.inflate();
+                standard_library
+            }
             Err(error) => {
                 error!(
                     "Custom standard library wasn't formatted properly: {}",

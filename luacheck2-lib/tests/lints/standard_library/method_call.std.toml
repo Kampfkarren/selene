@@ -1,0 +1,5 @@
+[foo.bar]
+method = true
+
+[[foo.bar.args]]
+type = "number"

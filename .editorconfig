@@ -7,3 +7,7 @@ charset = utf-8
 end_of_file = "lf"
 trim_trailing_whitespace = true
 insert_final_newline = false
+
+[*.yml]
+indent_style = space
+indent_size = 2

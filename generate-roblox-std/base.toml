@@ -1,0 +1,529 @@
+[luacheck2]
+base = "lua51"
+
+[luacheck2.structs.EnumItem.Name]
+property = true
+
+[luacheck2.structs.EnumItem.Value]
+property = true
+
+[luacheck2.structs.Event.Connect]
+method = true
+
+[[luacheck2.structs.Event.Connect.args]]
+type = "function"
+
+[luacheck2.structs.Event.Wait]
+method = true
+args = []
+
+[luacheck2.structs.Instance."*"]
+any = true
+
+[[BrickColor.new.args]]
+type = "any"
+
+[[BrickColor.new.args]]
+type = "number"
+required = false
+
+[[BrickColor.new.args]]
+type = "number"
+required = false
+
+[[BrickColor.palette.args]]
+type = "number"
+
+[BrickColor.random]
+args = []
+
+# BrickColor colors
+[BrickColor.Black]
+args = []
+
+[BrickColor.Blue]
+args = []
+
+[BrickColor.DarkGray]
+args = []
+
+[BrickColor.Gray]
+args = []
+
+[BrickColor.Green]
+args = []
+
+[BrickColor.Red]
+args = []
+
+[BrickColor.White]
+args = []
+
+[BrickColor.Yellow]
+args = []
+
+[[CFrame.Angles.args]]
+type = "number"
+required = false
+
+[[CFrame.Angles.args]]
+type = "number"
+required = false
+
+[[CFrame.Angles.args]]
+type = "number"
+required = false
+
+[[CFrame.new.args]]
+type = "any"
+required = false
+
+[[CFrame.new.args]]
+type = "any"
+required = false
+
+[[CFrame.new.args]]
+type = "number"
+required = false
+
+[[CFrame.new.args]]
+type = "number"
+required = false
+
+[[CFrame.new.args]]
+type = "number"
+required = false
+
+[[CFrame.new.args]]
+type = "number"
+required = false
+
+[[CFrame.new.args]]
+type = "number"
+required = false
+
+[[CFrame.new.args]]
+type = "number"
+required = false
+
+[[CFrame.new.args]]
+type = "number"
+required = false
+
+[[CFrame.new.args]]
+type = "number"
+required = false
+
+[[CFrame.new.args]]
+type = "number"
+required = false
+
+[[CFrame.new.args]]
+type = "number"
+required = false
+
+[[CFrame.fromAxisAngle.args]]
+type = { display = "Vector3" }
+
+[[CFrame.fromAxisAngle.args]]
+type = "number"
+
+[[CFrame.fromEulerAnglesXYZ.args]]
+type = "number"
+
+[[CFrame.fromEulerAnglesXYZ.args]]
+type = "number"
+
+[[CFrame.fromEulerAnglesXYZ.args]]
+type = "number"
+
+[[CFrame.fromMatrix.args]]
+type = { display = "Vector3" }
+
+[[CFrame.fromMatrix.args]]
+type = { display = "Vector3" }
+
+[[CFrame.fromMatrix.args]]
+type = { display = "Vector3" }
+
+[[CFrame.fromMatrix.args]]
+type = { display = "Vector3" }
+
+[[CFrame.fromOrientation.args]]
+type = "number"
+
+[[CFrame.fromOrientation.args]]
+type = "number"
+
+[[CFrame.fromOrientation.args]]
+type = "number"
+
+[[Color3.fromRGB.args]]
+type = "number"
+
+[[Color3.fromRGB.args]]
+type = "number"
+
+[[Color3.fromRGB.args]]
+type = "number"
+
+[[Color3.fromHSV.args]]
+type = "number"
+
+[[Color3.fromHSV.args]]
+type = "number"
+
+[[Color3.fromHSV.args]]
+type = "number"
+
+[[Color3.new.args]]
+type = "number"
+required = false
+
+[[Color3.new.args]]
+type = "number"
+required = false
+
+[[Color3.new.args]]
+type = "number"
+required = false
+
+[[Color3.toHSV.args]]
+type = { display = "Color3" }
+required = false
+
+[[ColorSequence.new.args]]
+type = "any"
+
+[[ColorSequence.new.args]]
+type = { display = "Color3" }
+required = false
+
+[[debug.profilebegin.args]]
+type = "string"
+
+[debug.profileend]
+args = []
+
+[[delay.args]]
+type = "number"
+
+[[delay.args]]
+type = "function"
+
+[[DockWidgetPluginGuiInfo.new.args]]
+type = { display = "InitialDockState" }
+required = false
+
+[[DockWidgetPluginGuiInfo.new.args]]
+type = "bool"
+required = false
+
+[[DockWidgetPluginGuiInfo.new.args]]
+type = "bool"
+required = false
+
+[[DockWidgetPluginGuiInfo.new.args]]
+type = "number"
+required = false
+
+[[DockWidgetPluginGuiInfo.new.args]]
+type = "number"
+required = false
+
+[[DockWidgetPluginGuiInfo.new.args]]
+type = "number"
+required = false
+
+[[DockWidgetPluginGuiInfo.new.args]]
+type = "number"
+required = false
+
+[[Instance.new.args]]
+type = "string" # This is changed at generate time
+
+[[math.clamp.args]]
+type = "number"
+
+[[math.clamp.args]]
+type = "number"
+
+[[math.clamp.args]]
+type = "number"
+
+[[math.sign.args]]
+type = "number"
+
+[[NumberSequence.new.args]]
+type = "any"
+
+[[NumberSequence.new.args]]
+type = "number"
+required = false
+
+[[PhysicalProperties.new.args]]
+type = "any"
+
+[[PhysicalProperties.new.args]]
+type = "number"
+required = false
+
+[[PhysicalProperties.new.args]]
+type = "number"
+required = false
+
+[[PhysicalProperties.new.args]]
+type = "number"
+required = false
+
+[[PhysicalProperties.new.args]]
+type = "number"
+required = false
+
+[[Random.new.args]]
+type = "number"
+required = false
+
+[[Ray.new.args]]
+type = { display = "Vector3" }
+
+[[Ray.new.args]]
+type = { display = "Vector3" }
+
+[[Rect.new.args]]
+type = "any"
+
+[[Rect.new.args]]
+type = "any"
+
+[[Rect.new.args]]
+type = "any"
+required = false
+
+[[Rect.new.args]]
+type = "any"
+required = false
+
+[[Region3.new.args]]
+type = { display = "Vector3" }
+
+[[Region3.new.args]]
+type = { display = "Vector3"}
+
+[[Region3int16.new.args]]
+type = { display = "Vector3" }
+
+[[Region3int16.new.args]]
+type = { display = "Vector3"}
+
+[settings]
+args = []
+
+[[spawn.args]]
+type = "function"
+
+[tick]
+args = []
+
+[time]
+args = []
+
+[[TweenInfo.new.args]]
+type = "number"
+required = false
+
+[[TweenInfo.new.args]]
+type = { display = "EasingStyle" }
+required = false
+
+[[TweenInfo.new.args]]
+type = { display = "EasingDirection" }
+required = false
+
+[[TweenInfo.new.args]]
+type = "number"
+required = false
+
+[[TweenInfo.new.args]]
+type = "bool"
+required = false
+
+[[TweenInfo.new.args]]
+type = "number"
+required = false
+
+[[typeof.args]]
+type = "any"
+
+[[UDim.new.args]]
+type = "number"
+
+[[UDim.new.args]]
+type = "number"
+
+[[UDim2.new.args]]
+type = "any"
+required = false
+
+[[UDim2.new.args]]
+type = "any"
+required = false
+
+[[UDim2.new.args]]
+type = "any"
+required = false
+
+[[UDim2.new.args]]
+type = "any"
+required = false
+
+[[UDim2.fromOffset.args]]
+type = "number"
+
+[[UDim2.fromOffset.args]]
+type = "number"
+
+[[UDim2.fromScale.args]]
+type = "number"
+
+[[UDim2.fromScale.args]]
+type = "number"
+
+[UserSettings]
+args = []
+
+[[Vector2.new.args]]
+type = "number"
+required = false
+
+[[Vector2.new.args]]
+type = "number"
+required = false
+
+[[Vector2int16.new.args]]
+type = "number"
+required = false
+
+[[Vector2int16.new.args]]
+type = "number"
+required = false
+
+[[Vector3.FromAxis.args]]
+type = { display = "Axis" }
+
+[[Vector3.FromNormalId.args]]
+type = { display = "NormalId" }
+
+[[Vector3.new.args]]
+type = "number"
+required = false
+
+[[Vector3.new.args]]
+type = "number"
+required = false
+
+[[Vector3.new.args]]
+type = "number"
+required = false
+
+[[Vector3int16.new.args]]
+type = "number"
+required = false
+
+[[Vector3int16.new.args]]
+type = "number"
+required = false
+
+[[Vector3int16.new.args]]
+type = "number"
+required = false
+
+[[warn.args]]
+type = "string"
+
+[[warn.args]]
+type = "..."
+required = false
+
+[[wait.args]]
+type = "number"
+required = false
+
+# Removed stuff
+[[collectgarbage.args]]
+type = ["count"]
+
+[dofile]
+removed = true
+
+[load]
+removed = true
+
+[loadfile]
+removed = true
+
+[module]
+removed = true
+
+[debug.debug]
+removed = true
+
+[debug.getfenv]
+removed = true
+
+[debug.gethook]
+removed = true
+
+[debug.getinfo]
+removed = true
+
+[debug.getmetatable]
+removed = true
+
+[debug.getregistry]
+removed = true
+
+[debug.getupvalue]
+removed = true
+
+[debug.setfenv]
+removed = true
+
+[debug.sethook]
+removed = true
+
+[debug.setlocal]
+removed = true
+
+[debug.setmetatable]
+removed = true
+
+[debug.setupvalue]
+removed = true
+
+[io]
+removed = true
+
+[os.clock]
+removed = true
+
+[os.execute]
+removed = true
+
+[os.exit]
+removed = true
+
+[os.getenv]
+removed = true
+
+[os.remove]
+removed = true
+
+[os.rename]
+removed = true
+
+[os.setlocale]
+removed = true
+
+[os.tmpname]
+removed = true

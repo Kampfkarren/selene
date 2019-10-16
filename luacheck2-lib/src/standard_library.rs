@@ -1,15 +1,38 @@
-use std::{collections::HashMap, fmt};
+use std::{
+    collections::{BTreeMap, HashMap},
+    fmt,
+};
 
 use serde::{
     de::{self, Deserializer, Visitor},
-    Deserialize,
+    ser::{SerializeMap, SerializeSeq, Serializer},
+    Deserialize, Serialize,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize)]
+lazy_static::lazy_static! {
+    static ref ANY_TABLE: BTreeMap<String, Field> = {
+        let mut map = BTreeMap::new();
+        map.insert("*".to_owned(), Field::Any);
+        map
+    };
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
 pub struct StandardLibrary {
-    pub base: Option<String>,
+    #[serde(rename = "luacheck2")]
+    pub meta: Option<StandardLibraryMeta>,
     #[serde(flatten)]
-    pub globals: HashMap<String, Field>,
+    pub globals: BTreeMap<String, Field>,
+    #[serde(skip)]
+    pub structs: BTreeMap<String, Field>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
+pub struct StandardLibraryMeta {
+    #[serde(default)]
+    pub base: Option<String>,
+    #[serde(default)]
+    pub structs: Option<BTreeMap<String, BTreeMap<String, Field>>>,
 }
 
 impl StandardLibrary {
@@ -52,24 +75,53 @@ impl StandardLibrary {
 
         // Traverse through `foo.bar` in `foo.bar.baz`
         for name in names.iter().take(names.len() - 1) {
-            if let Some(child) = current.get(name) {
-                if let Field::Table(children) = child {
-                    current = children;
-                } else {
-                    return None;
-                }
+            if let Some(child) = current
+                .get(name)
+                .or_else(|| current.get("*"))
+                .map(|field| self.unstruct(field))
+            {
+                match child {
+                    Field::Any => {
+                        current = &ANY_TABLE;
+                    }
+
+                    Field::Table(children) => {
+                        current = children;
+                    }
+
+                    _ => return None,
+                };
             } else {
                 return None;
             }
         }
 
-        current.get(names.last().unwrap())
+        current
+            .get(names.last().unwrap())
+            .or_else(|| current.get("*"))
+            .map(|field| self.unstruct(field))
     }
 
-    fn inflate(&mut self) {
-        fn merge(into: &mut HashMap<String, Field>, other: &mut HashMap<String, Field>) {
-            for (k, mut v) in other.drain() {
-                if v == Field::Removed {
+    pub fn unstruct<'a>(&'a self, field: &'a Field) -> &'a Field {
+        if let Field::Struct(name) = field {
+            self.structs
+                .get(name)
+                .unwrap_or_else(|| panic!("no struct named `{}` exists", name))
+        } else {
+            field
+        }
+    }
+
+    pub fn inflate(&mut self) {
+        fn merge(
+            structs: Option<&BTreeMap<String, BTreeMap<String, Field>>>,
+            into: &mut BTreeMap<String, Field>,
+            other: &mut BTreeMap<String, Field>,
+        ) {
+            for (k, v) in other {
+                let (k, mut v) = (k.to_owned(), v.to_owned());
+
+                if let Field::Removed = v {
                     into.remove(&k);
                     continue;
                 }
@@ -77,7 +129,7 @@ impl StandardLibrary {
                 if let Some(conflict) = into.get_mut(&k) {
                     if let Field::Table(ref mut from_children) = v {
                         if let Field::Table(into_children) = conflict {
-                            merge(into_children, from_children);
+                            merge(structs, into_children, from_children);
                             continue;
                         }
                     }
@@ -87,20 +139,35 @@ impl StandardLibrary {
             }
         }
 
-        if let Some(base) = &self.base {
-            let base = StandardLibrary::from_name(base).unwrap_or_else(|| {
-                panic!("standard library based on '{}', which does not exist", base)
-            });
+        let mut globals =
+            if let Some(base) = &self.meta.as_ref().and_then(|meta| meta.base.as_ref()) {
+                let base = StandardLibrary::from_name(base).unwrap_or_else(|| {
+                    panic!("standard library based on '{}', which does not exist", base)
+                });
 
-            let mut globals = base.globals.clone();
-            merge(&mut globals, &mut self.globals);
-            self.globals = globals;
+                base.globals.clone()
+            } else {
+                BTreeMap::new()
+            };
+
+        let structs = self
+            .meta
+            .as_ref()
+            .and_then(|meta| meta.structs.as_ref())
+            .cloned();
+        merge(structs.as_ref(), &mut globals, &mut self.globals);
+        self.globals = globals;
+
+        for (name, children) in structs.unwrap_or_default() {
+            self.structs
+                .insert(name.to_owned(), Field::Table(children.clone()));
         }
     }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Field {
+    Any,
     Function {
         arguments: Vec<Argument>,
         method: bool,
@@ -108,7 +175,8 @@ pub enum Field {
     Property {
         writable: Option<Writable>,
     },
-    Table(HashMap<String, Field>),
+    Struct(String),
+    Table(BTreeMap<String, Field>),
     Removed,
 }
 
@@ -116,13 +184,21 @@ impl<'de> Deserialize<'de> for Field {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let field_raw = FieldSerde::deserialize(deserializer)?;
 
+        if field_raw.any {
+            return Ok(Field::Any);
+        }
+
         if field_raw.removed {
             return Ok(Field::Removed);
         }
 
         let is_function = field_raw.args.is_some() || field_raw.method;
 
-        if !field_raw.property && !is_function && field_raw.children.is_empty() {
+        if !field_raw.property
+            && !is_function
+            && field_raw.children.is_empty()
+            && field_raw.strukt.is_none()
+        {
             return Err(de::Error::custom(
                 "can't determine what kind of field this is",
             ));
@@ -138,6 +214,10 @@ impl<'de> Deserialize<'de> for Field {
             });
         }
 
+        if let Some(name) = field_raw.strukt {
+            return Ok(Field::Struct(name));
+        }
+
         if is_function {
             // TODO: Don't allow vararg in the middle
             return Ok(Field::Function {
@@ -150,7 +230,54 @@ impl<'de> Deserialize<'de> for Field {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+impl Serialize for Field {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        match self {
+            Field::Any => {
+                let mut map = serializer.serialize_map(Some(1))?;
+                map.serialize_entry("any", &true)?;
+                map.end()
+            }
+
+            Field::Function { arguments, method } => {
+                let mut map = serializer.serialize_map(None)?;
+                if *method {
+                    map.serialize_entry("method", &true)?;
+                }
+                map.serialize_entry("args", arguments)?;
+                map.end()
+            }
+
+            Field::Property { writable } => {
+                let mut map = serializer.serialize_map(None)?;
+                map.serialize_entry("property", &true)?;
+                if let Some(writable) = writable {
+                    map.serialize_entry("writable", writable)?;
+                }
+                map.end()
+            }
+
+            Field::Struct(name) => {
+                let mut map = serializer.serialize_map(Some(1))?;
+                map.serialize_entry("struct", name)?;
+                map.end()
+            }
+
+            Field::Table(table) => {
+                // TODO: Can this be generic?
+                toml::Value::try_from(table).unwrap().serialize(serializer)
+            }
+
+            Field::Removed => {
+                let mut map = serializer.serialize_map(Some(1))?;
+                map.serialize_entry("removed", &true)?;
+                map.end()
+            }
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum Writable {
     // New fields can be added and set, but variable itself cannot be redefined
@@ -173,13 +300,19 @@ struct FieldSerde {
     writable: Option<Writable>,
     #[serde(default)]
     args: Option<Vec<Argument>>,
+    #[serde(default)]
+    #[serde(rename = "struct")]
+    strukt: Option<String>,
+    #[serde(default)]
+    any: bool,
     #[serde(flatten)]
-    children: HashMap<String, Field>,
+    children: BTreeMap<String, Field>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Argument {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Required::required_no_message")]
     pub required: Required,
     #[serde(rename = "type")]
     pub argument_type: ArgumentType,
@@ -201,6 +334,35 @@ pub enum ArgumentType {
     Table,
     // TODO: Support repeating types (like for string.char)
     Vararg,
+}
+
+impl Serialize for ArgumentType {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        match self {
+            &ArgumentType::Any
+            | &ArgumentType::Bool
+            | &ArgumentType::Function
+            | &ArgumentType::Nil
+            | &ArgumentType::Number
+            | &ArgumentType::String
+            | &ArgumentType::Table
+            | &ArgumentType::Vararg => serializer.serialize_str(&self.to_string()),
+
+            ArgumentType::Constant(constants) => {
+                let mut seq = serializer.serialize_seq(Some(constants.len()))?;
+                for constant in constants {
+                    seq.serialize_element(constant)?;
+                }
+                seq.end()
+            }
+
+            ArgumentType::Display(display) => {
+                let mut map = serializer.serialize_map(Some(1))?;
+                map.serialize_entry("display", display)?;
+                map.end()
+            }
+        }
+    }
 }
 
 impl<'de> Deserialize<'de> for ArgumentType {
@@ -291,6 +453,12 @@ pub enum Required {
     Required(Option<String>),
 }
 
+impl Required {
+    fn required_no_message(&self) -> bool {
+        self == &Required::Required(None)
+    }
+}
+
 impl Default for Required {
     fn default() -> Self {
         Required::Required(None)
@@ -300,6 +468,16 @@ impl Default for Required {
 impl<'de> Deserialize<'de> for Required {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         deserializer.deserialize_any(RequiredVisitor)
+    }
+}
+
+impl Serialize for Required {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        match self {
+            Required::NotRequired => serializer.serialize_bool(false),
+            Required::Required(None) => serializer.serialize_bool(true),
+            Required::Required(Some(message)) => serializer.serialize_str(message),
+        }
     }
 }
 
