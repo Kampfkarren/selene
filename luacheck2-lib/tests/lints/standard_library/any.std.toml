@@ -1,0 +1,5 @@
+[luacheck2]
+base = "lua51"
+
+[foo]
+any = true

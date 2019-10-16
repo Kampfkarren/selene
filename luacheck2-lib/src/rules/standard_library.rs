@@ -212,11 +212,17 @@ impl StandardLibraryVisitor<'_> {
                 let path = &name_path[0..bound];
                 match self.standard_library.find_global(path) {
                     Some(field) => {
-                        if let Field::Property { writable } = field {
-                            if writable.is_some() && *writable != Some(Writable::Overridden) {
-                                return;
+                        match field {
+                            Field::Any => return,
+
+                            Field::Property { writable } => {
+                                if writable.is_some() && *writable != Some(Writable::Overridden) {
+                                    return;
+                                }
                             }
-                        }
+
+                            _ => {}
+                        };
                     }
 
                     None => break,
@@ -270,12 +276,17 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                     {
                         match self.standard_library.find_global(&name_path) {
                             Some(field) => {
-                                if let Field::Property { writable } = field {
-                                    if writable.is_some() && *writable != Some(Writable::NewFields)
-                                    {
-                                        continue;
+                                match field {
+                                    Field::Property { writable } => {
+                                        if writable.is_some()
+                                            && *writable != Some(Writable::NewFields)
+                                        {
+                                            continue;
+                                        }
                                     }
-                                }
+                                    Field::Any => continue,
+                                    _ => {}
+                                };
 
                                 let range = var_expr.range().unwrap();
 
@@ -305,11 +316,15 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                     let name = name_token.to_string();
 
                     if let Some(global) = self.standard_library.find_global(&[name.to_owned()]) {
-                        if let Field::Property { writable } = global {
-                            if writable.is_some() && *writable != Some(Writable::NewFields) {
-                                continue;
+                        match global {
+                            Field::Property { writable } => {
+                                if writable.is_some() && *writable != Some(Writable::NewFields) {
+                                    continue;
+                                }
                             }
-                        }
+                            Field::Any => continue,
+                            _ => {}
+                        };
 
                         let range = name_token.range().unwrap();
 
@@ -387,6 +402,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
         };
 
         let (arguments, expecting_method) = match &field {
+            standard_library::Field::Any => return,
             standard_library::Field::Function { arguments, method } => (arguments, method),
             _ => {
                 self.diagnostics.push(Diagnostic::new(
@@ -620,6 +636,15 @@ mod tests {
                 vec!["foo".to_owned()],
                 vec!["foo".to_owned(), "bar".to_owned(), "baz".to_owned()],
             ]
+        );
+    }
+
+    #[test]
+    fn test_any() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "any",
         );
     }
 

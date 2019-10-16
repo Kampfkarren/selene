@@ -9,6 +9,14 @@ use serde::{
     Deserialize, Serialize,
 };
 
+lazy_static::lazy_static! {
+    static ref ANY_TABLE: BTreeMap<String, Field> = {
+        let mut map = BTreeMap::new();
+        map.insert("*".to_owned(), Field::Any);
+        map
+    };
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
 pub struct StandardLibrary {
     #[serde(rename = "luacheck2")]
@@ -72,11 +80,17 @@ impl StandardLibrary {
                 .or_else(|| current.get("*"))
                 .map(|field| self.unstruct(field))
             {
-                if let Field::Table(children) = child {
-                    current = children;
-                } else {
-                    return None;
-                }
+                match child {
+                    Field::Any => {
+                        current = &ANY_TABLE;
+                    }
+
+                    Field::Table(children) => {
+                        current = children;
+                    }
+
+                    _ => return None,
+                };
             } else {
                 return None;
             }
@@ -153,6 +167,7 @@ impl StandardLibrary {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Field {
+    Any,
     Function {
         arguments: Vec<Argument>,
         method: bool,
@@ -168,6 +183,10 @@ pub enum Field {
 impl<'de> Deserialize<'de> for Field {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let field_raw = FieldSerde::deserialize(deserializer)?;
+
+        if field_raw.any {
+            return Ok(Field::Any);
+        }
 
         if field_raw.removed {
             return Ok(Field::Removed);
@@ -214,6 +233,12 @@ impl<'de> Deserialize<'de> for Field {
 impl Serialize for Field {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         match self {
+            Field::Any => {
+                let mut map = serializer.serialize_map(Some(1))?;
+                map.serialize_entry("any", &true)?;
+                map.end()
+            }
+
             Field::Function { arguments, method } => {
                 let mut map = serializer.serialize_map(None)?;
                 if *method {
@@ -278,6 +303,8 @@ struct FieldSerde {
     #[serde(default)]
     #[serde(rename = "struct")]
     strukt: Option<String>,
+    #[serde(default)]
+    any: bool,
     #[serde(flatten)]
     children: BTreeMap<String, Field>,
 }

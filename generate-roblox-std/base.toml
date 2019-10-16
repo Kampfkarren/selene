@@ -1,6 +1,8 @@
 [luacheck2]
 base = "lua51"
-structs = {}
+
+[luacheck2.structs.Instance."*"]
+any = true
 
 [[CFrame.new.args]]
 type = "any"
