@@ -6,8 +6,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Generate
-      working-directory: generate-roblox-std
-      run: cargo run --verbose > roblox.toml
+      run: cargo run --bin generate-roblox-std --verbose > roblox.toml
     - name: Upload
       uses: actions/upload-artifact@v1
       with:
