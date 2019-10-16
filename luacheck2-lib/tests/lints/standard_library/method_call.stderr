@@ -6,7 +6,7 @@ error[incorrect_standard_library_use]: use of standard_library function `foo.bar
    │         ^^^ expected `number`, received `string`
    │
 
-error[incorrect_standard_library_use]: standard library function `foo` is a method
+error[incorrect_standard_library_use]: standard library function `foo.bar` is a method
 
    ┌── method_call.lua:3:1 ───
    │

@@ -435,6 +435,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                 "is a method"
             };
 
+            let using = if call_is_method { ":" } else { "." };
             let use_instead = if call_is_method { "." } else { ":" };
 
             let name = name_path.pop().unwrap();
@@ -442,9 +443,10 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
             self.diagnostics.push(Diagnostic::new_complete(
                 "incorrect_standard_library_use",
                 format!(
-                    // TODO: This message isn't great
-                    "standard library function `{}` {}",
+                    "standard library function `{}{}{}` {}",
                     name_path.join("."),
+                    using,
+                    name,
                     problem,
                 ),
                 Label::from_node(call, None),
