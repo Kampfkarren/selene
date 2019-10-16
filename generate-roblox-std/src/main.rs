@@ -193,17 +193,17 @@ fn write_class_members(
 }
 
 fn write_enums(std: &mut StandardLibrary, api: &api::ApiDump) {
-    let mut enum_children = BTreeMap::new();
-    enum_children.insert("Name".to_owned(), Field::Property { writable: None });
-    enum_children.insert("Value".to_owned(), Field::Property { writable: None });
-
     let mut children = BTreeMap::new();
 
     for enuhm in &api.enums {
         let mut enum_table = BTreeMap::new();
+        enum_table.insert("GetAllItems".to_owned(), Field::Function {
+            arguments: vec![],
+            method: true,
+        });
 
         for item in &enuhm.items {
-            enum_table.insert(item.name.to_owned(), Field::Table(enum_children.clone()));
+            enum_table.insert(item.name.to_owned(), Field::Struct("EnumItem".to_owned()));
         }
 
         children.insert(enuhm.name.to_owned(), Field::Table(enum_table));

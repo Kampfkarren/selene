@@ -1,8 +1,26 @@
 [luacheck2]
 base = "lua51"
 
+[luacheck2.structs.EnumItem.Name]
+property = true
+
+[luacheck2.structs.EnumItem.Value]
+property = true
+
 [luacheck2.structs.Instance."*"]
 any = true
+
+[[CFrame.Angles.args]]
+type = "number"
+required = false
+
+[[CFrame.Angles.args]]
+type = "number"
+required = false
+
+[[CFrame.Angles.args]]
+type = "number"
+required = false
 
 [[CFrame.new.args]]
 type = "any"
