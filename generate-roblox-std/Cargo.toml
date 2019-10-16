@@ -6,6 +6,7 @@ authors = ["Kampfkarren <boynedmaster@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+clap = "2"
 luacheck2-lib = { path = "../luacheck2-lib" }
 reqwest = "0.9"
 serde = "1.0"

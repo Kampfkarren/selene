@@ -7,6 +7,16 @@ property = true
 [luacheck2.structs.EnumItem.Value]
 property = true
 
+[luacheck2.structs.Event.Connect]
+method = true
+
+[[luacheck2.structs.Event.Connect.args]]
+type = "function"
+
+[luacheck2.structs.Event.Wait]
+method = true
+args = []
+
 [luacheck2.structs.Instance."*"]
 any = true
 
