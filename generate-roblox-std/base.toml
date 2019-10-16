@@ -142,6 +142,23 @@ required = false
 type = "number"
 required = false
 
+[[Color3.toHSV.args]]
+type = { display = "Color3" }
+required = false
+
+[[ColorSequence.new.args]]
+type = "any"
+
+[[ColorSequence.new.args]]
+type = { display = "Color3" }
+required = false
+
+[[debug.profilebegin.args]]
+type = "string"
+
+[debug.profileend]
+args = []
+
 [[delay.args]]
 type = "number"
 
@@ -161,6 +178,28 @@ type = "number"
 type = "number"
 
 [[math.sign.args]]
+type = "number"
+
+[[PhysicalProperties.new.args]]
+type = "any"
+
+[[PhysicalProperties.new.args]]
+type = "number"
+required = false
+
+[[PhysicalProperties.new.args]]
+type = "number"
+required = false
+
+[[PhysicalProperties.new.args]]
+type = "number"
+required = false
+
+[[PhysicalProperties.new.args]]
+type = "number"
+required = false
+
+[[Random.new.args]]
 type = "number"
 
 [[Ray.new.args]]

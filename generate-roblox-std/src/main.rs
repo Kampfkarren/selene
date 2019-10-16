@@ -198,7 +198,7 @@ fn write_enums(std: &mut StandardLibrary, api: &api::ApiDump) {
     for enuhm in &api.enums {
         let mut enum_table = BTreeMap::new();
         enum_table.insert(
-            "GetAllItems".to_owned(),
+            "GetEnumItems".to_owned(),
             Field::Function {
                 arguments: vec![],
                 method: true,
