@@ -15,6 +15,8 @@ pub struct StandardLibrary {
     pub meta: Option<StandardLibraryMeta>,
     #[serde(flatten)]
     pub globals: BTreeMap<String, Field>,
+    #[serde(skip)]
+    pub structs: BTreeMap<String, Field>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
@@ -65,7 +67,11 @@ impl StandardLibrary {
 
         // Traverse through `foo.bar` in `foo.bar.baz`
         for name in names.iter().take(names.len() - 1) {
-            if let Some(child) = current.get(name) {
+            if let Some(child) = current
+                .get(name)
+                .or_else(|| current.get("*"))
+                .map(|field| self.unstruct(field))
+            {
                 if let Field::Table(children) = child {
                     current = children;
                 } else {
@@ -76,7 +82,20 @@ impl StandardLibrary {
             }
         }
 
-        current.get(names.last().unwrap())
+        current
+            .get(names.last().unwrap())
+            .or_else(|| current.get("*"))
+            .map(|field| self.unstruct(field))
+    }
+
+    pub fn unstruct<'a>(&'a self, field: &'a Field) -> &'a Field {
+        if let Field::Struct(name) = field {
+            self.structs
+                .get(name)
+                .unwrap_or_else(|| panic!("no struct named `{}` exists", name))
+        } else {
+            field
+        }
     }
 
     pub fn inflate(&mut self) {
@@ -88,25 +107,10 @@ impl StandardLibrary {
             for (k, v) in other {
                 let (k, mut v) = (k.to_owned(), v.to_owned());
 
-                match v {
-                    Field::Removed => {
-                        into.remove(&k);
-                        continue;
-                    }
-
-                    Field::Struct(ref name) => {
-                        let structs =
-                            structs.expect("using a struct when no structs are specified!");
-
-                        let strukt = structs
-                            .get(name)
-                            .unwrap_or_else(|| panic!("no struct `{}` exists", name));
-
-                        v = Field::Table(strukt.to_owned());
-                    }
-
-                    _ => {}
-                };
+                if let Field::Removed = v {
+                    into.remove(&k);
+                    continue;
+                }
 
                 if let Some(conflict) = into.get_mut(&k) {
                     if let Field::Table(ref mut from_children) = v {
@@ -139,6 +143,11 @@ impl StandardLibrary {
             .cloned();
         merge(structs.as_ref(), &mut globals, &mut self.globals);
         self.globals = globals;
+
+        for (name, children) in structs.unwrap_or_default() {
+            self.structs
+                .insert(name.to_owned(), Field::Table(children.clone()));
+        }
     }
 }
 

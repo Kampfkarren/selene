@@ -1,6 +1,6 @@
 use super::{super::StandardLibrary, Context, Rule};
 use std::{
-    fs,
+    fmt, fs,
     io::Write,
     path::{Path, PathBuf},
 };
@@ -32,6 +32,17 @@ impl Default for TestUtilConfig {
     }
 }
 
+#[derive(PartialEq, Eq)]
+#[doc(hidden)]
+pub struct PrettyString<'a>(pub &'a str);
+
+/// Make diff to display string as multi-line string
+impl<'a> fmt::Debug for PrettyString<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.write_str(self.0)
+    }
+}
+
 pub fn test_lint_config<
     C: DeserializeOwned,
     E: std::error::Error,
@@ -40,9 +51,15 @@ pub fn test_lint_config<
     rule: R,
     lint_name: &'static str,
     test_name: &'static str,
-    config: TestUtilConfig,
+    mut config: TestUtilConfig,
 ) {
     let path_base = TEST_PROJECTS_ROOT.join(lint_name).join(test_name);
+
+    if let Ok(test_std_contents) = fs::read_to_string(path_base.with_extension("std.toml")) {
+        let mut std: StandardLibrary = toml::from_str(&test_std_contents).unwrap();
+        std.inflate();
+        config.standard_library = std;
+    }
 
     let lua_source =
         fs::read_to_string(path_base.with_extension("lua")).expect("Cannot find lua file");
@@ -81,7 +98,7 @@ pub fn test_lint_config<
     let output_path = path_base.with_extension("stderr");
 
     if let Ok(expected) = fs::read_to_string(&output_path) {
-        pretty_assertions::assert_eq!(expected, stderr);
+        pretty_assertions::assert_eq!(PrettyString(&expected), PrettyString(&stderr));
     } else {
         let mut output_file = fs::File::create(output_path).expect("couldn't create output file");
         output_file

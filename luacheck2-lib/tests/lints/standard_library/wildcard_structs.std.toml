@@ -1,0 +1,12 @@
+[luacheck2]
+base = "lua51"
+
+[luacheck2.structs.Instance.Name]
+property = true
+writable = "overridden"
+
+[luacheck2.structs.Instance."*"]
+struct = "Instance"
+
+[script]
+struct = "Instance"

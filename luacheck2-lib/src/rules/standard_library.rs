@@ -592,7 +592,6 @@ impl From<ArgumentType> for PassedArgumentType {
 #[cfg(test)]
 mod tests {
     use super::{super::test_util::*, *};
-    use std::collections::BTreeMap;
 
     #[test]
     fn test_name_path() {
@@ -666,38 +665,10 @@ mod tests {
 
     #[test]
     fn test_method_call() {
-        let mut globals = BTreeMap::new();
-
-        globals.insert(
-            "foo".to_owned(),
-            Field::Table({
-                let mut map = BTreeMap::new();
-                map.insert(
-                    "bar".to_owned(),
-                    Field::Function {
-                        arguments: vec![Argument {
-                            required: Required::Required(None),
-                            argument_type: ArgumentType::Number,
-                        }],
-
-                        method: true,
-                    },
-                );
-                map
-            }),
-        );
-
-        test_lint_config(
+        test_lint(
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "method_call",
-            TestUtilConfig {
-                standard_library: StandardLibrary {
-                    meta: None,
-                    globals,
-                },
-                ..TestUtilConfig::default()
-            },
         );
     }
 
@@ -725,6 +696,24 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "vararg",
+        );
+    }
+
+    #[test]
+    fn test_wildcard() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "wildcard",
+        );
+    }
+
+    #[test]
+    fn test_wildcard_structs() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "wildcard_structs",
         );
     }
 

@@ -48,6 +48,7 @@ fn write_class_struct(std: &mut StandardLibrary, api: &api::ApiDump, class_name:
     structs.insert(class_name.to_owned(), BTreeMap::new());
 
     let mut table = BTreeMap::new();
+    table.insert("*".to_owned(), Field::Struct("Instance".to_owned()));
     write_class_members(std, api, &mut table, class_name);
 
     let structs = std.meta.as_mut().unwrap().structs.as_mut().unwrap();
@@ -82,45 +83,58 @@ fn write_class_members(
                 name,
                 tags,
                 Some(Field::Function {
+                    // TODO: Roblox doesn't tell us which parameters are nillable or not
+                    // So results from these are regularly wrong
+                    // The best solution is a manual patch for every method we *know* is nillable
+                    // e.g. WaitForChild
+                    // We can also let some parameters be required in the middle, and fix unused_variable to accept them
+
+                    // arguments: parameters
+                    // .iter()
+                    // .map(|param| Argument {
+                    // required: if param.default.is_some() {
+                    // Required::NotRequired
+                    // } else {
+                    // Required::Required(None)
+                    // },
+                    // argument_type: match &param.parameter_type {
+                    // ApiValueType::Class { name } => {
+                    // ArgumentType::Display(name.to_owned())
+                    // }
+                    //
+                    // ApiValueType::DataType { value } => match value {
+                    // ApiDataType::Content => ArgumentType::String,
+                    // ApiDataType::Other(other) => {
+                    // ArgumentType::Display(other.to_owned())
+                    // }
+                    // },
+                    //
+                    // ApiValueType::Group { value } => match value {
+                    // ApiGroupType::Table => ArgumentType::Table,
+                    // ApiGroupType::Tuple => ArgumentType::Vararg,
+                    // ApiGroupType::Variant => ArgumentType::Any,
+                    // },
+                    //
+                    // ApiValueType::Primitive { value } => match value {
+                    // ApiPrimitiveType::Bool => ArgumentType::Bool,
+                    // ApiPrimitiveType::Double
+                    // | ApiPrimitiveType::Float
+                    // | ApiPrimitiveType::Int
+                    // | ApiPrimitiveType::Int64 => ArgumentType::Number,
+                    // ApiPrimitiveType::String => ArgumentType::String,
+                    // },
+                    //
+                    // ApiValueType::Other { name } => {
+                    // ArgumentType::Display(name.to_owned())
+                    // }
+                    // },
+                    // })
+                    // .collect(),
                     arguments: parameters
                         .iter()
-                        .map(|param| Argument {
-                            required: if param.default.is_some() {
-                                Required::NotRequired
-                            } else {
-                                Required::Required(None)
-                            },
-                            argument_type: match &param.parameter_type {
-                                ApiValueType::Class { name } => {
-                                    ArgumentType::Display(name.to_owned())
-                                }
-
-                                ApiValueType::DataType { value } => match value {
-                                    ApiDataType::Content => ArgumentType::String,
-                                    ApiDataType::Other(other) => {
-                                        ArgumentType::Display(other.to_owned())
-                                    }
-                                },
-
-                                ApiValueType::Group { value } => match value {
-                                    ApiGroupType::Table => ArgumentType::Table,
-                                    ApiGroupType::Tuple => ArgumentType::Vararg,
-                                    ApiGroupType::Variant => ArgumentType::Any,
-                                },
-
-                                ApiValueType::Primitive { value } => match value {
-                                    ApiPrimitiveType::Bool => ArgumentType::Bool,
-                                    ApiPrimitiveType::Double
-                                    | ApiPrimitiveType::Float
-                                    | ApiPrimitiveType::Int
-                                    | ApiPrimitiveType::Int64 => ArgumentType::Number,
-                                    ApiPrimitiveType::String => ArgumentType::String,
-                                },
-
-                                ApiValueType::Other { name } => {
-                                    ArgumentType::Display(name.to_owned())
-                                }
-                            },
+                        .map(|_| Argument {
+                            argument_type: ArgumentType::Any,
+                            required: Required::NotRequired,
                         })
                         .collect(),
                     method: true,
@@ -179,13 +193,17 @@ fn write_class_members(
 }
 
 fn write_enums(std: &mut StandardLibrary, api: &api::ApiDump) {
+    let mut enum_children = BTreeMap::new();
+    enum_children.insert("Name".to_owned(), Field::Property { writable: None });
+    enum_children.insert("Value".to_owned(), Field::Property { writable: None });
+
     let mut children = BTreeMap::new();
 
     for enuhm in &api.enums {
         let mut enum_table = BTreeMap::new();
 
         for item in &enuhm.items {
-            enum_table.insert(item.name.to_owned(), Field::Property { writable: None });
+            enum_table.insert(item.name.to_owned(), Field::Table(enum_children.clone()));
         }
 
         children.insert(enuhm.name.to_owned(), Field::Table(enum_table));
