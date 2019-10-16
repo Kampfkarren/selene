@@ -106,6 +106,9 @@ type = "number"
 [[delay.args]]
 type = "function"
 
+[[Instance.new.args]]
+type = "string" # This is changed at generate time
+
 [[math.clamp.args]]
 type = "number"
 
