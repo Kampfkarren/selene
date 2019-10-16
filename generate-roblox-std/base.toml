@@ -73,44 +73,80 @@ type = "any"
 required = false
 
 [[CFrame.new.args]]
-type = "any"
+type = "number"
 required = false
 
 [[CFrame.new.args]]
-type = "any"
+type = "number"
 required = false
 
 [[CFrame.new.args]]
-type = "any"
+type = "number"
 required = false
 
 [[CFrame.new.args]]
-type = "any"
+type = "number"
 required = false
 
 [[CFrame.new.args]]
-type = "any"
+type = "number"
 required = false
 
 [[CFrame.new.args]]
-type = "any"
+type = "number"
 required = false
 
 [[CFrame.new.args]]
-type = "any"
+type = "number"
 required = false
 
 [[CFrame.new.args]]
-type = "any"
+type = "number"
 required = false
 
 [[CFrame.new.args]]
-type = "any"
+type = "number"
 required = false
 
 [[CFrame.new.args]]
-type = "any"
+type = "number"
 required = false
+
+[[CFrame.fromAxisAngle.args]]
+type = { display = "Vector3" }
+
+[[CFrame.fromAxisAngle.args]]
+type = "number"
+
+[[CFrame.fromEulerAnglesXYZ.args]]
+type = "number"
+
+[[CFrame.fromEulerAnglesXYZ.args]]
+type = "number"
+
+[[CFrame.fromEulerAnglesXYZ.args]]
+type = "number"
+
+[[CFrame.fromMatrix.args]]
+type = { display = "Vector3" }
+
+[[CFrame.fromMatrix.args]]
+type = { display = "Vector3" }
+
+[[CFrame.fromMatrix.args]]
+type = { display = "Vector3" }
+
+[[CFrame.fromMatrix.args]]
+type = { display = "Vector3" }
+
+[[CFrame.fromOrientation.args]]
+type = "number"
+
+[[CFrame.fromOrientation.args]]
+type = "number"
+
+[[CFrame.fromOrientation.args]]
+type = "number"
 
 [[Color3.fromRGB.args]]
 type = "number"
@@ -165,6 +201,34 @@ type = "number"
 [[delay.args]]
 type = "function"
 
+[[DockWidgetPluginGuiInfo.new.args]]
+type = { display = "InitialDockState" }
+required = false
+
+[[DockWidgetPluginGuiInfo.new.args]]
+type = "bool"
+required = false
+
+[[DockWidgetPluginGuiInfo.new.args]]
+type = "bool"
+required = false
+
+[[DockWidgetPluginGuiInfo.new.args]]
+type = "number"
+required = false
+
+[[DockWidgetPluginGuiInfo.new.args]]
+type = "number"
+required = false
+
+[[DockWidgetPluginGuiInfo.new.args]]
+type = "number"
+required = false
+
+[[DockWidgetPluginGuiInfo.new.args]]
+type = "number"
+required = false
+
 [[Instance.new.args]]
 type = "string" # This is changed at generate time
 
@@ -179,6 +243,13 @@ type = "number"
 
 [[math.sign.args]]
 type = "number"
+
+[[NumberSequence.new.args]]
+type = "any"
+
+[[NumberSequence.new.args]]
+type = "number"
+required = false
 
 [[PhysicalProperties.new.args]]
 type = "any"
@@ -201,6 +272,7 @@ required = false
 
 [[Random.new.args]]
 type = "number"
+required = false
 
 [[Ray.new.args]]
 type = { display = "Vector3" }
@@ -221,6 +293,18 @@ required = false
 [[Rect.new.args]]
 type = "any"
 required = false
+
+[[Region3.new.args]]
+type = { display = "Vector3" }
+
+[[Region3.new.args]]
+type = { display = "Vector3"}
+
+[[Region3int16.new.args]]
+type = { display = "Vector3" }
+
+[[Region3int16.new.args]]
+type = { display = "Vector3"}
 
 [settings]
 args = []
@@ -269,9 +353,11 @@ type = "number"
 
 [[UDim2.new.args]]
 type = "any"
+required = false
 
 [[UDim2.new.args]]
 type = "any"
+required = false
 
 [[UDim2.new.args]]
 type = "any"
@@ -280,6 +366,9 @@ required = false
 [[UDim2.new.args]]
 type = "any"
 required = false
+
+[UserSettings]
+args = []
 
 [[Vector2.new.args]]
 type = "number"
@@ -289,7 +378,11 @@ required = false
 type = "number"
 required = false
 
-[[Vector3.new.args]]
+[[Vector2int16.new.args]]
+type = "number"
+required = false
+
+[[Vector2int16.new.args]]
 type = "number"
 required = false
 
@@ -298,6 +391,22 @@ type = "number"
 required = false
 
 [[Vector3.new.args]]
+type = "number"
+required = false
+
+[[Vector3.new.args]]
+type = "number"
+required = false
+
+[[Vector3int16.new.args]]
+type = "number"
+required = false
+
+[[Vector3int16.new.args]]
+type = "number"
+required = false
+
+[[Vector3int16.new.args]]
 type = "number"
 required = false
 

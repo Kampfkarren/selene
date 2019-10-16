@@ -276,6 +276,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let api: api::ApiDump = reqwest::get(API_DUMP)?.json()?;
 
     write_class(&mut export, &api, "game", "DataModel");
+    write_class(&mut export, &api, "plugin", "Plugin");
     write_class(&mut export, &api, "script", "Script");
     write_class(&mut export, &api, "workspace", "Workspace");
 
