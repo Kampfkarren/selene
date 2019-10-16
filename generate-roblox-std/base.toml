@@ -386,6 +386,12 @@ required = false
 type = "number"
 required = false
 
+[[Vector3.FromAxis.args]]
+type = { display = "Axis" }
+
+[[Vector3.FromNormalId.args]]
+type = { display = "NormalId" }
+
 [[Vector3.new.args]]
 type = "number"
 required = false
