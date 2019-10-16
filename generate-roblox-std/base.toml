@@ -367,6 +367,18 @@ required = false
 type = "any"
 required = false
 
+[[UDim2.fromOffset.args]]
+type = "number"
+
+[[UDim2.fromOffset.args]]
+type = "number"
+
+[[UDim2.fromScale.args]]
+type = "number"
+
+[[UDim2.fromScale.args]]
+type = "number"
+
 [UserSettings]
 args = []
 
