@@ -79,6 +79,15 @@ type = "number"
 [[Color3.fromRGB.args]]
 type = "number"
 
+[[Color3.fromHSV.args]]
+type = "number"
+
+[[Color3.fromHSV.args]]
+type = "number"
+
+[[Color3.fromHSV.args]]
+type = "number"
+
 [[Color3.new.args]]
 type = "number"
 required = false
@@ -97,9 +106,17 @@ type = "number"
 [[delay.args]]
 type = "function"
 
-# TODO: Constant type
-[[Instance.new.args]]
-type = "string"
+[[math.clamp.args]]
+type = "number"
+
+[[math.clamp.args]]
+type = "number"
+
+[[math.clamp.args]]
+type = "number"
+
+[[math.sign.args]]
+type = "number"
 
 [[Ray.new.args]]
 type = { display = "Vector3" }
