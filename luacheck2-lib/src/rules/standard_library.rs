@@ -693,7 +693,7 @@ mod tests {
             "method_call",
             TestUtilConfig {
                 standard_library: StandardLibrary {
-                    base: None,
+                    meta: None,
                     globals,
                 },
                 ..TestUtilConfig::default()

@@ -35,24 +35,31 @@ fn event_field() -> Field {
 }
 
 fn write_class(std: &mut StandardLibrary, api: &api::ApiDump, global_name: &str, class_name: &str) {
-    let mut mutate = BTreeMap::new();
-    write_class_members(std, api, &mut mutate, class_name);
-
-    let global_field = std
-        .globals
-        .entry(global_name.to_owned())
-        .or_insert_with(|| Field::Table(BTreeMap::new()));
-
-    let table = if let Field::Table(table) = global_field {
-        table
-    } else {
-        unreachable!();
-    };
-
-    table.extend(&mut mutate.into_iter());
+    write_class_struct(std, api, class_name);
+    std.globals
+        .insert(global_name.to_owned(), Field::Struct(class_name.to_owned()));
 }
 
-fn write_class_members(std: &mut StandardLibrary, api: &api::ApiDump, table: &mut BTreeMap<String, Field>, class_name: &str) {
+fn write_class_struct(std: &mut StandardLibrary, api: &api::ApiDump, class_name: &str) {
+    let structs = std.meta.as_mut().unwrap().structs.as_mut().unwrap();
+    if structs.contains_key(class_name) {
+        return;
+    }
+    structs.insert(class_name.to_owned(), BTreeMap::new());
+
+    let mut table = BTreeMap::new();
+    write_class_members(std, api, &mut table, class_name);
+
+    let structs = std.meta.as_mut().unwrap().structs.as_mut().unwrap();
+    structs.insert(class_name.to_owned(), table);
+}
+
+fn write_class_members(
+    std: &mut StandardLibrary,
+    api: &api::ApiDump,
+    table: &mut BTreeMap<String, Field>,
+    class_name: &str,
+) {
     let class = api.classes.iter().find(|c| c.name == class_name).unwrap();
 
     for member in &class.members {
@@ -133,11 +140,9 @@ fn write_class_members(std: &mut StandardLibrary, api: &api::ApiDump, table: &mu
                         None => &empty,
                     };
 
-                    if let ApiValueType::Class { .. } = value_type {
-                        // TODO: Lint to make sure you're using class properties/methods right
-                        Some(Field::Property {
-                            writable: Some(Writable::Full),
-                        })
+                    if let ApiValueType::Class { name } = value_type {
+                        write_class_struct(std, api, name);
+                        Some(Field::Struct(name.to_owned()))
                     } else {
                         Some(Field::Property {
                             writable: if tags.contains(&"ReadOnly".to_string()) {

@@ -11,9 +11,18 @@ use serde::{
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
 pub struct StandardLibrary {
-    pub base: Option<String>,
+    #[serde(rename = "luacheck2")]
+    pub meta: Option<StandardLibraryMeta>,
     #[serde(flatten)]
     pub globals: BTreeMap<String, Field>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
+pub struct StandardLibraryMeta {
+    #[serde(default)]
+    pub base: Option<String>,
+    #[serde(default)]
+    pub structs: Option<BTreeMap<String, BTreeMap<String, Field>>>,
 }
 
 impl StandardLibrary {
@@ -71,19 +80,38 @@ impl StandardLibrary {
     }
 
     pub fn inflate(&mut self) {
-        fn merge(into: &mut BTreeMap<String, Field>, other: &mut BTreeMap<String, Field>) {
+        fn merge(
+            structs: Option<&BTreeMap<String, BTreeMap<String, Field>>>,
+            into: &mut BTreeMap<String, Field>,
+            other: &mut BTreeMap<String, Field>,
+        ) {
             for (k, v) in other {
                 let (k, mut v) = (k.to_owned(), v.to_owned());
 
-                if v == Field::Removed {
-                    into.remove(&k);
-                    continue;
-                }
+                match v {
+                    Field::Removed => {
+                        into.remove(&k);
+                        continue;
+                    }
+
+                    Field::Struct(ref name) => {
+                        let structs =
+                            structs.expect("using a struct when no structs are specified!");
+
+                        let strukt = structs
+                            .get(name)
+                            .unwrap_or_else(|| panic!("no struct `{}` exists", name));
+
+                        v = Field::Table(strukt.to_owned());
+                    }
+
+                    _ => {}
+                };
 
                 if let Some(conflict) = into.get_mut(&k) {
                     if let Field::Table(ref mut from_children) = v {
                         if let Field::Table(into_children) = conflict {
-                            merge(into_children, from_children);
+                            merge(structs, into_children, from_children);
                             continue;
                         }
                     }
@@ -93,15 +121,24 @@ impl StandardLibrary {
             }
         }
 
-        if let Some(base) = &self.base {
-            let base = StandardLibrary::from_name(base).unwrap_or_else(|| {
-                panic!("standard library based on '{}', which does not exist", base)
-            });
+        let mut globals =
+            if let Some(base) = &self.meta.as_ref().and_then(|meta| meta.base.as_ref()) {
+                let base = StandardLibrary::from_name(base).unwrap_or_else(|| {
+                    panic!("standard library based on '{}', which does not exist", base)
+                });
 
-            let mut globals = base.globals.clone();
-            merge(&mut globals, &mut self.globals);
-            self.globals = globals;
-        }
+                base.globals.clone()
+            } else {
+                BTreeMap::new()
+            };
+
+        let structs = self
+            .meta
+            .as_ref()
+            .and_then(|meta| meta.structs.as_ref())
+            .cloned();
+        merge(structs.as_ref(), &mut globals, &mut self.globals);
+        self.globals = globals;
     }
 }
 
@@ -114,6 +151,7 @@ pub enum Field {
     Property {
         writable: Option<Writable>,
     },
+    Struct(String),
     Table(BTreeMap<String, Field>),
     Removed,
 }
@@ -128,7 +166,11 @@ impl<'de> Deserialize<'de> for Field {
 
         let is_function = field_raw.args.is_some() || field_raw.method;
 
-        if !field_raw.property && !is_function && field_raw.children.is_empty() {
+        if !field_raw.property
+            && !is_function
+            && field_raw.children.is_empty()
+            && field_raw.strukt.is_none()
+        {
             return Err(de::Error::custom(
                 "can't determine what kind of field this is",
             ));
@@ -142,6 +184,10 @@ impl<'de> Deserialize<'de> for Field {
             return Ok(Field::Property {
                 writable: field_raw.writable,
             });
+        }
+
+        if let Some(name) = field_raw.strukt {
+            return Ok(Field::Struct(name));
         }
 
         if is_function {
@@ -161,10 +207,10 @@ impl Serialize for Field {
         match self {
             Field::Function { arguments, method } => {
                 let mut map = serializer.serialize_map(None)?;
-                map.serialize_entry("args", arguments)?;
                 if *method {
                     map.serialize_entry("method", &true)?;
                 }
+                map.serialize_entry("args", arguments)?;
                 map.end()
             }
 
@@ -174,6 +220,12 @@ impl Serialize for Field {
                 if let Some(writable) = writable {
                     map.serialize_entry("writable", writable)?;
                 }
+                map.end()
+            }
+
+            Field::Struct(name) => {
+                let mut map = serializer.serialize_map(Some(1))?;
+                map.serialize_entry("struct", name)?;
                 map.end()
             }
 
@@ -214,6 +266,9 @@ struct FieldSerde {
     writable: Option<Writable>,
     #[serde(default)]
     args: Option<Vec<Argument>>,
+    #[serde(default)]
+    #[serde(rename = "struct")]
+    strukt: Option<String>,
     #[serde(flatten)]
     children: BTreeMap<String, Field>,
 }
