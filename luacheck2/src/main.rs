@@ -3,7 +3,7 @@ use std::{
     io::{self, Write},
     path::Path,
     sync::{
-        atomic::{AtomicBool, Ordering},
+        atomic::{AtomicBool, AtomicUsize, Ordering},
         Arc,
     },
 };
@@ -27,12 +27,41 @@ macro_rules! error {
 
 static QUIET: AtomicBool = AtomicBool::new(false);
 
+static LINT_ERRORS: AtomicUsize = AtomicUsize::new(0);
+static LINT_WARNINGS: AtomicUsize = AtomicUsize::new(0);
+static PARSE_ERRORS: AtomicUsize = AtomicUsize::new(0);
+
 fn error(text: String) -> io::Result<()> {
     let mut stderr = StandardStream::stderr(ColorChoice::Auto);
     stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
     write!(&mut stderr, "ERROR: ")?;
     stderr.set_color(ColorSpec::new().set_fg(None))?;
     writeln!(&mut stderr, "{}", text)?;
+    Ok(())
+}
+
+fn log_total(parse_errors: usize, lint_errors: usize, lint_warnings: usize) -> io::Result<()> {
+    let mut stdout = StandardStream::stdout(ColorChoice::Auto);
+
+    stdout.set_color(ColorSpec::new().set_fg(None))?;
+    writeln!(&mut stdout, "Results:")?;
+
+    let mut stat = |number: usize, label: &str| -> io::Result<()> {
+        if number > 0 {
+            stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
+        } else {
+            stdout.set_color(ColorSpec::new().set_fg(None))?;
+        }
+
+        write!(&mut stdout, "{}", number)?;
+        stdout.set_color(ColorSpec::new().set_fg(None))?;
+        writeln!(&mut stdout, " {}", label)
+    };
+
+    stat(lint_errors, "errors")?;
+    stat(lint_warnings, "warnings")?;
+    stat(parse_errors, "parse errors")?;
+
     Ok(())
 }
 
@@ -53,6 +82,7 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
         Ok(ast) => ast.owned(),
         Err(error) => {
             // TODO: Use codespan for this
+            PARSE_ERRORS.fetch_add(1, Ordering::Release);
             error!("Error parsing {}: {}", filename.display(), error);
             return;
         }
@@ -66,6 +96,17 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
 
     let stdout = termcolor::StandardStream::stdout(termcolor::ColorChoice::Auto);
     let mut stdout = stdout.lock();
+
+    let (mut errors, mut warnings) = (0, 0);
+    for diagnostic in &diagnostics {
+        match diagnostic.severity {
+            Severity::Error => errors += 1,
+            Severity::Warning => warnings += 1,
+        };
+    }
+
+    LINT_ERRORS.fetch_add(errors, Ordering::Release);
+    LINT_WARNINGS.fetch_add(warnings, Ordering::Release);
 
     for diagnostic in diagnostics.into_iter().map(|diagnostic| {
         diagnostic.diagnostic.into_codespan_diagnostic(
@@ -266,4 +307,16 @@ fn main() {
     }
 
     pool.join();
+
+    let (parse_errors, lint_errors, lint_warnings) = (
+        PARSE_ERRORS.load(Ordering::Relaxed),
+        LINT_ERRORS.load(Ordering::Relaxed),
+        LINT_WARNINGS.load(Ordering::Relaxed),
+    );
+
+    log_total(parse_errors, lint_errors, lint_warnings).ok();
+
+    if parse_errors + lint_errors + lint_warnings > 0 {
+        std::process::exit(1);
+    }
 }

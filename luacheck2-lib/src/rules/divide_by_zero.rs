@@ -24,13 +24,17 @@ impl Rule for DivideByZeroLint {
 
         visitor.visit_ast(&ast);
 
-        visitor.positions.iter().map(|position| {
-            Diagnostic::new(
-                "divide_by_zero",
-                "dividing by zero is not allowed, use math.huge instead".to_owned(),
-                Label::new(*position),
-            )
-        }).collect()
+        visitor
+            .positions
+            .iter()
+            .map(|position| {
+                Diagnostic::new(
+                    "divide_by_zero",
+                    "dividing by zero is not allowed, use math.huge instead".to_owned(),
+                    Label::new(*position),
+                )
+            })
+            .collect()
     }
 
     fn severity(&self) -> Severity {
@@ -59,7 +63,10 @@ impl Visitor<'_> for DivideByZeroVisitor {
         if let ast::Expression::Value { value, binop } = node {
             if let Some(rhs) = binop {
                 if let ast::BinOp::Slash(_) = rhs.bin_op() {
-                    if let ast::Expression::Value { value: rhs_value, .. } = rhs.rhs() {
+                    if let ast::Expression::Value {
+                        value: rhs_value, ..
+                    } = rhs.rhs()
+                    {
                         if value_is_zero(rhs_value) && !value_is_zero(value) {
                             let range = node.range().unwrap();
                             self.positions.push((range.0.bytes(), range.1.bytes()));
