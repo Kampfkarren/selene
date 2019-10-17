@@ -9,6 +9,7 @@ use serde::de::DeserializeOwned;
 
 pub mod divide_by_zero;
 pub mod empty_if;
+pub mod multiple_statements;
 pub mod standard_library;
 pub mod suspicious_reverse_loop;
 pub mod unbalanced_assignments;
@@ -26,6 +27,10 @@ pub trait Rule {
     where
         Self: Sized;
     fn pass(&self, ast: &full_moon::ast::Ast<'static>, context: &Context) -> Vec<Diagnostic>;
+
+    fn allow(&self) -> bool {
+        false
+    }
 
     fn severity(&self) -> Severity;
     fn rule_type(&self) -> RuleType;

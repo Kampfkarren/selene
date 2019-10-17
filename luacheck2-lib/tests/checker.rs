@@ -1,4 +1,3 @@
-// FIXME: These tests rely on nothing but empty_if triggering on them
 use std::collections::HashMap;
 
 use luacheck2_lib::{standard_library::StandardLibrary, *};
@@ -63,6 +62,6 @@ fn uses_rule_variation_allow() {
     .unwrap();
 
     assert!(checker
-        .test_on(&parse("if true then return end").unwrap())
+        .test_on(&parse("if true then\n\treturn\nend").unwrap())
         .is_empty());
 }

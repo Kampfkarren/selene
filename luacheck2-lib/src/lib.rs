@@ -99,7 +99,7 @@ macro_rules! use_rules {
                             let variation = config.rules.get(rule_name);
 
                             if variation != Some(&RuleVariation::Allow) {
-                                Some(<$rule_path>::new({
+                                let rule = <$rule_path>::new({
                                     match config.config.remove(rule_name) {
                                         Some(entry_generic) => {
                                             <$rule_path as Rule>::Config::deserialize(entry_generic).map_err(|error| {
@@ -119,7 +119,13 @@ macro_rules! use_rules {
                                         name: stringify!($rule_name),
                                         problem: CheckerErrorProblem::RuleNewError(Box::new(error)),
                                     }
-                                })?)
+                                })?;
+
+                                if variation == None && rule.allow() {
+                                    None
+                                } else {
+                                    Some(rule)
+                                }
                             } else {
                                 None
                             }
@@ -166,6 +172,7 @@ use_rules! {
     divide_by_zero: rules::divide_by_zero::DivideByZeroLint,
     empty_if: rules::empty_if::EmptyIfLint,
     incorrect_standard_library_use: rules::standard_library::StandardLibraryLint,
+    multiple_statements: rules::multiple_statements::MultipleStatementsLint,
     suspicious_reverse_loop: rules::suspicious_reverse_loop::SuspiciousReverseLoopLint,
     unbalanced_assignments: rules::unbalanced_assignments::UnbalancedAssignmentsLint,
     undefined_variable: rules::undefined_variable::UndefinedVariableLint,
