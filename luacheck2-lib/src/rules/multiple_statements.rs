@@ -60,10 +60,6 @@ impl Rule for MultipleStatementsLint {
             .collect()
     }
 
-    fn allow(&self) -> bool {
-        true
-    }
-
     fn severity(&self) -> Severity {
         Severity::Warning
     }
