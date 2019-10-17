@@ -173,6 +173,7 @@ use_rules! {
     empty_if: rules::empty_if::EmptyIfLint,
     incorrect_standard_library_use: rules::standard_library::StandardLibraryLint,
     multiple_statements: rules::multiple_statements::MultipleStatementsLint,
+    parenthese_conditions: rules::parenthese_conditions::ParentheseConditionsLint,
     suspicious_reverse_loop: rules::suspicious_reverse_loop::SuspiciousReverseLoopLint,
     unbalanced_assignments: rules::unbalanced_assignments::UnbalancedAssignmentsLint,
     undefined_variable: rules::undefined_variable::UndefinedVariableLint,

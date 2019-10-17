@@ -1,0 +1,40 @@
+error[parenthese_conditions]: lua does not require parentheses around conditions
+
+   ┌── parenthese_conditions.lua:2:4 ───
+   │
+ 2 │ if (x) then end
+   │    ^^^
+   │
+
+error[parenthese_conditions]: lua does not require parentheses around conditions
+
+   ┌── parenthese_conditions.lua:4:4 ───
+   │
+ 4 │ if (x) then
+   │    ^^^
+   │
+
+error[parenthese_conditions]: lua does not require parentheses around conditions
+
+   ┌── parenthese_conditions.lua:6:8 ───
+   │
+ 6 │ elseif (z) then
+   │        ^^^
+   │
+
+error[parenthese_conditions]: lua does not require parentheses around conditions
+
+    ┌── parenthese_conditions.lua:10:7 ───
+    │
+ 10 │ while (true) do end
+    │       ^^^^^^
+    │
+
+error[parenthese_conditions]: lua does not require parentheses around conditions
+
+    ┌── parenthese_conditions.lua:13:14 ───
+    │
+ 13 │ repeat until (false)
+    │              ^^^^^^^
+    │
+
