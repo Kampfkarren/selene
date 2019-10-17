@@ -11,6 +11,7 @@ pub mod divide_by_zero;
 pub mod empty_if;
 pub mod standard_library;
 pub mod suspicious_reverse_loop;
+pub mod unbalanced_assignments;
 pub mod undefined_variable;
 pub mod unused_variable;
 

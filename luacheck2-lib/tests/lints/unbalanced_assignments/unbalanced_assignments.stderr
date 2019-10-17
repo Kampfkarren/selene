@@ -1,0 +1,46 @@
+error[unbalanced_assignments]: values on right side don't match up to the left side of the assignment
+
+   ┌── unbalanced_assignments.lua:1:11 ───
+   │
+ 1 │ a, b, c = 1
+   │           ^
+   │
+
+error[unbalanced_assignments]: values on right side don't match up to the left side of the assignment
+
+   ┌── unbalanced_assignments.lua:2:11 ───
+   │
+ 2 │ a, b, c = 1, 2
+   │           ^^^^
+   │
+
+error[unbalanced_assignments]: values on right side don't match up to the left side of the assignment
+
+   ┌── unbalanced_assignments.lua:6:11 ───
+   │
+ 6 │ a, b, c = call(), 2
+   │           ^^^^^^^^^
+   │
+
+   ┌── unbalanced_assignments.lua:6:11 ───
+   │
+ 6 │ a, b, c = call(), 2
+   │           ------ help: if this function returns more than one value, the only first return value is actually used
+   │
+
+error[unbalanced_assignments]: too many values on the right side of the assignment
+
+    ┌── unbalanced_assignments.lua:13:26 ───
+    │
+ 13 │ local a, b, c = 1, 2, 3, 4
+    │                          ^
+    │
+
+error[unbalanced_assignments]: too many values on the right side of the assignment
+
+    ┌── unbalanced_assignments.lua:14:8 ───
+    │
+ 14 │ x = 1, 2
+    │        ^
+    │
+
