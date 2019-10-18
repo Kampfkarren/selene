@@ -15,3 +15,8 @@ local function foo() end
 if true then
     local function foo() end
 end
+
+for _ = 1, 5 do
+    for _ = 1, 5 do
+    end
+end

@@ -1,17 +1,36 @@
 use super::*;
 use crate::ast_util::scopes::ScopeManager;
-use std::convert::Infallible;
 
 use full_moon::ast::Ast;
+use regex::Regex;
+use serde::Deserialize;
 
-pub struct ShadowingLint;
+#[derive(Clone, Deserialize)]
+#[serde(default)]
+pub struct ShadowingConfig {
+    ignore_pattern: String,
+}
+
+impl Default for ShadowingConfig {
+    fn default() -> Self {
+        Self {
+            ignore_pattern: "^_".to_owned(),
+        }
+    }
+}
+
+pub struct ShadowingLint {
+    ignore_pattern: Regex,
+}
 
 impl Rule for ShadowingLint {
-    type Config = ();
-    type Error = Infallible;
+    type Config = ShadowingConfig;
+    type Error = regex::Error;
 
-    fn new(_: Self::Config) -> Result<Self, Self::Error> {
-        Ok(ShadowingLint)
+    fn new(config: Self::Config) -> Result<Self, Self::Error> {
+        Ok(ShadowingLint {
+            ignore_pattern: Regex::new(&config.ignore_pattern)?,
+        })
     }
 
     fn pass(&self, ast: &Ast, _: &Context) -> Vec<Diagnostic> {
@@ -23,9 +42,15 @@ impl Rule for ShadowingLint {
                 let shadow = &scope_manager.variables[shadow_id];
                 let definition = shadow.definitions[0];
 
+                let name = variable.name.to_owned();
+
+                if self.ignore_pattern.is_match(&name) {
+                    continue;
+                }
+
                 shadows.push(Shadow {
                     first_defined: (definition.0 as u32, definition.1 as u32),
-                    name: variable.name.to_owned(),
+                    name,
                     range: variable.definitions[0],
                 });
             }
@@ -69,6 +94,10 @@ mod tests {
 
     #[test]
     fn test_shadowing() {
-        test_lint(ShadowingLint::new(()).unwrap(), "shadowing", "shadowing");
+        test_lint(
+            ShadowingLint::new(ShadowingConfig::default()).unwrap(),
+            "shadowing",
+            "shadowing",
+        );
     }
 }
