@@ -1,3 +1,4 @@
+#![recursion_limit = "1000"]
 use std::{collections::HashMap, error::Error, fmt};
 
 use full_moon::ast::Ast;

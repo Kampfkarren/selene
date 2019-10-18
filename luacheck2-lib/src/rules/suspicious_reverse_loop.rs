@@ -54,24 +54,21 @@ struct SuspiciousReverseLoopVisitor {
 
 impl Visitor<'_> for SuspiciousReverseLoopVisitor {
     fn visit_numeric_for(&mut self, node: &ast::NumericFor) {
-        if node.step().is_none() {
-            if let ast::Expression::UnaryOperator { unop, .. } = node.start() {
-                if let ast::UnOp::Hash(_) = unop {
-                    if let ast::Expression::Value { value, binop } = node.end() {
-                        if binop.is_none() {
-                            if let ast::Value::Number(number) = &**value {
-                                if str::parse::<f32>(&number.to_string()).unwrap() <= 1.0 {
-                                    self.positions.push((
-                                        node.start().start_position().unwrap().bytes(),
-                                        node.end().end_position().unwrap().bytes(),
-                                    ));
-                                }
-                            }
-                        }
-                    }
-                }
+        if_chain::if_chain! {
+            if node.step().is_none();
+            if let ast::Expression::UnaryOperator { unop, .. } = node.start();
+            if let ast::UnOp::Hash(_) = unop;
+            if let ast::Expression::Value { value, binop } = node.end();
+            if binop.is_none();
+            if let ast::Value::Number(number) = &**value;
+            if str::parse::<f32>(&number.to_string()).unwrap() <= 1.0;
+            then {
+                self.positions.push((
+                    node.start().start_position().unwrap().bytes(),
+                    node.end().end_position().unwrap().bytes(),
+                ));
             }
-        }
+        };
     }
 }
 
