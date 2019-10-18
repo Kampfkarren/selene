@@ -40,7 +40,7 @@ impl Rule for ShadowingLint {
         for (_, variable) in &scope_manager.variables {
             if let Some(shadow_id) = variable.shadowed {
                 let shadow = &scope_manager.variables[shadow_id];
-                let definition = shadow.definitions[0];
+                let definition = shadow.identifiers[0];
 
                 let name = variable.name.to_owned();
 
@@ -51,7 +51,7 @@ impl Rule for ShadowingLint {
                 shadows.push(Shadow {
                     first_defined: (definition.0 as u32, definition.1 as u32),
                     name,
-                    range: variable.definitions[0],
+                    range: variable.identifiers[0],
                 });
             }
         }

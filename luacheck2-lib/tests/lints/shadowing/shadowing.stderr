@@ -1,29 +1,29 @@
 error[shadowing]: shadowing variable `x`
 
-   ┌── shadowing.lua:5:5 ───
+   ┌── shadowing.lua:5:11 ───
    │
  5 │     local x = 3
-   │     ^^^^^^^^^^^
+   │           ^
    │
 
-   ┌── shadowing.lua:1:1 ───
+   ┌── shadowing.lua:1:7 ───
    │
  1 │ local x = 1
-   │ ----------- previously defined here
+   │       - previously defined here
    │
 
 error[shadowing]: shadowing variable `x`
 
-   ┌── shadowing.lua:6:5 ───
+   ┌── shadowing.lua:6:11 ───
    │
  6 │     local x = 4
-   │     ^^^^^^^^^^^
+   │           ^
    │
 
-   ┌── shadowing.lua:5:5 ───
+   ┌── shadowing.lua:5:11 ───
    │
  5 │     local x = 3
-   │     ----------- previously defined here
+   │           - previously defined here
    │
 
 error[shadowing]: shadowing variable `foo`
