@@ -3,6 +3,9 @@ use std::convert::{TryFrom, TryInto};
 use full_moon::node::Node;
 
 pub mod scopes;
+mod side_effects;
+
+pub use side_effects::HasSideEffects;
 
 pub fn range<N: Node, P: TryFrom<usize>>(node: N) -> (P, P)
 where

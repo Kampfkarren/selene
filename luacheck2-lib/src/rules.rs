@@ -7,6 +7,7 @@ use codespan_reporting::diagnostic::{
 use full_moon::node::Node;
 use serde::de::DeserializeOwned;
 
+pub mod almost_swapped;
 pub mod divide_by_zero;
 pub mod empty_if;
 pub mod multiple_statements;
