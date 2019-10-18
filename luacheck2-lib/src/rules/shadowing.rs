@@ -44,7 +44,7 @@ impl Rule for ShadowingLint {
 
                 let name = variable.name.to_owned();
 
-                if self.ignore_pattern.is_match(&name) {
+                if self.ignore_pattern.is_match(&name) || name == "..." {
                     continue;
                 }
 

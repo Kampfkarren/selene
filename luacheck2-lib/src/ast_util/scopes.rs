@@ -116,6 +116,8 @@ impl ScopeVisitor {
                 ..ScopeVisitor::default()
             };
 
+            assert!(output.scope_stack.len() == 1, "scopes not all popped");
+
             output.visit_ast(ast);
             output
         } else {
@@ -565,8 +567,8 @@ impl Visitor<'_> for ScopeVisitor {
     }
 
     fn visit_if_end(&mut self, if_block: &ast::If) {
-        // elseif and else clean themselves up
-        if if_block.else_if().is_none() && if_block.else_block().is_none() {
+        // else clean themselves up
+        if if_block.else_block().is_none() {
             self.close_scope();
         }
     }
@@ -594,6 +596,7 @@ impl Visitor<'_> for ScopeVisitor {
                 .bytes(),
         );
 
+        self.open_scope(numeric_for);
         self.define_name(numeric_for.index_variable(), variable_range);
 
         self.write_name(
@@ -612,6 +615,7 @@ impl Visitor<'_> for ScopeVisitor {
     }
 
     fn visit_numeric_for_end(&mut self, _: &ast::NumericFor) {
+        self.close_scope();
         self.close_scope();
     }
 
