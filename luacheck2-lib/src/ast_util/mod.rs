@@ -19,6 +19,6 @@ where
             .expect("range start_position couldn't convert"),
         end.bytes()
             .try_into()
-            .expect("range start_position couldn't convert"),
+            .expect("range end_position couldn't convert"),
     )
 }
