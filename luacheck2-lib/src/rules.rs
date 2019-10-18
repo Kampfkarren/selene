@@ -11,6 +11,7 @@ pub mod divide_by_zero;
 pub mod empty_if;
 pub mod multiple_statements;
 pub mod parenthese_conditions;
+pub mod shadowing;
 pub mod standard_library;
 pub mod suspicious_reverse_loop;
 pub mod unbalanced_assignments;

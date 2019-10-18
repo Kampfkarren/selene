@@ -71,6 +71,7 @@ pub struct Variable {
     pub identifiers: Vec<Range>,
     pub name: String,
     pub references: Vec<Id<Reference>>,
+    pub shadowed: Option<Id<Variable>>,
 }
 
 #[derive(Default)]
@@ -280,8 +281,11 @@ impl ScopeVisitor {
         range: Range,
         definition_range: Range,
     ) -> Id<Variable> {
+        let shadowed = self.find_variable(name).map(|(var, _)| var);
+
         let id = self.scope_manager.variables.alloc(Variable {
             name: name.to_owned(),
+            shadowed,
             ..Variable::default()
         });
 
