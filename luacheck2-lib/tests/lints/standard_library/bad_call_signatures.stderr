@@ -39,7 +39,7 @@ error[incorrect_standard_library_use]: standard library function `math.max` requ
     │
     = use of max only makes sense with more than 1 parameter
 
-error[incorrect_standard_library_use]: standard library function `math.pi` is not a function
+error[incorrect_standard_library_use]: standard library field `math.pi` is not a function
 
     ┌── bad_call_signatures.lua:18:1 ───
     │

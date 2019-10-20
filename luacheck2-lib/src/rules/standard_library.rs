@@ -232,7 +232,6 @@ impl StandardLibraryVisitor<'_> {
             self.diagnostics.push(Diagnostic::new_complete(
                 "incorrect_standard_library_use",
                 format!(
-                    // TODO: This message isn't great
                     "standard library global `{}` does not contain the field `{}`",
                     name_path.join("."),
                     field,
@@ -245,7 +244,6 @@ impl StandardLibraryVisitor<'_> {
     }
 }
 
-// TODO: Test shadowing
 impl Visitor<'_> for StandardLibraryVisitor<'_> {
     fn visit_assignment(&mut self, assignment: &ast::Assignment) {
         for var in assignment.var_list() {
@@ -408,8 +406,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                 self.diagnostics.push(Diagnostic::new(
                     "incorrect_standard_library_use",
                     format!(
-                        // TODO: This message isn't great
-                        "standard library function `{}` is not a function",
+                        "standard library field `{}` is not a function",
                         name_path.join("."),
                     ),
                     Label::from_node(call, None),
