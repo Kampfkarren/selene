@@ -64,15 +64,17 @@ impl Visitor<'_> for IfsSameCondVisitor {
                 conditions.push(if_block.condition());
             }
 
-            for else_if in else_ifs {
+            'else_ifs: for else_if in else_ifs {
                 let condition = else_if.condition();
                 if !condition.has_side_effects() {
                     for other in &conditions {
                         if other.similar(&condition) {
                             self.positions.push((range(condition), range(other)));
-                            break;
+                            continue 'else_ifs;
                         }
                     }
+
+                    conditions.push(condition);
                 }
             }
         }

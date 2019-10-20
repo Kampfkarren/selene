@@ -12,3 +12,17 @@ error[ifs_same_cond]: this `elseif` has the same condition as a previous if
    │    ------ note: same as this
    │
 
+error[ifs_same_cond]: this `elseif` has the same condition as a previous if
+
+   ┌── ifs_same_cond.lua:7:8 ───
+   │
+ 7 │ elseif y == 1 then
+   │        ^^^^^^
+   │
+
+   ┌── ifs_same_cond.lua:6:8 ───
+   │
+ 6 │ elseif y == 1 then
+   │        ------ note: same as this
+   │
+
