@@ -10,6 +10,7 @@ use serde::de::DeserializeOwned;
 pub mod almost_swapped;
 pub mod divide_by_zero;
 pub mod empty_if;
+pub mod if_same_then_else;
 pub mod ifs_same_cond;
 pub mod multiple_statements;
 pub mod parenthese_conditions;
