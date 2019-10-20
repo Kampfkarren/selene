@@ -33,7 +33,8 @@ impl Rule for AlmostSwappedLint {
                     "almost_swapped",
                     format!(
                         "this looks like you are trying to swap `{}` and `{}`",
-                        (almost_swap.names.0), (almost_swap.names.1),
+                        (almost_swap.names.0),
+                        (almost_swap.names.1),
                     ),
                     Label::new(almost_swap.range),
                     vec![format!(
