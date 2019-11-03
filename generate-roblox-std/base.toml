@@ -1,5 +1,6 @@
 [luacheck2]
 base = "lua51"
+name = "roblox"
 
 [luacheck2.structs.EnumItem.Name]
 property = true
@@ -318,6 +319,10 @@ type = { display = "Vector3"}
 
 [settings]
 args = []
+
+[shared]
+property = true
+writable = "new-fields"
 
 [[spawn.args]]
 type = "function"

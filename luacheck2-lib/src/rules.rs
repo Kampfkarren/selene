@@ -176,3 +176,19 @@ impl Label {
 pub struct Context {
     pub standard_library: StandardLibrary,
 }
+
+impl Context {
+    #[cfg(feature = "roblox")]
+    pub fn is_roblox(&self) -> bool {
+        if let Some(meta) = self.standard_library.meta {
+            meta.name == Some("roblox")
+        } else {
+            false
+        }
+    }
+
+    #[cfg(not(feature = "roblox"))]
+    pub fn is_roblox(&self) -> bool {
+        false
+    }
+}

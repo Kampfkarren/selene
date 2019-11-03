@@ -32,6 +32,8 @@ pub struct StandardLibraryMeta {
     #[serde(default)]
     pub base: Option<String>,
     #[serde(default)]
+    pub name: Option<String>,
+    #[serde(default)]
     pub structs: Option<BTreeMap<String, BTreeMap<String, Field>>>,
 }
 

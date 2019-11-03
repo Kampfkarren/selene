@@ -16,3 +16,6 @@ num_cpus = "1.10"
 termcolor = "1.0"
 threadpool = "1.7"
 toml = "0.5"
+
+[features]
+roblox = ["luacheck2-lib/roblox"]
