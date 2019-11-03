@@ -16,3 +16,4 @@ math.sin(variable, variable)
 
 math.max(2)
 math.pi()
+string.format(-2, "foo")

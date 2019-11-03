@@ -8,7 +8,7 @@ edition = "2018"
 [dependencies]
 codespan = "0.4"
 codespan-reporting = "0.4"
-full_moon = "0.4.0-rc.10"
+full_moon = "0.4.0-rc.11"
 id-arena = "2.2"
 if_chain = "1.0"
 lazy_static = "1.4"

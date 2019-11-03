@@ -173,6 +173,7 @@ use_rules! {
     almost_swapped: rules::almost_swapped::AlmostSwappedLint,
     divide_by_zero: rules::divide_by_zero::DivideByZeroLint,
     empty_if: rules::empty_if::EmptyIfLint,
+    global_usage: rules::global_usage::GlobalLint,
     if_same_then_else: rules::if_same_then_else::IfSameThenElseLint,
     ifs_same_cond: rules::ifs_same_cond::IfsSameCondLint,
     incorrect_standard_library_use: rules::standard_library::StandardLibraryLint,
