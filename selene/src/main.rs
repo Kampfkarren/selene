@@ -11,7 +11,7 @@ use std::{
 use clap::{App, Arg};
 use codespan_reporting::{diagnostic::Severity as CodespanSeverity, term::DisplayStyle};
 use full_moon::ast::owned::Owned;
-use luacheck2_lib::{rules::Severity, standard_library::StandardLibrary, *};
+use selene_lib::{rules::Severity, standard_library::StandardLibrary, *};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
 
@@ -152,7 +152,7 @@ fn main() {
             Arg::with_name("config")
                 .long("config")
                 .help(
-                    "A toml file to configure the behavior of luacheck2 [default: luacheck2.toml]",
+                    "A toml file to configure the behavior of selene [default: selene.toml]",
                 )
                 .takes_value(true),
         )
@@ -199,7 +199,7 @@ fn main() {
             }
         }
 
-        None => match fs::read_to_string("luacheck2.toml") {
+        None => match fs::read_to_string("selene.toml") {
             Ok(config_contents) => match toml::from_str(&config_contents) {
                 Ok(config) => config,
                 Err(error) => {

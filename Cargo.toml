@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-	"luacheck2",
-    "luacheck2-lib",
+	"selene",
+    "selene-lib",
     "generate-roblox-std",
 ]

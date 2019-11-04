@@ -1,24 +1,24 @@
-[luacheck2]
+[selene]
 base = "lua51"
 name = "roblox"
 
-[luacheck2.structs.EnumItem.Name]
+[selene.structs.EnumItem.Name]
 property = true
 
-[luacheck2.structs.EnumItem.Value]
+[selene.structs.EnumItem.Value]
 property = true
 
-[luacheck2.structs.Event.Connect]
+[selene.structs.Event.Connect]
 method = true
 
-[[luacheck2.structs.Event.Connect.args]]
+[[selene.structs.Event.Connect.args]]
 type = "function"
 
-[luacheck2.structs.Event.Wait]
+[selene.structs.Event.Wait]
 method = true
 args = []
 
-[luacheck2.structs.Instance."*"]
+[selene.structs.Instance."*"]
 any = true
 
 [[BrickColor.new.args]]

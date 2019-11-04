@@ -1,11 +1,11 @@
-[luacheck2]
+[selene]
 base = "lua51"
 
-[luacheck2.structs.Instance.Name]
+[selene.structs.Instance.Name]
 property = true
 writable = "overridden"
 
-[luacheck2.structs.Instance."*"]
+[selene.structs.Instance."*"]
 struct = "Instance"
 
 [script]

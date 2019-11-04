@@ -1,4 +1,4 @@
-luacheck2 (good name pending) is a modern Lua linter.
+selene is a modern Lua linter.
 
 Priorities:
 - It's okay to not diagnose every problem, as long as the diagnostics that are made are never wrong

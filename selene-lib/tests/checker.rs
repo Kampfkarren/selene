@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use luacheck2_lib::{standard_library::StandardLibrary, *};
+use selene_lib::{standard_library::StandardLibrary, *};
 
 use full_moon::parse;
 use serde_json::json;

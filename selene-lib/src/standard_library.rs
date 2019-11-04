@@ -19,7 +19,7 @@ lazy_static::lazy_static! {
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
 pub struct StandardLibrary {
-    #[serde(rename = "luacheck2")]
+    #[serde(rename = "selene")]
     pub meta: Option<StandardLibraryMeta>,
     #[serde(flatten)]
     pub globals: BTreeMap<String, Field>,

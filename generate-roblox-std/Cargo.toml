@@ -7,7 +7,7 @@ edition = "2018"
 
 [dependencies]
 clap = "2"
-luacheck2-lib = { path = "../luacheck2-lib" }
+selene-lib = { path = "../selene-lib" }
 reqwest = "0.9"
 serde = "1.0"
 toml = "0.5"

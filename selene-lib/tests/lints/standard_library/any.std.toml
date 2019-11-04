@@ -1,4 +1,4 @@
-[luacheck2]
+[selene]
 base = "lua51"
 
 [foo]

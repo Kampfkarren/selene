@@ -7,7 +7,7 @@ mod api;
 
 use api::*;
 use clap::{App, Arg};
-use luacheck2_lib::standard_library::*;
+use selene_lib::standard_library::*;
 
 const API_DUMP: &str =
     "https://raw.githubusercontent.com/CloneTrooper1019/Roblox-Client-Tracker/roblox/API-Dump.json";
