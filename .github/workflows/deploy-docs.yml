@@ -21,6 +21,8 @@ jobs:
         cp -rp docs/book/* /tmp/book/
         cd /tmp/book
         git add -A
+        git config --global user.email "boynedmaster@gmail.com"
+        git config --global user.name "Kampfkarren"
         git commit -m "Update book"
     - name: Push changes
       uses: ad-m/github-push-action@master
