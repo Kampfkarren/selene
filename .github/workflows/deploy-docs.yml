@@ -1,0 +1,27 @@
+name: Deploy
+# on:
+#   release:
+#     types: [created]
+on: [push]
+
+jobs:
+  deploy_docs:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install mdBook
+      run: cargo install mdbook --vers "^0.3.0"
+    - uses: actions/checkout@v1
+    - name: Deploy Documentation
+      run: mdbook build docs
+    - name: Create Worktree
+      run: git worktree add ./docs/book gh-pages
+    - name: Commit files
+      run: |
+        cd ./docs/book
+        git add -A
+        git commit -m "Update book"
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      working-directory: docs/book
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
