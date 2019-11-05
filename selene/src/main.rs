@@ -8,12 +8,14 @@ use std::{
     },
 };
 
-use clap::{App, Arg};
 use codespan_reporting::{diagnostic::Severity as CodespanSeverity, term::DisplayStyle};
 use full_moon::ast::owned::Owned;
 use selene_lib::{rules::Severity, standard_library::StandardLibrary, *};
+use structopt::StructOpt;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
+
+mod opts;
 
 macro_rules! error {
     ($fmt:expr) => {
@@ -121,9 +123,9 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
             &mut stdout,
             &codespan_reporting::term::Config {
                 display_style: if QUIET.load(Ordering::Relaxed) {
-                    DisplayStyle::Rich
-                } else {
                     DisplayStyle::Short
+                } else {
+                    DisplayStyle::Rich
                 },
                 ..Default::default()
             },
@@ -135,52 +137,11 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
 }
 
 fn main() {
-    let num_cpus = num_cpus::get().to_string();
+    let matches = opts::Options::from_args();
 
-    let matches = App::new(env!("CARGO_PKG_NAME"))
-        .version(env!("CARGO_PKG_VERSION"))
-        .author("Kampfkarren")
-        .arg(
-            Arg::with_name("pattern")
-                .long("pattern")
-                .help("A glob to match files with to check")
-                .default_value("**/*.lua"),
-        )
-        .arg(
-            // .default is not used here since if the user explicitly specifies the config file
-            // we want it to error if it doesn't exist
-            Arg::with_name("config")
-                .long("config")
-                .help(
-                    "A toml file to configure the behavior of selene [default: selene.toml]",
-                )
-                .takes_value(true),
-        )
-        .arg(
-            Arg::with_name("num-threads")
-                .long("num-threads")
-                .help(
-                    "Number of threads to run on, default to the numbers of logical cores on your system"
-                )
-                .default_value(&num_cpus)
-        )
-        .arg(
-            Arg::with_name("quiet")
-                .short("q")
-                .help("Display only the necessary information")
-        )
-        .arg(
-            Arg::with_name("files")
-                .index(1)
-                .min_values(1)
-                .multiple(true)
-                .required(true),
-        )
-        .get_matches();
+    QUIET.store(matches.quiet, Ordering::Relaxed);
 
-    QUIET.store(!matches.is_present("quiet"), Ordering::Relaxed);
-
-    let config: CheckerConfig<toml::value::Value> = match matches.value_of("config") {
+    let config: CheckerConfig<toml::value::Value> = match matches.config {
         Some(config_file) => {
             let config_contents = match fs::read_to_string(config_file) {
                 Ok(contents) => contents,
@@ -244,19 +205,9 @@ fn main() {
         }
     });
 
-    let num_threads: usize = match &matches.value_of("num-threads").unwrap().parse() {
-        Ok(num_threads) => *num_threads,
-        Err(error) => {
-            error!("Couldn't parse num-threads: {}", error);
-            return;
-        }
-    };
+    let pool = ThreadPool::new(matches.num_threads);
 
-    let pattern = matches.value_of("pattern").unwrap();
-
-    let pool = ThreadPool::new(num_threads);
-
-    for filename in matches.values_of_os("files").unwrap() {
+    for filename in &matches.files {
         match fs::metadata(filename) {
             Ok(metadata) => {
                 if metadata.is_file() {
@@ -266,7 +217,7 @@ fn main() {
                     pool.execute(move || read_file(&checker, Path::new(&filename)));
                 } else if metadata.is_dir() {
                     let glob =
-                        match glob::glob(&format!("{}/{}", filename.to_string_lossy(), pattern)) {
+                        match glob::glob(&format!("{}/{}", filename.to_string_lossy(), matches.pattern)) {
                             Ok(glob) => glob,
                             Err(error) => {
                                 error!("Invalid glob pattern: {}", error);
