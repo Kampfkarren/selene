@@ -71,6 +71,10 @@ impl Visitor<'_> for IfSameThenElseVisitor {
             .map(|else_if| else_if.block())
             .chain(if_block.else_block())
         {
+            if block.iter_stmts().next().is_none() {
+                continue;
+            }
+
             for other in &blocks {
                 if other.similar(&block) {
                     self.positions.push((range(block), range(other)));
