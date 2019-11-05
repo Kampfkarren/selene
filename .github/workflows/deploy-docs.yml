@@ -20,6 +20,7 @@ jobs:
         rm -rf /tmp/book/*
         cp -rp docs/book/* /tmp/book/
         cd /tmp/book
+        git pull origin gh-pages
         git add -A
         git config --global user.email "boynedmaster@gmail.com"
         git config --global user.name "Kampfkarren"
