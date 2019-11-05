@@ -1,0 +1,71 @@
+# CLI Usage
+If you want to get a quick understanding of the interface, simply type `selene --help`.
+
+```
+USAGE:
+    selene [FLAGS] [OPTIONS] <files>...
+
+FLAGS:
+    -h, --help       Prints help information
+    -q               Display only the necessary information
+    -V, --version    Prints version information
+
+OPTIONS:
+        --config <config>              A toml file to configure the behavior of selene [default: selene.toml]
+        --num-threads <num-threads>    Number of threads to run on, default to the numbers of logical cores on your
+                                       system [default: 8]
+        --pattern <pattern>            A glob to match files with to check [default: **/*.lua]
+
+ARGS:
+    <files>...
+```
+
+## Basic usage
+
+All unnamed inputs you give to selene will be treated as files to check for.
+
+If you want to check a folder of files: `selene files`
+
+If you just want to check one file: `selene code.lua`
+
+If you want to check multiple files/folders: `selene file1 file2 file3 ...`
+
+## Advanced options
+
+**-q**
+
+**--quiet**
+
+Instead of the rich format, only necessary information will be displayed.
+
+```
+~# selene code.lua
+warning[divide_by_zero]: dividing by zero is not allowed, use math.huge instead
+
+   ┌── code.lua:1:6 ───
+   │
+ 1 │ call(1 / 0)
+   │      ^^^^^
+   │
+
+Results:
+0 errors
+1 warnings
+0 parse errors
+
+~# selene code.lua -q
+code.lua:1:6: warning[divide_by_zero]: dividing by zero is not allowed, use math.huge instead
+
+Results:
+0 errors
+1 warnings
+0 parse errors
+```
+
+**--num-threads** *num-threads*
+
+Specifies the number of threads for selene to use. Defaults to however many cores your CPU has. If you type `selene --help`, you can see this number because it will show as the default for you.
+
+**--pattern** *pattern*
+
+A [glob](https://en.wikipedia.org/wiki/Glob_(programming)) to match what files selene should check for. For example, if you only wanted to check files that end with `.spec.lua`, you would input `--pattern **/*.spec.lua`. Defaults to `**/*.lua`, meaning "any lua file".

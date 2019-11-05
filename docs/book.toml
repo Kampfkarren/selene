@@ -1,0 +1,6 @@
+[book]
+authors = ["Kampfkarren"]
+language = "en"
+multilingual = false
+src = "src"
+title = "selene Documentation"
