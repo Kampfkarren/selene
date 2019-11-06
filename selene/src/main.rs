@@ -1,4 +1,5 @@
 use std::{
+    ffi::OsString,
     fmt, fs,
     io::{self, Write},
     path::Path,
@@ -11,7 +12,7 @@ use std::{
 use codespan_reporting::{diagnostic::Severity as CodespanSeverity, term::DisplayStyle};
 use full_moon::ast::owned::Owned;
 use selene_lib::{rules::Severity, standard_library::StandardLibrary, *};
-use structopt::StructOpt;
+use structopt::{clap, StructOpt};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
 
@@ -27,6 +28,7 @@ macro_rules! error {
     };
 }
 
+static LUACHECK: AtomicBool = AtomicBool::new(false);
 static QUIET: AtomicBool = AtomicBool::new(false);
 
 static LINT_ERRORS: AtomicUsize = AtomicUsize::new(0);
@@ -136,10 +138,9 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     }
 }
 
-fn main() {
-    let matches = opts::Options::from_args();
-
-    QUIET.store(matches.quiet, Ordering::Relaxed);
+fn start(matches: opts::Options) {
+    QUIET.store(matches.quiet, Ordering::SeqCst);
+    LUACHECK.compare_and_swap(false, matches.luacheck, Ordering::SeqCst);
 
     let config: CheckerConfig<toml::value::Value> = match matches.config {
         Some(config_file) => {
@@ -216,14 +217,17 @@ fn main() {
 
                     pool.execute(move || read_file(&checker, Path::new(&filename)));
                 } else if metadata.is_dir() {
-                    let glob =
-                        match glob::glob(&format!("{}/{}", filename.to_string_lossy(), matches.pattern)) {
-                            Ok(glob) => glob,
-                            Err(error) => {
-                                error!("Invalid glob pattern: {}", error);
-                                return;
-                            }
-                        };
+                    let glob = match glob::glob(&format!(
+                        "{}/{}",
+                        filename.to_string_lossy(),
+                        matches.pattern
+                    )) {
+                        Ok(glob) => glob,
+                        Err(error) => {
+                            error!("Invalid glob pattern: {}", error);
+                            return;
+                        }
+                    };
 
                     for entry in glob {
                         match entry {
@@ -269,5 +273,93 @@ fn main() {
 
     if parse_errors + lint_errors + lint_warnings > 0 {
         std::process::exit(1);
+    }
+}
+
+// Give luacheck style outputs for existing consumers
+fn luacheck_mode() {
+    LUACHECK.store(true, Ordering::SeqCst);
+}
+
+fn main() {
+    if let Ok(path) = std::env::current_exe() {
+        if let Some(stem) = path.file_stem() {
+            if stem.to_str() == Some("luacheck") {
+                luacheck_mode();
+                return;
+            }
+        }
+    }
+
+    start(get_opts());
+}
+
+// Will attempt to get the options.
+// Different from Options::from_args() as if in Luacheck mode
+// (either found from --luacheck or from the LUACHECK AtomicBool)
+// it will ignore all extra parameters.
+// If not in luacheck mode and errors are found, will exit.
+fn get_opts() -> opts::Options {
+    get_opts_safe(std::env::args_os().collect::<Vec<_>>()).unwrap_or_else(|err| err.exit())
+}
+
+fn get_opts_safe(mut args: Vec<OsString>) -> Result<opts::Options, clap::Error> {
+    let mut first_error: Option<clap::Error> = None;
+
+    loop {
+        match opts::Options::from_iter_safe(&args) {
+            Ok(options) => {
+                if first_error.is_none() || (options.luacheck || LUACHECK.load(Ordering::Acquire)) {
+                    break Ok(options);
+                } else {
+                    break Err(first_error.unwrap());
+                }
+            }
+
+            Err(err) => match err.kind {
+                clap::ErrorKind::UnknownArgument => {
+                    let bad_arg =
+                        &err.info.as_ref().expect("no info for UnknownArgument")[0].to_owned();
+
+                    args = args
+                        .drain(..)
+                        .filter(|arg| arg.to_string_lossy() != bad_arg.as_ref())
+                        .collect();
+
+                    if first_error.is_none() {
+                        first_error = Some(err);
+                    }
+                }
+
+                _ => break Err(err),
+            },
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn args(mut args: Vec<&str>) -> Vec<OsString> {
+        args.insert(0, "selene");
+        args.into_iter().map(OsString::from).collect()
+    }
+
+    #[test]
+    fn test_luacheck_opts() {
+        assert!(get_opts_safe(args(vec!["file"])).is_ok());
+        assert!(get_opts_safe(args(vec!["--fail", "files"])).is_err());
+
+        match get_opts_safe(args(vec!["--luacheck", "--fail", "files"])) {
+            Ok(opts) => {
+                assert!(opts.luacheck);
+                assert_eq!(opts.files, vec![OsString::from("files")]);
+            }
+
+            Err(err) => {
+                panic!("selene --luacheck --fail files returned Err: {:?}", err);
+            }
+        }
     }
 }
