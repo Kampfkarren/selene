@@ -2,8 +2,9 @@ use std::ffi::OsString;
 
 use structopt::StructOpt;
 
-#[derive(StructOpt)]
+#[derive(Clone, Debug, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
+#[structopt(setting(structopt::clap::AppSettings::AllowExternalSubcommands))]
 pub struct Options {
     /// A glob to match files with to check
     #[structopt(long, default_value = "**/*.lua")]
@@ -22,6 +23,14 @@ pub struct Options {
     /// Display only the necessary information
     #[structopt(long, short)]
     pub quiet: bool,
+
+    /// Whether to pretend to be luacheck for existing consumers
+    #[structopt(long, hidden(true))]
+    pub luacheck: bool,
+
+    // Only used in Luacheck mode
+    #[structopt(long, hidden(true))]
+    pub ranges: bool,
 
     #[structopt(parse(from_os_str), min_values(1), index(1), required(true))]
     pub files: Vec<OsString>,

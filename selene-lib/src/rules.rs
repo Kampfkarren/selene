@@ -64,11 +64,11 @@ pub enum Severity {
 }
 
 pub struct Diagnostic {
-    code: &'static str,
-    message: String,
-    notes: Vec<String>,
-    primary_label: Label,
-    secondary_labels: Vec<Label>,
+    pub code: &'static str,
+    pub message: String,
+    pub notes: Vec<String>,
+    pub primary_label: Label,
+    pub secondary_labels: Vec<Label>,
 }
 
 impl Diagnostic {
@@ -124,8 +124,8 @@ impl Diagnostic {
 }
 
 pub struct Label {
-    message: Option<String>,
-    range: (u32, u32),
+    pub message: Option<String>,
+    pub range: (u32, u32),
 }
 
 impl Label {
