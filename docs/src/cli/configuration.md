@@ -7,7 +7,7 @@ Configuration files are placed in the directory you are running selene in and ar
 You can change the severity of lints by entering the following into selene.toml:
 
 ```toml
-[config]
+[rules]
 lint_1 = "severity"
 lint_2 = "severity"
 ...
@@ -25,7 +25,7 @@ Note that "deny" and "warn" are effectively the same, only warn will give orange
 You can configure specific rules by entering the following into selene.toml:
 
 ```toml
-[rules]
+[config]
 rule1 = ...
 rule2 = ...
 ...
@@ -34,7 +34,7 @@ rule2 = ...
 Where the value is whatever the special configuration of that rule is. You can learn these on the lints specific page in the [list of lints](../lints/index.md). For example, if we wanted to allow empty if branches if the contents contain comments, then we would write:
 
 ```toml
-[rules]
+[config]
 empty_if = { comments_count = false }
 ```
 
