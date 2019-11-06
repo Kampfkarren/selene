@@ -2,7 +2,7 @@ use std::ffi::OsString;
 
 use structopt::StructOpt;
 
-#[derive(Debug, StructOpt)]
+#[derive(Clone, Debug, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
 #[structopt(setting(structopt::clap::AppSettings::AllowExternalSubcommands))]
 pub struct Options {
@@ -27,6 +27,10 @@ pub struct Options {
     /// Whether to pretend to be luacheck for existing consumers
     #[structopt(long, hidden(true))]
     pub luacheck: bool,
+
+    // Only used in Luacheck mode
+    #[structopt(long, hidden(true))]
+    pub ranges: bool,
 
     #[structopt(parse(from_os_str), min_values(1), index(1), required(true))]
     pub files: Vec<OsString>,

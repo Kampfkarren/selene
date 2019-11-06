@@ -4,8 +4,8 @@ use std::{
     io::{self, Write},
     path::Path,
     sync::{
-        atomic::{AtomicBool, AtomicUsize, Ordering},
-        Arc,
+        atomic::{AtomicUsize, Ordering},
+        Arc, RwLock,
     },
 };
 
@@ -28,8 +28,9 @@ macro_rules! error {
     };
 }
 
-static LUACHECK: AtomicBool = AtomicBool::new(false);
-static QUIET: AtomicBool = AtomicBool::new(false);
+lazy_static::lazy_static! {
+    static ref OPTIONS: RwLock<Option<opts::Options>> = RwLock::new(None);
+}
 
 static LINT_ERRORS: AtomicUsize = AtomicUsize::new(0);
 static LINT_WARNINGS: AtomicUsize = AtomicUsize::new(0);
@@ -70,6 +71,9 @@ fn log_total(parse_errors: usize, lint_errors: usize, lint_warnings: usize) -> i
 }
 
 fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
+    let lock = OPTIONS.read().unwrap();
+    let opts = lock.as_ref().unwrap();
+
     let contents = match fs::read_to_string(filename) {
         Ok(contents) => contents,
         Err(error) => {
@@ -113,16 +117,57 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     LINT_WARNINGS.fetch_add(warnings, Ordering::Release);
 
     for diagnostic in diagnostics {
-        if LUACHECK.load(Ordering::Relaxed) {
+        if opts.luacheck {
             // Existing Luacheck consumers presumably use --formatter plain
             write!(stdout, "{}:", filename.display()).unwrap();
 
             let primary_label = &diagnostic.diagnostic.primary_label;
             let location = files.location(source_id, primary_label.range.0).unwrap();
-            write!(stdout, "{}:{}:", location.line, location.column).unwrap();
             write!(
                 stdout,
-                " ({}000) ",
+                "{}:{}",
+                location.line.to_usize() + 1,
+                location.column.to_usize() + 1
+            )
+            .unwrap();
+
+            if opts.ranges {
+                let end_location = files.location(source_id, primary_label.range.1).unwrap();
+
+                write!(
+                    stdout,
+                    "-{}",
+                    if location.line != end_location.line {
+                        // Cool that Luacheck only allows one line ranges :upside_down:
+                        // Keep going byte after byte until we get to a new line,
+                        // so that we capture the whole line
+                        let mut offset = 0;
+
+                        loop {
+                            let location =
+                                match files.location(source_id, primary_label.range.1 + offset) {
+                                    Ok(location) => location,
+                                    Err(_) => {
+                                        break location.column.to_usize() + offset as usize;
+                                    }
+                                };
+
+                            if location.line != end_location.line {
+                                // The offset before this was the last before going to a new line
+                                break location.column.to_usize() + offset as usize + 1;
+                            }
+                            offset += 1;
+                        }
+                    } else {
+                        end_location.column.to_usize() + 1
+                    }
+                )
+                .unwrap();
+            }
+
+            write!(
+                stdout,
+                ": ({}000) ",
                 match diagnostic.severity {
                     Severity::Error => "E",
                     Severity::Warning => "W",
@@ -149,7 +194,7 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
             codespan_reporting::term::emit(
                 &mut stdout,
                 &codespan_reporting::term::Config {
-                    display_style: if QUIET.load(Ordering::Relaxed) {
+                    display_style: if opts.quiet {
                         DisplayStyle::Short
                     } else {
                         DisplayStyle::Rich
@@ -165,8 +210,7 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
 }
 
 fn start(matches: opts::Options) {
-    QUIET.store(matches.quiet, Ordering::SeqCst);
-    LUACHECK.compare_and_swap(false, matches.luacheck, Ordering::SeqCst);
+    *OPTIONS.write().unwrap() = Some(matches.clone());
 
     let config: CheckerConfig<toml::value::Value> = match matches.config {
         Some(config_file) => {
@@ -246,7 +290,7 @@ fn start(matches: opts::Options) {
                     let glob = match glob::glob(&format!(
                         "{}/{}",
                         filename.to_string_lossy(),
-                        matches.pattern
+                        matches.pattern,
                     )) {
                         Ok(glob) => glob,
                         Err(error) => {
@@ -295,7 +339,7 @@ fn start(matches: opts::Options) {
         LINT_WARNINGS.load(Ordering::Relaxed),
     );
 
-    if !LUACHECK.load(Ordering::Relaxed) {
+    if !matches.luacheck {
         log_total(parse_errors, lint_errors, lint_warnings).ok();
     }
 
@@ -305,15 +349,17 @@ fn start(matches: opts::Options) {
 }
 
 fn main() {
+    let mut luacheck = false;
+
     if let Ok(path) = std::env::current_exe() {
         if let Some(stem) = path.file_stem() {
             if stem.to_str() == Some("luacheck") {
-                LUACHECK.store(true, Ordering::SeqCst);
+                luacheck = true;
             }
         }
     }
 
-    start(get_opts());
+    start(get_opts(luacheck));
 }
 
 // Will attempt to get the options.
@@ -321,18 +367,19 @@ fn main() {
 // (either found from --luacheck or from the LUACHECK AtomicBool)
 // it will ignore all extra parameters.
 // If not in luacheck mode and errors are found, will exit.
-fn get_opts() -> opts::Options {
-    get_opts_safe(std::env::args_os().collect::<Vec<_>>()).unwrap_or_else(|err| err.exit())
+fn get_opts(luacheck: bool) -> opts::Options {
+    get_opts_safe(std::env::args_os().collect::<Vec<_>>(), luacheck)
+        .unwrap_or_else(|err| err.exit())
 }
 
-fn get_opts_safe(mut args: Vec<OsString>) -> Result<opts::Options, clap::Error> {
+fn get_opts_safe(mut args: Vec<OsString>, luacheck: bool) -> Result<opts::Options, clap::Error> {
     let mut first_error: Option<clap::Error> = None;
 
     loop {
         match opts::Options::from_iter_safe(&args) {
             Ok(options) => match first_error {
                 Some(error) => {
-                    if options.luacheck || LUACHECK.load(Ordering::Acquire) {
+                    if options.luacheck || luacheck {
                         break Ok(options);
                     } else {
                         break Err(error);
@@ -374,10 +421,10 @@ mod tests {
 
     #[test]
     fn test_luacheck_opts() {
-        assert!(get_opts_safe(args(vec!["file"])).is_ok());
-        assert!(get_opts_safe(args(vec!["--fail", "files"])).is_err());
+        assert!(get_opts_safe(args(vec!["file"]), false).is_ok());
+        assert!(get_opts_safe(args(vec!["--fail", "files"]), false).is_err());
 
-        match get_opts_safe(args(vec!["--luacheck", "--fail", "files"])) {
+        match get_opts_safe(args(vec!["--luacheck", "--fail", "files"]), false) {
             Ok(opts) => {
                 assert!(opts.luacheck);
                 assert_eq!(opts.files, vec![OsString::from("files")]);
@@ -388,7 +435,6 @@ mod tests {
             }
         }
 
-        LUACHECK.store(true, Ordering::SeqCst);
-        assert!(get_opts_safe(args(vec!["--fail", "files"])).is_ok());
+        assert!(get_opts_safe(args(vec!["--fail", "files"]), true).is_ok());
     }
 }
