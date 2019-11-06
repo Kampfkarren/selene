@@ -143,7 +143,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                         let mut offset = 0;
 
                         loop {
-                            let location =
+                            let check =
                                 match files.location(source_id, primary_label.range.1 + offset) {
                                     Ok(location) => location,
                                     Err(_) => {
@@ -151,14 +151,15 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                                     }
                                 };
 
-                            if location.line != end_location.line {
+                            if check.line != location.line {
                                 // The offset before this was the last before going to a new line
-                                break location.column.to_usize() + offset as usize + 1;
+                                break check.column.to_usize() + offset as usize + 1;
                             }
+
                             offset += 1;
                         }
                     } else {
-                        end_location.column.to_usize() + 1
+                        end_location.column.to_usize()
                     }
                 )
                 .unwrap();
@@ -397,9 +398,10 @@ fn get_opts_safe(mut args: Vec<OsString>, luacheck: bool) -> Result<opts::Option
 
     loop {
         match opts::Options::from_iter_safe(&args) {
-            Ok(options) => match first_error {
+            Ok(mut options) => match first_error {
                 Some(error) => {
                     if options.luacheck || luacheck {
+                        options.luacheck = true;
                         break Ok(options);
                     } else {
                         break Err(error);
@@ -416,9 +418,7 @@ fn get_opts_safe(mut args: Vec<OsString>, luacheck: bool) -> Result<opts::Option
 
                     args = args
                         .drain(..)
-                        .filter(|arg| {
-                            arg.to_string_lossy().split("=").next().unwrap() != bad_arg
-                        })
+                        .filter(|arg| arg.to_string_lossy().split('=').next().unwrap() != bad_arg)
                         .collect();
 
                     if first_error.is_none() {
