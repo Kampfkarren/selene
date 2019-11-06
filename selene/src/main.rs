@@ -118,70 +118,68 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
     for diagnostic in diagnostics {
         if opts.luacheck {
             // Existing Luacheck consumers presumably use --formatter plain
-            write!(stdout, "{}:", filename.display()).unwrap();
-
             let primary_label = &diagnostic.diagnostic.primary_label;
-            let location = files.location(source_id, primary_label.range.0).unwrap();
-            write!(
-                stdout,
-                "{}:{}",
-                location.line.to_usize() + 1,
-                location.column.to_usize() + 1
-            )
-            .unwrap();
+            let end = files.location(source_id, primary_label.range.1).unwrap();
 
-            if opts.ranges {
-                let end_location = files.location(source_id, primary_label.range.1).unwrap();
+            // Closures in Rust cannot call themselves recursively, especially not mutable ones.
+            // Luacheck only allows one line ranges, so we just repeat the lint for every line it spans.
+            // This would be frustrating for a human to read, but consumers (editors) will instead show it
+            // as a native implementation would.
+            let mut stack = Vec::new();
+
+            let mut write = |stack: &mut Vec<_>, start: codespan::Location| -> io::Result<()>{
+                write!(stdout, "{}:", filename.display())?;
+                write!(stdout, "{}:{}", start.line.number(), start.column.number())?;
+
+                if opts.ranges {
+                    write!(
+                        stdout,
+                        "-{}",
+                        if start.line != end.line {
+                            // Report to the end of the line
+                            files.source(source_id).lines().nth(start.line.to_usize()).unwrap().chars().count()
+                        } else {
+                            end.column.to_usize()
+                        }
+                    )?;
+                }
+
+                // The next line will be displayed just like this one
+                if start.line != end.line {
+                    stack.push(codespan::Location::new(
+                        (start.line.to_usize() + 1) as u32,
+                        0,
+                    ));
+                }
 
                 write!(
                     stdout,
-                    "-{}",
-                    if location.line != end_location.line {
-                        // Cool that Luacheck only allows one line ranges :upside_down:
-                        // Keep going byte after byte until we get to a new line,
-                        // so that we capture the whole line
-                        let mut offset = 0;
-
-                        loop {
-                            let check =
-                                match files.location(source_id, primary_label.range.1 + offset) {
-                                    Ok(location) => location,
-                                    Err(_) => {
-                                        break location.column.to_usize() + offset as usize;
-                                    }
-                                };
-
-                            if check.line != location.line {
-                                // The offset before this was the last before going to a new line
-                                break check.column.to_usize() + offset as usize + 1;
-                            }
-
-                            offset += 1;
-                        }
-                    } else {
-                        end_location.column.to_usize()
+                    ": ({}000) ",
+                    match diagnostic.severity {
+                        Severity::Error => "E",
+                        Severity::Warning => "W",
                     }
-                )
-                .unwrap();
-            }
+                )?;
 
-            write!(
-                stdout,
-                ": ({}000) ",
-                match diagnostic.severity {
-                    Severity::Error => "E",
-                    Severity::Warning => "W",
+                write!(stdout, "[{}] ", diagnostic.diagnostic.code)?;
+                write!(stdout, "{}", diagnostic.diagnostic.message)?;
+
+                if !diagnostic.diagnostic.notes.is_empty() {
+                    write!(stdout, "\n{}", diagnostic.diagnostic.notes.join("\n"))?;
                 }
-            )
-            .unwrap();
-            write!(stdout, "[{}] ", diagnostic.diagnostic.code).unwrap();
-            write!(stdout, "{}", diagnostic.diagnostic.message).unwrap();
 
-            if !diagnostic.diagnostic.notes.is_empty() {
-                write!(stdout, "\n{}", diagnostic.diagnostic.notes.join("\n")).unwrap();
+                writeln!(stdout)?;
+                Ok(())
+            };
+
+            write(
+                &mut stack,
+                files.location(source_id, primary_label.range.0).unwrap(),
+            ).unwrap();
+
+            while let Some(new_start) = stack.pop() {
+                write(&mut stack, new_start).unwrap();
             }
-
-            writeln!(stdout).unwrap();
         } else {
             let diagnostic = diagnostic.diagnostic.into_codespan_diagnostic(
                 source_id,
