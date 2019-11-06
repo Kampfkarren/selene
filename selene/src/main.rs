@@ -1,7 +1,7 @@
 use std::{
     ffi::OsString,
     fmt, fs,
-    io::{self, Write},
+    io::{self, Read, Write},
     path::Path,
     sync::{
         atomic::{AtomicUsize, Ordering},
@@ -70,21 +70,20 @@ fn log_total(parse_errors: usize, lint_errors: usize, lint_warnings: usize) -> i
     Ok(())
 }
 
-fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
+fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut reader: R) {
+    let mut buffer = Vec::new();
+    if let Err(error) = reader.read_to_end(&mut buffer) {
+        error!(
+            "Couldn't read contents of file {}: {}",
+            filename.display(),
+            error,
+        );
+    }
+
+    let contents = String::from_utf8_lossy(&buffer);
+
     let lock = OPTIONS.read().unwrap();
     let opts = lock.as_ref().unwrap();
-
-    let contents = match fs::read_to_string(filename) {
-        Ok(contents) => contents,
-        Err(error) => {
-            error!(
-                "Couldn't read contents of file {}: {}",
-                filename.display(),
-                error
-            );
-            return;
-        }
-    };
 
     let ast = match full_moon::parse(&contents) {
         Ok(ast) => ast.owned(),
@@ -209,6 +208,21 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     }
 }
 
+fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
+    read(
+        checker,
+        filename,
+        match fs::File::open(filename) {
+            Ok(file) => file,
+            Err(error) => {
+                error!("Couldn't open file {}: {}", filename.display(), error,);
+
+                return;
+            }
+        },
+    );
+}
+
 fn start(matches: opts::Options) {
     *OPTIONS.write().unwrap() = Some(matches.clone());
 
@@ -279,6 +293,12 @@ fn start(matches: opts::Options) {
     let pool = ThreadPool::new(matches.num_threads);
 
     for filename in &matches.files {
+        if filename == "-" {
+            let checker = Arc::clone(&checker);
+            pool.execute(move || read(&checker, Path::new("-"), io::stdin().lock()));
+            continue;
+        }
+
         match fs::metadata(filename) {
             Ok(metadata) => {
                 if metadata.is_file() {
@@ -396,7 +416,9 @@ fn get_opts_safe(mut args: Vec<OsString>, luacheck: bool) -> Result<opts::Option
 
                     args = args
                         .drain(..)
-                        .filter(|arg| arg.to_string_lossy() != bad_arg.as_ref())
+                        .filter(|arg| {
+                            arg.to_string_lossy().split("=").next().unwrap() != bad_arg
+                        })
                         .collect();
 
                     if first_error.is_none() {
@@ -434,6 +456,8 @@ mod tests {
                 panic!("selene --luacheck --fail files returned Err: {:?}", err);
             }
         }
+
+        assert!(get_opts_safe(args(vec!["-", "--formatter=plain"]), true).is_ok());
 
         assert!(get_opts_safe(args(vec!["--fail", "files"]), true).is_ok());
     }
