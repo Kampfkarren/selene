@@ -304,17 +304,11 @@ fn start(matches: opts::Options) {
     }
 }
 
-// Give luacheck style outputs for existing consumers
-fn luacheck_mode() {
-    LUACHECK.store(true, Ordering::SeqCst);
-}
-
 fn main() {
     if let Ok(path) = std::env::current_exe() {
         if let Some(stem) = path.file_stem() {
             if stem.to_str() == Some("luacheck") {
-                luacheck_mode();
-                return;
+                LUACHECK.store(true, Ordering::SeqCst);
             }
         }
     }
