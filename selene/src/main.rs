@@ -127,7 +127,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
             // as a native implementation would.
             let mut stack = Vec::new();
 
-            let mut write = |stack: &mut Vec<_>, start: codespan::Location| -> io::Result<()>{
+            let mut write = |stack: &mut Vec<_>, start: codespan::Location| -> io::Result<()> {
                 write!(stdout, "{}:", filename.display())?;
                 write!(stdout, "{}:{}", start.line.number(), start.column.number())?;
 
@@ -137,7 +137,13 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                         "-{}",
                         if start.line != end.line {
                             // Report to the end of the line
-                            files.source(source_id).lines().nth(start.line.to_usize()).unwrap().chars().count()
+                            files
+                                .source(source_id)
+                                .lines()
+                                .nth(start.line.to_usize())
+                                .unwrap()
+                                .chars()
+                                .count()
                         } else {
                             end.column.to_usize()
                         }
@@ -175,7 +181,8 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
             write(
                 &mut stack,
                 files.location(source_id, primary_label.range.0).unwrap(),
-            ).unwrap();
+            )
+            .unwrap();
 
             while let Some(new_start) = stack.pop() {
                 write(&mut stack, new_start).unwrap();
