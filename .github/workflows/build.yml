@@ -1,0 +1,21 @@
+name: Build selene
+on: [push]
+jobs:
+  generate:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build (Lightweight)
+      run: |
+        cargo build --locked --release --verbose --bin selene
+        New-Item release -ItemType "directory"
+        Move-Item .\target\release\selene.exe .\release\selene-light.exe
+    - name: Build (All features)
+      run: |
+        cargo build --locked --release --bin selene --all-features
+        Move-Item .\target\release\selene.exe .\release\selene.exe
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        name: selene
+        path: release
