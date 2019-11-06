@@ -112,29 +112,55 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     LINT_ERRORS.fetch_add(errors, Ordering::Release);
     LINT_WARNINGS.fetch_add(warnings, Ordering::Release);
 
-    for diagnostic in diagnostics.into_iter().map(|diagnostic| {
-        diagnostic.diagnostic.into_codespan_diagnostic(
-            source_id,
-            match diagnostic.severity {
-                Severity::Error => CodespanSeverity::Error,
-                Severity::Warning => CodespanSeverity::Warning,
-            },
-        )
-    }) {
-        codespan_reporting::term::emit(
-            &mut stdout,
-            &codespan_reporting::term::Config {
-                display_style: if QUIET.load(Ordering::Relaxed) {
-                    DisplayStyle::Short
-                } else {
-                    DisplayStyle::Rich
+    for diagnostic in diagnostics {
+        if LUACHECK.load(Ordering::Relaxed) {
+            // Existing Luacheck consumers presumably use --formatter plain
+            write!(stdout, "{}:", filename.display()).unwrap();
+
+            let primary_label = &diagnostic.diagnostic.primary_label;
+            let location = files.location(source_id, primary_label.range.0).unwrap();
+            write!(stdout, "{}:{}:", location.line, location.column).unwrap();
+            write!(
+                stdout,
+                " ({}000) ",
+                match diagnostic.severity {
+                    Severity::Error => "E",
+                    Severity::Warning => "W",
+                }
+            )
+            .unwrap();
+            write!(stdout, "[{}] ", diagnostic.diagnostic.code).unwrap();
+            write!(stdout, "{}", diagnostic.diagnostic.message).unwrap();
+
+            if !diagnostic.diagnostic.notes.is_empty() {
+                write!(stdout, "\n{}", diagnostic.diagnostic.notes.join("\n")).unwrap();
+            }
+
+            writeln!(stdout).unwrap();
+        } else {
+            let diagnostic = diagnostic.diagnostic.into_codespan_diagnostic(
+                source_id,
+                match diagnostic.severity {
+                    Severity::Error => CodespanSeverity::Error,
+                    Severity::Warning => CodespanSeverity::Warning,
                 },
-                ..Default::default()
-            },
-            &files,
-            &diagnostic,
-        )
-        .expect("couldn't emit to codespan");
+            );
+
+            codespan_reporting::term::emit(
+                &mut stdout,
+                &codespan_reporting::term::Config {
+                    display_style: if QUIET.load(Ordering::Relaxed) {
+                        DisplayStyle::Short
+                    } else {
+                        DisplayStyle::Rich
+                    },
+                    ..Default::default()
+                },
+                &files,
+                &diagnostic,
+            )
+            .expect("couldn't emit to codespan");
+        }
     }
 }
 
@@ -269,7 +295,9 @@ fn start(matches: opts::Options) {
         LINT_WARNINGS.load(Ordering::Relaxed),
     );
 
-    log_total(parse_errors, lint_errors, lint_warnings).ok();
+    if !LUACHECK.load(Ordering::Relaxed) {
+        log_total(parse_errors, lint_errors, lint_warnings).ok();
+    }
 
     if parse_errors + lint_errors + lint_warnings > 0 {
         std::process::exit(1);
@@ -308,19 +336,17 @@ fn get_opts_safe(mut args: Vec<OsString>) -> Result<opts::Options, clap::Error> 
 
     loop {
         match opts::Options::from_iter_safe(&args) {
-            Ok(options) => {
-                match first_error {
-                    Some(error) => {
-                        if options.luacheck || LUACHECK.load(Ordering::Acquire) {
-                            break Ok(options);
-                        } else {
-                            break Err(error);
-                        }
+            Ok(options) => match first_error {
+                Some(error) => {
+                    if options.luacheck || LUACHECK.load(Ordering::Acquire) {
+                        break Ok(options);
+                    } else {
+                        break Err(error);
                     }
-
-                    None => break Ok(options),
                 }
-            }
+
+                None => break Ok(options),
+            },
 
             Err(err) => match err.kind {
                 clap::ErrorKind::UnknownArgument => {
