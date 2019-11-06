@@ -309,10 +309,16 @@ fn get_opts_safe(mut args: Vec<OsString>) -> Result<opts::Options, clap::Error> 
     loop {
         match opts::Options::from_iter_safe(&args) {
             Ok(options) => {
-                if first_error.is_none() || (options.luacheck || LUACHECK.load(Ordering::Acquire)) {
-                    break Ok(options);
-                } else {
-                    break Err(first_error.unwrap());
+                match first_error {
+                    Some(error) => {
+                        if options.luacheck || LUACHECK.load(Ordering::Acquire) {
+                            break Ok(options);
+                        } else {
+                            break Err(error);
+                        }
+                    }
+
+                    None => break Ok(options),
                 }
             }
 
