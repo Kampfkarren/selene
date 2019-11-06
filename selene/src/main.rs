@@ -361,5 +361,8 @@ mod tests {
                 panic!("selene --luacheck --fail files returned Err: {:?}", err);
             }
         }
+
+        LUACHECK.store(true, Ordering::SeqCst);
+        assert!(get_opts_safe(args(vec!["--fail", "files"])).is_ok());
     }
 }
