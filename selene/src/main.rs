@@ -264,28 +264,20 @@ fn start(matches: opts::Options) {
         },
     };
 
-    let standard_library = match fs::read_to_string(format!("{}.toml", &config.std)) {
-        Ok(contents) => match toml::from_str::<StandardLibrary>(&contents) {
-            Ok(mut standard_library) => {
-                standard_library.inflate();
-                standard_library
-            }
-            Err(error) => {
-                error!(
-                    "Custom standard library wasn't formatted properly: {}",
-                    error
-                );
-                return;
-            }
-        },
+    let current_dir = std::env::current_dir().unwrap();
+    let standard_library = match StandardLibrary::from_config_name(&config.std, Some(&current_dir))
+    {
+        Ok(Some(library)) => library,
 
-        Err(_) => match StandardLibrary::from_name(&config.std) {
-            Some(std) => std,
-            None => {
-                error!("Unknown standard library '{}'", config.std);
-                return;
-            }
-        },
+        Ok(None) => {
+            error!("Standard library was empty.");
+            return;
+        }
+
+        Err(error) => {
+            error!("Could not retrieve standard library: {}", error);
+            return;
+        }
     };
 
     let checker = Arc::new(match Checker::new(config, standard_library) {

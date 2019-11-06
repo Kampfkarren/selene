@@ -52,3 +52,13 @@ std = "lua52"
 ```toml
 std = "special"
 ```
+
+### Chaining the standard library
+
+We can chain together multiple standard libraries by simply using a plus sign (`+`) in between the names.
+
+For example, if we had `game.toml` and `engine.toml` standard libraries, we could chain them together like so:
+
+```toml
+std = "game+engine"
+```

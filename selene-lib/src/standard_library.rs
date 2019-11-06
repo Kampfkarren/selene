@@ -1,6 +1,7 @@
 use std::{
     collections::{BTreeMap, HashMap},
-    fmt,
+    fmt, fs, io,
+    path::Path,
 };
 
 use serde::{
@@ -37,6 +38,40 @@ pub struct StandardLibraryMeta {
     pub structs: Option<BTreeMap<String, BTreeMap<String, Field>>>,
 }
 
+#[derive(Debug)]
+pub enum StandardLibraryError {
+    DeserializeError(toml::de::Error),
+    IoError(io::Error),
+}
+
+impl fmt::Display for StandardLibraryError {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            StandardLibraryError::DeserializeError(error) => {
+                write!(formatter, "deserialize error: {}", error)
+            }
+            StandardLibraryError::IoError(error) => write!(formatter, "io error: {}", error),
+        }
+    }
+}
+
+impl std::error::Error for StandardLibraryError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        use StandardLibraryError::*;
+
+        match self {
+            DeserializeError(error) => Some(error),
+            IoError(error) => Some(error),
+        }
+    }
+}
+
+impl From<io::Error> for StandardLibraryError {
+    fn from(error: io::Error) -> Self {
+        StandardLibraryError::IoError(error)
+    }
+}
+
 impl StandardLibrary {
     pub fn from_name(name: &str) -> Option<StandardLibrary> {
         macro_rules! names {
@@ -54,6 +89,16 @@ impl StandardLibrary {
                                 )
                             });
 
+                            if let Some(meta) = &std.meta {
+                                if let Some(base_name) = &meta.base {
+                                    let base = StandardLibrary::from_name(base_name);
+
+                                    std.extend(
+                                        base.expect("built-in library based off of non-existent built-in"),
+                                    );
+                                }
+                            }
+
                             std.inflate();
 
                             Some(std)
@@ -69,6 +114,65 @@ impl StandardLibrary {
             "lua51" => "../default_std/lua51.toml",
             "lua52" => "../default_std/lua52.toml",
         }
+    }
+
+    pub fn from_config_name(
+        name: &str,
+        directory: Option<&Path>,
+    ) -> Result<Option<StandardLibrary>, StandardLibraryError> {
+        let mut library: Option<StandardLibrary> = None;
+
+        for segment in name.split('+') {
+            let segment_library = match StandardLibrary::from_name(segment) {
+                Some(default) => default,
+
+                None => {
+                    let mut path = directory
+                        .map(Path::to_path_buf)
+                        .unwrap_or_else(||
+                            panic!(
+                                "from_config_name used with no directory, but segment `{}` is not a built-in library",
+                                segment
+                            )
+                        );
+
+                    path.push(format!("{}.toml", segment));
+                    match StandardLibrary::from_file(&path)? {
+                        Some(library) => library,
+                        None => return Ok(None),
+                    }
+                }
+            };
+
+            match library {
+                Some(ref mut base) => base.extend(segment_library),
+                None => library = Some(segment_library),
+            };
+        }
+
+        if let Some(ref mut library) = library {
+            library.inflate();
+        }
+
+        Ok(library)
+    }
+
+    pub fn from_file(filename: &Path) -> Result<Option<StandardLibrary>, StandardLibraryError> {
+        let content = fs::read_to_string(filename)?;
+        let mut library: StandardLibrary =
+            toml::from_str(&content).map_err(StandardLibraryError::DeserializeError)?;
+
+        if let Some(meta) = &library.meta {
+            if let Some(base_name) = &meta.base {
+                if let Some(base) =
+                    StandardLibrary::from_config_name(&base_name, filename.parent())?
+                {
+                    library.extend(base);
+                }
+            }
+        }
+
+        Ok(Some(library))
     }
 
     pub fn find_global(&self, names: &[String]) -> Option<&Field> {
@@ -114,12 +218,8 @@ impl StandardLibrary {
         }
     }
 
-    pub fn inflate(&mut self) {
-        fn merge(
-            structs: Option<&BTreeMap<String, BTreeMap<String, Field>>>,
-            into: &mut BTreeMap<String, Field>,
-            other: &mut BTreeMap<String, Field>,
-        ) {
+    pub fn extend(&mut self, mut other: StandardLibrary) {
+        fn merge(into: &mut BTreeMap<String, Field>, other: &mut BTreeMap<String, Field>) {
             for (k, v) in other {
                 let (k, mut v) = (k.to_owned(), v.to_owned());
 
@@ -131,7 +231,7 @@ impl StandardLibrary {
                 if let Some(conflict) = into.get_mut(&k) {
                     if let Field::Table(ref mut from_children) = v {
                         if let Field::Table(into_children) = conflict {
-                            merge(structs, into_children, from_children);
+                            merge(into_children, from_children);
                             continue;
                         }
                     }
@@ -141,24 +241,34 @@ impl StandardLibrary {
             }
         }
 
-        let mut globals =
-            if let Some(base) = &self.meta.as_ref().and_then(|meta| meta.base.as_ref()) {
-                let base = StandardLibrary::from_name(base).unwrap_or_else(|| {
-                    panic!("standard library based on '{}', which does not exist", base)
-                });
+        if let Some(other_meta) = &mut other.meta {
+            if let Some(other_structs) = &mut other_meta.structs {
+                if self.meta.is_none() {
+                    self.meta = Some(StandardLibraryMeta::default());
+                }
 
-                base.globals.clone()
-            } else {
-                BTreeMap::new()
-            };
+                let meta = self.meta.as_mut().unwrap();
 
+                if let Some(structs) = meta.structs.as_mut() {
+                    structs.extend(other_structs.iter().map(|(k, v)| (k.clone(), v.clone())));
+                } else {
+                    meta.structs = Some(other_structs.clone());
+                }
+            }
+        }
+
+        let mut globals = BTreeMap::new();
+        merge(&mut globals, &mut other.globals);
+        merge(&mut globals, &mut self.globals);
+        self.globals = globals;
+    }
+
+    pub fn inflate(&mut self) {
         let structs = self
             .meta
             .as_ref()
             .and_then(|meta| meta.structs.as_ref())
             .cloned();
-        merge(structs.as_ref(), &mut globals, &mut self.globals);
-        self.globals = globals;
 
         for (name, children) in structs.unwrap_or_default() {
             self.structs
