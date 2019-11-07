@@ -1,6 +1,6 @@
 use std::ffi::OsString;
 
-use structopt::StructOpt;
+use structopt::{clap::arg_enum, StructOpt};
 
 #[derive(Clone, Debug, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
@@ -24,6 +24,14 @@ pub struct Options {
     #[structopt(long, short)]
     pub quiet: bool,
 
+    #[structopt(
+        long,
+        possible_values = &Color::variants(),
+        case_insensitive = true,
+        default_value = "auto",
+    )]
+    pub color: Color,
+
     /// Whether to pretend to be luacheck for existing consumers
     #[structopt(long, hidden(true))]
     pub luacheck: bool,
@@ -34,6 +42,15 @@ pub struct Options {
 
     #[structopt(parse(from_os_str), min_values(1), index(1), required(true))]
     pub files: Vec<OsString>,
+}
+
+arg_enum! {
+    #[derive(Clone, Copy, Debug)]
+    pub enum Color {
+        Always,
+        Auto,
+        Never,
+    }
 }
 
 // We can't just do default_value = num_cpus::get().to_string().as_str(),

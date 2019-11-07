@@ -2,6 +2,12 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- Added `--color` option to specify whether colors could be used on the output.
+
+### Changed
+- Colors will no longer be on by default when being piped. [(#32)](https://github.com/Kampfkarren/selene/issues/32)
+
 ### Fixed
 - Fixed false positive with `unused_variable` linting function declarations as only mutations. [(#30)](https://github.com/Kampfkarren/selene/issues/30)
 

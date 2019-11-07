@@ -36,8 +36,25 @@ static LINT_ERRORS: AtomicUsize = AtomicUsize::new(0);
 static LINT_WARNINGS: AtomicUsize = AtomicUsize::new(0);
 static PARSE_ERRORS: AtomicUsize = AtomicUsize::new(0);
 
+fn get_color() -> ColorChoice {
+    let lock = OPTIONS.read().unwrap();
+    let opts = lock.as_ref().unwrap();
+
+    match opts.color {
+        opts::Color::Always => ColorChoice::Always,
+        opts::Color::Auto => {
+            if atty::is(atty::Stream::Stdout) {
+                ColorChoice::Auto
+            } else {
+                ColorChoice::Never
+            }
+        },
+        opts::Color::Never => ColorChoice::Never
+    }
+}
+
 fn error(text: String) -> io::Result<()> {
-    let mut stderr = StandardStream::stderr(ColorChoice::Auto);
+    let mut stderr = StandardStream::stderr(get_color());
     stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
     write!(&mut stderr, "ERROR: ")?;
     stderr.set_color(ColorSpec::new().set_fg(None))?;
@@ -46,7 +63,7 @@ fn error(text: String) -> io::Result<()> {
 }
 
 fn log_total(parse_errors: usize, lint_errors: usize, lint_warnings: usize) -> io::Result<()> {
-    let mut stdout = StandardStream::stdout(ColorChoice::Auto);
+    let mut stdout = StandardStream::stdout(get_color());
 
     stdout.set_color(ColorSpec::new().set_fg(None))?;
     writeln!(&mut stdout, "Results:")?;
@@ -101,7 +118,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
     let mut files = codespan::Files::new();
     let source_id = files.add(filename.to_string_lossy(), contents);
 
-    let stdout = termcolor::StandardStream::stdout(termcolor::ColorChoice::Auto);
+    let stdout = termcolor::StandardStream::stdout(get_color());
     let mut stdout = stdout.lock();
 
     let (mut errors, mut warnings) = (0, 0);
