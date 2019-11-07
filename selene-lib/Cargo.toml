@@ -7,7 +7,6 @@ description = "A library for linting Lua code. You probably want selene instead.
 categories = ["command-line-utilities"]
 keywords = ["lua", "linter", "lua51"]
 repository = "https://github.com/Kampfkarren/selene"
-documentation = "https://kampfkarren.github.io/selene/"
 edition = "2018"
 
 [dependencies]
