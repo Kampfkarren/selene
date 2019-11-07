@@ -48,8 +48,8 @@ fn get_color() -> ColorChoice {
             } else {
                 ColorChoice::Never
             }
-        },
-        opts::Color::Never => ColorChoice::Never
+        }
+        opts::Color::Never => ColorChoice::Never,
     }
 }
 
