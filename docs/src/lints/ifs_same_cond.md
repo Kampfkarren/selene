@@ -11,7 +11,7 @@ if foo then
     print(1)
 elseif foo then
     print(1)
-then
+end
 ```
 
 ## Remarks
@@ -22,7 +22,7 @@ if foo() then
     print(1)
 elseif foo() then
     print(1)
-then
+end
 ```
 
 ...as the result of `foo()` could be different the second time it is called.
