@@ -320,6 +320,17 @@ type = "number"
 [[math.sign.args]]
 type = "number"
 
+[[math.noise.args]]
+type = "number"
+
+[[math.noise.args]]
+type = "number"
+required = false
+
+[[math.noise.args]]
+type = "number"
+required = false
+
 [[NumberSequence.new.args]]
 type = "any"
 
