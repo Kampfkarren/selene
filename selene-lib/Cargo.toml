@@ -3,6 +3,11 @@ name = "selene-lib"
 version = "0.2.0"
 license = "MPL-2.0"
 authors = ["Kampfkarren <kampfkarren@gmail.com>"]
+description = "A library for linting Lua code. You probably want selene instead."
+categories = ["command-line-utilities"]
+keywords = ["lua", "linter", "lua51"]
+repository = "https://github.com/Kampfkarren/selene"
+documentation = "https://kampfkarren.github.io/selene/"
 edition = "2018"
 
 [dependencies]
