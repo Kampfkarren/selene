@@ -57,7 +57,7 @@ fn error(text: String) -> io::Result<()> {
     let mut stderr = StandardStream::stderr(get_color());
     stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
     write!(&mut stderr, "ERROR: ")?;
-    stderr.set_color(ColorSpec::new().set_fg(None))?;
+    stderr.reset()?;
     writeln!(&mut stderr, "{}", text)?;
     Ok(())
 }
@@ -65,18 +65,18 @@ fn error(text: String) -> io::Result<()> {
 fn log_total(parse_errors: usize, lint_errors: usize, lint_warnings: usize) -> io::Result<()> {
     let mut stdout = StandardStream::stdout(get_color());
 
-    stdout.set_color(ColorSpec::new().set_fg(None))?;
+    stdout.reset()?;
     writeln!(&mut stdout, "Results:")?;
 
     let mut stat = |number: usize, label: &str| -> io::Result<()> {
         if number > 0 {
             stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
         } else {
-            stdout.set_color(ColorSpec::new().set_fg(None))?;
+            stdout.reset()?;
         }
 
         write!(&mut stdout, "{}", number)?;
-        stdout.set_color(ColorSpec::new().set_fg(None))?;
+        stdout.reset()?;
         writeln!(&mut stdout, " {}", label)
     };
 
