@@ -150,6 +150,15 @@ mod tests {
     }
 
     #[test]
+    fn test_mutating_functions() {
+        test_lint(
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
+            "unused_variable",
+            "mutating_functions",
+        );
+    }
+
+    #[test]
     fn test_objects() {
         test_lint(
             UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),

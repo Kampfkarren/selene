@@ -515,8 +515,11 @@ impl Visitor<'_> for ScopeVisitor {
 
         if names.next().is_some() {
             self.write_name(base, Some(range(declaration.name())));
-        } else {
-            self.read_name(base);
+        }
+
+        self.read_name(base);
+
+        if names.next().is_none() {
             self.try_hoist();
         }
 
