@@ -21,6 +21,71 @@ args = []
 [selene.structs.Instance."*"]
 any = true
 
+[[bit32.arshift.args]]
+type = "number"
+
+[[bit32.arshift.args]]
+type = "number"
+
+[[bit32.band.args]]
+type = "number"
+
+[[bit32.bnot.args]]
+type = "number"
+
+[[bit32.bor.args]]
+type = "..."
+
+[[bit32.btest.args]]
+type = "..."
+
+[[bit32.bxor.args]]
+type = "..."
+
+[[bit32.extract.args]]
+type = "number"
+
+[[bit32.extract.args]]
+type = "number"
+
+[[bit32.extract.args]]
+type = "number"
+required = false
+
+[[bit32.replace.args]]
+type = "number"
+
+[[bit32.replace.args]]
+type = "number"
+
+[[bit32.replace.args]]
+type = "number"
+required = false
+
+[[bit32.lrotate.args]]
+type = "number"
+
+[[bit32.lrotate.args]]
+type = "number"
+
+[[bit32.lshift.args]]
+type = "number"
+
+[[bit32.lshift.args]]
+type = "number"
+
+[[bit32.rrotate.args]]
+type = "number"
+
+[[bit32.rrotate.args]]
+type = "number"
+
+[[bit32.rshift.args]]
+type = "number"
+
+[[bit32.rshift.args]]
+type = "number"
+
 [[BrickColor.new.args]]
 type = "any"
 
