@@ -15,3 +15,5 @@ e("ThisDoesntExist", {})
 e(Components.FooComponent, {
     Foo = 1,
 })
+
+call("foo", {})

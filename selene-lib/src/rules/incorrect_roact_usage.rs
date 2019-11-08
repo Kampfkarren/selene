@@ -60,7 +60,7 @@ impl Rule for IncorrectRoactUsageLint {
     }
 }
 
-fn is_roact_create_element(prefix: &ast::Prefix, suffixes: Vec<&ast::Suffix>) -> bool {
+fn is_roact_create_element(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]) -> bool {
     if_chain! {
         if let ast::Prefix::Name(prefix_token) = prefix;
         if prefix_token.to_string() == "Roact";
@@ -125,8 +125,33 @@ impl Visitor<'_> for IncorrectRoactUsageVisitor {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         // Check if caller is Roact.createElement or a variable defined to it
         let mut suffixes = call.iter_suffixes().collect::<Vec<_>>();
+        let call_suffix = suffixes.pop();
+
+        let mut check = false;
+
+        if suffixes.is_empty() {
+            // Call is foo(), not foo.bar()
+            // Check if foo is a variable for Roact.createElement
+            if let ast::Prefix::Name(name) = call.prefix() {
+                if self
+                    .definitions_of_create_element
+                    .contains(&name.to_string())
+                {
+                    check = true;
+                }
+            }
+        } else if suffixes.len() == 1 {
+            // Call is foo.bar()
+            // Check if foo.bar is Roact.createElement
+            check = is_roact_create_element(call.prefix(), &suffixes);
+        }
+
+        if !check {
+            return;
+        }
+
         let (mut class, arguments) = if_chain! {
-            if let Some(ast::Suffix::Call(call)) = suffixes.pop();
+            if let Some(ast::Suffix::Call(call)) = call_suffix;
             if let ast::Call::AnonymousCall(arguments) = call;
             if let ast::FunctionArgs::Parentheses { arguments, .. } = arguments;
             if arguments.len() >= 2;
@@ -151,29 +176,6 @@ impl Visitor<'_> for IncorrectRoactUsageVisitor {
                 return;
             }
         };
-
-        let mut check = false;
-
-        if suffixes.is_empty() {
-            // Call is foo(), not foo.bar()
-            // Check if foo is a variable for Roact.createElement
-            if let ast::Prefix::Name(name) = call.prefix() {
-                if self
-                    .definitions_of_create_element
-                    .contains(&name.to_string())
-                {
-                    check = true;
-                }
-            }
-        } else if suffixes.len() == 1 {
-            // Call is foo.bar()
-            // Check if foo.bar is Roact.createElement
-            check = is_roact_create_element(call.prefix(), suffixes);
-        }
-
-        if !check {
-            return;
-        }
 
         let mut valid_properties = HashSet::new();
 
@@ -212,7 +214,7 @@ impl Visitor<'_> for IncorrectRoactUsageVisitor {
                 if binop.is_none();
                 if let ast::Value::Var(var) = &**value;
                 if let ast::Var::Expression(var_expr) = var;
-                if is_roact_create_element(var_expr.prefix(), var_expr.iter_suffixes().collect());
+                if is_roact_create_element(var_expr.prefix(), &var_expr.iter_suffixes().collect::<Vec<_>>());
                 then {
                     self.definitions_of_create_element.insert(name.to_string());
                 }
