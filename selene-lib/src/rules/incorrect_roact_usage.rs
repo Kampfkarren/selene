@@ -67,9 +67,8 @@ fn is_roact_create_element(prefix: &ast::Prefix, suffixes: Vec<&ast::Suffix>) ->
         if suffixes.len() == 1;
         if let ast::Suffix::Index(index) = suffixes[0];
         if let ast::Index::Dot { name, .. } = index;
-        if name.to_string() == "createElement";
         then {
-            true
+            name.to_string() == "createElement"
         } else {
             false
         }
@@ -155,7 +154,7 @@ impl Visitor<'_> for IncorrectRoactUsageVisitor {
 
         let mut check = false;
 
-        if suffixes.len() == 0 {
+        if suffixes.is_empty() {
             // Call is foo(), not foo.bar()
             // Check if foo is a variable for Roact.createElement
             if let ast::Prefix::Name(name) = call.prefix() {
