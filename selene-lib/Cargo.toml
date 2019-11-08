@@ -27,4 +27,5 @@ pretty_assertions = "0.6"
 termcolor = "1.0"
 
 [features]
+default = ["roblox"]
 roblox = ["rbx_reflection"]

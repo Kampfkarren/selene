@@ -7,7 +7,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Build (Lightweight)
       run: |
-        cargo build --locked --release --verbose --bin selene
+        cargo build --locked --release --verbose --bin selene --no-default-features
         New-Item release -ItemType "directory"
         Move-Item .\target\release\selene.exe .\release\selene-light.exe
     - name: Build (All features)

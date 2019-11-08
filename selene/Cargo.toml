@@ -25,4 +25,5 @@ threadpool = "1.7"
 toml = "0.5"
 
 [features]
+default = ["roblox"]
 roblox = ["selene-lib/roblox"]
