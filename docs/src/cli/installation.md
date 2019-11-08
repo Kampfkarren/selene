@@ -18,4 +18,4 @@ cargo install --bin selene --git https://github.com/Kampfkarren/selene
 ```
 
 ### Roblox developers
-selene is built without Roblox specific lints by default. If you want these, type `--features roblox` after whichever command you choose.
+selene is built with Roblox specific lints by default. If you don't want these, type `--no-default-features` after whichever command you choose.
