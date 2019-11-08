@@ -1,0 +1,16 @@
+error[unscoped_variables]: `bar` is not declared locally, and will be available in every scope
+
+   ┌── unscoped_variables.lua:1:1 ───
+   │
+ 1 │ bar = true
+   │ ^^^
+   │
+
+error[unscoped_variables]: `baz` is not declared locally, and will be available in every scope
+
+    ┌── unscoped_variables.lua:11:5 ───
+    │
+ 11 │     baz = 1
+    │     ^^^
+    │
+

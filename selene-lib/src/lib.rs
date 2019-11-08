@@ -226,6 +226,7 @@ use_rules! {
     suspicious_reverse_loop: rules::suspicious_reverse_loop::SuspiciousReverseLoopLint,
     unbalanced_assignments: rules::unbalanced_assignments::UnbalancedAssignmentsLint,
     undefined_variable: rules::undefined_variable::UndefinedVariableLint,
+    unscoped_variables: rules::unscoped_variables::UnscopedVariablesLint,
     unused_variable: rules::unused_variable::UnusedVariableLint,
 
     #[cfg(feature = "roblox")]

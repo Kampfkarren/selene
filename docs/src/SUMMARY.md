@@ -24,4 +24,5 @@
   - [suspicious_reverse_loop](./lints/suspicious_reverse_loop.md)
   - [unbalanced_assignments](./lints/unbalanced_assignments.md)
   - [undefined_variable](./lints/undefined_variable.md)
+  - [unscoped_variables](./lints/unscoped_variables.md)
   - [unused_variable](./lints/unused_variable.md)

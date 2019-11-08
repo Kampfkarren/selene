@@ -20,6 +20,7 @@ pub mod standard_library;
 pub mod suspicious_reverse_loop;
 pub mod unbalanced_assignments;
 pub mod undefined_variable;
+pub mod unscoped_variables;
 pub mod unused_variable;
 
 #[cfg(feature = "roblox")]
