@@ -1,5 +1,5 @@
 name: Build selene
-on: [push]
+on: [push, pull_request]
 jobs:
   generate:
     runs-on: windows-latest
