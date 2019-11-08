@@ -22,6 +22,9 @@ pub mod unbalanced_assignments;
 pub mod undefined_variable;
 pub mod unused_variable;
 
+#[cfg(feature = "roblox")]
+pub mod incorrect_roact_usage;
+
 #[cfg(test)]
 mod test_util;
 

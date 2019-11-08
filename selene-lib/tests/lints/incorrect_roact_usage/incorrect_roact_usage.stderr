@@ -1,0 +1,24 @@
+error[incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Instance`
+
+   ┌── incorrect_roact_usage.lua:2:5 ───
+   │
+ 2 │     ThisPropertyDoesntExist = true,
+   │     ^^^^^^^^^^^^^^^^^^^^^^^
+   │
+
+error[incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Instance`
+
+    ┌── incorrect_roact_usage.lua:10:5 ───
+    │
+ 10 │     ThisPropertyDoesntExist = true,
+    │     ^^^^^^^^^^^^^^^^^^^^^^^
+    │
+
+error[incorrect_roact_usage]: `ThisDoesntExist` is not a valid class
+
+    ┌── incorrect_roact_usage.lua:13:3 ───
+    │
+ 13 │ e("ThisDoesntExist", {})
+    │   ^^^^^^^^^^^^^^^^^
+    │
+

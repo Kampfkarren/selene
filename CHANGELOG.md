@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## Unreleased
 ### Added
 - Added `--color` option to specify whether colors could be used on the output.
+- Added [`incorrect_roact_usage`](https://kampfkarren.github.io/selene/lints/incorrect_roact_usage.html) lint to verify correct usage of Roact.createElement.
 
 ### Changed
 - Colors will no longer be on by default when being piped. [(#32)](https://github.com/Kampfkarren/selene/issues/32)

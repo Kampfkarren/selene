@@ -16,6 +16,7 @@
   - [global_usage](./lints/global_usage.md)
   - [if_same_then_else](./lints/if_same_then_else.md)
   - [ifs_same_cond](./lints/ifs_same_cond.md)
+  - [incorrect_roact_usage](./lints/incorrect_roact_usage.md)
   - [multiple_statements](./lints/multiple_statements.md)
   - [parenthese_conditions](./lints/parenthese_conditions.md)
   - [shadowing](./lints/shadowing.md)
