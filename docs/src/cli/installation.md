@@ -14,7 +14,7 @@ cargo install selene
 
 **If you want the most up to date version of selene**
 ```
-cargo install --bin selene --git https://github.com/Kampfkarren/selene
+cargo install --git https://github.com/Kampfkarren/selene selene
 ```
 
 ### Roblox developers
