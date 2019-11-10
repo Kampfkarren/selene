@@ -305,7 +305,7 @@ fn start(matches: opts::Options) {
         }
 
         Err(error) => {
-            if cfg!(feature = "roblox") && config.std == "roblox" {
+            if cfg!(feature = "roblox") && config.std.split('+').any(|name| name == "roblox") {
                 eprintln!("`std = \"roblox\"`, but no roblox standard library found.");
                 eprintln!("You can generate one manually with `selene generate-roblox-std`.");
                 eprintln!("Generating...");
