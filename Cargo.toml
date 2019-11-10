@@ -3,5 +3,4 @@
 members = [
 	"selene",
     "selene-lib",
-    "generate-roblox-std",
 ]

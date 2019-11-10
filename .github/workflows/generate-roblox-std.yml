@@ -6,7 +6,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Generate
-      run: cargo run --bin generate-roblox-std --verbose > roblox.toml
+      run: cargo run --bin selene --verbose -- generate-roblox-std
     - name: Upload
       uses: actions/upload-artifact@v1
       with:
