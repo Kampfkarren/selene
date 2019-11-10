@@ -17,6 +17,8 @@ use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
 
 mod opts;
+#[cfg(feature = "roblox")]
+mod roblox;
 
 macro_rules! error {
     ($fmt:expr) => {
@@ -247,6 +249,16 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
 }
 
 fn start(matches: opts::Options) {
+    if let Some(opts::Command::GenerateRobloxStd { deprecated }) = matches.command {
+        println!("Generating Roblox standard library...");
+
+        if let Err(error) = generate_roblox_std(deprecated) {
+            error!("Couldn't create roblox standard library: {}", error);
+        }
+
+        return;
+    }
+
     *OPTIONS.write().unwrap() = Some(matches.clone());
 
     let config: CheckerConfig<toml::value::Value> = match matches.config {
@@ -282,6 +294,7 @@ fn start(matches: opts::Options) {
     };
 
     let current_dir = std::env::current_dir().unwrap();
+
     let standard_library = match StandardLibrary::from_config_name(&config.std, Some(&current_dir))
     {
         Ok(Some(library)) => library,
@@ -292,8 +305,22 @@ fn start(matches: opts::Options) {
         }
 
         Err(error) => {
-            error!("Could not retrieve standard library: {}", error);
-            return;
+            if cfg!(feature = "roblox") && config.std == "roblox" {
+                eprintln!("`std = \"roblox\"`, but no roblox standard library found.");
+                eprintln!("You can generate one manually with `selene generate-roblox-std`.");
+                eprintln!("Generating...");
+
+                match generate_roblox_std(false) {
+                    Ok(library) => library,
+                    Err(err) => {
+                        error!("Could not create roblox standard library: {}", err);
+                        return;
+                    }
+                }
+            } else {
+                error!("Could not retrieve standard library: {}", error);
+                return;
+            }
         }
     };
 
@@ -444,6 +471,26 @@ fn get_opts_safe(mut args: Vec<OsString>, luacheck: bool) -> Result<opts::Option
             },
         }
     }
+}
+
+#[cfg(feature = "roblox")]
+fn generate_roblox_std(show_deprecated: bool) -> Result<StandardLibrary, roblox::GenerateError> {
+    let (contents, std) = roblox::RobloxGenerator {
+        std: roblox::RobloxGenerator::base_std()?,
+        show_deprecated,
+    }
+    .generate()?;
+
+    fs::File::create("roblox.toml")
+        .and_then(|mut file| file.write_all(&contents))
+        .map_err(roblox::GenerateError::Io)?;
+
+    Ok(std)
+}
+
+#[cfg(not(feature = "roblox"))]
+fn generate_roblox_std(_: bool) -> Result<StandardLibrary, std::convert::Infallible> {
+    unreachable!("generate_roblox_std called when Roblox feature was not installed!");
 }
 
 #[cfg(test)]

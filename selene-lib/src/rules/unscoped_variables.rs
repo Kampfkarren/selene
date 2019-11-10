@@ -55,7 +55,10 @@ impl Rule for UnscopedVariablesLint {
 
                 diagnostics.push(Diagnostic::new(
                     "unscoped_variables",
-                    format!("`{}` is not declared locally, and will be available in every scope", reference.name),
+                    format!(
+                        "`{}` is not declared locally, and will be available in every scope",
+                        reference.name
+                    ),
                     Label::new(reference.identifier),
                 ));
             }

@@ -4,7 +4,8 @@ use structopt::{clap::arg_enum, StructOpt};
 
 #[derive(Clone, Debug, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
-#[structopt(setting(structopt::clap::AppSettings::AllowExternalSubcommands))]
+#[structopt(setting(structopt::clap::AppSettings::ArgsNegateSubcommands))]
+#[structopt(setting(structopt::clap::AppSettings::SubcommandsNegateReqs))]
 pub struct Options {
     /// A glob to match files with to check
     #[structopt(long, default_value = "**/*.lua")]
@@ -42,6 +43,19 @@ pub struct Options {
 
     #[structopt(parse(from_os_str), min_values(1), index(1), required(true))]
     pub files: Vec<OsString>,
+
+    #[structopt(subcommand)]
+    pub command: Option<Command>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, StructOpt)]
+#[structopt(rename_all = "kebab-case")]
+pub enum Command {
+    #[cfg(feature = "roblox")]
+    GenerateRobloxStd {
+        #[structopt(long)]
+        deprecated: bool,
+    },
 }
 
 arg_enum! {
