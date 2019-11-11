@@ -8,6 +8,7 @@
   - [Usage](./cli/usage.md)
   - [Configuration](./cli/configuration.md)
   - [Standard Library Format](./cli/std.md)
+- [Roblox Guide](./roblox.md)
 - [Contributing](./contributing.md)
 - [Lints](./lints/index.md)
   - [almost_swapped](./lints/almost_swapped.md)

@@ -306,9 +306,12 @@ fn start(matches: opts::Options) {
 
         Err(error) => {
             if cfg!(feature = "roblox") && config.std.split('+').any(|name| name == "roblox") {
-                eprintln!("`std = \"roblox\"`, but no roblox standard library found.");
-                eprintln!("You can generate one manually with `selene generate-roblox-std`.");
-                eprintln!("Generating...");
+                eprint!("`std = \"roblox\"`, but there is no roblox.toml in this directory. ");
+                eprintln!("We are automatically generating one for you now!");
+
+                eprint!("By the way, you can do this manually in the future if you need ");
+                eprint!("to use new Roblox features with: ");
+                eprintln!("`selene generate-roblox-std`.");
 
                 match generate_roblox_std(false) {
                     Ok(library) => library,
