@@ -9,7 +9,12 @@ use std::{
     },
 };
 
-use codespan_reporting::{diagnostic::Severity as CodespanSeverity, term::DisplayStyle};
+use codespan_reporting::{
+    diagnostic::{
+        Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
+    },
+    term::DisplayStyle,
+};
 use full_moon::ast::owned::Owned;
 use selene_lib::{rules::Severity, standard_library::StandardLibrary, *};
 use structopt::{clap, StructOpt};
@@ -104,24 +109,62 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
     let lock = OPTIONS.read().unwrap();
     let opts = lock.as_ref().unwrap();
 
+    let config = &codespan_reporting::term::Config {
+        display_style: if opts.quiet {
+            DisplayStyle::Short
+        } else {
+            DisplayStyle::Rich
+        },
+        ..Default::default()
+    };
+
+    let mut files = codespan::Files::new();
+    let source_id = files.add(filename.to_string_lossy(), &*contents);
+
+    let stdout = termcolor::StandardStream::stdout(get_color());
+    let mut stdout = stdout.lock();
+
     let ast = match full_moon::parse(&contents) {
         Ok(ast) => ast.owned(),
         Err(error) => {
-            // TODO: Use codespan for this
             PARSE_ERRORS.fetch_add(1, Ordering::Release);
-            error!("Error parsing {}: {}", filename.display(), error);
+
+            if let full_moon::Error::AstError(full_moon::ast::AstError::UnexpectedToken {
+                token,
+                additional,
+            }) = error
+            {
+                codespan_reporting::term::emit(
+                    &mut stdout,
+                    &config,
+                    &files,
+                    &CodespanDiagnostic {
+                        severity: CodespanSeverity::Error,
+                        code: Some("parse_error".to_owned()),
+                        message: format!("unexpected token `{}`", token),
+                        primary_label: CodespanLabel::new(
+                            source_id,
+                            codespan::Span::new(
+                                token.start_position().bytes() as u32,
+                                token.end_position().bytes() as u32,
+                            ),
+                            additional.unwrap_or_default().to_owned(),
+                        ),
+                        notes: Vec::new(),
+                        secondary_labels: Vec::new(),
+                    },
+                )
+                .expect("couldn't emit parse error to codespan");
+            } else {
+                error!("Error parsing {}: {}", filename.display(), error);
+            }
+
             return;
         }
     };
 
     let mut diagnostics = checker.test_on(&ast);
     diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.start_position());
-
-    let mut files = codespan::Files::new();
-    let source_id = files.add(filename.to_string_lossy(), contents);
-
-    let stdout = termcolor::StandardStream::stdout(get_color());
-    let mut stdout = stdout.lock();
 
     let (mut errors, mut warnings) = (0, 0);
     for diagnostic in &diagnostics {
@@ -217,14 +260,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
 
             codespan_reporting::term::emit(
                 &mut stdout,
-                &codespan_reporting::term::Config {
-                    display_style: if opts.quiet {
-                        DisplayStyle::Short
-                    } else {
-                        DisplayStyle::Rich
-                    },
-                    ..Default::default()
-                },
+                &config,
                 &files,
                 &diagnostic,
             )

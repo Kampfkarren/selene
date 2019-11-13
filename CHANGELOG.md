@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 - Changed incorrect_roact_usage to roblox_incorrect_roact_usage. [(#41)](https://github.com/Kampfkarren/selene/issues/41)
+- Changed parsing errors to produce prettier results.
 
 ## [0.3.0] - 2019-11-08
 ### Added
