@@ -31,7 +31,7 @@ impl Rule for IncorrectRoactUsageLint {
 
         for invalid_property in visitor.invalid_properties {
             diagnostics.push(Diagnostic::new(
-                "incorrect_roact_usage",
+                "roblox_incorrect_roact_usage",
                 format!(
                     "`{}` is not a property of `{}`",
                     invalid_property.property_name, invalid_property.class_name
@@ -42,7 +42,7 @@ impl Rule for IncorrectRoactUsageLint {
 
         for unknown_class in visitor.unknown_class {
             diagnostics.push(Diagnostic::new(
-                "incorrect_roact_usage",
+                "roblox_incorrect_roact_usage",
                 format!("`{}` is not a valid class", unknown_class.name),
                 Label::new(unknown_class.range),
             ));
@@ -228,11 +228,11 @@ mod tests {
     use super::{super::test_util::test_lint, *};
 
     #[test]
-    fn test_incorrect_roact_usage() {
+    fn test_roblox_incorrect_roact_usage() {
         test_lint(
             IncorrectRoactUsageLint::new(()).unwrap(),
-            "incorrect_roact_usage",
-            "incorrect_roact_usage",
+            "roblox_incorrect_roact_usage",
+            "roblox_incorrect_roact_usage",
         );
     }
 }

@@ -231,6 +231,6 @@ use_rules! {
 
     #[cfg(feature = "roblox")]
     {
-        incorrect_roact_usage: rules::incorrect_roact_usage::IncorrectRoactUsageLint,
+        roblox_incorrect_roact_usage: rules::roblox_incorrect_roact_usage::IncorrectRoactUsageLint,
     },
 }

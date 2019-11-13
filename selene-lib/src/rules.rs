@@ -24,7 +24,7 @@ pub mod unscoped_variables;
 pub mod unused_variable;
 
 #[cfg(feature = "roblox")]
-pub mod incorrect_roact_usage;
+pub mod roblox_incorrect_roact_usage;
 
 #[cfg(test)]
 mod test_util;
