@@ -231,6 +231,7 @@ use_rules! {
 
     #[cfg(feature = "roblox")]
     {
+        roblox_incorrect_color3_new_bounds: rules::roblox_incorrect_color3_new_bounds::Color3BoundsLint,
         roblox_incorrect_roact_usage: rules::roblox_incorrect_roact_usage::IncorrectRoactUsageLint,
     },
 }
