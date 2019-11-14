@@ -258,13 +258,8 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                 },
             );
 
-            codespan_reporting::term::emit(
-                &mut stdout,
-                &config,
-                &files,
-                &diagnostic,
-            )
-            .expect("couldn't emit to codespan");
+            codespan_reporting::term::emit(&mut stdout, &config, &files, &diagnostic)
+                .expect("couldn't emit to codespan");
         }
     }
 }
