@@ -65,9 +65,10 @@ impl RobloxGenerator {
         .map_err(GenerateError::Io)?;
 
         self.std.extend(
-            StandardLibrary::from_name(&self.std.meta.as_ref().unwrap().base.as_ref().unwrap())
-                .unwrap(),
+            StandardLibrary::from_name(&self.std.meta.as_ref().unwrap().base.as_ref().unwrap()).unwrap(),
         );
+
+        self.std.inflate();
 
         Ok((bytes, self.std))
     }

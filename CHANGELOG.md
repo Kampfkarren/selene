@@ -3,6 +3,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Unreleased
 
+## [0.4.2] - 2019-11-13
+### Fixed
+- Fixed Roblox standard library not including structs, and thus failing when using `game`, `script`, etc.
+
 ## [0.4.1] - 2019-11-13
 ### Fixed
 - Fixed Roblox standard library not including Lua 5.1 globals the first time you ran selene.
