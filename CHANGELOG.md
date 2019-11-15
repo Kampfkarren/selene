@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Fixed
+- Fixed a concatenated result always triggering an error when the standard library function expected a constant string (such as `collectgarbage` or `Instance.new`).
 
 ## [0.4.2] - 2019-11-13
 ### Fixed

@@ -563,7 +563,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
     }
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 enum PassedArgumentType {
     Primitive(ArgumentType),
     String(String),
@@ -581,7 +581,15 @@ impl PassedArgumentType {
         }
 
         match self {
-            PassedArgumentType::Primitive(us) => us == &ArgumentType::Vararg || us == argument_type,
+            PassedArgumentType::Primitive(us) => {
+                us == &ArgumentType::Vararg
+                    || us == argument_type
+                    || (us == &ArgumentType::String
+                        && match argument_type {
+                            ArgumentType::Constant(_) => true,
+                            _ => false,
+                        })
+            }
             PassedArgumentType::String(text) => match argument_type {
                 ArgumentType::Constant(constants) => constants.contains(text),
                 ArgumentType::String => true,
