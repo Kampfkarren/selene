@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## Unreleased
 ### Fixed
 - Fixed a concatenated result always triggering an error when the standard library function expected a constant string (such as `collectgarbage` or `Instance.new`).
+- Fixed parenthese conditions mixed with non-parenthese conditions (such as `(condition) and condition`) tripping the `parenthese_conditions` lint.
 
 ## [0.4.2] - 2019-11-13
 ### Fixed

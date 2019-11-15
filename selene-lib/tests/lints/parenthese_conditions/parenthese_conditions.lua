@@ -11,3 +11,5 @@ while (true) do end
 
 repeat until false
 repeat until (false)
+
+while (true) and false do end
