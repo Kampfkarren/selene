@@ -13,7 +13,7 @@ use codespan_reporting::{
     diagnostic::{
         Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
     },
-    term::DisplayStyle,
+    term::DisplayStyle as CodespanDisplayStyle,
 };
 use full_moon::ast::owned::Owned;
 use selene_lib::{rules::Severity, standard_library::StandardLibrary, *};
@@ -94,6 +94,31 @@ fn log_total(parse_errors: usize, lint_errors: usize, lint_warnings: usize) -> i
     Ok(())
 }
 
+fn emit_codespan(
+    writer: &mut impl termcolor::WriteColor,
+    files: &codespan::Files,
+    diagnostic: &CodespanDiagnostic,
+) {
+    let lock = OPTIONS.read().unwrap();
+    let opts = lock.as_ref().unwrap();
+
+    let config = &codespan_reporting::term::Config {
+        display_style: if opts.quiet() {
+            CodespanDisplayStyle::Short
+        } else {
+            CodespanDisplayStyle::Rich
+        },
+        ..Default::default()
+    };
+
+    if opts.display_style == opts::DisplayStyle::Json {
+        writeln!(writer, "{}", serde_json::to_string(&diagnostic).unwrap()).unwrap();
+    } else {
+        codespan_reporting::term::emit(writer, &config, &files, diagnostic)
+            .expect("couldn't emit error to codespan");
+    }
+}
+
 fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut reader: R) {
     let mut buffer = Vec::new();
     if let Err(error) = reader.read_to_end(&mut buffer) {
@@ -108,15 +133,6 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
 
     let lock = OPTIONS.read().unwrap();
     let opts = lock.as_ref().unwrap();
-
-    let config = &codespan_reporting::term::Config {
-        display_style: if opts.quiet {
-            DisplayStyle::Short
-        } else {
-            DisplayStyle::Rich
-        },
-        ..Default::default()
-    };
 
     let mut files = codespan::Files::new();
     let source_id = files.add(filename.to_string_lossy(), &*contents);
@@ -134,9 +150,8 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                 additional,
             }) = error
             {
-                codespan_reporting::term::emit(
+                emit_codespan(
                     &mut stdout,
-                    &config,
                     &files,
                     &CodespanDiagnostic {
                         severity: CodespanSeverity::Error,
@@ -153,8 +168,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                         notes: Vec::new(),
                         secondary_labels: Vec::new(),
                     },
-                )
-                .expect("couldn't emit parse error to codespan");
+                );
             } else {
                 error!("Error parsing {}: {}", filename.display(), error);
             }
@@ -258,8 +272,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                 },
             );
 
-            codespan_reporting::term::emit(&mut stdout, &config, &files, &diagnostic)
-                .expect("couldn't emit to codespan");
+            emit_codespan(&mut stdout, &files, &diagnostic);
         }
     }
 }

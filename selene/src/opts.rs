@@ -21,7 +21,18 @@ pub struct Options {
     #[structopt(long, default_value = get_num_cpus())]
     pub num_threads: usize,
 
-    /// Display only the necessary information
+    /// Sets the display method
+    #[structopt(
+        long,
+        possible_values = &DisplayStyle::variants(),
+        case_insensitive = true,
+        conflicts_with = "quiet",
+        default_value = "rich",
+    )]
+    pub display_style: DisplayStyle,
+
+    /// Display only the necessary information.
+    /// Equivalent to --display-style="quiet"
     #[structopt(long, short)]
     pub quiet: bool,
 
@@ -48,6 +59,12 @@ pub struct Options {
     pub command: Option<Command>,
 }
 
+impl Options {
+    pub fn quiet(&self) -> bool {
+        self.quiet || self.display_style == DisplayStyle::Quiet
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
 pub enum Command {
@@ -64,6 +81,15 @@ arg_enum! {
         Always,
         Auto,
         Never,
+    }
+}
+
+arg_enum! {
+    #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+    pub enum DisplayStyle {
+        Json,
+        Rich,
+        Quiet,
     }
 }
 

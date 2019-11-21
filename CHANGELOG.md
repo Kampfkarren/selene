@@ -2,6 +2,9 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- Added `display-style` flag to use either rich (default), quiet (equivalent to -q), or JSON.
+
 ### Fixed
 - Fixed a concatenated result always triggering an error when the standard library function expected a constant string (such as `collectgarbage` or `Instance.new`).
 - Fixed parenthese conditions mixed with non-parenthese conditions (such as `(condition) and condition`) tripping the `parenthese_conditions` lint.
