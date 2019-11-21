@@ -2,7 +2,9 @@
     "name": "selene-vscode",
     "displayName": "Selene",
     "description": "A blazing-fast modern Lua linter written in Rust",
-    "version": "0.0.1",
+    "version": "1.0.0",
+    "publisher": "Kampfkarren",
+    "repository": "https://github.com/Kampfkarren/selene",
     "engines": {
         "vscode": "^1.40.0"
     },
@@ -21,13 +23,11 @@
         "test": "node ./out/test/runTest.js"
     },
     "contributes": {
-        "commands": [
-            {
-                "command": "selene.reinstall",
-                "title": "Reinstall Selene",
-                "category": "Selene"
-            }
-        ],
+        "commands": [{
+            "command": "selene.reinstall",
+            "title": "Reinstall Selene",
+            "category": "Selene"
+        }],
         "configuration": {
             "title": "Selene",
             "properties": {
