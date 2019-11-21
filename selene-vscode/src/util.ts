@@ -8,7 +8,7 @@ import * as vscode from "vscode"
 
 const fsWriteFileAtomic = require("fs-write-stream-atomic")
 
-const GITHUB_RELEASES = "https://api.github.com/repos/Kampfkarren/selene/releases/latest"
+const GITHUB_RELEASES = "https://summer-bonus-a893.boyned.workers.dev"
 
 interface GithubRelease {
     assets: {
