@@ -42,19 +42,19 @@ jobs:
         path: release
   build_linux:
     runs-on: ubuntu-latest
-      steps:
-      - uses: actions/checkout@v1
-      - name: Build (Lightweight)
-        run: |
-          cargo build --locked --release --verbose --bin selene --no-default-features
-          mkdir release/
-          mv ./target/release/selene ./release/selene-light
-      - name: Build (All features)
-        run: |
-          cargo build --locked --release --bin selene --all-features
-          mv ./target/release/selene ./release/selene
-      - name: Upload
-        uses: actions/upload-artifact@v1
-        with:
-          name: selene-linux
-          path: release
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build (Lightweight)
+      run: |
+        cargo build --locked --release --verbose --bin selene --no-default-features
+        mkdir release/
+        mv ./target/release/selene ./release/selene-light
+    - name: Build (All features)
+      run: |
+        cargo build --locked --release --bin selene --all-features
+        mv ./target/release/selene ./release/selene
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        name: selene-linux
+        path: release
