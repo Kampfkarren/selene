@@ -1,5 +1,11 @@
 name: Build selene
-on: [push, pull_request]
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
 jobs:
   build_windows:
     runs-on: windows-latest
@@ -33,6 +39,7 @@ jobs:
         mv ./target/release/selene ./release/selene-light
     - name: Build (All features)
       run: |
+        source $HOME/.cargo/env
         cargo build --locked --release --bin selene --all-features
         mv ./target/release/selene ./release/selene
     - name: Upload
