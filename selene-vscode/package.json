@@ -1,0 +1,63 @@
+{
+    "name": "selene-vscode",
+    "displayName": "Selene",
+    "description": "A blazing-fast modern Lua linter written in Rust",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.40.0"
+    },
+    "categories": [
+        "Linters"
+    ],
+    "activationEvents": [
+        "onLanguage:lua"
+    ],
+    "main": "./out/extension.js",
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile",
+        "test": "node ./out/test/runTest.js"
+    },
+    "contributes": {
+        "commands": [
+            {
+                "command": "selene.reinstall",
+                "title": "Reinstall Selene",
+                "category": "Selene"
+            }
+        ],
+        "configuration": {
+            "title": "Selene",
+            "properties": {
+                "selene.selenePath": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "default": null,
+                    "description": "Specifies the path of selene. If not specified, will automatically download one from the GitHub releases."
+                }
+            }
+        }
+    },
+    "devDependencies": {
+        "@types/glob": "^7.1.1",
+        "@types/mocha": "^5.2.7",
+        "@types/node": "^12.11.7",
+        "@types/request": "^2.48.3",
+        "@types/request-promise-native": "^1.0.17",
+        "@types/vscode": "^1.40.0",
+        "glob": "^7.1.5",
+        "mocha": "^6.2.2",
+        "tslint": "^5.20.0",
+        "typescript": "^3.6.4",
+        "vscode-test": "^1.2.2"
+    },
+    "dependencies": {
+        "fs-write-stream-atomic": "^1.0.10",
+        "request": "^2.88.0",
+        "request-promise-native": "^1.0.8"
+    }
+}
