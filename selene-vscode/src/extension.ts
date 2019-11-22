@@ -75,6 +75,7 @@ export async function activate(context: vscode.ExtensionContext) {
         )
 
         if (!output) {
+            diagnosticsCollection.delete(document.uri)
             return
         }
 
