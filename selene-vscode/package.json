@@ -12,7 +12,8 @@
         "Linters"
     ],
     "activationEvents": [
-        "onLanguage:lua"
+        "onLanguage:lua",
+        "onCommand:selene.reinstall"
     ],
     "main": "./out/extension.js",
     "scripts": {
@@ -23,11 +24,13 @@
         "test": "node ./out/test/runTest.js"
     },
     "contributes": {
-        "commands": [{
-            "command": "selene.reinstall",
-            "title": "Reinstall Selene",
-            "category": "Selene"
-        }],
+        "commands": [
+            {
+                "command": "selene.reinstall",
+                "title": "Reinstall Selene",
+                "category": "Selene"
+            }
+        ],
         "configuration": {
             "title": "Selene",
             "properties": {
