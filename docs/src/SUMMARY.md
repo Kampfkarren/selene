@@ -22,7 +22,7 @@
   - [roblox_incorrect_color3_new_bounds](./lints/roblox_incorrect_color3_new_bounds.md)
   - [roblox_incorrect_roact_usage](./lints/roblox_incorrect_roact_usage.md)
   - [shadowing](./lints/shadowing.md)
-  - [standard_library](./lints/standard_library.md)
+  - [incorrect_standard_library_use](./lints/incorrect_standard_library_use.md)
   - [suspicious_reverse_loop](./lints/suspicious_reverse_loop.md)
   - [unbalanced_assignments](./lints/unbalanced_assignments.md)
   - [undefined_variable](./lints/undefined_variable.md)

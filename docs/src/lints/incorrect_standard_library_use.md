@@ -1,4 +1,4 @@
-# standard_library
+# incorrect_standard_library_use
 ## What it does
 Checks for correct use of [the standard library](../cli/std.md).
 
