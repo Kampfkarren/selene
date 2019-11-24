@@ -5,7 +5,7 @@ selene provides a robust standard library format to allow for use with environme
 For examples of the standard library format, see:
 - [`lua51.toml`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/default_std/lua51.toml) - The default standard library for Lua 5.1
 - [`lua52.toml`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/default_std/lua52.toml) - A standard library for Lua 5.2's additions and removals. Reference this if your standard library is based off another (it most likely is).
-- [`roblox.toml`](https://hastebin.com/exovojewax.toml) - A standard library for Roblox that incorporates all the advanced features of the format. If you are a Roblox developer, don't use this as anything other than reference--an up to date version of this library is available with every commit.
+- [`roblox.toml`](https://gist.github.com/evaera/13c96302d308c7a9ffb2a3fc5d28ac96) - A standard library for Roblox that incorporates all the advanced features of the format. If you are a Roblox developer, don't use this as anything other than reference--an up to date version of this library is available with every commit.
 
 ## [selene]
 Anything under the key `[selene]` is used for meta information. The following paths are accepted:
