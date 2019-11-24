@@ -67,7 +67,7 @@ use_rules! {
 }
 ```
 
-Put your lint in this lint (alphabetical order) as the following format:
+Put your lint in this list (alphabetical order) as the following format:
 
 ```
 lint_name: rules::module_name::LintObject,
