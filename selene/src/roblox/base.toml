@@ -308,6 +308,13 @@ required = false
 [[Instance.new.args]]
 type = "string" # This is changed at generate time
 
+[[string.split.args]]
+type = "string"
+
+[[string.split.args]]
+type = "string"
+required = false
+
 [[math.clamp.args]]
 type = "number"
 
