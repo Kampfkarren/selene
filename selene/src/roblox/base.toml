@@ -331,6 +331,13 @@ required = false
 type = "number"
 required = false
 
+[[NumberRange.new.args]]
+type = "number"
+
+[[NumberRange.new.args]]
+required = false
+type = "number"
+
 [[NumberSequence.new.args]]
 type = "any"
 
