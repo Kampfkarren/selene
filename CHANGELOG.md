@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Added `NumberRange` to the Roblox standard library.
 - Added `string.split` to the Roblox standard library.
+- Added `table.find` to the Roblox standard library.
 
 ## [0.4.3] - 2019-11-20
 ### Added

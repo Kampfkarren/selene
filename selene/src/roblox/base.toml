@@ -308,13 +308,6 @@ required = false
 [[Instance.new.args]]
 type = "string" # This is changed at generate time
 
-[[string.split.args]]
-type = "string"
-
-[[string.split.args]]
-type = "string"
-required = false
-
 [[math.clamp.args]]
 type = "number"
 
@@ -416,6 +409,23 @@ writable = "new-fields"
 
 [[spawn.args]]
 type = "function"
+
+[[string.split.args]]
+type = "string"
+
+[[string.split.args]]
+type = "string"
+required = false
+
+[[table.find.args]]
+type = "table"
+
+[[table.find.args]]
+type = "any"
+
+[[table.find.args]]
+type = "number"
+required = false
 
 [tick]
 args = []
