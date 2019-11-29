@@ -265,6 +265,9 @@ type = "any"
 type = { display = "Color3" }
 required = false
 
+[coroutine.isyieldable]
+args = []
+
 [[debug.profilebegin.args]]
 type = "string"
 
@@ -316,6 +319,13 @@ type = "number"
 
 [[math.clamp.args]]
 type = "number"
+
+[[math.log.args]]
+type = "number"
+
+[[math.log.args]]
+type = "number"
+required = false
 
 [[math.sign.args]]
 type = "number"
@@ -424,6 +434,43 @@ type = "table"
 type = "any"
 
 [[table.find.args]]
+type = "number"
+required = false
+
+[[table.create.args]]
+type = "number"
+
+[[table.create.args]]
+type = "any"
+required = false
+
+[[table.move.args]]
+type = "table"
+
+[[table.move.args]]
+type = "number"
+
+[[table.move.args]]
+type = "number"
+
+[[table.move.args]]
+type = "number"
+
+[[table.move.args]]
+type = "table"
+required = false
+
+[[table.pack.args]]
+type = "..."
+
+[[table.unpack.args]]
+type = "table"
+
+[[table.unpack.args]]
+type = "number"
+required = false
+
+[[table.unpack.args]]
 type = "number"
 required = false
 
