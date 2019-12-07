@@ -355,6 +355,16 @@ type = "any"
 type = "number"
 required = false
 
+[[NumberSequenceKeypoint.new.args]]
+type = "number"
+
+[[NumberSequenceKeypoint.new.args]]
+type = "number"
+
+[[NumberSequenceKeypoint.new.args]]
+type = "number"
+required = false
+
 [[PhysicalProperties.new.args]]
 type = "any"
 
