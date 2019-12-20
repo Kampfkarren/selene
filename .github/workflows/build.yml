@@ -19,6 +19,7 @@ jobs:
         Move-Item .\target\release\selene.exe .\release\selene-light.exe
     - name: Build (All features)
       run: |
+        cd selene
         cargo build --locked --release --all-features
         Move-Item .\target\release\selene.exe .\release\selene.exe
     - name: Upload
@@ -42,6 +43,7 @@ jobs:
     - name: Build (All features)
       run: |
         source $HOME/.cargo/env
+        cd selene
         cargo build --locked --release --all-features
         mv ../target/release/selene ./release/selene
     - name: Upload
@@ -61,6 +63,7 @@ jobs:
         mv ../target/release/selene ./release/selene-light
     - name: Build (All features)
       run: |
+        cd selene
         cargo build --locked --release --all-features
         mv ../target/release/selene ./release/selene
     - name: Upload
