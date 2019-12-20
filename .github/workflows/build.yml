@@ -38,12 +38,12 @@ jobs:
         cd selene
         cargo build --locked --release --verbose --no-default-features
         mkdir release/
-        mv ./target/release/selene ./release/selene-light
+        mv ../target/release/selene ./release/selene-light
     - name: Build (All features)
       run: |
         source $HOME/.cargo/env
         cargo build --locked --release --all-features
-        mv ./target/release/selene ./release/selene
+        mv ../target/release/selene ./release/selene
     - name: Upload
       uses: actions/upload-artifact@v1
       with:
@@ -58,11 +58,11 @@ jobs:
         cd selene
         cargo build --locked --release --verbose --no-default-features
         mkdir release/
-        mv ./target/release/selene ./release/selene-light
+        mv ../target/release/selene ./release/selene-light
     - name: Build (All features)
       run: |
         cargo build --locked --release --all-features
-        mv ./target/release/selene ./release/selene
+        mv ../target/release/selene ./release/selene
     - name: Upload
       uses: actions/upload-artifact@v1
       with:
