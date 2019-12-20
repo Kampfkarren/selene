@@ -1,6 +1,9 @@
 use std::ffi::OsString;
 
-use structopt::{clap::arg_enum, StructOpt};
+use structopt::{
+    clap::{arg_enum, AppSettings},
+    StructOpt,
+};
 
 #[derive(Clone, Debug, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
@@ -73,6 +76,9 @@ pub enum Command {
         #[structopt(long)]
         deprecated: bool,
     },
+
+    #[structopt(setting(AppSettings::Hidden))]
+    NonExhaustive,
 }
 
 arg_enum! {
