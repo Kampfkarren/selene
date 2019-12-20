@@ -13,12 +13,13 @@ jobs:
     - uses: actions/checkout@v1
     - name: Build (Lightweight)
       run: |
-        cargo build --locked --release --verbose --bin selene --no-default-features
+      cd selene
+        cargo build --locked --release --verbose --no-default-features
         New-Item release -ItemType "directory"
         Move-Item .\target\release\selene.exe .\release\selene-light.exe
     - name: Build (All features)
       run: |
-        cargo build --locked --release --bin selene --all-features
+        cargo build --locked --release --all-features
         Move-Item .\target\release\selene.exe .\release\selene.exe
     - name: Upload
       uses: actions/upload-artifact@v1
@@ -34,13 +35,14 @@ jobs:
     - name: Build (Lightweight)
       run: |
         source $HOME/.cargo/env
-        cargo build --locked --release --verbose --bin selene --no-default-features
+        cd selene
+        cargo build --locked --release --verbose --no-default-features
         mkdir release/
         mv ./target/release/selene ./release/selene-light
     - name: Build (All features)
       run: |
         source $HOME/.cargo/env
-        cargo build --locked --release --bin selene --all-features
+        cargo build --locked --release --all-features
         mv ./target/release/selene ./release/selene
     - name: Upload
       uses: actions/upload-artifact@v1
@@ -53,12 +55,13 @@ jobs:
     - uses: actions/checkout@v1
     - name: Build (Lightweight)
       run: |
-        cargo build --locked --release --verbose --bin selene --no-default-features
+        cd selene
+        cargo build --locked --release --verbose --no-default-features
         mkdir release/
         mv ./target/release/selene ./release/selene-light
     - name: Build (All features)
       run: |
-        cargo build --locked --release --bin selene --all-features
+        cargo build --locked --release --all-features
         mv ./target/release/selene ./release/selene
     - name: Upload
       uses: actions/upload-artifact@v1
