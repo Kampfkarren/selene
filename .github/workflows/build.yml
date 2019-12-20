@@ -21,12 +21,12 @@ jobs:
       run: |
         cd selene
         cargo build --locked --release --all-features
-        Move-Item .\target\release\selene.exe .\release\selene.exe
+        Move-Item ..\target\release\selene.exe .\release\selene.exe
     - name: Upload
       uses: actions/upload-artifact@v1
       with:
         name: selene-windows
-        path: release
+        path: ./selene/release
   build_mac:
     runs-on: macos-latest
     steps:
@@ -50,7 +50,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: selene-macos
-        path: release
+        path: ./selene/release
   build_linux:
     runs-on: ubuntu-latest
     steps:
@@ -70,4 +70,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: selene-linux
-        path: release
+        path: ./selene/release
