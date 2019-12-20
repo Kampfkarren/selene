@@ -16,7 +16,7 @@ jobs:
         cd selene
         cargo build --locked --release --verbose --no-default-features
         New-Item release -ItemType "directory"
-        Move-Item .\target\release\selene.exe .\release\selene-light.exe
+        Move-Item ..\target\release\selene.exe .\release\selene-light.exe
     - name: Build (All features)
       run: |
         cd selene
