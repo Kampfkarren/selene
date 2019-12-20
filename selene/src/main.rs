@@ -293,14 +293,16 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
 }
 
 fn start(matches: opts::Options) {
-    if let Some(opts::Command::GenerateRobloxStd { deprecated }) = matches.command {
-        println!("Generating Roblox standard library...");
+    if cfg!(feature = "roblox") {
+        if let Some(opts::Command::GenerateRobloxStd { deprecated }) = matches.command {
+            println!("Generating Roblox standard library...");
 
-        if let Err(error) = generate_roblox_std(deprecated) {
-            error!("Couldn't create roblox standard library: {}", error);
+            if let Err(error) = generate_roblox_std(deprecated) {
+                error!("Couldn't create roblox standard library: {}", error);
+            }
+
+            return;
         }
-
-        return;
     }
 
     *OPTIONS.write().unwrap() = Some(matches.clone());
