@@ -7,6 +7,10 @@ mod side_effects;
 
 pub use side_effects::HasSideEffects;
 
+pub fn is_type_function(name: &str, roblox: bool) -> bool {
+    name == "type" || (name == "typeof" && roblox)
+}
+
 pub fn range<N: Node, P: TryFrom<usize>>(node: N) -> (P, P)
 where
     <P as TryFrom<usize>>::Error: std::fmt::Debug,

@@ -224,6 +224,7 @@ use_rules! {
     parenthese_conditions: rules::parenthese_conditions::ParentheseConditionsLint,
     shadowing: rules::shadowing::ShadowingLint,
     suspicious_reverse_loop: rules::suspicious_reverse_loop::SuspiciousReverseLoopLint,
+    type_check_inside_call: rules::type_check_inside_call::TypeCheckInsideCallLint,
     unbalanced_assignments: rules::unbalanced_assignments::UnbalancedAssignmentsLint,
     undefined_variable: rules::undefined_variable::UndefinedVariableLint,
     unscoped_variables: rules::unscoped_variables::UnscopedVariablesLint,

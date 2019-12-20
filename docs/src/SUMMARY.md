@@ -24,6 +24,7 @@
   - [shadowing](./lints/shadowing.md)
   - [incorrect_standard_library_use](./lints/incorrect_standard_library_use.md)
   - [suspicious_reverse_loop](./lints/suspicious_reverse_loop.md)
+  - [type_check_inside_call](./lints/type_check_inside_call.md)
   - [unbalanced_assignments](./lints/unbalanced_assignments.md)
   - [undefined_variable](./lints/undefined_variable.md)
   - [unscoped_variables](./lints/unscoped_variables.md)
