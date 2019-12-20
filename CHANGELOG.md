@@ -14,6 +14,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added second argument to `math.log` to the Roblox standard library.
 - Added `NumberSequenceKeypoint` to the Roblox standard library.
 
+### Fixed
+- Fixed ternary expressions resolving as booleans.
+
 ## [0.4.3] - 2019-11-20
 ### Added
 - Added `display-style` flag to use either rich (default), quiet (equivalent to -q), or JSON.

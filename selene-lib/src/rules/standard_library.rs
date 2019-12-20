@@ -148,7 +148,7 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                 ast::Value::Var(_) => None,
             };
 
-            if let Some(rhs) = rhs {
+            if let Some(rhs) = dbg!(rhs) {
                 // Nearly all of these will return wrong results if you have a non-idiomatic metatable
                 // I intentionally omitted common metamethod re-typings, like __mul
                 match rhs.bin_op() {
@@ -159,7 +159,18 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                     | ast::BinOp::LessThan(_)
                     | ast::BinOp::LessThanEqual(_)
                     | ast::BinOp::TwoEqual(_)
-                    | ast::BinOp::TildeEqual(_) => Some(ArgumentType::Bool.into()),
+                    | ast::BinOp::TildeEqual(_) => {
+                        if_chain::if_chain! {
+                            if let ast::Expression::Value { binop: rhs, .. } = rhs.rhs();
+                            if let Some(rhs) = rhs;
+                            if let ast::BinOp::And(_) | ast::BinOp::Or(_) = rhs.bin_op();
+                            then {
+                                None
+                            } else {
+                                Some(ArgumentType::Bool.into())
+                            }
+                        }
+                    }
 
                     // Basic types will often re-implement these (e.g. Roblox's Vector3)
                     ast::BinOp::Plus(_)
@@ -710,6 +721,15 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "shadowing",
+        );
+    }
+
+    #[test]
+    fn test_ternary() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "ternary",
         );
     }
 

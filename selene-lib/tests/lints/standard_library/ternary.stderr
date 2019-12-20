@@ -1,0 +1,8 @@
+error[incorrect_standard_library_use]: use of standard_library function `math.floor` is incorrect
+
+   ┌── ternary.lua:2:12 ───
+   │
+ 2 │ math.floor(r > 1 + 1)
+   │            ^^^^^^^^^ expected `number`, received `bool`
+   │
+
