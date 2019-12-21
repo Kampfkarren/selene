@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+## [0.5.0] - 2019-12-20
 ### Added
 - Added `type_check_inside_call` lint for checking `type(foo == "type")` instead of `type(foo) == "type"`.
 - Added `NumberRange` to the Roblox standard library.
