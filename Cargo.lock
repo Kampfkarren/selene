@@ -1162,6 +1162,7 @@ name = "selene"
 version = "0.4.3"
 dependencies = [
  "atty 0.2.13 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cfg-if 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "codespan 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "codespan-reporting 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "full_moon 0.4.0-rc.12 (registry+https://github.com/rust-lang/crates.io-index)",
