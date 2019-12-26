@@ -615,7 +615,7 @@ required = false
 type = "number"
 required = false
 
-[[utf8.charpattern]]
+[utf8.charpattern]
 property = true
 
 [[Vector2.new.args]]
