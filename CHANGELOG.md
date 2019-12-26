@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- Added the `utf8` library to the Roblox standard library
 
 ## [0.5.0] - 2019-12-20
 ### Added
