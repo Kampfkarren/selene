@@ -554,6 +554,70 @@ type = "number"
 [UserSettings]
 args = []
 
+[[utf8.char.args]]
+type = "number"
+required = "utf8.char should be used with an argument despite it not throwing"
+
+[[utf8.char.args]]
+type = "..."
+required = false
+
+[[utf8.codepoint.args]]
+type = "string"
+
+[[utf8.codepoint.args]]
+type = "number"
+required = false
+
+[[utf8.codepoint.args]]
+type = "number"
+required = false
+
+[[utf8.codes.args]]
+type = "string"
+
+[[utf8.graphemes.args]]
+type = "string"
+
+[[utf8.graphemes.args]]
+type = "number"
+required = false
+
+[[utf8.graphemes.args]]
+type = "number"
+required = false
+
+[[utf8.len.args]]
+type = "string"
+
+[[utf8.len.args]]
+type = "number"
+required = false
+
+[[utf8.len.args]]
+type = "number"
+required = false
+
+[[utf8.nfcnormalize.args]]
+type = "string"
+
+[[utf8.nfdnormalize.args]]
+type = "string"
+
+[[utf8.offset.args]]
+type = "string"
+
+[[utf8.offset.args]]
+type = "number"
+required = false
+
+[[utf8.offset.args]]
+type = "number"
+required = false
+
+[[utf8.charpattern.args]]
+property = true
+
 [[Vector2.new.args]]
 type = "number"
 required = false
