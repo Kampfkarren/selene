@@ -562,6 +562,9 @@ required = "utf8.char should be used with an argument despite it not throwing"
 type = "..."
 required = false
 
+[utf8.charpattern]
+property = true
+
 [[utf8.codepoint.args]]
 type = "string"
 
@@ -614,9 +617,6 @@ required = false
 [[utf8.offset.args]]
 type = "number"
 required = false
-
-[utf8.charpattern]
-property = true
 
 [[Vector2.new.args]]
 type = "number"
