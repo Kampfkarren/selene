@@ -2,8 +2,14 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+## [0.5.1] - 2020-01-19
 ### Added
 - Added the `utf8` library to the Roblox standard library
+- Added support for Typed Lua when using the Roblox feature flag.
+
+### Changed
+- Updated full-moon, which should result in faster parsing.
 
 ## [0.5.0] - 2019-12-20
 ### Added
