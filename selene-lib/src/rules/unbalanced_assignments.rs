@@ -75,7 +75,7 @@ struct UnbalancedAssignmentsVisitor {
 fn expression_is_call(expression: &ast::Expression) -> bool {
     match expression {
         ast::Expression::Parentheses { expression, .. } => expression_is_call(expression),
-        ast::Expression::Value { value, binop } => {
+        ast::Expression::Value { value, binop, .. } => {
             if binop.is_none() {
                 if let ast::Value::FunctionCall(_) = &**value {
                     true
@@ -94,7 +94,7 @@ fn expression_is_call(expression: &ast::Expression) -> bool {
 fn expression_is_nil(expression: &ast::Expression) -> bool {
     match expression {
         ast::Expression::Parentheses { expression, .. } => expression_is_call(expression),
-        ast::Expression::Value { value, binop } => {
+        ast::Expression::Value { value, binop, .. } => {
             if binop.is_none() {
                 if let ast::Value::Symbol(symbol) = &**value {
                     *symbol.token_type()

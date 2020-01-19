@@ -119,7 +119,9 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
             }
         }
 
-        ast::Expression::Value { binop: rhs, value } => {
+        ast::Expression::Value {
+            binop: rhs, value, ..
+        } => {
             let base = match &**value {
                 ast::Value::Function(_) => Some(ArgumentType::Function.into()),
                 ast::Value::FunctionCall(_) => None,

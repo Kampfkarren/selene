@@ -73,7 +73,7 @@ impl Visitor<'_> for TypeCheckInsideCallVisitor {
             if let ast::BinOp::TwoEqual(_) = rhs.bin_op();
 
             // Check that rhs is a constant string
-            if let ast::Expression::Value { binop: rhs, value } = rhs.rhs();
+            if let ast::Expression::Value { binop: rhs, value, .. } = rhs.rhs();
             if rhs.is_none();
             if let ast::Value::String(_) = &**value;
 

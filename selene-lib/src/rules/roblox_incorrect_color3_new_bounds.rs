@@ -78,7 +78,7 @@ impl Visitor<'_> for Color3BoundsVisitor {
                 for argument in arguments {
                     // Check if the argument is a constant number
                     if_chain::if_chain! {
-                        if let ast::Expression::Value { value, binop } = argument;
+                        if let ast::Expression::Value { value, binop, .. } = argument;
                         if binop.is_none();
                         if let ast::Value::Number(value) = &**value;
                         if let Ok(number) = value.to_string().parse::<f32>();

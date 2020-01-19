@@ -159,14 +159,14 @@ impl Visitor<'_> for IncorrectRoactUsageVisitor {
 
             // Get first argument, check if it is a Roblox class
             let name_arg = iter.next().unwrap();
-            if let ast::Expression::Value { value, binop } = name_arg;
+            if let ast::Expression::Value { value, binop, .. } = name_arg;
             if binop.is_none();
             if let ast::Value::String(token) = &**value;
             if let Some(class) = self.check_class_name(&token);
 
             // Get second argument, check if it is a table
             let arg = iter.next().unwrap();
-            if let ast::Expression::Value { value, binop } = arg;
+            if let ast::Expression::Value { value, binop, .. } = arg;
             if binop.is_none();
             if let ast::Value::TableConstructor(table) = &**value;
 
@@ -210,7 +210,7 @@ impl Visitor<'_> for IncorrectRoactUsageVisitor {
     fn visit_local_assignment(&mut self, node: &ast::LocalAssignment) {
         for (name, expr) in node.name_list().iter().zip(node.expr_list().iter()) {
             if_chain! {
-                if let ast::Expression::Value { value, binop } = expr;
+                if let ast::Expression::Value { value, binop, .. } = expr;
                 if binop.is_none();
                 if let ast::Value::Var(var) = &**value;
                 if let ast::Var::Expression(var_expr) = var;

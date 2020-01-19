@@ -54,7 +54,7 @@ impl ParentheseConditionsVisitor {
     fn lint_condition(&mut self, condition: &ast::Expression) {
         let is_parentheses = match condition {
             ast::Expression::Parentheses { .. } => true,
-            ast::Expression::Value { value, binop } => {
+            ast::Expression::Value { value, binop, .. } => {
                 if let ast::Value::ParseExpression(_) = &**value {
                     binop.is_none()
                 } else {

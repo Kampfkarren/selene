@@ -61,7 +61,7 @@ fn value_is_zero(value: &ast::Value) -> bool {
 impl Visitor<'_> for DivideByZeroVisitor {
     fn visit_expression(&mut self, node: &ast::Expression) {
         if_chain::if_chain! {
-            if let ast::Expression::Value { value, binop } = node;
+            if let ast::Expression::Value { value, binop, .. } = node;
             if let Some(rhs) = binop;
             if let ast::BinOp::Slash(_) = rhs.bin_op();
             if let ast::Expression::Value {

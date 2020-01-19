@@ -156,7 +156,7 @@ impl ScopeVisitor {
                 self.read_expression(expression);
             }
 
-            ast::Expression::Value { value, binop } => {
+            ast::Expression::Value { value, binop, .. } => {
                 if let Some(binop) = binop {
                     self.read_expression(binop.rhs());
                 }
