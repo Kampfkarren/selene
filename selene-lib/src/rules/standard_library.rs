@@ -150,7 +150,7 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                 ast::Value::Var(_) => None,
             };
 
-            if let Some(rhs) = dbg!(rhs) {
+            if let Some(rhs) = rhs {
                 // Nearly all of these will return wrong results if you have a non-idiomatic metatable
                 // I intentionally omitted common metamethod re-typings, like __mul
                 match rhs.bin_op() {
