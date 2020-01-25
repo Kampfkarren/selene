@@ -203,6 +203,15 @@ type = "number"
 [[CFrame.fromEulerAnglesXYZ.args]]
 type = "number"
 
+[[CFrame.fromEulerAnglesYXZ.args]]
+type = "number"
+
+[[CFrame.fromEulerAnglesYXZ.args]]
+type = "number"
+
+[[CFrame.fromEulerAnglesYXZ.args]]
+type = "number"
+
 [[CFrame.fromMatrix.args]]
 type = { display = "Vector3" }
 
