@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- Added tuple argument to `xpcall`
 
 ## [0.5.2] - 2020-01-19
 ### Fixed
