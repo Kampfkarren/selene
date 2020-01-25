@@ -274,6 +274,12 @@ type = "any"
 type = { display = "Color3" }
 required = false
 
+[[ColorSequenceKeypoint.new.args]]
+type = "number"
+
+[[ColorSequenceKeypoint.new.args]]
+type = { display = "Color3" }
+
 [coroutine.isyieldable]
 args = []
 
