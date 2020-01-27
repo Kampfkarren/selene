@@ -203,6 +203,15 @@ type = "number"
 [[CFrame.fromEulerAnglesXYZ.args]]
 type = "number"
 
+[[CFrame.fromEulerAnglesYXZ.args]]
+type = "number"
+
+[[CFrame.fromEulerAnglesYXZ.args]]
+type = "number"
+
+[[CFrame.fromEulerAnglesYXZ.args]]
+type = "number"
+
 [[CFrame.fromMatrix.args]]
 type = { display = "Vector3" }
 
@@ -264,6 +273,12 @@ type = "any"
 [[ColorSequence.new.args]]
 type = { display = "Color3" }
 required = false
+
+[[ColorSequenceKeypoint.new.args]]
+type = "number"
+
+[[ColorSequenceKeypoint.new.args]]
+type = { display = "Color3" }
 
 [coroutine.isyieldable]
 args = []
