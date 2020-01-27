@@ -168,6 +168,10 @@ type = "function"
 [[xpcall.args]]
 type = "function"
 
+[[xpcall.args]]
+type = "..."
+required = false
+
 # coroutine
 [[coroutine.create.args]]
 type = "function"

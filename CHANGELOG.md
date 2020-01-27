@@ -3,6 +3,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Unreleased
 ### Added
+
+- Added tuple argument to `xpcall`
 - Added `CFrame.fromEulerAnglesYXZ` to Roblox standard library
 - Added `ColorSequenceKeypoint` to the Roblox standard library
 
