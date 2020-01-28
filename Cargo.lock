@@ -365,7 +365,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "full_moon"
-version = "0.4.0-rc.13"
+version = "0.4.0-rc.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "atomic_refcell 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1190,18 +1190,18 @@ dependencies = [
 
 [[package]]
 name = "selene"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "atty 0.2.13 (registry+https://github.com/rust-lang/crates.io-index)",
  "cfg-if 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "codespan 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "codespan-reporting 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "full_moon 0.4.0-rc.13 (registry+https://github.com/rust-lang/crates.io-index)",
+ "full_moon 0.4.0-rc.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "glob 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "num_cpus 1.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "reqwest 0.9.22 (registry+https://github.com/rust-lang/crates.io-index)",
- "selene-lib 0.5.2",
+ "selene-lib 0.5.3",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)",
  "structopt 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1212,11 +1212,11 @@ dependencies = [
 
 [[package]]
 name = "selene-lib"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "codespan 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "codespan-reporting 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "full_moon 0.4.0-rc.13 (registry+https://github.com/rust-lang/crates.io-index)",
+ "full_moon 0.4.0-rc.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "id-arena 2.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "if_chain 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1768,7 +1768,7 @@ dependencies = [
 "checksum fuchsia-cprng 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "a06f77d526c1a601b7c4cdd98f54b5eaabffc14d5f2f0296febdc7f357c6d3ba"
 "checksum fuchsia-zircon 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "2e9763c69ebaae630ba35f74888db465e49e259ba1bc0eda7d06f4a067615d82"
 "checksum fuchsia-zircon-sys 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "3dcaa9ae7725d12cdb85b3ad99a434db70b468c09ded17e012d86b5c1010f7a7"
-"checksum full_moon 0.4.0-rc.13 (registry+https://github.com/rust-lang/crates.io-index)" = "620c62a76655ba918f57e2bd6bf13cc2fa25e5017fe28a10defb514f16e59da4"
+"checksum full_moon 0.4.0-rc.14 (registry+https://github.com/rust-lang/crates.io-index)" = "d9b73d6b89c55e52433cfd4a8ff06cc6c871afcb550b4c5b7f5e484c02187454"
 "checksum full_moon_derive 0.4.0-rc.13 (registry+https://github.com/rust-lang/crates.io-index)" = "e899d2dbe09f983914034b3b407248b88b0719d900442e647eb2828500cbf9b6"
 "checksum futures 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)" = "1b980f2816d6ee8673b6517b52cb0e808a180efc92e5c19d02cdda79066703ef"
 "checksum futures-cpupool 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)" = "ab90cde24b3319636588d0c35fe03b1333857621051837ed769faefb4c2162e4"

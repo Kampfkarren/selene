@@ -2,11 +2,15 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
-### Added
 
+## [0.5.3] - 2020-01-27
+### Added
 - Added tuple argument to `xpcall`
 - Added `CFrame.fromEulerAnglesYXZ` to Roblox standard library
 - Added `ColorSequenceKeypoint` to the Roblox standard library
+
+### Fixed
+- Fixed comments with tabs reporting as a parse error.
 
 ## [0.5.2] - 2020-01-19
 ### Fixed
