@@ -3,6 +3,21 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Unreleased
 
+### Added
+- Added `debug.getlocal`, `math.cosh`, and `string.reverse`
+- Added `package` library
+- Added `Axes`, `Faces`, `PathWaypoint`,  to the Roblox standard library
+- Added `DebuggerManager`, `elapsedTime` to the Roblox standard library
+
+### Fixed
+- Corrected arguments for `assert`, `xpcall`, `coroutine.yield`, `debug.getinfo`, `debug.setfenv`, `string.char`, and `string.gsub` in Lua 5.1 standard library
+- Corrected arguments for `bit32.band`, `Color3.toHSV`, `Rect.new`, and `UDim2.new` in the Roblox standard library
+- `require` now accepts numbers in the Roblox standard library
+- Removed `string.dump` from the Roblox standard library
+
+### Changed
+- Changed the argument display type of `io.input` and `io.output` into `file`
+
 ## [0.5.3] - 2020-01-27
 ### Added
 - Added tuple argument to `xpcall`
