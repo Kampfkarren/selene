@@ -21,6 +21,9 @@ args = []
 [selene.structs.Instance."*"]
 any = true
 
+[[Axes.new.args]]
+type = "..."
+
 [[bit32.arshift.args]]
 type = "number"
 
@@ -28,7 +31,7 @@ type = "number"
 type = "number"
 
 [[bit32.band.args]]
-type = "number"
+type = "..."
 
 [[bit32.bnot.args]]
 type = "number"
@@ -265,7 +268,6 @@ required = false
 
 [[Color3.toHSV.args]]
 type = { display = "Color3" }
-required = false
 
 [[ColorSequence.new.args]]
 type = "any"
@@ -295,6 +297,9 @@ type = "number"
 [[delay.args]]
 type = "function"
 
+[DebuggerManager]
+args = []
+
 [[DockWidgetPluginGuiInfo.new.args]]
 type = { display = "InitialDockState" }
 required = false
@@ -322,6 +327,12 @@ required = false
 [[DockWidgetPluginGuiInfo.new.args]]
 type = "number"
 required = false
+
+[elapsedTime]
+args=[]
+
+[[Faces.new.args]]
+type = "..."
 
 [[Instance.new.args]]
 type = "string" # This is changed at generate time
@@ -380,6 +391,14 @@ type = "number"
 type = "number"
 required = false
 
+[[PathWaypoint.new.args]]
+type = { display = "Vector3" }
+required = false
+
+[[PathWaypoint.new.args]]
+type = { display = "PathWaypointAction" }
+required = false
+
 [[PhysicalProperties.new.args]]
 type = "any"
 
@@ -416,11 +435,11 @@ type = "any"
 type = "any"
 
 [[Rect.new.args]]
-type = "any"
+type = "number"
 required = false
 
 [[Rect.new.args]]
-type = "any"
+type = "number"
 required = false
 
 [[Region3.new.args]]
@@ -434,6 +453,9 @@ type = { display = "Vector3" }
 
 [[Region3int16.new.args]]
 type = { display = "Vector3"}
+
+[[require.args]]
+type = "number"
 
 [settings]
 args = []
@@ -547,11 +569,11 @@ type = "any"
 required = false
 
 [[UDim2.new.args]]
-type = "any"
+type = "number"
 required = false
 
 [[UDim2.new.args]]
-type = "any"
+type = "number"
 required = false
 
 [[UDim2.fromOffset.args]]
@@ -718,6 +740,9 @@ removed = true
 [debug.getinfo]
 removed = true
 
+[debug.getlocal]
+removed = true
+
 [debug.getmetatable]
 removed = true
 
@@ -745,6 +770,9 @@ removed = true
 [io]
 removed = true
 
+[string.dump]
+removed = true
+
 [os.clock]
 removed = true
 
@@ -767,4 +795,7 @@ removed = true
 removed = true
 
 [os.tmpname]
+removed = true
+
+[package]
 removed = true

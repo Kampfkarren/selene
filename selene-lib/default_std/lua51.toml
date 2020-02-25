@@ -10,8 +10,8 @@ property = true
 type = "any"
 
 [[assert.args]]
-type = "any"
-required = false
+type = "string"
+required = "A failed assertion without a message is unhelpful to users."
 
 [[collectgarbage.args]]
 type = [
@@ -166,9 +166,6 @@ required = false
 type = "function"
 
 [[xpcall.args]]
-type = "function"
-
-[[xpcall.args]]
 type = "..."
 required = false
 
@@ -196,6 +193,10 @@ type = "function"
 type = { display = "coroutine" }
 required = false
 
+[[coroutine.yield.args]]
+type = "..."
+required = false
+
 # debug
 [debug.debug]
 args = []
@@ -215,8 +216,19 @@ type = "any"
 
 [[debug.getinfo.args]]
 type = "any"
+required = false # As mentioned above, since only one of the three arguments is required, this is necessary
 
 [[debug.getinfo.args]]
+type = "any"
+required = false
+
+[[debug.getlocal.args]]
+type = "any"
+
+[[debug.getlocal.args]]
+type = "any"
+
+[[debug.getlocal.args]]
 type = "any"
 required = false
 
@@ -236,7 +248,7 @@ type = "number"
 type = "any"
 
 [[debug.setfenv.args]]
-type = "number"
+type = "table"
 
 [[debug.sethook.args]]
 type = "any"
@@ -301,7 +313,7 @@ required = false
 args = []
 
 [[io.input.args]]
-type = "any"
+type = { display = "file" }
 required = false
 
 [[io.lines.args]]
@@ -322,7 +334,7 @@ type = [
 required = false
 
 [[io.output.args]]
-type = "any"
+type = { display = "file" }
 required = false
 
 [[io.popen.args]]
@@ -389,6 +401,9 @@ type = "number"
 type = "number"
 
 [[math.cos.args]]
+type = "number"
+
+[[math.cosh.args]]
 type = "number"
 
 [[math.deg.args]]
@@ -532,6 +547,36 @@ required = false
 [os.tmpname]
 args = []
 
+# package
+[package.cpath]
+property = true
+writable = "full"
+
+[package.loaded]
+property = true
+writable = "new-fields"
+
+[package.loaders]
+property = true
+writable = "new-fields"
+
+[[package.loadlib.args]]
+type = "string"
+
+[[package.loadlib.args]]
+type = "string"
+
+[package.path]
+property = true
+writable = "full"
+
+[package.preload]
+property = true
+writable = "new-fields"
+
+[[package.seeall.args]]
+type = "table"
+
 # string
 [[string.byte.args]]
 type = "string"
@@ -545,7 +590,12 @@ type = "number"
 required = false
 
 [[string.char.args]]
+type = "number"
+required = "string.char should be used with an argument despite it not throwing"
+
+[[string.char.args]]
 type = "..."
+required = false
 
 [[string.dump.args]]
 type = "function"
@@ -584,7 +634,7 @@ type = "string"
 type = "string" # TODO: Pattern type?
 
 [[string.gsub.args]]
-type = "string"
+type = "any"
 
 [[string.gsub.args]]
 type = "number"
@@ -611,6 +661,9 @@ type = "string"
 
 [[string.rep.args]]
 type = "number"
+
+[[string.reverse.args]]
+type = "string"
 
 [[string.sub.args]]
 type = "string"
