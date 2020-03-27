@@ -13,6 +13,7 @@ edition = "2018"
 [dependencies]
 atty = "0.2"
 cfg-if = "0.1"
+chrono = "0.4"
 codespan = { version = "0.4", features = ["serialization"] }
 codespan-reporting = { version = "0.4", features = ["serialization"] }
 full_moon = "=0.4.0-rc.14"
@@ -27,7 +28,6 @@ structopt = "0.3"
 termcolor = "1.0"
 threadpool = "1.7"
 toml = "0.5"
-chrono = "0.4"
 
 [features]
 default = ["roblox"]

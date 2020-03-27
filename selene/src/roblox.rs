@@ -1,6 +1,4 @@
-extern crate chrono;
 use chrono::Local;
-
 use std::{collections::BTreeMap, fmt, io::Write};
 
 mod api;
