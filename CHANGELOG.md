@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## Unreleased
 
 ### Added
+- Added timestamp to generated Roblox standard library
 - Added `debug.getlocal`, `math.cosh`, and `string.reverse`
 - Added `package` library
 - Added `Axes`, `Faces`, `PathWaypoint`,  to the Roblox standard library
