@@ -484,6 +484,21 @@ type = "any"
 type = "number"
 required = false
 
+[[table.foreach.args]]
+type = "table"
+
+[[table.foreach.args]]
+type = "function"
+
+[[table.foreachi.args]]
+type = "table"
+
+[[table.foreachi.args]]
+type = "function"
+
+[[table.getn.args]]
+type = "table"
+
 [[table.create.args]]
 type = "number"
 

@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `package` library
 - Added `Axes`, `Faces`, `PathWaypoint`,  to the Roblox standard library
 - Added `DebuggerManager`, `elapsedTime` to the Roblox standard library
+- Added `table.foreach`, `table.foreachi`, `table.getn` to the Roblox standard library
 
 ### Fixed
 - Corrected arguments for `assert`, `xpcall`, `coroutine.yield`, `debug.getinfo`, `debug.setfenv`, `string.char`, and `string.gsub` in Lua 5.1 standard library
