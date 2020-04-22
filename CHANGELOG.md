@@ -3,6 +3,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Unreleased
 
+## [0.6.0] - 2020-04-21
 ### Added
 - Added timestamp to generated Roblox standard library
 - Added `debug.getlocal`, `math.cosh`, and `string.reverse`
@@ -19,6 +20,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 - Changed the argument display type of `io.input` and `io.output` into `file`
+- Updated to version 0.5.0 of full-moon, which should result in speedier parsing
 
 ## [0.5.3] - 2020-01-27
 ### Added
