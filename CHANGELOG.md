@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Corrected arguments for `bit32.band`, `Color3.toHSV`, `Rect.new`, and `UDim2.new` in the Roblox standard library
 - `require` now accepts numbers in the Roblox standard library
 - Removed `string.dump` from the Roblox standard library
+- Fixed a bug where the `almost_swapped` lint would panic if the last line was an assignment [(#93)](https://github.com/Kampfkarren/selene/issues/93)
 
 ### Changed
 - Changed the argument display type of `io.input` and `io.output` into `file`

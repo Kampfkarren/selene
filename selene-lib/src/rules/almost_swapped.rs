@@ -20,7 +20,6 @@ impl Rule for AlmostSwappedLint {
     fn pass(&self, ast: &Ast, _: &Context) -> Vec<Diagnostic> {
         let mut visitor = AlmostSwappedVisitor {
             almost_swaps: Vec::new(),
-            ast_as_string: full_moon::print(ast),
         };
 
         visitor.visit_ast(&ast);
@@ -59,10 +58,6 @@ impl Rule for AlmostSwappedLint {
 
 struct AlmostSwappedVisitor {
     almost_swaps: Vec<AlmostSwap>,
-    // HACK: Until full-moon#45 is implemented, there's no easy way to check if two nodes are equal in our case.
-    // <Node>::eq check if the positions match, which they never will for us.
-    // So instead, we check if the bytes match up
-    ast_as_string: String,
 }
 
 struct AlmostSwap {
@@ -84,12 +79,10 @@ impl Visitor<'_> for AlmostSwappedVisitor {
                     let var = var_list.into_iter().next().unwrap();
 
                     if !var.has_side_effects() {
-                        // HACK: Read comment for AlmostSwappedVisitor.ast_as_string for details
-                        let (expr_start, expr_end) = range(expr);
-                        let (var_start, var_end) = range(var);
+                        let expr_end = range(expr).1;
 
-                        let expr_text = self.ast_as_string[expr_start..=expr_end].trim().to_owned();
-                        let var_text = self.ast_as_string[var_start..=var_end].trim().to_owned();
+                        let expr_text = expr.to_string().trim().to_owned();
+                        let var_text = var.to_string().trim().to_owned();
 
                         if let Some(last_swap) = last_swap.take() {
                             if last_swap.names.0 == expr_text && last_swap.names.1 == var_text {
@@ -125,6 +118,15 @@ mod tests {
             AlmostSwappedLint::new(()).unwrap(),
             "almost_swapped",
             "almost_swapped",
+        );
+    }
+
+    #[test]
+    fn test_almost_swapped_panic() {
+        test_lint(
+            AlmostSwappedLint::new(()).unwrap(),
+            "almost_swapped",
+            "panic",
         );
     }
 }
