@@ -61,7 +61,7 @@ impl Visitor<'_> for SuspiciousReverseLoopVisitor {
             if let ast::Expression::Value { value, binop, .. } = node.end();
             if binop.is_none();
             if let ast::Value::Number(number) = &**value;
-            if str::parse::<f32>(&number.to_string()).unwrap() <= 1.0;
+            if str::parse::<f32>(&number.token().to_string()).ok() <= Some(1.0);
             then {
                 self.positions.push((
                     node.start().start_position().unwrap().bytes(),

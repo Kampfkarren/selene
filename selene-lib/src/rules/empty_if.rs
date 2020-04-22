@@ -4,7 +4,7 @@ use std::convert::Infallible;
 use full_moon::{
     ast::{self, Ast},
     node::Node,
-    tokenizer::{Token, TokenKind, TokenReference},
+    tokenizer::{Token, TokenKind},
     visitors::Visitor,
 };
 use serde::Deserialize;
@@ -83,7 +83,7 @@ impl Rule for EmptyIfLint {
 }
 
 fn block_is_empty(block: &ast::Block) -> bool {
-    block.last_stmts().is_none() && block.iter_stmts().next().is_none()
+    block.last_stmt().is_none() && block.iter_stmts().next().is_none()
 }
 
 struct EmptyIfVisitor {
@@ -143,7 +143,7 @@ impl Visitor<'_> for EmptyIfVisitor {
         }
     }
 
-    fn visit_token(&mut self, token: &TokenReference<'_>) {
+    fn visit_token(&mut self, token: &Token<'_>) {
         match token.token_kind() {
             TokenKind::MultiLineComment | TokenKind::SingleLineComment => {
                 self.comment_positions

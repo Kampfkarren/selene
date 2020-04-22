@@ -155,7 +155,7 @@ impl Label {
         }
     }
 
-    pub fn from_node<N: Node>(node: N, message: Option<String>) -> Label {
+    pub fn from_node<'a, N: Node<'a>>(node: N, message: Option<String>) -> Label {
         let (start, end) = node.range().expect("node passed returned a None range");
 
         Label {

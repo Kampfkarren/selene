@@ -52,7 +52,7 @@ struct DivideByZeroVisitor {
 
 fn value_is_zero(value: &ast::Value) -> bool {
     if let ast::Value::Number(token) = value {
-        token.to_string() == "0"
+        token.token().to_string() == "0"
     } else {
         false
     }

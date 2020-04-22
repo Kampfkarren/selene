@@ -113,13 +113,13 @@ fn expression_is_nil(expression: &ast::Expression) -> bool {
     }
 }
 
-fn range<N: Node>(node: N) -> (u32, u32) {
+fn range<'a, N: Node<'a>>(node: N) -> (u32, u32) {
     let (start, end) = node.range().unwrap();
     (start.bytes() as u32, end.bytes() as u32)
 }
 
 impl UnbalancedAssignmentsVisitor {
-    fn lint_assignment(&mut self, lhs: usize, rhs: &Punctuated<ast::Expression>) {
+    fn lint_assignment<'a>(&mut self, lhs: usize, rhs: &Punctuated<'a, ast::Expression<'a>>) {
         if rhs.is_empty() {
             return;
         }

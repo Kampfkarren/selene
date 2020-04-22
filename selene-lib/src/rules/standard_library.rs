@@ -56,7 +56,7 @@ fn name_path_from_prefix_suffix<'a, 'ast, S: Iterator<Item = &'a ast::Suffix<'as
 ) -> Option<Vec<String>> {
     if let ast::Prefix::Name(ref name) = prefix {
         let mut names = Vec::new();
-        names.push(name.to_string());
+        names.push(name.token().to_string());
 
         let mut keep_going = true;
 
@@ -64,13 +64,13 @@ fn name_path_from_prefix_suffix<'a, 'ast, S: Iterator<Item = &'a ast::Suffix<'as
             match suffix {
                 ast::Suffix::Call(call) => {
                     if let ast::Call::MethodCall(method_call) = call {
-                        names.push(method_call.name().to_string());
+                        names.push(method_call.name().token().to_string());
                     }
                 }
 
                 ast::Suffix::Index(index) => {
                     if let ast::Index::Dot { name, .. } = index {
-                        names.push(name.to_string());
+                        names.push(name.token().to_string());
                     } else {
                         return None;
                     }
@@ -128,7 +128,7 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                 ast::Value::Number(_) => Some(ArgumentType::Number.into()),
                 ast::Value::ParseExpression(expression) => get_argument_type(expression),
                 ast::Value::String(token) => {
-                    Some(PassedArgumentType::from_string(token.to_string()))
+                    Some(PassedArgumentType::from_string(token.token().to_string()))
                 }
                 ast::Value::Symbol(symbol) => match *symbol.token_type() {
                     TokenType::Symbol { symbol } => match symbol {
@@ -324,7 +324,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                 }
 
                 ast::Var::Name(name_token) => {
-                    let name = name_token.to_string();
+                    let name = name_token.token().to_string();
 
                     if let Some(global) = self.standard_library.find_global(&[name.to_owned()]) {
                         match global {
@@ -484,7 +484,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
             ast::FunctionArgs::String(token) => {
                 argument_types.push((
                     token.range().unwrap(),
-                    Some(PassedArgumentType::from_string(token.to_string())),
+                    Some(PassedArgumentType::from_string(token.token().to_string())),
                 ));
             }
 

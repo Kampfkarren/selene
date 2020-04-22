@@ -63,12 +63,12 @@ impl Rule for IncorrectRoactUsageLint {
 fn is_roact_create_element(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]) -> bool {
     if_chain! {
         if let ast::Prefix::Name(prefix_token) = prefix;
-        if prefix_token.to_string() == "Roact";
+        if prefix_token.token().to_string() == "Roact";
         if suffixes.len() == 1;
         if let ast::Suffix::Index(index) = suffixes[0];
         if let ast::Index::Dot { name, .. } = index;
         then {
-            name.to_string() == "createElement"
+            name.token().to_string() == "createElement"
         } else {
             false
         }
@@ -135,7 +135,7 @@ impl Visitor<'_> for IncorrectRoactUsageVisitor {
             if let ast::Prefix::Name(name) = call.prefix() {
                 if self
                     .definitions_of_create_element
-                    .contains(&name.to_string())
+                    .contains(&name.token().to_string())
                 {
                     check = true;
                 }
@@ -195,7 +195,7 @@ impl Visitor<'_> for IncorrectRoactUsageVisitor {
 
         for (field, _) in arguments.iter_fields() {
             if let ast::Field::NameKey { key, .. } = field {
-                let property_name = key.to_string();
+                let property_name = key.token().to_string();
                 if !valid_properties.contains(property_name.as_str()) {
                     self.invalid_properties.push(InvalidProperty {
                         class_name: class.name().to_string(),
@@ -216,7 +216,7 @@ impl Visitor<'_> for IncorrectRoactUsageVisitor {
                 if let ast::Var::Expression(var_expr) = var;
                 if is_roact_create_element(var_expr.prefix(), &var_expr.iter_suffixes().collect::<Vec<_>>());
                 then {
-                    self.definitions_of_create_element.insert(name.to_string());
+                    self.definitions_of_create_element.insert(name.token().to_string());
                 }
             };
         }

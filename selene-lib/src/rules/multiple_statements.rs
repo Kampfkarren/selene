@@ -84,7 +84,7 @@ impl MultipleStatementsVisitor {
         if self.config.one_line_if != OneLineIf::Deny {
             if self.config.one_line_if == OneLineIf::BreakReturnOnly
                 && (if_block.block().iter_stmts().next().is_some()
-                    || if_block.block().last_stmts().is_none())
+                    || if_block.block().last_stmt().is_none())
             {
                 return;
             }
@@ -93,7 +93,7 @@ impl MultipleStatementsVisitor {
         }
     }
 
-    fn lint_stmt<N: Node>(&mut self, stmt: N) {
+    fn lint_stmt<'a, N: Node<'a>>(&mut self, stmt: N) {
         let line = stmt.end_position().unwrap().line();
 
         if self.lines_with_stmt.contains(&line) {
