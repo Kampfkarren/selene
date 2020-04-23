@@ -484,6 +484,13 @@ type = "any"
 type = "number"
 required = false
 
+[[table.create.args]]
+type = "number"
+
+[[table.create.args]]
+type = "any"
+required = false
+
 [[table.foreach.args]]
 type = "table"
 
@@ -498,13 +505,6 @@ type = "function"
 
 [[table.getn.args]]
 type = "table"
-
-[[table.create.args]]
-type = "number"
-
-[[table.create.args]]
-type = "any"
-required = false
 
 [[table.move.args]]
 type = "table"
