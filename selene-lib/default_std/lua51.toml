@@ -292,7 +292,8 @@ type = "number"
 [[debug.setupvalue.args]]
 type = "string"
 
-[[debug.traceback.args]] # Since all of the arguments are optional and disregard order, the best thing to do is make them untyped.
+# Since all of the arguments are optional and disregard order, the best thing to do is make them untyped.
+[[debug.traceback.args]]
 type = "any"
 required = false
 
