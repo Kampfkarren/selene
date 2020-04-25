@@ -121,9 +121,16 @@ export async function activate(context: vscode.ExtensionContext) {
         diagnosticsCollection.set(document.uri, diagnostics)
     }
 
+    async function clearLints(documentUri: vscode.Uri) {
+        diagnosticsCollection.set(documentUri, [])
+    }
+
     vscode.workspace.onDidSaveTextDocument(lint)
     vscode.workspace.onDidOpenTextDocument(lint)
     vscode.workspace.onDidChangeTextDocument(event => lint(event.document))
+    vscode.workspace.onWillDeleteFiles(event => {
+        event.files.forEach(clearLints);
+    })
     vscode.window.onDidChangeActiveTextEditor(editor => {
         if (editor !== undefined) {
             lint(editor.document)
