@@ -124,6 +124,11 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidSaveTextDocument(lint)
     vscode.workspace.onDidOpenTextDocument(lint)
     vscode.workspace.onDidChangeTextDocument(event => lint(event.document))
+    vscode.workspace.onWillDeleteFiles(event => {
+        for (const documentUri of event.files) {
+            diagnosticsCollection.set(documentUri, [])
+        }
+    })
     vscode.window.onDidChangeActiveTextEditor(editor => {
         if (editor !== undefined) {
             lint(editor.document)
