@@ -40,7 +40,7 @@ pub trait Rule {
     fn new(config: Self::Config) -> Result<Self, Self::Error>
     where
         Self: Sized;
-    fn pass(&self, ast: &full_moon::ast::Ast<'static>, context: &Context) -> Vec<Diagnostic>;
+    fn pass(&self, ast: &full_moon::ast::Ast, context: &Context) -> Vec<Diagnostic>;
 
     fn allow(&self) -> bool {
         false
@@ -72,7 +72,7 @@ pub enum Severity {
 }
 
 pub struct Diagnostic {
-    pub code: &'static str,
+    pub code: String,
     pub message: String,
     pub notes: Vec<String>,
     pub primary_label: Label,
@@ -80,10 +80,14 @@ pub struct Diagnostic {
 }
 
 impl Diagnostic {
-    pub fn new(code: &'static str, message: String, primary_label: Label) -> Self {
+    pub fn new<S1, S2>(code: S1, message: S2, primary_label: Label) -> Self
+    where
+        S1: Into<String>,
+        S2: Into<String>,
+    {
         Self {
-            code,
-            message,
+            code: code.into(),
+            message: message.into(),
             primary_label,
 
             notes: Vec::new(),
@@ -91,16 +95,20 @@ impl Diagnostic {
         }
     }
 
-    pub fn new_complete(
-        code: &'static str,
-        message: String,
+    pub fn new_complete<S1, S2>(
+        code: S1,
+        message: S2,
         primary_label: Label,
         notes: Vec<String>,
         secondary_labels: Vec<Label>,
-    ) -> Self {
+    ) -> Self
+    where
+        S1: Into<String>,
+        S2: Into<String>,
+    {
         Self {
-            code,
-            message,
+            code: code.into(),
+            message: message.into(),
             notes,
             primary_label,
             secondary_labels,
