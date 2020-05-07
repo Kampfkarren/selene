@@ -797,5 +797,8 @@ removed = true
 [os.tmpname]
 removed = true
 
+[[ypcall.args]]
+type = "function"
+
 [package]
 removed = true
