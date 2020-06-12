@@ -226,6 +226,7 @@ type = { display = "Vector3" }
 
 [[CFrame.fromMatrix.args]]
 type = { display = "Vector3" }
+required = false
 
 [[CFrame.fromOrientation.args]]
 type = "number"
