@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## Unreleased
 ### Changed
 - Removed types from `debug.traceback` arguments in the Lua 5.1 standard library
+- Made 4th argument to CFrame.fromMatrix optionial (#113)
 
 ## [0.6.0] - 2020-04-21
 ### Added
