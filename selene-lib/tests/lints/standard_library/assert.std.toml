@@ -1,0 +1,6 @@
+[[assert.args]]
+type = "any"
+
+[[assert.args]]
+type = "string"
+required = "A failed assertion without a message is unhelpful to users."
