@@ -527,19 +527,19 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
             }
         }
 
-        let mut minimum_passed_arguments = argument_types.len();
+        let mut maybe_more_arguments = false;
 
         if let ast::FunctionArgs::Parentheses { arguments, .. } = function_args {
             if let Some(ast::punctuated::Pair::End(last)) = arguments.last() {
                 if let ast::Expression::Value { value, .. } = last {
                     match &**value {
                         ast::Value::FunctionCall(_) => {
-                            minimum_passed_arguments -= 1;
+                            maybe_more_arguments = true;
                         }
                         ast::Value::Symbol(token_ref) => {
                             if let TokenType::Symbol { symbol } = token_ref.token().token_type() {
                                 if symbol == &full_moon::tokenizer::Symbol::Ellipse {
-                                    minimum_passed_arguments -= 1;
+                                    maybe_more_arguments = true;
                                 }
                             }
                         }
@@ -551,8 +551,8 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
 
         let arguments_length = argument_types.len();
 
-        if (minimum_passed_arguments == arguments_length && arguments_length < expected_args)
-            || (!vararg && minimum_passed_arguments > max_args)
+        if (arguments_length < expected_args && !maybe_more_arguments)
+            || (!vararg && arguments_length > max_args)
         {
             self.diagnostics.push(Diagnostic::new(
                 "incorrect_standard_library_use",
