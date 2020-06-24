@@ -1,0 +1,24 @@
+error[incorrect_standard_library_use]: standard library function `assert` requires 2 parameters, 1 passed
+
+   ┌── assert.lua:6:1 ───
+   │
+ 6 │ assert(true)
+   │ ^^^^^^^^^^^^
+   │
+
+error[incorrect_standard_library_use]: standard library function `assert` requires 2 parameters, 3 passed
+
+   ┌── assert.lua:7:1 ───
+   │
+ 7 │ assert(true, "message", call())
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+
+error[incorrect_standard_library_use]: standard library function `assert` requires 2 parameters, 3 passed
+
+   ┌── assert.lua:8:1 ───
+   │
+ 8 │ assert(true, "message", ...)
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+

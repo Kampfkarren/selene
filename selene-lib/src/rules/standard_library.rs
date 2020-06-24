@@ -527,12 +527,32 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
             }
         }
 
-        let any_are_vararg = argument_types.iter().any(|(_, argument_type)| {
-            argument_type.as_ref() == Some(&PassedArgumentType::Primitive(ArgumentType::Vararg))
-        });
+        let mut maybe_more_arguments = false;
 
-        if (!any_are_vararg && argument_types.len() < expected_args)
-            || (!vararg && argument_types.len() > max_args)
+        if let ast::FunctionArgs::Parentheses { arguments, .. } = function_args {
+            if let Some(ast::punctuated::Pair::End(last)) = arguments.last() {
+                if let ast::Expression::Value { value, .. } = last {
+                    match &**value {
+                        ast::Value::FunctionCall(_) => {
+                            maybe_more_arguments = true;
+                        }
+                        ast::Value::Symbol(token_ref) => {
+                            if let TokenType::Symbol { symbol } = token_ref.token().token_type() {
+                                if symbol == &full_moon::tokenizer::Symbol::Ellipse {
+                                    maybe_more_arguments = true;
+                                }
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        };
+
+        let arguments_length = argument_types.len();
+
+        if (arguments_length < expected_args && !maybe_more_arguments)
+            || (!vararg && arguments_length > max_args)
         {
             self.diagnostics.push(Diagnostic::new(
                 "incorrect_standard_library_use",
@@ -665,6 +685,15 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "any",
+        );
+    }
+
+    #[test]
+    fn test_assert() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "assert",
         );
     }
 
