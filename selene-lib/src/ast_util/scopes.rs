@@ -189,16 +189,7 @@ impl ScopeVisitor {
                         }
                     }
 
-                    ast::Value::Var(var) => match var {
-                        ast::Var::Expression(var_expr) => {
-                            self.read_prefix(var_expr.prefix());
-                            for suffix in var_expr.iter_suffixes() {
-                                self.read_suffix(suffix);
-                            }
-                        }
-
-                        ast::Var::Name(name) => self.read_name(name),
-                    },
+                    ast::Value::Var(var) => self.read_var(var),
 
                     _ => {}
                 }
@@ -255,6 +246,19 @@ impl ScopeVisitor {
                     self.read_expression(value);
                 }
             }
+        }
+    }
+
+    fn read_var(&mut self, var: &ast::Var) {
+        match var {
+            ast::Var::Expression(var_expr) => {
+                self.read_prefix(var_expr.prefix());
+                for suffix in var_expr.iter_suffixes() {
+                    self.read_suffix(suffix);
+                }
+            }
+
+            ast::Var::Name(name) => self.read_name(name),
         }
     }
 
@@ -463,6 +467,12 @@ impl Visitor<'_> for ScopeVisitor {
 
             _ => {}
         }
+    }
+
+    #[cfg(feature = "roblox")]
+    fn visit_compound_assignment(&mut self, compound_assignment: &ast::types::CompoundAssignment) {
+        self.read_var(compound_assignment.lhs());
+        self.read_expression(compound_assignment.rhs());
     }
 
     fn visit_do(&mut self, do_block: &ast::Do) {

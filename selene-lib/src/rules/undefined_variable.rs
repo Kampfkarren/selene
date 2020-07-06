@@ -66,6 +66,16 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "roblox")]
+    fn test_compound_assignments() {
+        test_lint(
+            UndefinedVariableLint::new(()).unwrap(),
+            "undefined_variable",
+            "compound_assignments",
+        );
+    }
+
+    #[test]
     fn test_hoisting() {
         test_lint(
             UndefinedVariableLint::new(()).unwrap(),
