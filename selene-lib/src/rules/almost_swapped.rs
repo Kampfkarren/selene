@@ -1,5 +1,5 @@
 use super::*;
-use crate::ast_util::{range, HasSideEffects};
+use crate::ast_util::{purge_trivia, range, HasSideEffects};
 use std::convert::Infallible;
 
 use full_moon::{
@@ -22,7 +22,7 @@ impl Rule for AlmostSwappedLint {
             almost_swaps: Vec::new(),
         };
 
-        visitor.visit_ast(&ast);
+        visitor.visit_ast(&purge_trivia(ast.to_owned()));
 
         visitor
             .almost_swaps

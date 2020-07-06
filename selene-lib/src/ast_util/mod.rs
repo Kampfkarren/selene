@@ -2,9 +2,11 @@ use std::convert::{TryFrom, TryInto};
 
 use full_moon::node::Node;
 
+mod purge_trivia;
 pub mod scopes;
 mod side_effects;
 
+pub use purge_trivia::purge_trivia;
 pub use side_effects::HasSideEffects;
 
 pub fn is_type_function(name: &str, roblox: bool) -> bool {
