@@ -1,7 +1,13 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.7.0] - 2020-06-08
+### Added
+- Added support for `continue`, compound assignments (`+`), intersectional types, and numbers with underscores under the `roblox` feature flag.
+
+### Fixed
+- Fixed several parse errors with numbers.
+
 ### Changed
 - Removed types from `debug.traceback` arguments in the Lua 5.1 standard library
 - Made 4th argument to `CFrame.fromMatrix` optional (#113)
