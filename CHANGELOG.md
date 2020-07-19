@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Added
+- Added support for `os.clock`.
+
 ## [0.7.0] - 2020-06-08
 ### Added
 - Added support for `continue`, compound assignments (`+`), intersectional types, and numbers with underscores under the `roblox` feature flag.
