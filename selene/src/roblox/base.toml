@@ -774,9 +774,6 @@ removed = true
 [string.dump]
 removed = true
 
-[os.clock]
-removed = true
-
 [os.execute]
 removed = true
 
