@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added support for `os.clock`.
 - Added `RaycastParams.new`.
 
+### Fixed
+- Fixed an incorrect argument to `coroutine.yield`.
+
 ## [0.7.0] - 2020-06-08
 ### Added
 - Added support for `continue`, compound assignments (`+`), intersectional types, and numbers with underscores under the `roblox` feature flag.
