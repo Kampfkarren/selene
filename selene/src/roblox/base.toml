@@ -429,6 +429,9 @@ type = { display = "Vector3" }
 [[Ray.new.args]]
 type = { display = "Vector3" }
 
+[RaycastParams.new]
+args = []
+
 [[Rect.new.args]]
 type = "any"
 
