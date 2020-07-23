@@ -35,7 +35,7 @@ Where the value is whatever the special configuration of that rule is. You can l
 
 ```toml
 [config]
-empty_if = { comments_count = false }
+empty_if = { comments_count = true }
 ```
 
 ## Setting the standard library
