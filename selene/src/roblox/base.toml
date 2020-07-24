@@ -478,6 +478,25 @@ type = "string"
 type = "string"
 required = false
 
+[[string.pack.args]]
+type = "string"
+
+[[string.pack.args]]
+type = "..."
+
+[[string.packsize.args]]
+type = "string"
+
+[[string.unpack.args]]
+type = "string"
+
+[[string.unpack.args]]
+type = "string"
+
+[[string.unpack.args]]
+type = "number"
+required = false
+
 [[table.find.args]]
 type = "table"
 
