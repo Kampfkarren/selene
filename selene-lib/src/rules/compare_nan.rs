@@ -92,15 +92,26 @@ impl Visitor<'_> for CompareNanVisitor {
             if let ast::Value::Var(_) = value.as_ref();
             if let Some(rhs) = binop;
             then {
-                let actual_op = rhs.bin_op();
-                match actual_op {
-                    ast::BinOp::TildeEqual(_) | ast::BinOp::TwoEqual(_) => {
+                match rhs.bin_op() {
+                    ast::BinOp::TildeEqual(_) => {
                         if expression_is_nan(rhs.rhs()) {
                             let range = node.range().unwrap();
                             self.comparisons.push(
                                 Comparison {
                                     variable: value.to_string().trim().to_owned(),
-                                    operator: actual_op.to_string().trim().to_owned(),
+                                    operator: "==".to_owned(),
+                                    range: ((range.0.bytes(), range.1.bytes())),
+                                }
+                            );
+                        }
+                    },
+                    ast::BinOp::TwoEqual(_) => {
+                        if expression_is_nan(rhs.rhs()) {
+                            let range = node.range().unwrap();
+                            self.comparisons.push(
+                                Comparison {
+                                    variable: value.to_string().trim().to_owned(),
+                                    operator: "~=".to_owned(),
                                     range: ((range.0.bytes(), range.1.bytes())),
                                 }
                             );
