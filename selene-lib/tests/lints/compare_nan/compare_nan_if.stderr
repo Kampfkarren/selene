@@ -1,0 +1,18 @@
+error[compare_nan]: comparing things to nan directly is not allowed
+
+   ┌── compare_nan_if.lua:1:4 ───
+   │
+ 1 │ if x == 0/0 then
+   │    ^^^^^^^^
+   │
+   = try: `x == x` instead
+
+error[compare_nan]: comparing things to nan directly is not allowed
+
+   ┌── compare_nan_if.lua:4:4 ───
+   │
+ 4 │ if x ~= 0/0 then
+   │    ^^^^^^^^
+   │
+   = try: `x ~= x` instead
+
