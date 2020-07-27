@@ -34,7 +34,7 @@ impl Rule for CompareNanLint {
                     vec![format!(
                         "try: `{variable} {operator} {variable}` instead",
                         variable = comparisons.variable,
-                        operator = comparisons.operator
+                        operator = comparisons.operator,
                     )],
                     Vec::new(),
                 )
@@ -79,7 +79,7 @@ fn expression_is_nan(node: &ast::Expression) -> bool {
         } = rhs.rhs();
         if value_is_zero(rhs_value) && value_is_zero(value);
         then {
-            return true
+            return true;
         }
     }
     false
@@ -136,6 +136,7 @@ mod tests {
             "compare_nan_variables",
         );
     }
+
     #[test]
     fn test_compare_nan_if() {
         test_lint(
