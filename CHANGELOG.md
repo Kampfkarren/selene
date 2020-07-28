@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Added support for `os.clock`.
 - Added `RaycastParams.new`.
+- Added lint `compare_nan` to guard against comparing directly to nan (e.g. `x ~= 0/0`).
 
 ## [0.7.0] - 2020-06-08
 ### Added
