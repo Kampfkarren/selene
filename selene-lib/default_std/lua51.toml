@@ -190,10 +190,6 @@ type = { display = "coroutine" }
 type = "function"
 
 [[coroutine.yield.args]]
-type = { display = "coroutine" }
-required = false
-
-[[coroutine.yield.args]]
 type = "..."
 required = false
 
