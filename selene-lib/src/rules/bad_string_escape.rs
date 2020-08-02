@@ -112,7 +112,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
     fn visit_value(&mut self, node: &ast::Value) {
         if_chain::if_chain! {
             if let ast::Value::String(token) = node;
-            if let tokenizer::TokenType::StringLiteral {literal, multi_line, quote_type} = token.token_type();
+            if let tokenizer::TokenType::StringLiteral { literal, multi_line, quote_type } = token.token_type();
             if multi_line.is_none();
             then {
                 let value_start = node.range().unwrap().0.bytes();
@@ -126,10 +126,10 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                             if &captures[2].len() > &1 {
                                 let hundreds = u16::from_str_radix(&captures[1], 10).unwrap() * 100;
                                 let tens = u16::from_str_radix(&captures[2][1..2], 10).unwrap();
-                                if hundreds+tens > 0xff {
+                                if hundreds + tens > 0xff {
                                     self.sequences.push(
                                         StringEscapeSequence{
-                                            range: (start, start+4),
+                                            range: (start, start + 4),
                                             issue: ReasonWhy::DecimalTooHigh,
                                         }
                                     );
@@ -140,7 +140,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                             if quote_type == &tokenizer::StringLiteralQuoteType::Single {
                                 self.sequences.push(
                                     StringEscapeSequence{
-                                        range: (start, start+2),
+                                        range: (start, start + 2),
                                         issue: ReasonWhy::DoubleInSingle,
                                     }
                                 );
@@ -150,7 +150,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                             if quote_type == &tokenizer::StringLiteralQuoteType::Double {
                                 self.sequences.push(
                                     StringEscapeSequence{
-                                        range: (start, start+2),
+                                        range: (start, start + 2),
                                         issue: ReasonWhy::SingleInDouble,
                                     }
                                 );
@@ -160,7 +160,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                             if !self.roblox {
                                 self.sequences.push(
                                     StringEscapeSequence{
-                                        range: (start, start+2),
+                                        range: (start, start + 2),
                                         issue: ReasonWhy::Invalid,
                                     }
                                 );
@@ -170,7 +170,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                             if !self.roblox {
                                 self.sequences.push(
                                     StringEscapeSequence{
-                                        range: (start, start+2),
+                                        range: (start, start + 2),
                                         issue: ReasonWhy::Invalid,
                                     }
                                 );
@@ -180,7 +180,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                             if second_capture_len != &2 {
                                 self.sequences.push(
                                     StringEscapeSequence{
-                                        range: (start, start+second_capture_len+2),
+                                        range: (start, start + second_capture_len + 2),
                                         issue: ReasonWhy::Malformed
                                     }
                                 );
@@ -190,7 +190,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                             if !self.roblox {
                                 self.sequences.push(
                                     StringEscapeSequence{
-                                        range: (start, start+2),
+                                        range: (start, start + 2),
                                         issue: ReasonWhy::Invalid,
                                     }
                                 );
@@ -200,7 +200,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                             if &captures[3].len() == &0 {
                                 self.sequences.push(
                                     StringEscapeSequence{
-                                        range: (start, start+second_capture_len+3),
+                                        range: (start, start + second_capture_len + 3),
                                         issue: ReasonWhy::Malformed,
                                     }
                                 );
@@ -210,7 +210,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                             if codepoint > 0x10ffff {
                                 self.sequences.push(
                                     StringEscapeSequence {
-                                        range: (start, start+second_capture_len+4),
+                                        range: (start, start + second_capture_len + 4),
                                         issue: ReasonWhy::CodepointTooHigh,
                                     }
                                 );
@@ -219,7 +219,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                         _ => {
                             self.sequences.push(
                                 StringEscapeSequence{
-                                    range: (start, start+2),
+                                    range: (start, start + 2),
                                     issue: ReasonWhy::Invalid,
                                 }
                             );
