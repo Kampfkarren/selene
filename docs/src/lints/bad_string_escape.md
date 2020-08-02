@@ -5,7 +5,7 @@ Checks for invalid, malformed, or unnecessary string escape sequences.
 ## Why this is bad
 Invalid string escapes don't do anything, so should obviously be caught in dealt with. Additionally, in double strings, you shouldn't escape single quote strings since it makes the string less readable. Same with single quote strings and double quotes.
 
-In some cases (specifically `\x` and `\u` when built with the `roblox` feature) it's possible to write an escape sequence that looks right but doesn't work when ran. Because this is probably not intentional, they are caught by this lint.
+In some cases (specifically `\x` and `\u` in a Roblox codebase) it's possible to write an escape sequence that looks right but doesn't work when ran. Because this is probably not intentional, they are caught by this lint.
 
 ## Example
 ```lua
