@@ -13,11 +13,11 @@ lazy_static::lazy_static! {
 }
 
 enum ReasonWhy {
+    CodepointTooHigh,
+    DecimalTooHigh,
+    DoubleInSingle,
     Invalid,
     Malformed,
-    DecimalTooHigh,
-    CodepointTooHigh,
-    DoubleInSingle,
     SingleInDouble,
 }
 
