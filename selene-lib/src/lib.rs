@@ -214,6 +214,7 @@ pub struct CheckerDiagnostic {
 
 use_rules! {
     almost_swapped: rules::almost_swapped::AlmostSwappedLint,
+    bad_string_escape: rules::bad_string_escape::BadStringEscapeLint,
     compare_nan: rules::compare_nan::CompareNanLint,
     divide_by_zero: rules::divide_by_zero::DivideByZeroLint,
     empty_if: rules::empty_if::EmptyIfLint,
