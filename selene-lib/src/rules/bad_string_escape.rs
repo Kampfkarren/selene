@@ -115,6 +115,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
             if let tokenizer::TokenType::StringLiteral { literal, multi_line, quote_type } = token.token_type();
             if multi_line.is_none();
             then {
+                let quote_type = *quote_type;
                 let value_start = node.range().unwrap().0.bytes();
 
                 for captures in STRING_ESCAPE_REGEX.captures_iter(literal) {
@@ -123,7 +124,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                     match &captures[1] {
                         "a" | "b" | "f" | "n" | "r" | "t" | "v" | "\\" => {},
                         "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" => {
-                            if &captures[2].len() > &1 {
+                            if captures[2].len() > 1 {
                                 let hundreds = u16::from_str_radix(&captures[1], 10).unwrap() * 100;
                                 let tens = u16::from_str_radix(&captures[2][1..2], 10).unwrap();
                                 if hundreds + tens > 0xff {
@@ -137,7 +138,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                             }
                         },
                         "\"" => {
-                            if quote_type == &tokenizer::StringLiteralQuoteType::Single {
+                            if quote_type == tokenizer::StringLiteralQuoteType::Single {
                                 self.sequences.push(
                                     StringEscapeSequence{
                                         range: (start, start + 2),
@@ -147,7 +148,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                             }
                         },
                         "'" => {
-                            if quote_type == &tokenizer::StringLiteralQuoteType::Double {
+                            if quote_type == tokenizer::StringLiteralQuoteType::Double {
                                 self.sequences.push(
                                     StringEscapeSequence{
                                         range: (start, start + 2),
@@ -176,8 +177,8 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                                 );
                                 continue;
                             }
-                            let second_capture_len = &captures[2].len();
-                            if second_capture_len != &2 {
+                            let second_capture_len = captures[2].len();
+                            if second_capture_len != 2 {
                                 self.sequences.push(
                                     StringEscapeSequence{
                                         range: (start, start + second_capture_len + 2),
@@ -196,8 +197,8 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                                 );
                                 continue;
                             }
-                            let second_capture_len = &captures[2].len();
-                            if &captures[3].len() == &0 {
+                            let second_capture_len = captures[2].len();
+                            if captures[3].len() == 0 {
                                 self.sequences.push(
                                     StringEscapeSequence{
                                         range: (start, start + second_capture_len + 3),
