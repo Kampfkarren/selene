@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `RaycastParams.new`.
 - Added support for `string.pack`, `string.packsize`, and `string.unpack` to the Roblox standard library.
 - Added lint `compare_nan` to guard against comparing directly to nan (e.g. `x ~= 0/0`).
+- Add lint `bad_string_escape` to guard invalid or malformed string escape sequences.
 
 ### Fixed
 - Fixed `coroutine.yield` only accepting coroutines as a first argument.
