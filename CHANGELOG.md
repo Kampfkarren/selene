@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+## [0.8.0] - 2020-08-24
 ### Added
 - Added support for `os.clock`.
 - Added `RaycastParams.new`.
@@ -11,7 +13,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 - Fixed `coroutine.yield` only accepting coroutines as a first argument.
-
 
 ## [0.7.0] - 2020-06-08
 ### Added
