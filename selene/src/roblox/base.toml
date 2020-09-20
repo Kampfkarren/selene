@@ -354,6 +354,9 @@ type = "number"
 type = "number"
 required = false
 
+[[math.round.args]]
+type = "number"
+
 [[math.sign.args]]
 type = "number"
 
