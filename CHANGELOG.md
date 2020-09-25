@@ -2,6 +2,11 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- Arguments that aren't required can now be filled with nil.
+
+### Changed
+- setmetatable no longer requires a second argument.
 
 ## [0.8.0] - 2020-08-24
 ### Added

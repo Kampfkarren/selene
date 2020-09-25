@@ -244,7 +244,7 @@ mod tests {
             "lua51_string_escapes",
         );
     }
-    
+
     #[test]
     #[cfg(feature = "roblox")]
     fn test_bad_string_escape_roblox() {

@@ -572,6 +572,13 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
             }
 
             if let Some(passed_type) = passed_type {
+                // Allow nil for unrequired arguments
+                if expected.required == Required::NotRequired
+                    && passed_type == &PassedArgumentType::Primitive(ArgumentType::Nil)
+                {
+                    continue;
+                }
+
                 let matches = passed_type.matches(&expected.argument_type);
 
                 if !matches {
@@ -743,6 +750,15 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "method_call",
+        );
+    }
+
+    #[test]
+    fn test_required() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "required",
         );
     }
 

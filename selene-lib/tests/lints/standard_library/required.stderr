@@ -1,0 +1,16 @@
+error[incorrect_standard_library_use]: standard library function `ipairs` requires 1 parameters, 0 passed
+
+   ┌── required.lua:2:1 ───
+   │
+ 2 │ ipairs()
+   │ ^^^^^^^^
+   │
+
+error[incorrect_standard_library_use]: standard library function `setmetatable` requires 1 parameters, 0 passed
+
+   ┌── required.lua:5:1 ───
+   │
+ 5 │ setmetatable()
+   │ ^^^^^^^^^^^^^^
+   │
+
