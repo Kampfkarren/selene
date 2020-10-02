@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 - setmetatable no longer requires a second argument.
+- `allow_unused_self` is now toggled on for `unused_variable` by default.
 
 ## [0.8.0] - 2020-08-24
 ### Added
