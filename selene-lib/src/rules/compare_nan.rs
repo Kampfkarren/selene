@@ -100,7 +100,7 @@ impl Visitor<'_> for CompareNanVisitor {
                                 Comparison {
                                     variable: value.to_string().trim().to_owned(),
                                     operator: "==".to_owned(),
-                                    range: ((range.0.bytes(), range.1.bytes())),
+                                    range: (range.0.bytes(), range.1.bytes()),
                                 }
                             );
                         }
@@ -112,7 +112,7 @@ impl Visitor<'_> for CompareNanVisitor {
                                 Comparison {
                                     variable: value.to_string().trim().to_owned(),
                                     operator: "~=".to_owned(),
-                                    range: ((range.0.bytes(), range.1.bytes())),
+                                    range: (range.0.bytes(), range.1.bytes()),
                                 }
                             );
                         }
