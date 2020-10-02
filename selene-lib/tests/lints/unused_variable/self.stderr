@@ -1,10 +1,9 @@
 error[unused_variable]: self is defined, but never used
-
-   ┌── self.lua:3:14 ───
-   │
- 3 │ function Foo:A() end
-   │              ^
-   │
-   = `self` is implicitly defined when defining a method
-   = if you don't need it, consider using `.` instead of `:`
+  ┌─ self.lua:3:14
+  │
+3 │ function Foo:A() end
+  │              ^
+  │
+  = `self` is implicitly defined when defining a method
+  = if you don't need it, consider using `.` instead of `:`
 

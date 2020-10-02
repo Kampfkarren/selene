@@ -1,32 +1,24 @@
 error[unused_variable]: localA is defined, but never used
-
-   ┌── if.lua:2:11 ───
-   │
- 2 │     local localA
-   │           ^^^^^^
-   │
+  ┌─ if.lua:2:11
+  │
+2 │     local localA
+  │           ^^^^^^
 
 error[unused_variable]: localB is defined, but never used
-
-   ┌── if.lua:4:11 ───
-   │
- 4 │     local localB
-   │           ^^^^^^
-   │
+  ┌─ if.lua:4:11
+  │
+4 │     local localB
+  │           ^^^^^^
 
 error[unused_variable]: localC is defined, but never used
-
-   ┌── if.lua:7:11 ───
-   │
- 7 │     local localC
-   │           ^^^^^^
-   │
+  ┌─ if.lua:7:11
+  │
+7 │     local localC
+  │           ^^^^^^
 
 error[unused_variable]: localD is defined, but never used
-
-    ┌── if.lua:10:11 ───
-    │
- 10 │     local localD
-    │           ^^^^^^
-    │
+   ┌─ if.lua:10:11
+   │
+10 │     local localD
+   │           ^^^^^^
 

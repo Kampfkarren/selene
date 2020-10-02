@@ -1,24 +1,18 @@
 error[incorrect_standard_library_use]: standard library global `script.ClassName` is not writable
-
-   ┌── wildcard.lua:1:1 ───
-   │
- 1 │ script.ClassName = 3
-   │ ^^^^^^^^^^^^^^^^
-   │
+  ┌─ wildcard.lua:1:1
+  │
+1 │ script.ClassName = 3
+  │ ^^^^^^^^^^^^^^^^
 
 error[incorrect_standard_library_use]: standard library global `script.Name` does not contain the field `UhOh`
-
-   ┌── wildcard.lua:4:1 ───
-   │
- 4 │ script.Name.UhOh = "Oops"
-   │ ^^^^^^^^^^^^^^^^
-   │
+  ┌─ wildcard.lua:4:1
+  │
+4 │ script.Name.UhOh = "Oops"
+  │ ^^^^^^^^^^^^^^^^
 
 error[incorrect_standard_library_use]: standard library global `script.Child` is not writable
-
-   ┌── wildcard.lua:6:1 ───
-   │
- 6 │ script.Child = "Oops"
-   │ ^^^^^^^^^^^^
-   │
+  ┌─ wildcard.lua:6:1
+  │
+6 │ script.Child = "Oops"
+  │ ^^^^^^^^^^^^
 

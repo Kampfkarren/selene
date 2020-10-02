@@ -1,18 +1,16 @@
 error[suspicious_reverse_loop]: this loop will only ever run once at most
-
-   ┌── suspicious_reverse_loop.lua:1:9 ───
-   │
- 1 │ for _ = #x, 1 do
-   │         ^^^^^
-   │
-   = help: try adding `, -1` after `1`
+  ┌─ suspicious_reverse_loop.lua:1:9
+  │
+1 │ for _ = #x, 1 do
+  │         ^^^^^
+  │
+  = help: try adding `, -1` after `1`
 
 error[suspicious_reverse_loop]: this loop will only ever run once at most
-
-   ┌── suspicious_reverse_loop.lua:4:9 ───
-   │
- 4 │ for _ = #x, 0 do
-   │         ^^^^^
-   │
-   = help: try adding `, -1` after `1`
+  ┌─ suspicious_reverse_loop.lua:4:9
+  │
+4 │ for _ = #x, 0 do
+  │         ^^^^^
+  │
+  = help: try adding `, -1` after `1`
 

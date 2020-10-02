@@ -1,32 +1,24 @@
 error[incorrect_standard_library_use]: standard library global `math` does not contain the field `pie`
-
-   ┌── unknown_property.lua:1:18 ───
-   │
- 1 │ print("3.14 = ", math.pie)
-   │                  ^^^^^^^^
-   │
+  ┌─ unknown_property.lua:1:18
+  │
+1 │ print("3.14 = ", math.pie)
+  │                  ^^^^^^^^
 
 error[incorrect_standard_library_use]: standard library global `print` does not contain the field `foo`
-
-   ┌── unknown_property.lua:2:7 ───
-   │
- 2 │ print(print.foo)
-   │       ^^^^^^^^^
-   │
+  ┌─ unknown_property.lua:2:7
+  │
+2 │ print(print.foo)
+  │       ^^^^^^^^^
 
 error[incorrect_standard_library_use]: standard library global `math.huge` does not contain the field `big`
-
-   ┌── unknown_property.lua:3:7 ───
-   │
- 3 │ print(math.huge.big)
-   │       ^^^^^^^^^^^^^
-   │
+  ┌─ unknown_property.lua:3:7
+  │
+3 │ print(math.huge.big)
+  │       ^^^^^^^^^^^^^
 
 error[incorrect_standard_library_use]: standard library global `math` does not contain the field `call`
-
-   ┌── unknown_property.lua:4:1 ───
-   │
- 4 │ math.call()
-   │ ^^^^^^^^^
-   │
+  ┌─ unknown_property.lua:4:1
+  │
+4 │ math.call()
+  │ ^^^^^^^^^
 

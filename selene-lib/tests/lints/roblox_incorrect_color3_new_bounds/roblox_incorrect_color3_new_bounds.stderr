@@ -1,9 +1,8 @@
 error[roblox_incorrect_color3_new_bounds]: Color3.new only takes numbers from 0 to 1
-
-   ┌── roblox_incorrect_color3_new_bounds.lua:1:12 ───
-   │
- 1 │ Color3.new(255, 0, 0)
-   │            ^^^
-   │
-   = help: did you mean to use Color3.fromRGB instead?
+  ┌─ roblox_incorrect_color3_new_bounds.lua:1:12
+  │
+1 │ Color3.new(255, 0, 0)
+  │            ^^^
+  │
+  = help: did you mean to use Color3.fromRGB instead?
 

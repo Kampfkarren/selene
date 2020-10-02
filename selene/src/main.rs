@@ -96,8 +96,8 @@ fn log_total(parse_errors: usize, lint_errors: usize, lint_warnings: usize) -> i
 
 fn emit_codespan(
     writer: &mut impl termcolor::WriteColor,
-    files: &codespan::Files,
-    diagnostic: &CodespanDiagnostic,
+    files: &codespan::Files<&str>,
+    diagnostic: &CodespanDiagnostic<codespan::FileId>,
 ) {
     let lock = OPTIONS.read().unwrap();
     let opts = lock.as_ref().unwrap();
@@ -114,7 +114,7 @@ fn emit_codespan(
     if opts.display_style == opts::DisplayStyle::Json {
         writeln!(writer, "{}", serde_json::to_string(&diagnostic).unwrap()).unwrap();
     } else {
-        codespan_reporting::term::emit(writer, &config, &files, diagnostic)
+        codespan_reporting::term::emit(writer, &config, files, diagnostic)
             .expect("couldn't emit error to codespan");
     }
 }
@@ -135,7 +135,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
     let opts = lock.as_ref().unwrap();
 
     let mut files = codespan::Files::new();
-    let source_id = files.add(filename.to_string_lossy(), &*contents);
+    let source_id = files.add(filename.as_os_str(), &*contents);
 
     let stdout = termcolor::StandardStream::stdout(get_color());
     let mut stdout = stdout.lock();
@@ -157,16 +157,15 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                         severity: CodespanSeverity::Error,
                         code: Some("parse_error".to_owned()),
                         message: format!("unexpected token `{}`", token),
-                        primary_label: CodespanLabel::new(
+                        labels: vec![CodespanLabel::primary(
                             source_id,
                             codespan::Span::new(
                                 token.start_position().bytes() as u32,
                                 token.end_position().bytes() as u32,
                             ),
-                            additional.unwrap_or_default().to_owned(),
-                        ),
+                        )
+                        .with_message(additional.unwrap_or_default())],
                         notes: Vec::new(),
-                        secondary_labels: Vec::new(),
                     },
                 );
             } else {

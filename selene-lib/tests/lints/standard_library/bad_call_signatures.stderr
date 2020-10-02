@@ -1,57 +1,44 @@
 error[incorrect_standard_library_use]: use of standard_library function `math.sin` is incorrect
-
-   ┌── bad_call_signatures.lua:9:10 ───
-   │
- 9 │ math.sin("i'd like the sine of three, please")
-   │          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `number`, received `string`
-   │
+  ┌─ bad_call_signatures.lua:9:10
+  │
+9 │ math.sin("i'd like the sine of three, please")
+  │          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `number`, received `string`
 
 error[incorrect_standard_library_use]: standard library function `math.floor` requires 1 parameters, 2 passed
-
-    ┌── bad_call_signatures.lua:10:1 ───
-    │
- 10 │ math.floor(3.5, "remember to make sure it's 3 :)")
-    │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    │
+   ┌─ bad_call_signatures.lua:10:1
+   │
+10 │ math.floor(3.5, "remember to make sure it's 3 :)")
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error[incorrect_standard_library_use]: use of standard_library function `math.sin` is incorrect
-
-    ┌── bad_call_signatures.lua:11:10 ───
-    │
- 11 │ math.sin "pi"
-    │          ^^^^ expected `number`, received `string`
-    │
+   ┌─ bad_call_signatures.lua:11:10
+   │
+11 │ math.sin "pi"
+   │          ^^^^ expected `number`, received `string`
 
 error[incorrect_standard_library_use]: standard library function `math.sin` requires 1 parameters, 2 passed
-
-    ┌── bad_call_signatures.lua:15:1 ───
-    │
- 15 │ math.sin(variable, variable)
-    │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    │
+   ┌─ bad_call_signatures.lua:15:1
+   │
+15 │ math.sin(variable, variable)
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error[incorrect_standard_library_use]: standard library function `math.max` requires use of the vararg
-
-    ┌── bad_call_signatures.lua:17:1 ───
-    │
- 17 │ math.max(2)
-    │ ^^^^^^^^^^^
-    │
-    = use of max only makes sense with more than 1 parameter
+   ┌─ bad_call_signatures.lua:17:1
+   │
+17 │ math.max(2)
+   │ ^^^^^^^^^^^
+   │
+   = use of max only makes sense with more than 1 parameter
 
 error[incorrect_standard_library_use]: standard library field `math.pi` is not a function
-
-    ┌── bad_call_signatures.lua:18:1 ───
-    │
- 18 │ math.pi()
-    │ ^^^^^^^^^
-    │
+   ┌─ bad_call_signatures.lua:18:1
+   │
+18 │ math.pi()
+   │ ^^^^^^^^^
 
 error[incorrect_standard_library_use]: use of standard_library function `string.format` is incorrect
-
-    ┌── bad_call_signatures.lua:19:15 ───
-    │
- 19 │ string.format(-2, "foo")
-    │               ^^ expected `string`, received `number`
-    │
+   ┌─ bad_call_signatures.lua:19:15
+   │
+19 │ string.format(-2, "foo")
+   │               ^^ expected `string`, received `number`
 

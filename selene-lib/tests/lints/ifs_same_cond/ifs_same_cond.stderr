@@ -1,28 +1,16 @@
 error[ifs_same_cond]: this `elseif` has the same condition as a previous if
-
-   ┌── ifs_same_cond.lua:2:8 ───
-   │
- 2 │ elseif x == 1 then
-   │        ^^^^^^
-   │
-
-   ┌── ifs_same_cond.lua:1:4 ───
-   │
- 1 │ if x == 1 then
-   │    ------ note: same as this
-   │
+  ┌─ ifs_same_cond.lua:1:4
+  │
+1 │ if x == 1 then
+  │    ^^^^^^ note: same as this
+2 │ elseif x == 1 then
+  │        ^^^^^^
 
 error[ifs_same_cond]: this `elseif` has the same condition as a previous if
-
-   ┌── ifs_same_cond.lua:7:8 ───
-   │
- 7 │ elseif y == 1 then
-   │        ^^^^^^
-   │
-
-   ┌── ifs_same_cond.lua:6:8 ───
-   │
- 6 │ elseif y == 1 then
-   │        ------ note: same as this
-   │
+  ┌─ ifs_same_cond.lua:6:8
+  │
+6 │ elseif y == 1 then
+  │        ^^^^^^ note: same as this
+7 │ elseif y == 1 then
+  │        ^^^^^^
 
