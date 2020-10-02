@@ -113,18 +113,20 @@ impl Diagnostic {
         self,
         file_id: codespan::FileId,
         severity: CodespanSeverity,
-    ) -> CodespanDiagnostic {
+    ) -> CodespanDiagnostic<codespan::FileId> {
+        let mut labels = Vec::with_capacity(1 + self.secondary_labels.len());
+        labels.push(self.primary_label.codespan_label(file_id));
+        labels.extend(&mut self.secondary_labels.iter().map(|label| {
+            CodespanLabel::secondary(file_id, codespan::Span::new(label.range.0, label.range.1))
+                .with_message(label.message.as_ref().unwrap_or(&"".to_owned()).to_owned())
+        }));
+
         CodespanDiagnostic {
-            severity,
             code: Some(self.code.to_owned()),
+            labels,
             message: self.message.to_owned(),
-            primary_label: self.primary_label.codespan_label(file_id),
             notes: self.notes.to_owned(),
-            secondary_labels: self
-                .secondary_labels
-                .iter()
-                .map(|label| label.codespan_label(file_id))
-                .collect(),
+            severity,
         }
     }
 
@@ -173,12 +175,12 @@ impl Label {
         }
     }
 
-    pub fn codespan_label(&self, file_id: codespan::FileId) -> CodespanLabel {
-        CodespanLabel::new(
+    pub fn codespan_label(&self, file_id: codespan::FileId) -> CodespanLabel<codespan::FileId> {
+        CodespanLabel::primary(
             file_id.to_owned(),
             codespan::Span::new(self.range.0, self.range.1),
-            self.message.as_ref().unwrap_or(&"".to_owned()).to_owned(),
         )
+        .with_message(self.message.as_ref().unwrap_or(&"".to_owned()).to_owned())
     }
 }
 

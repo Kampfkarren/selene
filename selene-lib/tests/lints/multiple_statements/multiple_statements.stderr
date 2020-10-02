@@ -1,16 +1,12 @@
 error[multiple_statements]: only one statement per line is allowed
-
-   ┌── multiple_statements.lua:6:34 ───
-   │
- 6 │ table.sort(stuff, function(a, b) local sum = a + b return math.abs(sum) > 2 end)
-   │                                  ^^^^^^^^^^^^^^^^^
-   │
+  ┌─ multiple_statements.lua:6:34
+  │
+6 │ table.sort(stuff, function(a, b) local sum = a + b return math.abs(sum) > 2 end)
+  │                                  ^^^^^^^^^^^^^^^^^
 
 error[multiple_statements]: only one statement per line is allowed
-
-   ┌── multiple_statements.lua:6:52 ───
-   │
- 6 │ table.sort(stuff, function(a, b) local sum = a + b return math.abs(sum) > 2 end)
-   │                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
-   │
+  ┌─ multiple_statements.lua:6:52
+  │
+6 │ table.sort(stuff, function(a, b) local sum = a + b return math.abs(sum) > 2 end)
+  │                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
 

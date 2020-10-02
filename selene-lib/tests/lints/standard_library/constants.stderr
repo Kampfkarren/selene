@@ -1,16 +1,12 @@
 error[incorrect_standard_library_use]: use of standard_library function `collectgarbage` is incorrect
-
-   ┌── constants.lua:4:16 ───
-   │
- 4 │ collectgarbage("doge")
-   │                ^^^^^^ expected `"collect", "count", "restart", "setpause", "setstepmul", "step", "stop"`, received `string`
-   │
+  ┌─ constants.lua:4:16
+  │
+4 │ collectgarbage("doge")
+  │                ^^^^^^ expected `"collect", "count", "restart", "setpause", "setstepmul", "step", "stop"`, received `string`
 
 error[incorrect_standard_library_use]: use of standard_library function `collectgarbage` is incorrect
-
-   ┌── constants.lua:5:16 ───
-   │
- 5 │ collectgarbage(1)
-   │                ^ expected `"collect", "count", "restart", "setpause", "setstepmul", "step", "stop"`, received `number`
-   │
+  ┌─ constants.lua:5:16
+  │
+5 │ collectgarbage(1)
+  │                ^ expected `"collect", "count", "restart", "setpause", "setstepmul", "step", "stop"`, received `number`
 

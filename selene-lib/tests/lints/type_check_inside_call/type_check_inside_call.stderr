@@ -1,9 +1,8 @@
 error[type_check_inside_call]: you are checking the type inside the call, not outside
-
-   ┌── type_check_inside_call.lua:1:11 ───
-   │
- 1 │ print(type(x == "boolean"))
-   │           ^^^^^^^^^^^^^^^^
-   │
-   = note: this will always return `boolean`
+  ┌─ type_check_inside_call.lua:1:11
+  │
+1 │ print(type(x == "boolean"))
+  │           ^^^^^^^^^^^^^^^^
+  │
+  = note: this will always return `boolean`
 

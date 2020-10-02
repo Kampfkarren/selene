@@ -1,24 +1,18 @@
 error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Instance`
-
-   ┌── roblox_incorrect_roact_usage.lua:2:5 ───
-   │
- 2 │     ThisPropertyDoesntExist = true,
-   │     ^^^^^^^^^^^^^^^^^^^^^^^
-   │
+  ┌─ roblox_incorrect_roact_usage.lua:2:5
+  │
+2 │     ThisPropertyDoesntExist = true,
+  │     ^^^^^^^^^^^^^^^^^^^^^^^
 
 error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Instance`
-
-    ┌── roblox_incorrect_roact_usage.lua:10:5 ───
-    │
- 10 │     ThisPropertyDoesntExist = true,
-    │     ^^^^^^^^^^^^^^^^^^^^^^^
-    │
+   ┌─ roblox_incorrect_roact_usage.lua:10:5
+   │
+10 │     ThisPropertyDoesntExist = true,
+   │     ^^^^^^^^^^^^^^^^^^^^^^^
 
 error[roblox_incorrect_roact_usage]: `ThisDoesntExist` is not a valid class
-
-    ┌── roblox_incorrect_roact_usage.lua:13:3 ───
-    │
- 13 │ e("ThisDoesntExist", {})
-    │   ^^^^^^^^^^^^^^^^^
-    │
+   ┌─ roblox_incorrect_roact_usage.lua:13:3
+   │
+13 │ e("ThisDoesntExist", {})
+   │   ^^^^^^^^^^^^^^^^^
 

@@ -1,16 +1,12 @@
 error[undefined_variable]: `x` is not defined
-
-   ┌── compound_assignments.lua:1:1 ───
-   │
- 1 │ x += y
-   │ ^
-   │
+  ┌─ compound_assignments.lua:1:1
+  │
+1 │ x += y
+  │ ^
 
 error[undefined_variable]: `y` is not defined
-
-   ┌── compound_assignments.lua:1:6 ───
-   │
- 1 │ x += y
-   │      ^
-   │
+  ┌─ compound_assignments.lua:1:6
+  │
+1 │ x += y
+  │      ^
 

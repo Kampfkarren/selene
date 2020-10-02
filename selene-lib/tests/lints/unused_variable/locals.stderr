@@ -1,32 +1,24 @@
 error[unused_variable]: localA is defined, but never used
-
-   ┌── locals.lua:2:7 ───
-   │
- 2 │ local localA, localB
-   │       ^^^^^^
-   │
+  ┌─ locals.lua:2:7
+  │
+2 │ local localA, localB
+  │       ^^^^^^
 
 error[unused_variable]: localB is defined, but never used
-
-   ┌── locals.lua:2:15 ───
-   │
- 2 │ local localA, localB
-   │               ^^^^^^
-   │
+  ┌─ locals.lua:2:15
+  │
+2 │ local localA, localB
+  │               ^^^^^^
 
 error[unused_variable]: localD is assigned a value, but never used
-
-   ┌── locals.lua:9:7 ───
-   │
- 9 │ local localD = 1
-   │       ^^^^^^
-   │
+  ┌─ locals.lua:9:7
+  │
+9 │ local localD = 1
+  │       ^^^^^^
 
 error[unused_variable]: localI is assigned a value, but never used
-
-    ┌── locals.lua:30:7 ───
-    │
- 30 │ local localI = { localH }
-    │       ^^^^^^
-    │
+   ┌─ locals.lua:30:7
+   │
+30 │ local localI = { localH }
+   │       ^^^^^^
 

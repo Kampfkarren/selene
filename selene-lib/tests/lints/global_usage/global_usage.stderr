@@ -1,8 +1,6 @@
 error[global_usage]: use of `_G` is not allowed, structure your code in a more idiomatic way
-
-   ┌── global_usage.lua:1:1 ───
-   │
- 1 │ _G.foo = 1
-   │ ^^
-   │
+  ┌─ global_usage.lua:1:1
+  │
+1 │ _G.foo = 1
+  │ ^^
 

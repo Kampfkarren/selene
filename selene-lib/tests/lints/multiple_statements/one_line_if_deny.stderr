@@ -1,8 +1,6 @@
 error[multiple_statements]: only one statement per line is allowed
-
-   ┌── one_line_if_deny.lua:1:14 ───
-   │
- 1 │ if true then return end
-   │              ^^^^^^
-   │
+  ┌─ one_line_if_deny.lua:1:14
+  │
+1 │ if true then return end
+  │              ^^^^^^
 

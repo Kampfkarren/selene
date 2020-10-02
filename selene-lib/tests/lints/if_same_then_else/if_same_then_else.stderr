@@ -1,42 +1,27 @@
 error[if_same_then_else]: this has the same block as a previous if
-
-   ┌── if_same_then_else.lua:4:5 ───
-   │
- 4 │     print(1)
-   │     ^^^^^^^^
-   │
-
-   ┌── if_same_then_else.lua:2:5 ───
-   │
- 2 │     print(1)
-   │     -------- note: same as this
-   │
+  ┌─ if_same_then_else.lua:2:5
+  │
+2 │     print(1)
+  │     -------- note: same as this
+3 │ elseif 2 then
+4 │     print(1)
+  │     ^^^^^^^^
 
 error[if_same_then_else]: this has the same block as a previous if
-
-   ┌── if_same_then_else.lua:6:5 ───
-   │
- 6 │     print(1)
-   │     ^^^^^^^^
-   │
-
-   ┌── if_same_then_else.lua:2:5 ───
-   │
- 2 │     print(1)
-   │     -------- note: same as this
-   │
+  ┌─ if_same_then_else.lua:2:5
+  │
+2 │     print(1)
+  │     -------- note: same as this
+  ·
+6 │     print(1)
+  │     ^^^^^^^^
 
 error[if_same_then_else]: this has the same block as a previous if
-
-    ┌── if_same_then_else.lua:14:5 ───
-    │
- 14 │     print(2)
-    │     ^^^^^^^^
-    │
-
-    ┌── if_same_then_else.lua:12:5 ───
-    │
- 12 │     print(2)
-    │     -------- note: same as this
-    │
+   ┌─ if_same_then_else.lua:12:5
+   │
+12 │     print(2)
+   │     -------- note: same as this
+13 │ elseif 3 then
+14 │     print(2)
+   │     ^^^^^^^^
 

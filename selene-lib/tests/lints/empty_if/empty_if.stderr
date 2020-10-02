@@ -1,101 +1,81 @@
 error[empty_if]: empty if block
-
-   ┌── empty_if.lua:1:1 ───
-   │
- 1 │ ╭ if true then
- 2 │ │ end
-   │ ╰───^
-   │
+  ┌─ empty_if.lua:1:1
+  │  
+1 │ ╭ if true then
+2 │ │ end
+  │ ╰───^
 
 error[empty_if]: empty if block
-
-   ┌── empty_if.lua:4:1 ───
-   │
- 4 │ ╭ if true then
- 5 │ │     -- bla bla bla
- 6 │ │     -- lot of documentation
- 7 │ │     -- oh no i forgot code
- 8 │ │ end
-   │ ╰───^
-   │
+  ┌─ empty_if.lua:4:1
+  │  
+4 │ ╭ if true then
+5 │ │     -- bla bla bla
+6 │ │     -- lot of documentation
+7 │ │     -- oh no i forgot code
+8 │ │ end
+  │ ╰───^
 
 error[empty_if]: empty else block
-
-    ┌── empty_if.lua:16:1 ───
-    │
- 16 │ ╭ else
- 17 │ │     -- oh no
- 18 │ │ end
-    │ ╰───^
-    │
+   ┌─ empty_if.lua:16:1
+   │  
+16 │ ╭ else
+17 │ │     -- oh no
+18 │ │ end
+   │ ╰───^
 
 error[empty_if]: empty if block
-
-    ┌── empty_if.lua:20:1 ───
-    │
- 20 │ ╭ if true then
- 21 │ │     -- oh no
- 22 │ │ else
- 23 │ │     print("code here")
- 24 │ │ end
-    │ ╰───^
-    │
+   ┌─ empty_if.lua:20:1
+   │  
+20 │ ╭ if true then
+21 │ │     -- oh no
+22 │ │ else
+23 │ │     print("code here")
+24 │ │ end
+   │ ╰───^
 
 error[empty_if]: empty if block
-
-    ┌── empty_if.lua:26:1 ───
-    │
- 26 │ ╭ if true then
- 27 │ │ elseif false then
- 28 │ │ end
-    │ ╰───^
-    │
+   ┌─ empty_if.lua:26:1
+   │  
+26 │ ╭ if true then
+27 │ │ elseif false then
+28 │ │ end
+   │ ╰───^
 
 error[empty_if]: empty elseif block
-
-    ┌── empty_if.lua:27:1 ───
-    │
- 27 │ ╭ elseif false then
- 28 │ │ end
-    │ ╰^
-    │
+   ┌─ empty_if.lua:27:1
+   │  
+27 │ ╭ elseif false then
+28 │ │ end
+   │ ╰^
 
 error[empty_if]: empty elseif block
-
-    ┌── empty_if.lua:32:1 ───
-    │
- 32 │ ╭ elseif 2 then
- 33 │ │     -- uh oh
- 34 │ │ else
-    │ ╰^
-    │
+   ┌─ empty_if.lua:32:1
+   │  
+32 │ ╭ elseif 2 then
+33 │ │     -- uh oh
+34 │ │ else
+   │ ╰^
 
 error[empty_if]: empty if block
-
-    ┌── empty_if.lua:46:1 ───
-    │
- 46 │ ╭ if true then
- 47 │ │ elseif true then
- 48 │ │ else
- 49 │ │ end
-    │ ╰───^
-    │
+   ┌─ empty_if.lua:46:1
+   │  
+46 │ ╭ if true then
+47 │ │ elseif true then
+48 │ │ else
+49 │ │ end
+   │ ╰───^
 
 error[empty_if]: empty elseif block
-
-    ┌── empty_if.lua:47:1 ───
-    │
- 47 │ ╭ elseif true then
- 48 │ │ else
-    │ ╰^
-    │
+   ┌─ empty_if.lua:47:1
+   │  
+47 │ ╭ elseif true then
+48 │ │ else
+   │ ╰^
 
 error[empty_if]: empty else block
-
-    ┌── empty_if.lua:48:1 ───
-    │
- 48 │ ╭ else
- 49 │ │ end
-    │ ╰───^
-    │
+   ┌─ empty_if.lua:48:1
+   │  
+48 │ ╭ else
+49 │ │ end
+   │ ╰───^
 

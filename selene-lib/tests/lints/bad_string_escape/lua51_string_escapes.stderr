@@ -1,105 +1,80 @@
 error[bad_string_escape]: single quotes do not have to be escaped when inside double quoted strings
-
-    ┌── lua51_string_escapes.lua:11:12 ───
-    │
- 11 │ local x = "\'\""
-    │            ^^
-    │
+   ┌─ lua51_string_escapes.lua:11:12
+   │
+11 │ local x = "\'\""
+   │            ^^
 
 error[bad_string_escape]: double quotes do not have to be escaped when inside single quoted strings
-
-    ┌── lua51_string_escapes.lua:13:12 ───
-    │
- 13 │ local x = '\"\''
-    │            ^^
-    │
+   ┌─ lua51_string_escapes.lua:13:12
+   │
+13 │ local x = '\"\''
+   │            ^^
 
 error[bad_string_escape]: string escape sequence doesn't exist
-
-    ┌── lua51_string_escapes.lua:20:14 ───
-    │
- 20 │ local bad = "\z"
-    │              ^^
-    │
+   ┌─ lua51_string_escapes.lua:20:14
+   │
+20 │ local bad = "\z"
+   │              ^^
 
 error[bad_string_escape]: string escape sequence doesn't exist
-
-    ┌── lua51_string_escapes.lua:22:15 ───
-    │
- 22 │ local bad2 = "\x1\x10"
-    │               ^^
-    │
+   ┌─ lua51_string_escapes.lua:22:15
+   │
+22 │ local bad2 = "\x1\x10"
+   │               ^^
 
 error[bad_string_escape]: string escape sequence doesn't exist
-
-    ┌── lua51_string_escapes.lua:22:18 ───
-    │
- 22 │ local bad2 = "\x1\x10"
-    │                  ^^
-    │
+   ┌─ lua51_string_escapes.lua:22:18
+   │
+22 │ local bad2 = "\x1\x10"
+   │                  ^^
 
 error[bad_string_escape]: string escape sequence doesn't exist
-
-    ┌── lua51_string_escapes.lua:24:15 ───
-    │
- 24 │ local bad3 = "\u{1337}\u{1234\u{1337}"
-    │               ^^
-    │
+   ┌─ lua51_string_escapes.lua:24:15
+   │
+24 │ local bad3 = "\u{1337}\u{1234\u{1337}"
+   │               ^^
 
 error[bad_string_escape]: string escape sequence doesn't exist
-
-    ┌── lua51_string_escapes.lua:24:23 ───
-    │
- 24 │ local bad3 = "\u{1337}\u{1234\u{1337}"
-    │                       ^^
-    │
+   ┌─ lua51_string_escapes.lua:24:23
+   │
+24 │ local bad3 = "\u{1337}\u{1234\u{1337}"
+   │                       ^^
 
 error[bad_string_escape]: string escape sequence doesn't exist
-
-    ┌── lua51_string_escapes.lua:24:30 ───
-    │
- 24 │ local bad3 = "\u{1337}\u{1234\u{1337}"
-    │                              ^^
-    │
+   ┌─ lua51_string_escapes.lua:24:30
+   │
+24 │ local bad3 = "\u{1337}\u{1234\u{1337}"
+   │                              ^^
 
 error[bad_string_escape]: string escape sequence doesn't exist
-
-    ┌── lua51_string_escapes.lua:26:15 ───
-    │
- 26 │ local bad4 = "\u{10ffff}\u{110000}"
-    │               ^^
-    │
+   ┌─ lua51_string_escapes.lua:26:15
+   │
+26 │ local bad4 = "\u{10ffff}\u{110000}"
+   │               ^^
 
 error[bad_string_escape]: string escape sequence doesn't exist
-
-    ┌── lua51_string_escapes.lua:26:25 ───
-    │
- 26 │ local bad4 = "\u{10ffff}\u{110000}"
-    │                         ^^
-    │
+   ┌─ lua51_string_escapes.lua:26:25
+   │
+26 │ local bad4 = "\u{10ffff}\u{110000}"
+   │                         ^^
 
 error[bad_string_escape]: string escape sequence doesn't exist
-
-    ┌── lua51_string_escapes.lua:28:15 ───
-    │
- 28 │ local bad5 = "\m"
-    │               ^^
-    │
+   ┌─ lua51_string_escapes.lua:28:15
+   │
+28 │ local bad5 = "\m"
+   │               ^^
 
 error[bad_string_escape]: decimal escape is too high
-
-    ┌── lua51_string_escapes.lua:30:15 ───
-    │
- 30 │ local bad6 = "\999"
-    │               ^^^^
-    │
-    = help: the maximum codepoint allowed in decimal escapes is `255`
+   ┌─ lua51_string_escapes.lua:30:15
+   │
+30 │ local bad6 = "\999"
+   │               ^^^^
+   │
+   = help: the maximum codepoint allowed in decimal escapes is `255`
 
 error[bad_string_escape]: string escape sequence doesn't exist
-
-    ┌── lua51_string_escapes.lua:32:15 ───
-    │
- 32 │ local bad7 = "\u{ffffffffff}"
-    │               ^^
-    │
+   ┌─ lua51_string_escapes.lua:32:15
+   │
+32 │ local bad7 = "\u{ffffffffff}"
+   │               ^^
 

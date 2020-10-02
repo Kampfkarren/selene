@@ -1,25 +1,20 @@
 error[incorrect_standard_library_use]: use of standard_library function `foo.bar` is incorrect
-
-   ┌── method_call.lua:2:9 ───
-   │
- 2 │ foo:bar("a")
-   │         ^^^ expected `number`, received `string`
-   │
+  ┌─ method_call.lua:2:9
+  │
+2 │ foo:bar("a")
+  │         ^^^ expected `number`, received `string`
 
 error[incorrect_standard_library_use]: standard library function `foo.bar` is a method
-
-   ┌── method_call.lua:3:1 ───
-   │
- 3 │ foo.bar()
-   │ ^^^^^^^^^
-   │
-   = try: foo:bar(...)
+  ┌─ method_call.lua:3:1
+  │
+3 │ foo.bar()
+  │ ^^^^^^^^^
+  │
+  = try: foo:bar(...)
 
 error[incorrect_standard_library_use]: standard library global `foo` does not contain the field `baz`
-
-   ┌── method_call.lua:4:1 ───
-   │
- 4 │ foo:baz()
-   │ ^^^^^^^
-   │
+  ┌─ method_call.lua:4:1
+  │
+4 │ foo:baz()
+  │ ^^^^^^^
 

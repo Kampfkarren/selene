@@ -14,8 +14,8 @@ edition = "2018"
 atty = "0.2"
 cfg-if = "0.1"
 chrono = "0.4"
-codespan = { version = "0.4", features = ["serialization"] }
-codespan-reporting = { version = "0.4", features = ["serialization"] }
+codespan = { version = "0.9", features = ["serialization"] }
+codespan-reporting = { version = "0.9", features = ["serialization"] }
 full_moon = "0.6.0"
 lazy_static = "1.4"
 glob = "0.3"

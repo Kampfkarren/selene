@@ -10,8 +10,8 @@ repository = "https://github.com/Kampfkarren/selene"
 edition = "2018"
 
 [dependencies]
-codespan = "0.4"
-codespan-reporting = "0.4"
+codespan = "0.9"
+codespan-reporting = "0.9"
 full_moon = "0.6.0"
 id-arena = "2.2"
 if_chain = "1.0"

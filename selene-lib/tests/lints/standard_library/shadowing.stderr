@@ -1,8 +1,6 @@
 error[incorrect_standard_library_use]: standard library function `table.insert` requires 2 parameters, 0 passed
-
-    ┌── shadowing.lua:11:1 ───
-    │
- 11 │ table.insert()
-    │ ^^^^^^^^^^^^^^
-    │
+   ┌─ shadowing.lua:11:1
+   │
+11 │ table.insert()
+   │ ^^^^^^^^^^^^^^
 

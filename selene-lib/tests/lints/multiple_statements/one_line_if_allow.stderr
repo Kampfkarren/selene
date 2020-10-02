@@ -1,8 +1,6 @@
 error[multiple_statements]: only one statement per line is allowed
-
-   ┌── one_line_if_allow.lua:2:20 ───
-   │
- 2 │ if true then foo() bar() end
-   │                    ^^^^^
-   │
+  ┌─ one_line_if_allow.lua:2:20
+  │
+2 │ if true then foo() bar() end
+  │                    ^^^^^
 
