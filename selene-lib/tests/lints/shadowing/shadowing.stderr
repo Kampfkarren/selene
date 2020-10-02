@@ -2,7 +2,7 @@ error[shadowing]: shadowing variable `x`
   ┌─ shadowing.lua:1:7
   │
 1 │ local x = 1
-  │       ^ previously defined here
+  │       - previously defined here
   ·
 5 │     local x = 3
   │           ^
@@ -11,7 +11,7 @@ error[shadowing]: shadowing variable `x`
   ┌─ shadowing.lua:5:11
   │
 5 │     local x = 3
-  │           ^ previously defined here
+  │           - previously defined here
 6 │     local x = 4
   │           ^
 
@@ -19,7 +19,7 @@ error[shadowing]: shadowing variable `foo`
    ┌─ shadowing.lua:14:16
    │
 14 │ local function foo() end
-   │                ^^^ previously defined here
+   │                --- previously defined here
 15 │ if true then
 16 │     local function foo() end
    │                    ^^^

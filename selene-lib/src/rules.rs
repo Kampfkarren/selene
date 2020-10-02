@@ -116,12 +116,10 @@ impl Diagnostic {
     ) -> CodespanDiagnostic<codespan::FileId> {
         let mut labels = Vec::with_capacity(1 + self.secondary_labels.len());
         labels.push(self.primary_label.codespan_label(file_id));
-        labels.extend(
-            &mut self
-                .secondary_labels
-                .iter()
-                .map(|label| label.codespan_label(file_id)),
-        );
+        labels.extend(&mut self.secondary_labels.iter().map(|label| {
+            CodespanLabel::secondary(file_id, codespan::Span::new(label.range.0, label.range.1))
+                .with_message(label.message.as_ref().unwrap_or(&"".to_owned()).to_owned())
+        }));
 
         CodespanDiagnostic {
             code: Some(self.code.to_owned()),
