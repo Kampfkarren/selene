@@ -15,7 +15,7 @@ pub struct UnusedVariableConfig {
 impl Default for UnusedVariableConfig {
     fn default() -> Self {
         Self {
-            allow_unused_self: false,
+            allow_unused_self: true,
             ignore_pattern: "^_".to_owned(),
         }
     }
@@ -179,7 +179,11 @@ mod tests {
     #[test]
     fn test_self() {
         test_lint(
-            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
+            UnusedVariableLint::new(UnusedVariableConfig {
+                allow_unused_self: false,
+                ..UnusedVariableConfig::default()
+            })
+            .unwrap(),
             "unused_variable",
             "self",
         );
@@ -188,11 +192,7 @@ mod tests {
     #[test]
     fn test_self_ignored() {
         test_lint(
-            UnusedVariableLint::new(UnusedVariableConfig {
-                allow_unused_self: true,
-                ..UnusedVariableConfig::default()
-            })
-            .unwrap(),
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "self_ignored",
         );
