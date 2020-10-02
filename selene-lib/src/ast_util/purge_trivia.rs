@@ -9,6 +9,6 @@ impl<'ast> VisitorMut<'ast> for TriviaPurger {
 }
 
 /// Returns a new Ast without any trivia
-pub fn purge_trivia<'ast>(ast: ast::Ast<'ast>) -> ast::Ast<'ast> {
+pub fn purge_trivia(ast: ast::Ast) -> ast::Ast {
     TriviaPurger.visit_ast(ast)
 }

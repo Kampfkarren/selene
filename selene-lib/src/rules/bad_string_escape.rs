@@ -198,7 +198,7 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                                 continue;
                             }
                             let second_capture_len = captures[2].len();
-                            if captures[3].len() == 0 {
+                            if captures[3].is_empty() {
                                 self.sequences.push(
                                     StringEscapeSequence{
                                         range: (start, start + second_capture_len + 3),
@@ -207,8 +207,8 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                                 );
                                 continue;
                             }
-                            let codepoint = u32::from_str_radix(&captures[2], 16).unwrap_or(0x110000);
-                            if codepoint > 0x10ffff {
+                            let codepoint = u32::from_str_radix(&captures[2], 16).unwrap_or(0x0011_0000);
+                            if codepoint > 0x0010_ffff {
                                 self.sequences.push(
                                     StringEscapeSequence {
                                         range: (start, start + second_capture_len + 4),
