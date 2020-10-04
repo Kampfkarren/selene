@@ -501,32 +501,6 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
         let mut vararg = false;
         let mut max_args = arguments.len();
 
-        if let Some(last) = arguments.last() {
-            if last.argument_type == ArgumentType::Vararg {
-                if let Required::Required(message) = &last.required {
-                    // Functions like math.ceil where not using the vararg is wrong
-                    if arguments.len() > argument_types.len() {
-                        self.diagnostics.push(Diagnostic::new_complete(
-                            "incorrect_standard_library_use",
-                            format!(
-                                // TODO: This message isn't great
-                                "standard library function `{}` requires use of the vararg",
-                                name_path.join("."),
-                            ),
-                            Label::from_node(call, None),
-                            message.iter().cloned().collect(),
-                            Vec::new(),
-                        ));
-                    }
-
-                    expected_args -= 1;
-                    max_args -= 1;
-                }
-
-                vararg = true;
-            }
-        }
-
         let mut maybe_more_arguments = false;
 
         if let ast::FunctionArgs::Parentheses { arguments, .. } = function_args {
@@ -548,6 +522,32 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                 }
             }
         };
+
+        if let Some(last) = arguments.last() {
+            if last.argument_type == ArgumentType::Vararg {
+                if let Required::Required(message) = &last.required {
+                    // Functions like math.ceil where not using the vararg is wrong
+                    if arguments.len() > argument_types.len() && !maybe_more_arguments {
+                        self.diagnostics.push(Diagnostic::new_complete(
+                            "incorrect_standard_library_use",
+                            format!(
+                                // TODO: This message isn't great
+                                "standard library function `{}` requires use of the vararg",
+                                name_path.join("."),
+                            ),
+                            Label::from_node(call, None),
+                            message.iter().cloned().collect(),
+                            Vec::new(),
+                        ));
+                    }
+
+                    expected_args -= 1;
+                    max_args -= 1;
+                }
+
+                vararg = true;
+            }
+        }
 
         let arguments_length = argument_types.len();
 
@@ -786,6 +786,15 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "unknown_property",
+        );
+    }
+
+    #[test]
+    fn test_unpack_function_arguments() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "unpack_function_arguments",
         );
     }
 

@@ -1,0 +1,8 @@
+error[incorrect_standard_library_use]: standard library function `debug.setlocal` requires 3 parameters, 2 passed
+
+   ┌── unpack_function_arguments.lua:9:1 ───
+   │
+ 9 │ debug.setlocal(unpack(stuff), 2)
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+
