@@ -7,3 +7,6 @@ math.max(unpack(stuff))
 -- This should lint, since functions only pass multiple parameters if they are the last argument.
 -- debug.setlocal is used because it takes three required parameters.
 debug.setlocal(unpack(stuff), 2)
+
+-- This is still wrong since it has too many parameters.
+string.upper("text", unpack(stuff))
