@@ -10,6 +10,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - setmetatable no longer requires a second argument.
 - `allow_unused_self` is now toggled on for `unused_variable` by default.
 
+### Fixed
+- Using a function call as the last argument in a function will silence lint for not passing enough parameters. This means, for example, `math.max(unpack(numbers))` will no longer error.
+
 ## [0.8.0] - 2020-08-24
 ### Added
 - Added support for `os.clock`.

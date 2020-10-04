@@ -1,0 +1,16 @@
+error[incorrect_standard_library_use]: standard library function `debug.setlocal` requires 3 parameters, 2 passed
+
+   ┌── unpack_function_arguments.lua:9:1 ───
+   │
+ 9 │ debug.setlocal(unpack(stuff), 2)
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+
+error[incorrect_standard_library_use]: standard library function `string.upper` requires 1 parameters, 2 passed
+
+    ┌── unpack_function_arguments.lua:12:1 ───
+    │
+ 12 │ string.upper("text", unpack(stuff))
+    │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    │
+
