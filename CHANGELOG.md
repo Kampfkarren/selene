@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 - Using a function call as the last argument in a function will silence lint for not passing enough parameters. This means, for example, `math.max(unpack(numbers))` will no longer error.
+- Using the parent argument in Instance.new(string val, Instance parent) is no longer detected as incorrect standard library use.
 
 ## [0.8.0] - 2020-08-24
 ### Added

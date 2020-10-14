@@ -338,6 +338,9 @@ type = "..."
 [[Instance.new.args]]
 type = "string" # This is changed at generate time
 
+[[Instance.new.args]]
+type = "any"
+
 [[math.clamp.args]]
 type = "number"
 
