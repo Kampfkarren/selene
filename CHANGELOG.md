@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Arguments that aren't required can now be filled with nil.
 - Added support for `math.round` to the Roblox standard library.
+- Added support for `CFrame.lookAt` to the Roblox standard library.
 
 ### Changed
 - setmetatable no longer requires a second argument.

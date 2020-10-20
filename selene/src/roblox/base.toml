@@ -191,6 +191,16 @@ required = false
 type = "number"
 required = false
 
+[[CFrame.lookAt.args]]
+type = { display = "Vector3" }
+
+[[CFrame.lookAt.args]]
+type = { display = "Vector3" }
+
+[[CFrame.lookAt.args]]
+type = { display = "Vector3" }
+required = false
+
 [[CFrame.fromAxisAngle.args]]
 type = { display = "Vector3" }
 
