@@ -113,6 +113,21 @@ fn expression_is_nil(expression: &ast::Expression) -> bool {
     }
 }
 
+fn expression_is_ellipsis(expression: &ast::Expression) -> bool {
+    match expression {
+        ast::Expression::Value{value, ..} => {
+            if let ast::Value::Symbol(symbol) = &**value {
+                *symbol.token_type() == TokenType::Symbol { symbol: Symbol::Ellipse} 
+            } else {
+                false
+            }
+            
+        },
+
+        _ => false
+    }
+}
+
 fn range<'a, N: Node<'a>>(node: N) -> (u32, u32) {
     let (start, end) = node.range().unwrap();
     (start.bytes() as u32, end.bytes() as u32)
@@ -142,7 +157,7 @@ impl UnbalancedAssignmentsVisitor {
                 ),
                 ..UnbalancedAssignment::default()
             });
-        } else if rhs.len() < lhs && !expression_is_call(last_rhs) && !expression_is_nil(last_rhs) {
+        } else if rhs.len() < lhs && !expression_is_ellipsis(last_rhs) && !expression_is_call(last_rhs) && !expression_is_nil(last_rhs) {
             self.assignments.push(UnbalancedAssignment {
                 first_call: rhs.iter().find(|e| expression_is_call(e)).map(range),
                 range: range(rhs),
