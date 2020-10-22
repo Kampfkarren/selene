@@ -114,18 +114,13 @@ fn expression_is_nil(expression: &ast::Expression) -> bool {
 }
 
 fn expression_is_ellipsis(expression: &ast::Expression) -> bool {
-    match expression {
-        ast::Expression::Value{value, ..} => {
-            if let ast::Value::Symbol(symbol) = &**value {
-                *symbol.token_type() == TokenType::Symbol { symbol: Symbol::Ellipse} 
-            } else {
-                false
-            }
-            
-        },
-
-        _ => false
+    if let ast::Expression::Value{value, ..} = expression {
+        if let ast::Value::Symbol(symbol) = &**value {
+            return *symbol.token_type() == TokenType::Symbol { symbol: Symbol::Ellipse };
+        }
     }
+
+    false
 }
 
 fn range<'a, N: Node<'a>>(node: N) -> (u32, u32) {
