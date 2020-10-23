@@ -12,3 +12,5 @@ a, b, c = nil
 
 local a, b, c = 1, 2, 3, 4
 x = 1, 2
+
+local a, b, c = ...

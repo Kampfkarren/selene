@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 - Using a function call as the last argument in a function will silence lint for not passing enough parameters. This means, for example, `math.max(unpack(numbers))` will no longer error.
+- Using an ellipsis on the right side of unbalanced assignments no longer lints.
 
 ## [0.8.0] - 2020-08-24
 ### Added
