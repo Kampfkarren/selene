@@ -4,6 +4,7 @@ import * as path from "path"
 import * as selene from "./selene"
 import * as requestNative from "request"
 import * as request from "request-promise-native"
+import * as unzip from "unzipper"
 import * as vscode from "vscode"
 
 const fsWriteFileAtomic = require("fs-write-stream-atomic")
@@ -63,9 +64,21 @@ function getSeleneFilename(): string {
         case "win32":
             return "selene.exe"
         case "linux":
-            return "selene-linux"
         case "darwin":
-            return "selene-osx"
+            return "selene"
+        default:
+            throw new Error("Platform not supported")
+    }
+}
+
+function getSeleneFilenamePattern(): RegExp {
+    switch (os.platform()) {
+        case "win32":
+            return /selene-[^-]+-windows.zip/
+        case "linux":
+            return /selene-[^-]+-linux.zip/
+        case "darwin":
+            return /selene-[^-]+-macos.zip/
         default:
             throw new Error("Platform not supported")
     }
@@ -81,10 +94,11 @@ export async function downloadSelene(directory: string) {
     vscode.window.showInformationMessage("Downloading Selene...")
 
     const filename = getSeleneFilename()
+    const filenamePattern = getSeleneFilenamePattern()
     const release = await getLatestSeleneRelease()
 
     for (const asset of release.assets) {
-        if (asset.name === filename) {
+        if (filenamePattern.test(asset.name)) {
             const file = fsWriteFileAtomic(path.join(directory, filename), {
                 mode: 0o755,
             })
@@ -95,9 +109,17 @@ export async function downloadSelene(directory: string) {
                         "User-Agent": "selene-vscode",
                     }
                 })
-                    .pipe(file)
-                    .on("finish", resolve)
-                    .on("error", reject)
+                    .pipe(unzip.Parse())
+                    .on("entry", (entry: unzip.Entry) => {
+                        if (entry.path !== filename) {
+                            entry.autodrain()
+                            return
+                        }
+
+                        entry.pipe(file)
+                            .on("finish", resolve)
+                            .on("error", reject)
+                    })
             })
         }
     }
