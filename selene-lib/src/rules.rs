@@ -125,7 +125,7 @@ impl Diagnostic {
             code: Some(self.code.to_owned()),
             labels,
             message: self.message.to_owned(),
-            notes: self.notes.to_owned(),
+            notes: self.notes,
             severity,
         }
     }

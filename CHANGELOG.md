@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1] - 2020-11-04
+### Fixed
+- Fixed `--display-style=json` giving an output incompatible with previous tooling.
+
 ## [0.9.0] - 2020-11-04
 ### Added
 - Arguments that aren't required can now be filled with nil.

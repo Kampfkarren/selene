@@ -1,6 +1,6 @@
 [package]
 name = "selene"
-version = "0.9.0"
+version = "0.9.1"
 license = "MPL-2.0"
 authors = ["Kampfkarren <kampfkarren@gmail.com>"]
 description = "A blazing-fast modern Lua linter written in Rust"

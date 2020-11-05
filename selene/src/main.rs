@@ -21,6 +21,7 @@ use structopt::{clap, StructOpt};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
 
+mod json_output;
 mod opts;
 #[cfg(feature = "roblox")]
 mod roblox;
@@ -112,7 +113,12 @@ fn emit_codespan(
     };
 
     if opts.display_style == opts::DisplayStyle::Json {
-        writeln!(writer, "{}", serde_json::to_string(&diagnostic).unwrap()).unwrap();
+        writeln!(
+            writer,
+            "{}",
+            json_output::diagnostic_to_json(diagnostic).unwrap()
+        )
+        .unwrap();
     } else {
         codespan_reporting::term::emit(writer, &config, files, diagnostic)
             .expect("couldn't emit error to codespan");
