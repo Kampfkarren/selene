@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - setmetatable no longer requires a second argument.
 - `allow_unused_self` is now toggled on for `unused_variable` by default.
+- Updated local Roblox reflection for more up to date instances.
 
 ### Fixed
 - Using a function call as the last argument in a function will silence lint for not passing enough parameters. This means, for example, `math.max(unpack(numbers))` will no longer error.
