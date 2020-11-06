@@ -13,8 +13,7 @@ use full_moon::ast::owned::Owned;
 use serde::de::DeserializeOwned;
 
 lazy_static::lazy_static! {
-    static ref TEST_PROJECTS_ROOT: PathBuf =
-        { Path::new(env!("CARGO_MANIFEST_DIR")).join("tests").join("lints") };
+    static ref TEST_PROJECTS_ROOT: PathBuf = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests").join("lints");
 }
 
 pub struct TestUtilConfig {

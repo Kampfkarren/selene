@@ -42,17 +42,15 @@ impl HasSideEffects for ast::Value<'_> {
             ast::Value::FunctionCall(_) => true,
             ast::Value::ParseExpression(expression) => expression.has_side_effects(),
             ast::Value::TableConstructor(table_constructor) => {
-                table_constructor
-                    .iter_fields()
-                    .any(|(field, _)| match field {
-                        ast::Field::ExpressionKey { key, value, .. } => {
-                            key.has_side_effects() || value.has_side_effects()
-                        }
+                table_constructor.iter_fields().any(|field| match field {
+                    ast::Field::ExpressionKey { key, value, .. } => {
+                        key.has_side_effects() || value.has_side_effects()
+                    }
 
-                        ast::Field::NameKey { value, .. } => value.has_side_effects(),
+                    ast::Field::NameKey { value, .. } => value.has_side_effects(),
 
-                        ast::Field::NoKey(expression) => expression.has_side_effects(),
-                    })
+                    ast::Field::NoKey(expression) => expression.has_side_effects(),
+                })
             }
             ast::Value::Var(var) => var.has_side_effects(),
         }
