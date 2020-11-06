@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.2] - 2020-11-06
+### Changed
+- Updated full-moon, read [the full-moon changelog](https://github.com/Kampfkarren/full-moon/blob/master/CHANGELOG.md#070---2020-11-06) to learn more.
+
 ## [0.9.1] - 2020-11-04
 ### Fixed
 - Fixed `--display-style=json` giving an output incompatible with previous tooling.
