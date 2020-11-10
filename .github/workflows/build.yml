@@ -22,11 +22,16 @@ jobs:
         cd selene
         cargo build --locked --release --verbose --no-default-features
         Move-Item ..\target\release\selene.exe .\release\selene-light.exe
-    - name: Upload
+    - name: Upload selene
       uses: actions/upload-artifact@v1
       with:
         name: selene-windows
-        path: ./selene/release
+        path: ./selene/release/selene.exe
+    - name: Upload selene-light
+      uses: actions/upload-artifact@v1
+      with:
+        name: selene-light-windows
+        path: ./selene/release/selene-light.exe
   build_mac:
     runs-on: macos-latest
     steps:
@@ -46,11 +51,16 @@ jobs:
         cd selene
         cargo build --locked --release --verbose --no-default-features
         mv ../target/release/selene ./release/selene-light
-    - name: Upload
+    - name: Upload selene
       uses: actions/upload-artifact@v1
       with:
         name: selene-macos
-        path: ./selene/release
+        path: ./selene/release/selene
+    - name: Upload selene-light
+      uses: actions/upload-artifact@v1
+      with:
+        name: selene-light-macos
+        path: ./selene/release/selene-light
   build_linux:
     runs-on: ubuntu-latest
     steps:
@@ -66,8 +76,13 @@ jobs:
         cd selene
         cargo build --locked --release --verbose --no-default-features
         mv ../target/release/selene ./release/selene-light
-    - name: Upload
+    - name: Upload selene
       uses: actions/upload-artifact@v1
       with:
         name: selene-linux
-        path: ./selene/release
+        path: ./selene/release/selene
+    - name: Upload selene-light
+      uses: actions/upload-artifact@v1
+      with:
+        name: selene-light-linux
+        path: ./selene/release/selene-light
