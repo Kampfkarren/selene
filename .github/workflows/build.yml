@@ -15,23 +15,20 @@ jobs:
       run: |
         cd selene
         cargo build --locked --release --all-features
-        New-Item release -ItemType "directory"
-        Move-Item ..\target\release\selene.exe .\release\selene.exe
-    - name: Build (Lightweight)
-      run: |
-        cd selene
-        cargo build --locked --release --verbose --no-default-features
-        Move-Item ..\target\release\selene.exe .\release\selene-light.exe
     - name: Upload selene
       uses: actions/upload-artifact@v1
       with:
         name: selene-windows
-        path: ./selene/release/selene.exe
+        path: ../target/release/selene.exe
+    - name: Build (Lightweight)
+      run: |
+        cd selene
+        cargo build --locked --release --verbose --no-default-features
     - name: Upload selene-light
       uses: actions/upload-artifact@v1
       with:
         name: selene-light-windows
-        path: ./selene/release/selene-light.exe
+        path: ../target/release/selene.exe
   build_mac:
     runs-on: macos-latest
     steps:
@@ -43,24 +40,21 @@ jobs:
         source $HOME/.cargo/env
         cd selene
         cargo build --locked --release --all-features
-        mkdir release/
-        mv ../target/release/selene ./release/selene
+    - name: Upload selene
+      uses: actions/upload-artifact@v1
+      with:
+        name: selene-macos
+        path: ../target/release/selene
     - name: Build (Lightweight)
       run: |
         source $HOME/.cargo/env
         cd selene
         cargo build --locked --release --verbose --no-default-features
-        mv ../target/release/selene ./release/selene-light
-    - name: Upload selene
-      uses: actions/upload-artifact@v1
-      with:
-        name: selene-macos
-        path: ./selene/release/selene
     - name: Upload selene-light
       uses: actions/upload-artifact@v1
       with:
         name: selene-light-macos
-        path: ./selene/release/selene-light
+        path: ../target/release/selene
   build_linux:
     runs-on: ubuntu-latest
     steps:
@@ -69,20 +63,17 @@ jobs:
       run: |
         cd selene
         cargo build --locked --release --all-features
-        mkdir release/
-        mv ../target/release/selene ./release/selene
-    - name: Build (Lightweight)
-      run: |
-        cd selene
-        cargo build --locked --release --verbose --no-default-features
-        mv ../target/release/selene ./release/selene-light
     - name: Upload selene
       uses: actions/upload-artifact@v1
       with:
         name: selene-linux
-        path: ./selene/release/selene
+        path: ../target/release/selene
+    - name: Build (Lightweight)
+      run: |
+        cd selene
+        cargo build --locked --release --verbose --no-default-features
     - name: Upload selene-light
       uses: actions/upload-artifact@v1
       with:
         name: selene-light-linux
-        path: ./selene/release/selene-light
+        path: ../target/release/selene
