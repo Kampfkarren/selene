@@ -19,7 +19,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: selene-windows
-        path: ../target/release/selene.exe
+        path: ./target/release/selene.exe
     - name: Build (Lightweight)
       run: |
         cd selene
@@ -28,7 +28,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: selene-light-windows
-        path: ../target/release/selene.exe
+        path: ./target/release/selene.exe
   build_mac:
     runs-on: macos-latest
     steps:
@@ -44,7 +44,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: selene-macos
-        path: ../target/release/selene
+        path: ./target/release/selene
     - name: Build (Lightweight)
       run: |
         source $HOME/.cargo/env
@@ -54,7 +54,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: selene-light-macos
-        path: ../target/release/selene
+        path: ./target/release/selene
   build_linux:
     runs-on: ubuntu-latest
     steps:
@@ -67,7 +67,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: selene-linux
-        path: ../target/release/selene
+        path: ./target/release/selene
     - name: Build (Lightweight)
       run: |
         cd selene
@@ -76,4 +76,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: selene-light-linux
-        path: ../target/release/selene
+        path: ./target/release/selene
