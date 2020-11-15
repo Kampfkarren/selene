@@ -97,11 +97,10 @@ impl<'ast> NodeVisitor<'ast> for FilterVisitor {
                 TokenType::MultiLineComment { comment, .. } => comment,
                 _ => continue,
             }
-            .split_whitespace()
-            .collect::<String>()
             .lines()
+            .map(|line| line.split_whitespace().collect::<String>())
             {
-                let configurations = match parse_comment(comment) {
+                let configurations = match parse_comment(&comment) {
                     Some(configurations) => configurations,
                     None => continue,
                 };

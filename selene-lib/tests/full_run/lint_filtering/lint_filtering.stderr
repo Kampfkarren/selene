@@ -10,12 +10,6 @@ error[undefined_variable]: `y` is not defined
 18 │     y
    │     ^
 
-warning[unused_variable]: f is assigned a value, but never used
-   ┌─ lint_filtering.lua:35:7
-   │
-35 │ local f = call()
-   │       ^
-
 warning[unused_variable]: g is assigned a value, but never used
    ┌─ lint_filtering.lua:38:7
    │
