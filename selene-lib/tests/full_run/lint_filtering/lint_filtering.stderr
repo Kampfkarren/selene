@@ -1,0 +1,50 @@
+warning[unused_variable]: c is assigned a value, but never used
+   ┌─ lint_filtering.lua:12:7
+   │
+12 │ local c = 1
+   │       ^
+
+error[undefined_variable]: `y` is not defined
+   ┌─ lint_filtering.lua:18:5
+   │
+18 │     y
+   │     ^
+
+warning[unused_variable]: f is assigned a value, but never used
+   ┌─ lint_filtering.lua:35:7
+   │
+35 │ local f = call()
+   │       ^
+
+warning[unused_variable]: g is assigned a value, but never used
+   ┌─ lint_filtering.lua:38:7
+   │
+38 │ local g = 1
+   │       ^
+
+error[unused_variable]: unusedButBad is assigned a value, but never used
+   ┌─ lint_filtering.lua:44:11
+   │
+44 │     local unusedButBad = 2
+   │           ^^^^^^^^^^^^
+
+error[type_check_inside_call]: you are checking the type inside the call, not outside
+   ┌─ lint_filtering.lua:48:11
+   │
+48 │ print(type(1 == "boolean"))
+   │           ^^^^^^^^^^^^^^^^
+   │
+   = note: this will always return `boolean`
+
+error[unused_variable]: doC is assigned a value, but never used
+   ┌─ lint_filtering.lua:62:19
+   │
+62 │             local doC = 3
+   │                   ^^^
+
+error[unused_variable]: doD is assigned a value, but never used
+   ┌─ lint_filtering.lua:64:23
+   │
+64 │                 local doD = 4
+   │                       ^^^
+

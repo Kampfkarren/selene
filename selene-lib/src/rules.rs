@@ -73,6 +73,7 @@ pub enum Severity {
     Warning,
 }
 
+#[derive(Debug)]
 pub struct Diagnostic {
     pub code: &'static str,
     pub message: String,
@@ -135,6 +136,7 @@ impl Diagnostic {
     }
 }
 
+#[derive(Debug)]
 pub struct Label {
     pub message: Option<String>,
     pub range: (u32, u32),

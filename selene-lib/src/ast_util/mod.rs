@@ -5,6 +5,7 @@ use full_moon::node::Node;
 mod purge_trivia;
 pub mod scopes;
 mod side_effects;
+pub mod visit_nodes;
 
 pub use purge_trivia::purge_trivia;
 pub use side_effects::HasSideEffects;

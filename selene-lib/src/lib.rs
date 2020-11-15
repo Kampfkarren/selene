@@ -8,8 +8,12 @@ use serde::{
 };
 
 mod ast_util;
+mod lint_filtering;
 pub mod rules;
 pub mod standard_library;
+
+#[cfg(test)]
+mod test_util;
 
 use rules::{Context, Diagnostic, Rule, Severity};
 use standard_library::StandardLibrary;
@@ -64,12 +68,22 @@ impl<V> Default for CheckerConfig<V> {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum RuleVariation {
     Allow,
     Deny,
     Warn,
+}
+
+impl RuleVariation {
+    pub fn to_severity(self) -> Option<Severity> {
+        match self {
+            RuleVariation::Deny => Some(Severity::Error),
+            RuleVariation::Warn => Some(Severity::Warning),
+            RuleVariation::Allow => None,
+        }
+    }
 }
 
 macro_rules! use_rules {
@@ -177,10 +191,8 @@ macro_rules! use_rules {
                                 CheckerDiagnostic {
                                     diagnostic,
                                     severity: match self.config.rules.get(stringify!($name)) {
+                                        Some(variation) => variation.to_severity().expect("RuleVariation::Allow somehow passed through to diagnostics"),
                                         None => rule.severity(),
-                                        Some(RuleVariation::Deny) => Severity::Error,
-                                        Some(RuleVariation::Warn) => Severity::Warning,
-                                        Some(RuleVariation::Allow) => unreachable!(),
                                     }
                                 }
                             }));
@@ -201,12 +213,15 @@ macro_rules! use_rules {
                     )+
                 )+
 
+                diagnostics = lint_filtering::filter_diagnostics(ast, diagnostics);
+
                 diagnostics
             }
         }
     };
 }
 
+#[derive(Debug)]
 pub struct CheckerDiagnostic {
     pub diagnostic: Diagnostic,
     pub severity: Severity,

@@ -1,0 +1,261 @@
+use crate::{
+    ast_util::visit_nodes::{NodeVisitor, VisitorType},
+    rules::Diagnostic,
+    CheckerDiagnostic, RuleVariation,
+};
+use full_moon::{ast::Ast, node::Node, tokenizer::TokenType};
+use std::collections::HashSet;
+
+lazy_static::lazy_static! {
+    static ref NODES_TO_IGNORE: HashSet<VisitorType> = {
+        let mut set = HashSet::new();
+        set.insert(VisitorType::VisitBlock);
+        set
+    };
+}
+
+#[derive(Debug)]
+struct FilterConfiguration {
+    lint: String,
+    variation: RuleVariation,
+}
+
+struct Filter {
+    configuration: FilterConfiguration,
+    range: (usize, usize),
+}
+
+#[derive(Default)]
+struct FilterVisitor {
+    comments_checked: HashSet<(usize, usize)>,
+    ranges: Vec<Result<Filter, Diagnostic>>,
+}
+
+fn parse_comment(comment: &str) -> Option<Vec<FilterConfiguration>> {
+    let config = comment.strip_prefix("selene:")?;
+
+    let mut variation = String::new();
+    let mut lint = String::new();
+
+    let mut check_lint = false;
+    let mut finished = false;
+
+    for character in config.chars() {
+        if character == '(' {
+            check_lint = true;
+        } else if character == ')' {
+            finished = true;
+            break;
+        } else if check_lint {
+            lint.push(character);
+        } else {
+            variation.push(character);
+        }
+    }
+
+    if !finished || variation.is_empty() || lint.is_empty() {
+        return None;
+    }
+
+    let variation = match variation.as_str() {
+        "allow" => RuleVariation::Allow,
+        "deny" => RuleVariation::Deny,
+        "warn" => RuleVariation::Warn,
+        _ => return None,
+    };
+
+    Some(
+        lint.split(",")
+            .map(|lint| FilterConfiguration {
+                lint: lint.to_owned(),
+                variation,
+            })
+            .collect(),
+    )
+}
+
+impl<'ast> NodeVisitor<'ast> for FilterVisitor {
+    fn visit_node<'a>(&mut self, node: &'a dyn Node<'ast>, visitor_type: VisitorType) {
+        if NODES_TO_IGNORE.contains(&visitor_type) {
+            return;
+        }
+
+        let leading_trivia = node.surrounding_trivia().0;
+        for trivia in leading_trivia {
+            let (trivia_start_position, trivia_end_position) =
+                trivia.range().expect("trivia has no range");
+            let hash = (trivia_start_position.bytes(), trivia_end_position.bytes());
+
+            if self.comments_checked.contains(&hash) {
+                continue;
+            }
+
+            self.comments_checked.insert(hash);
+
+            for comment in match &*trivia.token_type() {
+                TokenType::SingleLineComment { comment } => comment,
+                TokenType::MultiLineComment { comment, .. } => comment,
+                _ => continue,
+            }
+            .split_whitespace()
+            .collect::<String>()
+            .lines()
+            {
+                let configurations = match parse_comment(comment) {
+                    Some(configurations) => configurations,
+                    None => continue,
+                };
+
+                let range = node.range().unwrap_or_else(|| {
+                    panic!(
+                        "node has no range (lint filter at L{}:{} - L{}:{}",
+                        trivia_start_position.line(),
+                        trivia_start_position.character(),
+                        trivia_end_position.line(),
+                        trivia_end_position.character()
+                    )
+                });
+
+                // TODO: Check if lint is real here
+                self.ranges
+                    .extend(configurations.into_iter().map(|configuration| {
+                        Ok(Filter {
+                            configuration,
+                            range: (range.0.bytes(), range.1.bytes()),
+                        })
+                    }));
+            }
+        }
+    }
+}
+
+fn get_filter_ranges<'ast>(ast: &Ast<'ast>) -> Vec<Result<Filter, Diagnostic>> {
+    let mut filter_visitor = FilterVisitor::default();
+    filter_visitor.visit_nodes(ast);
+    filter_visitor.ranges
+}
+
+#[derive(Debug)]
+enum FilterInstruction {
+    Push {
+        configuration: FilterConfiguration,
+        bytes: usize,
+    },
+
+    Pop {
+        bytes: usize,
+    },
+}
+
+impl FilterInstruction {
+    fn bytes(&self) -> usize {
+        match self {
+            FilterInstruction::Push { bytes, .. } => *bytes,
+            FilterInstruction::Pop { bytes } => *bytes,
+        }
+    }
+}
+
+pub fn filter_diagnostics<'ast>(
+    ast: &Ast<'ast>,
+    mut diagnostics: Vec<CheckerDiagnostic>,
+) -> Vec<CheckerDiagnostic> {
+    let filter_ranges = get_filter_ranges(ast);
+    let (mut filters, mut failures) = (Vec::new(), Vec::new());
+    let mut new_diagnostics;
+
+    for thing in filter_ranges {
+        match thing {
+            Ok(filter) => filters.push(filter),
+            Err(failure) => failures.push(failure),
+        }
+    }
+
+    if filters.is_empty() {
+        new_diagnostics = diagnostics;
+    } else {
+        // Filter ranges are translated into instructions for a stack
+        let mut instructions: Vec<FilterInstruction> = Vec::new();
+
+        for filter in filters {
+            instructions.insert(
+                instructions
+                    .iter()
+                    .position(|instruction| instruction.bytes() < filter.range.1)
+                    .unwrap_or(instructions.len()),
+                FilterInstruction::Pop {
+                    bytes: filter.range.1,
+                },
+            );
+
+            instructions.insert(
+                instructions
+                    .iter()
+                    .position(|instruction| instruction.bytes() < filter.range.0)
+                    .unwrap_or(instructions.len()),
+                FilterInstruction::Push {
+                    configuration: filter.configuration,
+                    bytes: filter.range.0,
+                },
+            );
+        }
+
+        new_diagnostics = Vec::with_capacity(diagnostics.len());
+        let mut stack = Vec::with_capacity(instructions.len());
+
+        diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.primary_label.range.0);
+
+        'next_diagnostic: for diagnostic in diagnostics.into_iter() {
+            let start_byte = diagnostic.diagnostic.primary_label.range.0 as usize;
+
+            // Run all instructions from before this byte
+            while let Some(instruction) = instructions.pop() {
+                if instruction.bytes() <= start_byte {
+                    match instruction {
+                        FilterInstruction::Push { configuration, .. } => {
+                            stack.push(configuration);
+                        }
+
+                        FilterInstruction::Pop { .. } => {
+                            stack
+                                .pop()
+                                .expect("FilterInstruction::Pop instructed, but stack is empty");
+                        }
+                    }
+                } else {
+                    instructions.push(instruction);
+                    break;
+                }
+            }
+
+            // Find the most recent configuration for this lint, and respect it
+            for configuration in stack.iter().rev() {
+                if configuration.lint == diagnostic.diagnostic.code {
+                    if let Some(severity) = configuration.variation.to_severity() {
+                        new_diagnostics.push(CheckerDiagnostic {
+                            severity,
+                            diagnostic: diagnostic.diagnostic,
+                        });
+                    }
+
+                    continue 'next_diagnostic;
+                }
+            }
+
+            // If no configuration touched this lint, pass it through identically
+            new_diagnostics.push(diagnostic);
+        }
+    }
+
+    new_diagnostics
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::test_util::test_full_run;
+
+    #[test]
+    fn test_lint_filtering() {
+        test_full_run("lint_filtering", "lint_filtering");
+    }
+}
