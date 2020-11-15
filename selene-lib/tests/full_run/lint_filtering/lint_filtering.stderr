@@ -1,3 +1,9 @@
+error[invalid_lint_filter]: No lint named `lint_thatll_never_be_created` exists
+   ┌─ lint_filtering.lua:11:1
+   │
+11 │ -- selene: allow(lint_thatll_never_be_created)
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 warning[unused_variable]: c is assigned a value, but never used
    ┌─ lint_filtering.lua:12:7
    │

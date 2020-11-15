@@ -99,6 +99,21 @@ macro_rules! use_rules {
             },
         )+
     } => {
+        lazy_static::lazy_static! {
+            static ref ALL_RULES: Vec<&'static str> = vec![
+                $(
+                    stringify!($rule_name),
+                )+
+
+                $(
+                    $(
+                        #[$meta]
+                        stringify!($meta_rule_name),
+                    )+
+                )+
+            ];
+        }
+
         pub struct Checker<V: 'static + DeserializeOwned> {
             config: CheckerConfig<V>,
             context: Context,
@@ -190,10 +205,7 @@ macro_rules! use_rules {
                             diagnostics.extend(&mut rule.pass(ast, &self.context).into_iter().map(|diagnostic| {
                                 CheckerDiagnostic {
                                     diagnostic,
-                                    severity: match self.config.rules.get(stringify!($name)) {
-                                        Some(variation) => variation.to_severity().expect("RuleVariation::Allow somehow passed through to diagnostics"),
-                                        None => rule.severity(),
-                                    }
+                                    severity: self.get_lint_severity(rule, stringify!($name)),
                                 }
                             }));
                         }
@@ -213,9 +225,19 @@ macro_rules! use_rules {
                     )+
                 )+
 
-                diagnostics = lint_filtering::filter_diagnostics(ast, diagnostics);
+                diagnostics = lint_filtering::filter_diagnostics(ast, diagnostics, match self.invalid_lint_filter.as_ref() {
+                    Some(invalid_lint_filter) => Some(self.get_lint_severity(invalid_lint_filter, "invalid_lint_filter")),
+                    None => None,
+                });
 
                 diagnostics
+            }
+
+            fn get_lint_severity<R: Rule>(&self, lint: &R, name: &'static str) -> Severity {
+                match self.config.rules.get(name) {
+                    Some(variation) => variation.to_severity().expect("RuleVariation::Allow somehow passed through to diagnostics"),
+                    None => lint.severity(),
+                }
             }
         }
     };
@@ -225,6 +247,10 @@ macro_rules! use_rules {
 pub struct CheckerDiagnostic {
     pub diagnostic: Diagnostic,
     pub severity: Severity,
+}
+
+pub fn rule_exists(name: &str) -> bool {
+    ALL_RULES.contains(&name)
 }
 
 use_rules! {
@@ -237,6 +263,7 @@ use_rules! {
     if_same_then_else: rules::if_same_then_else::IfSameThenElseLint,
     ifs_same_cond: rules::ifs_same_cond::IfsSameCondLint,
     incorrect_standard_library_use: rules::standard_library::StandardLibraryLint,
+    invalid_lint_filter: rules::invalid_lint_filter::InvalidLintFilterLint,
     multiple_statements: rules::multiple_statements::MultipleStatementsLint,
     parenthese_conditions: rules::parenthese_conditions::ParentheseConditionsLint,
     shadowing: rules::shadowing::ShadowingLint,

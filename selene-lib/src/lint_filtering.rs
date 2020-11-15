@@ -1,6 +1,7 @@
 use crate::{
     ast_util::visit_nodes::{NodeVisitor, VisitorType},
-    rules::Diagnostic,
+    rule_exists,
+    rules::{Diagnostic, Label, Severity},
     CheckerDiagnostic, RuleVariation,
 };
 use full_moon::{ast::Ast, node::Node, tokenizer::TokenType};
@@ -118,10 +119,21 @@ impl<'ast> NodeVisitor<'ast> for FilterVisitor {
                 // TODO: Check if lint is real here
                 self.ranges
                     .extend(configurations.into_iter().map(|configuration| {
-                        Ok(Filter {
-                            configuration,
-                            range: (range.0.bytes(), range.1.bytes()),
-                        })
+                        if rule_exists(&configuration.lint) {
+                            Ok(Filter {
+                                configuration,
+                                range: (range.0.bytes(), range.1.bytes()),
+                            })
+                        } else {
+                            Err(Diagnostic::new(
+                                "invalid_lint_filter",
+                                format!("No lint named `{}` exists", configuration.lint),
+                                Label::new((
+                                    trivia_start_position.bytes(),
+                                    trivia_end_position.bytes(),
+                                )),
+                            ))
+                        }
                     }));
             }
         }
@@ -158,6 +170,7 @@ impl FilterInstruction {
 pub fn filter_diagnostics<'ast>(
     ast: &Ast<'ast>,
     mut diagnostics: Vec<CheckerDiagnostic>,
+    invalid_lint_filter_severity: Option<Severity>,
 ) -> Vec<CheckerDiagnostic> {
     let filter_ranges = get_filter_ranges(ast);
     let (mut filters, mut failures) = (Vec::new(), Vec::new());
@@ -244,6 +257,13 @@ pub fn filter_diagnostics<'ast>(
             // If no configuration touched this lint, pass it through identically
             new_diagnostics.push(diagnostic);
         }
+    }
+
+    if let Some(invalid_lint_filter_severity) = invalid_lint_filter_severity {
+        new_diagnostics.extend(&mut failures.into_iter().map(|failure| CheckerDiagnostic {
+            severity: invalid_lint_filter_severity,
+            diagnostic: failure,
+        }));
     }
 
     new_diagnostics
