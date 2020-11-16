@@ -74,7 +74,7 @@ fn parse_comment(comment: &str) -> Option<Vec<FilterConfiguration>> {
     };
 
     Some(
-        lint.split(",")
+        lint.split(',')
             .map(|lint| FilterConfiguration {
                 global,
                 lint: lint.to_owned(),
