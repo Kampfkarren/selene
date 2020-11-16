@@ -15,14 +15,16 @@ lazy_static::lazy_static! {
     };
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 struct FilterConfiguration {
     lint: String,
     variation: RuleVariation,
 }
 
+#[derive(Clone)]
 struct Filter {
     configuration: FilterConfiguration,
+    comment_range: (usize, usize),
     range: (usize, usize),
 }
 
@@ -120,8 +122,11 @@ impl<'ast> NodeVisitor<'ast> for FilterVisitor {
                 self.ranges
                     .extend(configurations.into_iter().map(|configuration| {
                         if rule_exists(&configuration.lint) {
+                            let trivia_range = trivia.range().expect("no range for comment");
+
                             Ok(Filter {
                                 configuration,
+                                comment_range: (trivia_range.0.bytes(), trivia_range.1.bytes()),
                                 range: (range.0.bytes(), range.1.bytes()),
                             })
                         } else {
@@ -188,8 +193,35 @@ pub fn filter_diagnostics<'ast>(
     } else {
         // Filter ranges are translated into instructions for a stack
         let mut instructions: Vec<FilterInstruction> = Vec::new();
+        let mut conflicting: Option<((usize, usize), Vec<Filter>)> = None;
 
         for filter in filters {
+            // Check for conflicting filters
+            if let Some((range, ref mut filters)) = conflicting.as_mut() {
+                if *range == filter.range {
+                    for possibly_conflicting in filters.iter() {
+                        if possibly_conflicting.configuration.lint == filter.configuration.lint {
+                            failures.push(Diagnostic::new_complete(
+                                "invalid_lint_filter",
+                                "filter conflicts with a previous one for the same code".to_owned(),
+                                Label::new(filter.comment_range),
+                                Vec::new(),
+                                vec![Label::new_with_message(
+                                    possibly_conflicting.comment_range,
+                                    "conflicts with this".to_owned(),
+                                )],
+                            ));
+                        }
+                    }
+
+                    filters.push(filter.clone());
+                } else {
+                    conflicting = Some((filter.range, vec![filter.clone()]));
+                }
+            } else {
+                conflicting = Some((filter.range, vec![filter.clone()]));
+            }
+
             instructions.insert(
                 instructions
                     .iter()

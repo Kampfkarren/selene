@@ -48,3 +48,21 @@ error[unused_variable]: doD is assigned a value, but never used
 64 │                 local doD = 4
    │                       ^^^
 
+error[invalid_lint_filter]: filter conflicts with a previous one for the same code
+   ┌─ lint_filtering.lua:76:1
+   │
+76 │ -- selene: allow(unused_variable)
+   │ --------------------------------- conflicts with this
+77 │ -- selene: deny(unused_variable)
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[invalid_lint_filter]: filter conflicts with a previous one for the same code
+   ┌─ lint_filtering.lua:80:1
+   │    
+80 │ ╭ ╭ --[[
+81 │ │ │     selene: allow(unused_variable)
+82 │ │ │     selene: deny(unused_variable)
+83 │ │ │ ]]
+   │ ╰─│──^
+   │   ╰──' conflicts with this
+

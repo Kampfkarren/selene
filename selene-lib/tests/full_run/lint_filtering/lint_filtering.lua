@@ -77,4 +77,10 @@ end
 -- selene: deny(unused_variable)
 print("WHAT DO YOU WANT FROM ME")
 
+--[[
+    selene: allow(unused_variable)
+    selene: deny(unused_variable)
+]]
+print("THIS DOESNT HELP!!!")
+
 print("Finale!")

@@ -171,7 +171,18 @@ impl Label {
         }
     }
 
-    pub fn new_with_message(range: (u32, u32), message: String) -> Label {
+    pub fn new_with_message<P: TryInto<u32>>(range: (P, P), message: String) -> Label {
+        let range = (
+            range
+                .0
+                .try_into()
+                .unwrap_or_else(|_| panic!("TryInto failed for Label::new range")),
+            range
+                .1
+                .try_into()
+                .unwrap_or_else(|_| panic!("TryInto failed for Label::new range")),
+        );
+
         Label {
             range,
             message: Some(message),
