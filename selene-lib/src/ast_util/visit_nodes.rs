@@ -1,9 +1,7 @@
-use full_moon::{
-    ast::{types::*, *},
-    node::Node,
-    tokenizer::Token,
-    visitors::Visitor,
-};
+use full_moon::{ast::*, node::Node, tokenizer::Token, visitors::Visitor};
+
+#[cfg(feature = "roblox")]
+use full_moon::ast::types::*;
 
 pub trait NodeVisitor<'ast> {
     fn visit_node<'a>(&mut self, node: &'a dyn Node<'ast>, visitor_type: VisitorType);
