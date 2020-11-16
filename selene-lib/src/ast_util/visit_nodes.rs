@@ -1,4 +1,9 @@
-use full_moon::{ast::*, node::Node, tokenizer::Token, visitors::Visitor};
+use full_moon::{
+    ast::*,
+    node::Node,
+    tokenizer::{Token, TokenReference},
+    visitors::Visitor,
+};
 
 #[cfg(feature = "roblox")]
 use full_moon::ast::types::*;
@@ -83,6 +88,7 @@ make_node_visitor!({
     visit_call(Call),
     visit_do(Do),
     visit_else_if(ElseIf),
+    visit_eof(TokenReference),
     visit_expression(Expression),
     visit_field(Field),
     visit_function_args(FunctionArgs),

@@ -1,5 +1,8 @@
 use crate::{
-    ast_util::visit_nodes::{NodeVisitor, VisitorType},
+    ast_util::{
+        first_code,
+        visit_nodes::{NodeVisitor, VisitorType},
+    },
     rule_exists,
     rules::{Diagnostic, Label, Severity},
     CheckerDiagnostic, RuleVariation,
@@ -17,11 +20,12 @@ lazy_static::lazy_static! {
 
 #[derive(Clone, Debug)]
 struct FilterConfiguration {
+    global: bool,
     lint: String,
     variation: RuleVariation,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct Filter {
     configuration: FilterConfiguration,
     comment_range: (usize, usize),
@@ -35,7 +39,9 @@ struct FilterVisitor {
 }
 
 fn parse_comment(comment: &str) -> Option<Vec<FilterConfiguration>> {
-    let config = comment.strip_prefix("selene:")?;
+    let global_stripped = comment.strip_prefix("!");
+    let global = global_stripped.is_some();
+    let config = global_stripped.unwrap_or(comment).strip_prefix("selene:")?;
 
     let mut variation = String::new();
     let mut lint = String::new();
@@ -70,6 +76,7 @@ fn parse_comment(comment: &str) -> Option<Vec<FilterConfiguration>> {
     Some(
         lint.split(",")
             .map(|lint| FilterConfiguration {
+                global,
                 lint: lint.to_owned(),
                 variation,
             })
@@ -132,7 +139,7 @@ impl<'ast> NodeVisitor<'ast> for FilterVisitor {
                         } else {
                             Err(Diagnostic::new(
                                 "invalid_lint_filter",
-                                format!("No lint named `{}` exists", configuration.lint),
+                                format!("no lint named `{}` exists", configuration.lint),
                                 Label::new((
                                     trivia_start_position.bytes(),
                                     trivia_end_position.bytes(),
@@ -192,10 +199,32 @@ pub fn filter_diagnostics<'ast>(
         new_diagnostics = diagnostics;
     } else {
         // Filter ranges are translated into instructions for a stack
+        let mut global_filters: Vec<Filter> = Vec::new();
         let mut instructions: Vec<FilterInstruction> = Vec::new();
         let mut conflicting: Option<((usize, usize), Vec<Filter>)> = None;
+        let first_code = first_code(ast);
 
         for filter in filters {
+            // Check for global filters
+            if filter.configuration.global {
+                if let Some(first_code) = first_code {
+                    if filter.comment_range.0 >= first_code.0.bytes() {
+                        failures.push(Diagnostic::new_complete(
+                            "invalid_lint_filter",
+                            "global filters must come before any code".to_owned(),
+                            Label::new(filter.comment_range),
+                            Vec::new(),
+                            vec![Label::new_with_message(
+                                (first_code.0.bytes(), first_code.1.bytes()),
+                                "global filter must be before this".to_owned(),
+                            )],
+                        ));
+
+                        continue;
+                    }
+                }
+            }
+
             // Check for conflicting filters
             if let Some((range, ref mut filters)) = conflicting.as_mut() {
                 if *range == filter.range {
@@ -222,26 +251,37 @@ pub fn filter_diagnostics<'ast>(
                 conflicting = Some((filter.range, vec![filter.clone()]));
             }
 
-            instructions.insert(
-                instructions
-                    .iter()
-                    .position(|instruction| instruction.bytes() < filter.range.1)
-                    .unwrap_or(instructions.len()),
-                FilterInstruction::Pop {
-                    bytes: filter.range.1,
-                },
-            );
+            if filter.configuration.global {
+                global_filters.push(filter);
+            } else {
+                instructions.insert(
+                    instructions
+                        .iter()
+                        .position(|instruction| instruction.bytes() < filter.range.1)
+                        .unwrap_or(instructions.len()),
+                    FilterInstruction::Pop {
+                        bytes: filter.range.1,
+                    },
+                );
 
-            instructions.insert(
-                instructions
-                    .iter()
-                    .position(|instruction| instruction.bytes() < filter.range.0)
-                    .unwrap_or(instructions.len()),
-                FilterInstruction::Push {
-                    configuration: filter.configuration,
-                    bytes: filter.range.0,
-                },
-            );
+                instructions.insert(
+                    instructions
+                        .iter()
+                        .position(|instruction| instruction.bytes() < filter.range.0)
+                        .unwrap_or(instructions.len()),
+                    FilterInstruction::Push {
+                        configuration: filter.configuration,
+                        bytes: filter.range.0,
+                    },
+                );
+            }
+        }
+
+        for global_filter in global_filters {
+            instructions.push(FilterInstruction::Push {
+                configuration: global_filter.configuration,
+                bytes: 0,
+            })
         }
 
         new_diagnostics = Vec::with_capacity(diagnostics.len());
@@ -308,5 +348,10 @@ mod tests {
     #[test]
     fn test_lint_filtering() {
         test_full_run("lint_filtering", "lint_filtering");
+    }
+
+    #[test]
+    fn test_just_comments() {
+        test_full_run("lint_filtering", "just_comments");
     }
 }

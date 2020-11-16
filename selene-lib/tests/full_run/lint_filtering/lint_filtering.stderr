@@ -1,4 +1,4 @@
-error[invalid_lint_filter]: No lint named `lint_thatll_never_be_created` exists
+error[invalid_lint_filter]: no lint named `lint_thatll_never_be_created` exists
    ┌─ lint_filtering.lua:11:1
    │
 11 │ -- selene: allow(lint_thatll_never_be_created)
@@ -28,13 +28,16 @@ error[unused_variable]: unusedButBad is assigned a value, but never used
 44 │     local unusedButBad = 2
    │           ^^^^^^^^^^^^
 
-error[type_check_inside_call]: you are checking the type inside the call, not outside
-   ┌─ lint_filtering.lua:48:11
-   │
-48 │ print(type(1 == "boolean"))
-   │           ^^^^^^^^^^^^^^^^
-   │
-   = note: this will always return `boolean`
+error[invalid_lint_filter]: global filters must come before any code
+   ┌─ lint_filtering.lua:4:1
+   │  
+ 4 │ ╭ local function a(x, y)
+ 5 │ │     local unusedHereToo = true
+ 6 │ │ end
+   │ ╰───' global filter must be before this
+   ·  
+50 │   --! selene: allow(unused_variable)
+   │   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error[unused_variable]: doC is assigned a value, but never used
    ┌─ lint_filtering.lua:62:19
