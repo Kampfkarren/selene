@@ -27,9 +27,13 @@ impl<'a> fmt::Debug for PrettyString<'a> {
 }
 
 // TODO: Most of this is copy and pasted from test_lint_config, try and abstract it out a bit
-pub fn test_full_run(directory: &'static str, test_name: &'static str) {
+pub fn test_full_run_config(
+    directory: &'static str,
+    test_name: &'static str,
+    checker_config: CheckerConfig<serde_json::Value>,
+) {
     let checker = Checker::<serde_json::Value>::new(
-        CheckerConfig::default(),
+        checker_config,
         StandardLibrary::from_name("lua51").expect("no lua51 standard library"),
     )
     .expect("couldn't create checker");
@@ -52,14 +56,15 @@ pub fn test_full_run(directory: &'static str, test_name: &'static str) {
 
     let mut output = termcolor::NoColor::new(Vec::new());
 
-    for diagnostic in diagnostics.into_iter().map(|diagnostic| {
-        diagnostic.diagnostic.into_codespan_diagnostic(
+    for diagnostic in diagnostics.into_iter().filter_map(|diagnostic| {
+        Some(diagnostic.diagnostic.into_codespan_diagnostic(
             source_id,
             match diagnostic.severity {
+                Severity::Allow => return None,
                 Severity::Error => CodespanSeverity::Error,
                 Severity::Warning => CodespanSeverity::Warning,
             },
-        )
+        ))
     }) {
         codespan_reporting::term::emit(
             &mut output,
@@ -81,4 +86,8 @@ pub fn test_full_run(directory: &'static str, test_name: &'static str) {
             .write_all(output.get_ref())
             .expect("couldn't write to output file");
     }
+}
+
+pub fn test_full_run(directory: &'static str, test_name: &'static str) {
+    test_full_run_config(directory, test_name, CheckerConfig::default());
 }

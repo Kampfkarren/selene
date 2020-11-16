@@ -45,10 +45,6 @@ pub trait Rule {
         Self: Sized;
     fn pass(&self, ast: &full_moon::ast::Ast<'static>, context: &Context) -> Vec<Diagnostic>;
 
-    fn allow(&self) -> bool {
-        false
-    }
-
     fn severity(&self) -> Severity;
     fn rule_type(&self) -> RuleType;
 }
@@ -70,6 +66,7 @@ pub enum RuleType {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Severity {
+    Allow,
     Error,
     Warning,
 }

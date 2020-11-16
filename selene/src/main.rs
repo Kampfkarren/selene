@@ -188,6 +188,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
     let (mut errors, mut warnings) = (0, 0);
     for diagnostic in &diagnostics {
         match diagnostic.severity {
+            Severity::Allow => {}
             Severity::Error => errors += 1,
             Severity::Warning => warnings += 1,
         };
@@ -243,6 +244,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                     stdout,
                     ": ({}000) ",
                     match diagnostic.severity {
+                        Severity::Allow => return Ok(()),
                         Severity::Error => "E",
                         Severity::Warning => "W",
                     }
@@ -272,6 +274,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
             let diagnostic = diagnostic.diagnostic.into_codespan_diagnostic(
                 source_id,
                 match diagnostic.severity {
+                    Severity::Allow => continue,
                     Severity::Error => CodespanSeverity::Error,
                     Severity::Warning => CodespanSeverity::Warning,
                 },

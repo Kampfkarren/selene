@@ -182,7 +182,7 @@ impl FilterInstruction {
 pub fn filter_diagnostics<'ast>(
     ast: &Ast<'ast>,
     mut diagnostics: Vec<CheckerDiagnostic>,
-    invalid_lint_filter_severity: Option<Severity>,
+    invalid_lint_filter_severity: Severity,
 ) -> Vec<CheckerDiagnostic> {
     let filter_ranges = get_filter_ranges(ast);
     let (mut filters, mut failures) = (Vec::new(), Vec::new());
@@ -315,7 +315,8 @@ pub fn filter_diagnostics<'ast>(
             // Find the most recent configuration for this lint, and respect it
             for configuration in stack.iter().rev() {
                 if configuration.lint == diagnostic.diagnostic.code {
-                    if let Some(severity) = configuration.variation.to_severity() {
+                    let severity = configuration.variation.to_severity();
+                    if severity != Severity::Allow {
                         new_diagnostics.push(CheckerDiagnostic {
                             severity,
                             diagnostic: diagnostic.diagnostic,
@@ -331,19 +332,21 @@ pub fn filter_diagnostics<'ast>(
         }
     }
 
-    if let Some(invalid_lint_filter_severity) = invalid_lint_filter_severity {
-        new_diagnostics.extend(&mut failures.into_iter().map(|failure| CheckerDiagnostic {
-            severity: invalid_lint_filter_severity,
-            diagnostic: failure,
-        }));
-    }
+    new_diagnostics.extend(&mut failures.into_iter().map(|failure| CheckerDiagnostic {
+        severity: invalid_lint_filter_severity,
+        diagnostic: failure,
+    }));
 
     new_diagnostics
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::test_util::test_full_run;
+    use crate::{
+        test_util::{test_full_run, test_full_run_config},
+        CheckerConfig, RuleVariation,
+    };
+    use std::collections::HashMap;
 
     #[test]
     fn test_lint_filtering() {
@@ -353,5 +356,21 @@ mod tests {
     #[test]
     fn test_just_comments() {
         test_full_run("lint_filtering", "just_comments");
+    }
+
+    #[test]
+    fn test_deny_allowed_in_config() {
+        test_full_run_config(
+            "lint_filtering",
+            "deny_allowed_in_config",
+            CheckerConfig {
+                rules: {
+                    let mut map = HashMap::new();
+                    map.insert("unused_variable".to_owned(), RuleVariation::Allow);
+                    map
+                },
+                ..CheckerConfig::default()
+            },
+        );
     }
 }
