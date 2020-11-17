@@ -133,6 +133,9 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
             filename.display(),
             error,
         );
+
+        LINT_ERRORS.fetch_add(1, Ordering::Release);
+        return;
     }
 
     let contents = String::from_utf8_lossy(&buffer);
@@ -289,8 +292,8 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
         match fs::File::open(filename) {
             Ok(file) => file,
             Err(error) => {
-                error!("Couldn't open file {}: {}", filename.display(), error,);
-
+                error!("Couldn't open file {}: {}", filename.display(), error);
+                LINT_ERRORS.fetch_add(1, Ordering::Release);
                 return;
             }
         },
@@ -305,6 +308,7 @@ fn start(matches: opts::Options) {
 
             if let Err(error) = generate_roblox_std(deprecated) {
                 error!("Couldn't create roblox standard library: {}", error);
+                std::process::exit(1);
             }
 
             return;
@@ -319,7 +323,7 @@ fn start(matches: opts::Options) {
                 Ok(contents) => contents,
                 Err(error) => {
                     error!("Couldn't read config file: {}", error);
-                    return;
+                    std::process::exit(1);
                 }
             };
 
@@ -327,7 +331,7 @@ fn start(matches: opts::Options) {
                 Ok(config) => config,
                 Err(error) => {
                     error!("Config file not in correct format: {}", error);
-                    return;
+                    std::process::exit(1);
                 }
             }
         }
@@ -337,7 +341,7 @@ fn start(matches: opts::Options) {
                 Ok(config) => config,
                 Err(error) => {
                     error!("Config file not in correct format: {}", error);
-                    return;
+                    std::process::exit(1);
                 }
             },
 
@@ -353,7 +357,7 @@ fn start(matches: opts::Options) {
 
         Ok(None) => {
             error!("Standard library was empty.");
-            return;
+            std::process::exit(1);
         }
 
         Err(error) => {
@@ -369,12 +373,12 @@ fn start(matches: opts::Options) {
                     Ok(library) => library,
                     Err(err) => {
                         error!("Could not create roblox standard library: {}", err);
-                        return;
+                        std::process::exit(1);
                     }
                 }
             } else {
                 error!("Could not retrieve standard library: {}", error);
-                return;
+                std::process::exit(1);
             }
         }
     };
@@ -383,7 +387,7 @@ fn start(matches: opts::Options) {
         Ok(checker) => checker,
         Err(error) => {
             error!("{}", error);
-            return;
+            std::process::exit(1);
         }
     });
 
@@ -444,6 +448,8 @@ fn start(matches: opts::Options) {
                     filename.to_string_lossy(),
                     error
                 );
+
+                LINT_ERRORS.fetch_add(1, Ordering::Release);
             }
         };
     }
