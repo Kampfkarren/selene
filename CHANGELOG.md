@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Added
+- Added inline lint filtering, read [the documentation](https://kampfkarren.github.io/selene/usage/filtering.html) for more information.
+
 ## [0.9.2] - 2020-11-06
 ### Changed
 - Updated full-moon, read [the full-moon changelog](https://github.com/Kampfkarren/full-moon/blob/master/CHANGELOG.md#070---2020-11-06) to learn more.
