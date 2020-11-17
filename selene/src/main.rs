@@ -134,7 +134,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
             error,
         );
 
-        LINT_ERRORS.fetch_add(1, Ordering::Release);
+        LINT_ERRORS.fetch_add(1, Ordering::SeqCst);
         return;
     }
 
@@ -152,7 +152,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
     let ast = match full_moon::parse(&contents) {
         Ok(ast) => ast.owned(),
         Err(error) => {
-            PARSE_ERRORS.fetch_add(1, Ordering::Release);
+            PARSE_ERRORS.fetch_add(1, Ordering::SeqCst);
 
             if let full_moon::Error::AstError(full_moon::ast::AstError::UnexpectedToken {
                 token,
@@ -196,8 +196,8 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
         };
     }
 
-    LINT_ERRORS.fetch_add(errors, Ordering::Release);
-    LINT_WARNINGS.fetch_add(warnings, Ordering::Release);
+    LINT_ERRORS.fetch_add(errors, Ordering::SeqCst);
+    LINT_WARNINGS.fetch_add(warnings, Ordering::SeqCst);
 
     for diagnostic in diagnostics {
         if opts.luacheck {
@@ -293,7 +293,7 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
             Ok(file) => file,
             Err(error) => {
                 error!("Couldn't open file {}: {}", filename.display(), error);
-                LINT_ERRORS.fetch_add(1, Ordering::Release);
+                LINT_ERRORS.fetch_add(1, Ordering::SeqCst);
                 return;
             }
         },
@@ -449,7 +449,7 @@ fn start(matches: opts::Options) {
                     error
                 );
 
-                LINT_ERRORS.fetch_add(1, Ordering::Release);
+                LINT_ERRORS.fetch_add(1, Ordering::SeqCst);
             }
         };
     }
@@ -457,9 +457,9 @@ fn start(matches: opts::Options) {
     pool.join();
 
     let (parse_errors, lint_errors, lint_warnings) = (
-        PARSE_ERRORS.load(Ordering::Relaxed),
-        LINT_ERRORS.load(Ordering::Relaxed),
-        LINT_WARNINGS.load(Ordering::Relaxed),
+        PARSE_ERRORS.load(Ordering::SeqCst),
+        LINT_ERRORS.load(Ordering::SeqCst),
+        LINT_WARNINGS.load(Ordering::SeqCst),
     );
 
     if !matches.luacheck {
