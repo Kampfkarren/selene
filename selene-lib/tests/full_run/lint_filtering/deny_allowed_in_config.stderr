@@ -1,0 +1,6 @@
+error[unused_variable]: bar is assigned a value, but never used
+  ┌─ deny_allowed_in_config.lua:5:7
+  │
+5 │ local bar = 1
+  │       ^^^
+

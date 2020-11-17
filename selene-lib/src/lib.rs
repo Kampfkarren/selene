@@ -8,8 +8,12 @@ use serde::{
 };
 
 mod ast_util;
+mod lint_filtering;
 pub mod rules;
 pub mod standard_library;
+
+#[cfg(test)]
+mod test_util;
 
 use rules::{Context, Diagnostic, Rule, Severity};
 use standard_library::StandardLibrary;
@@ -64,12 +68,22 @@ impl<V> Default for CheckerConfig<V> {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum RuleVariation {
     Allow,
     Deny,
     Warn,
+}
+
+impl RuleVariation {
+    pub fn to_severity(self) -> Severity {
+        match self {
+            RuleVariation::Allow => Severity::Allow,
+            RuleVariation::Deny => Severity::Error,
+            RuleVariation::Warn => Severity::Warning,
+        }
+    }
 }
 
 macro_rules! use_rules {
@@ -85,18 +99,33 @@ macro_rules! use_rules {
             },
         )+
     } => {
+        lazy_static::lazy_static! {
+            static ref ALL_RULES: Vec<&'static str> = vec![
+                $(
+                    stringify!($rule_name),
+                )+
+
+                $(
+                    $(
+                        #[$meta]
+                        stringify!($meta_rule_name),
+                    )+
+                )+
+            ];
+        }
+
         pub struct Checker<V: 'static + DeserializeOwned> {
             config: CheckerConfig<V>,
             context: Context,
 
             $(
-                $rule_name: Option<$rule_path>,
+                $rule_name: $rule_path,
             )+
 
             $(
                 $(
                     #[$meta]
-                    $meta_rule_name: Option<$meta_rule_path>,
+                    $meta_rule_name: $meta_rule_path,
                 )+
             )+
         }
@@ -110,39 +139,30 @@ macro_rules! use_rules {
                 macro_rules! rule_field {
                     ($name:ident, $path:ty) => {{
                         let rule_name = stringify!($name);
-                        let variation = config.rules.get(rule_name);
 
-                        if variation != Some(&RuleVariation::Allow) {
-                            let rule = <$path>::new({
-                                match config.config.remove(rule_name) {
-                                    Some(entry_generic) => {
-                                        <$path as Rule>::Config::deserialize(entry_generic).map_err(|error| {
-                                            CheckerError {
-                                                name: rule_name,
-                                                problem: CheckerErrorProblem::ConfigDeserializeError(Box::new(error)),
-                                            }
-                                        })?
-                                    }
-
-                                    None => {
-                                        <$path as Rule>::Config::default()
-                                    }
+                        let rule = <$path>::new({
+                            match config.config.remove(rule_name) {
+                                Some(entry_generic) => {
+                                    <$path as Rule>::Config::deserialize(entry_generic).map_err(|error| {
+                                        CheckerError {
+                                            name: rule_name,
+                                            problem: CheckerErrorProblem::ConfigDeserializeError(Box::new(error)),
+                                        }
+                                    })?
                                 }
-                            }).map_err(|error| {
-                                CheckerError {
-                                    name: stringify!($name),
-                                    problem: CheckerErrorProblem::RuleNewError(Box::new(error)),
-                                }
-                            })?;
 
-                            if variation == None && rule.allow() {
-                                None
-                            } else {
-                                Some(rule)
+                                None => {
+                                    <$path as Rule>::Config::default()
+                                }
                             }
-                        } else {
-                            None
-                        }
+                        }).map_err(|error| {
+                            CheckerError {
+                                name: stringify!($name),
+                                problem: CheckerErrorProblem::RuleNewError(Box::new(error)),
+                            }
+                        })?;
+
+                        rule
                     }};
                 }
 
@@ -172,19 +192,13 @@ macro_rules! use_rules {
 
                 macro_rules! check_rule {
                     ($name:ident) => {
-                        if let Some(rule) = &self.$name {
-                            diagnostics.extend(&mut rule.pass(ast, &self.context).into_iter().map(|diagnostic| {
-                                CheckerDiagnostic {
-                                    diagnostic,
-                                    severity: match self.config.rules.get(stringify!($name)) {
-                                        None => rule.severity(),
-                                        Some(RuleVariation::Deny) => Severity::Error,
-                                        Some(RuleVariation::Warn) => Severity::Warning,
-                                        Some(RuleVariation::Allow) => unreachable!(),
-                                    }
-                                }
-                            }));
-                        }
+                        let rule = &self.$name;
+                        diagnostics.extend(&mut rule.pass(ast, &self.context).into_iter().map(|diagnostic| {
+                            CheckerDiagnostic {
+                                diagnostic,
+                                severity: self.get_lint_severity(rule, stringify!($name)),
+                            }
+                        }));
                     };
                 }
 
@@ -201,15 +215,33 @@ macro_rules! use_rules {
                     )+
                 )+
 
+                diagnostics = lint_filtering::filter_diagnostics(
+                    ast,
+                    diagnostics,
+                    self.get_lint_severity(&self.invalid_lint_filter, "invalid_lint_filter"),
+                );
+
                 diagnostics
+            }
+
+            fn get_lint_severity<R: Rule>(&self, lint: &R, name: &'static str) -> Severity {
+                match self.config.rules.get(name) {
+                    Some(variation) => variation.to_severity(),
+                    None => lint.severity(),
+                }
             }
         }
     };
 }
 
+#[derive(Debug)]
 pub struct CheckerDiagnostic {
     pub diagnostic: Diagnostic,
     pub severity: Severity,
+}
+
+pub fn rule_exists(name: &str) -> bool {
+    ALL_RULES.contains(&name)
 }
 
 use_rules! {
@@ -222,6 +254,7 @@ use_rules! {
     if_same_then_else: rules::if_same_then_else::IfSameThenElseLint,
     ifs_same_cond: rules::ifs_same_cond::IfsSameCondLint,
     incorrect_standard_library_use: rules::standard_library::StandardLibraryLint,
+    invalid_lint_filter: rules::invalid_lint_filter::InvalidLintFilterLint,
     multiple_statements: rules::multiple_statements::MultipleStatementsLint,
     parenthese_conditions: rules::parenthese_conditions::ParentheseConditionsLint,
     shadowing: rules::shadowing::ShadowingLint,
