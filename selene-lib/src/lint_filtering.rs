@@ -10,6 +10,8 @@ use crate::{
 use full_moon::{ast::Ast, node::Node, tokenizer::TokenType};
 use std::collections::HashSet;
 
+const GLOBAL_LINT_PREFIX: &str = "#";
+
 lazy_static::lazy_static! {
     static ref NODES_TO_IGNORE: HashSet<VisitorType> = {
         let mut set = HashSet::new();
@@ -39,7 +41,7 @@ struct FilterVisitor {
 }
 
 fn parse_comment(comment: &str) -> Option<Vec<FilterConfiguration>> {
-    let global_stripped = comment.strip_prefix("!");
+    let global_stripped = comment.strip_prefix(GLOBAL_LINT_PREFIX);
     let global = global_stripped.is_some();
     let config = global_stripped.unwrap_or(comment).strip_prefix("selene:")?;
 

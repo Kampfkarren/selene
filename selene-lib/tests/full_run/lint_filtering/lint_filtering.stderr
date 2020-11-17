@@ -36,7 +36,7 @@ error[invalid_lint_filter]: global filters must come before any code
  6 │ │ end
    │ ╰───' global filter must be before this
    ·  
-50 │   --! selene: allow(unused_variable)
+50 │   --# selene: allow(unused_variable)
    │   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error[unused_variable]: doC is assigned a value, but never used

@@ -1,4 +1,4 @@
---! selene: allow(type_check_inside_call)
+--# selene: allow(type_check_inside_call)
 
 -- selene: allow(unused_variable)
 local function a(x, y)
@@ -47,7 +47,7 @@ end
 -- This case is allowed file wide in the beginning
 print(type(1 == "boolean"))
 
---! selene: allow(unused_variable)
+--# selene: allow(unused_variable)
 print("The above comment should lint, since its not at the beginning of the file")
 print("This is to make sure programmers understand the difference!")
 
