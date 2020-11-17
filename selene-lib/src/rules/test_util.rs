@@ -1,6 +1,7 @@
-use super::{super::StandardLibrary, Context, Rule};
+use super::{Context, Rule};
+use crate::{test_util::PrettyString, StandardLibrary};
 use std::{
-    fmt, fs,
+    fs,
     io::Write,
     path::{Path, PathBuf},
 };
@@ -28,17 +29,6 @@ impl Default for TestUtilConfig {
             standard_library: StandardLibrary::from_name("lua51").unwrap(),
             __non_exhaustive: (),
         }
-    }
-}
-
-#[derive(PartialEq, Eq)]
-#[doc(hidden)]
-pub struct PrettyString<'a>(pub &'a str);
-
-/// Make diff to display string as multi-line string
-impl<'a> fmt::Debug for PrettyString<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_str(self.0)
     }
 }
 

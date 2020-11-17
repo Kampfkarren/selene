@@ -1,0 +1,71 @@
+error[invalid_lint_filter]: no lint named `lint_thatll_never_be_created` exists
+   ┌─ lint_filtering.lua:11:1
+   │
+11 │ -- selene: allow(lint_thatll_never_be_created)
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning[unused_variable]: c is assigned a value, but never used
+   ┌─ lint_filtering.lua:12:7
+   │
+12 │ local c = 1
+   │       ^
+
+error[undefined_variable]: `y` is not defined
+   ┌─ lint_filtering.lua:18:5
+   │
+18 │     y
+   │     ^
+
+warning[unused_variable]: g is assigned a value, but never used
+   ┌─ lint_filtering.lua:38:7
+   │
+38 │ local g = 1
+   │       ^
+
+error[unused_variable]: unusedButBad is assigned a value, but never used
+   ┌─ lint_filtering.lua:44:11
+   │
+44 │     local unusedButBad = 2
+   │           ^^^^^^^^^^^^
+
+error[invalid_lint_filter]: global filters must come before any code
+   ┌─ lint_filtering.lua:4:1
+   │  
+ 4 │ ╭ local function a(x, y)
+ 5 │ │     local unusedHereToo = true
+ 6 │ │ end
+   │ ╰───' global filter must be before this
+   ·  
+50 │   --# selene: allow(unused_variable)
+   │   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[unused_variable]: doC is assigned a value, but never used
+   ┌─ lint_filtering.lua:62:19
+   │
+62 │             local doC = 3
+   │                   ^^^
+
+error[unused_variable]: doD is assigned a value, but never used
+   ┌─ lint_filtering.lua:64:23
+   │
+64 │                 local doD = 4
+   │                       ^^^
+
+error[invalid_lint_filter]: filter conflicts with a previous one for the same code
+   ┌─ lint_filtering.lua:76:1
+   │
+76 │ -- selene: allow(unused_variable)
+   │ --------------------------------- conflicts with this
+77 │ -- selene: deny(unused_variable)
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[invalid_lint_filter]: filter conflicts with a previous one for the same code
+   ┌─ lint_filtering.lua:80:1
+   │    
+80 │ ╭ ╭ --[[
+81 │ │ │     selene: allow(unused_variable)
+82 │ │ │     selene: deny(unused_variable)
+83 │ │ │ ]]
+   │ ╰─│──^
+   │   ╰──' conflicts with this
+

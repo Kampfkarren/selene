@@ -15,6 +15,7 @@ pub mod empty_if;
 pub mod global_usage;
 pub mod if_same_then_else;
 pub mod ifs_same_cond;
+pub mod invalid_lint_filter;
 pub mod multiple_statements;
 pub mod parenthese_conditions;
 pub mod shadowing;
@@ -44,10 +45,6 @@ pub trait Rule {
         Self: Sized;
     fn pass(&self, ast: &full_moon::ast::Ast<'static>, context: &Context) -> Vec<Diagnostic>;
 
-    fn allow(&self) -> bool {
-        false
-    }
-
     fn severity(&self) -> Severity;
     fn rule_type(&self) -> RuleType;
 }
@@ -69,10 +66,12 @@ pub enum RuleType {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Severity {
+    Allow,
     Error,
     Warning,
 }
 
+#[derive(Debug)]
 pub struct Diagnostic {
     pub code: &'static str,
     pub message: String,
@@ -135,6 +134,7 @@ impl Diagnostic {
     }
 }
 
+#[derive(Debug)]
 pub struct Label {
     pub message: Option<String>,
     pub range: (u32, u32),
@@ -168,7 +168,18 @@ impl Label {
         }
     }
 
-    pub fn new_with_message(range: (u32, u32), message: String) -> Label {
+    pub fn new_with_message<P: TryInto<u32>>(range: (P, P), message: String) -> Label {
+        let range = (
+            range
+                .0
+                .try_into()
+                .unwrap_or_else(|_| panic!("TryInto failed for Label::new range")),
+            range
+                .1
+                .try_into()
+                .unwrap_or_else(|_| panic!("TryInto failed for Label::new range")),
+        );
+
         Label {
             range,
             message: Some(message),

@@ -44,6 +44,7 @@ math.pi()
 - selene has a much simpler codebase, and is much easier to add your own lints to.
 - selene has optional support and large focus specifically for Roblox development.
 - selene will only show you files that lint, luacheck only does this with the `-q` option (quiet).
+- selene [filters specific lints](./usage/filtering.md) and applies over code rather than lines, luacheck does not.
 - selene has [significantly more lints](./lints/index.md).
 
 This is not to say selene is objectively better than luacheck, at least not yet.
@@ -54,10 +55,6 @@ This is not to say selene is objectively better than luacheck, at least not yet.
   - Unused labels (selene does not officially support Lua 5.2 yet)
   - Detecting variables that are only ever mutated, but not read
   - Using uninitialized variables
-
-If you would like to contribute these lints, please submit a pull request!
-- luacheck supports `-- luacheck: ignore` for ignoring specific lines, while selene does not. This is something that will eventually be fixed when this design is evaluted.
-- luacheck is supported by editor extensions, while selene does not. [This is something that will eventually be fixed.](https://github.com/Kampfkarren/selene/issues/22)
 
 ## Migration
 luacheck does not require much configuration to begin with, so migration should be easy.
