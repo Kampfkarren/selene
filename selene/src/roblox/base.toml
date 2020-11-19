@@ -342,6 +342,14 @@ required = false
 [elapsedTime]
 args=[]
 
+[[error.args]]
+type = "any"
+required = "Erroring without an explanation is unhelpful to users."
+
+[[error.args]]
+type = "number"
+required = false
+
 [[Faces.new.args]]
 type = "..."
 
