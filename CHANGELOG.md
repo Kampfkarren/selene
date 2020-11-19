@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Added inline lint filtering, read [the documentation](https://kampfkarren.github.io/selene/usage/filtering.html) for more information.
 - More errors now set the exit code.
+- Added support for error({any}) to the Roblox standard library.
 
 ## [0.9.2] - 2020-11-06
 ### Changed
