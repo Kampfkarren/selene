@@ -90,7 +90,8 @@ type = "number"
 type = "number"
 
 [[BrickColor.new.args]]
-type = "any"
+type = "number"
+required = false
 
 [[BrickColor.new.args]]
 type = "number"
@@ -98,6 +99,18 @@ required = false
 
 [[BrickColor.new.args]]
 type = "number"
+required = false
+
+[[BrickColor.new.args]]
+type = "number"
+required = false
+
+[[BrickColor.new.args]]
+type = "string"
+required = false
+
+[[BrickColor.new.args]]
+type = { display = "Color3" }
 required = false
 
 [[BrickColor.palette.args]]
@@ -144,11 +157,7 @@ type = "number"
 required = false
 
 [[CFrame.new.args]]
-type = "any"
-required = false
-
-[[CFrame.new.args]]
-type = "any"
+type = { display = "Vector3" }
 required = false
 
 [[CFrame.new.args]]
@@ -461,6 +470,22 @@ required = false
 type = "number"
 required = false
 
+[[Rect.new.args]]
+type = "number"
+required = false
+
+[[Rect.new.args]]
+type = "number"
+required = false
+
+[[Rect.new.args]]
+type = { display = "Vector3" }
+required = false
+
+[[Rect.new.args]]
+type = { display = "Vector3" }
+required = false
+
 [[Region3.new.args]]
 type = { display = "Vector3" }
 
@@ -601,11 +626,11 @@ type = "number"
 required = false
 
 [[UDim2.new.args]]
-type = "any"
+type = { display = "UDim" }
 required = false
 
 [[UDim2.new.args]]
-type = "any"
+type = { display = "UDim" }
 required = false
 
 [[UDim2.new.args]]
