@@ -8,7 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added support for error({any}) to the Roblox standard library.
 
 ### Fixed
-- Fixed several required parameters.
+- Fixed several required parameters in the Roblox standard library.
 
 ## [0.9.2] - 2020-11-06
 ### Changed
