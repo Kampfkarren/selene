@@ -7,6 +7,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - More errors now set the exit code.
 - Added support for error({any}) to the Roblox standard library.
 
+### Fixed
+- Fixed several required parameters.
+
 ## [0.9.2] - 2020-11-06
 ### Changed
 - Updated full-moon, read [the full-moon changelog](https://github.com/Kampfkarren/full-moon/blob/master/CHANGELOG.md#070---2020-11-06) to learn more.
