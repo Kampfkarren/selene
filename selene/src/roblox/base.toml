@@ -634,7 +634,7 @@ required = false
 
 [[UDim2.fromScale.args]]
 type = "number"
-required = false
+required = "use UDim2.new() if you want an empty UDim2"
 
 [[UDim2.fromScale.args]]
 type = "number"
