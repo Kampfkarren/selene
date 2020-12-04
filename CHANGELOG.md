@@ -7,9 +7,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - More errors now set the exit code.
 - Added support for error({any}) to the Roblox standard library.
 
-### Fixed
-- Fixed `UDim.new` and `Region3int16.new` from requiring parameters.
-- Fixed `UDim2.fromOffset` and `UDim2.fromScale` to now require using `UDim.new` if no parameters are specified.
+### Changed
+- `UDim.new` and `Region3int16.new` no longer require parameters.
+- `UDim2.fromOffset` and `UDim2.fromScale` now require you to use `UDim.new` if no parameters are specified.
 
 ## [0.9.2] - 2020-11-06
 ### Changed
