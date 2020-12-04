@@ -494,9 +494,11 @@ type = { display = "Vector3"}
 
 [[Region3int16.new.args]]
 type = { display = "Vector3" }
+required = false
 
 [[Region3int16.new.args]]
 type = { display = "Vector3"}
+required = false
 
 [[require.args]]
 type = "number"
