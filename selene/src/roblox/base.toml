@@ -454,12 +454,6 @@ type = { display = "Vector3" }
 args = []
 
 [[Rect.new.args]]
-type = "any"
-
-[[Rect.new.args]]
-type = "any"
-
-[[Rect.new.args]]
 type = "number"
 required = false
 
