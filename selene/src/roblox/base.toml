@@ -600,9 +600,11 @@ type = "any"
 
 [[UDim.new.args]]
 type = "number"
+required = false
 
 [[UDim.new.args]]
 type = "number"
+required = false
 
 [[UDim2.new.args]]
 type = "any"
@@ -622,15 +624,19 @@ required = false
 
 [[UDim2.fromOffset.args]]
 type = "number"
+required = false
 
 [[UDim2.fromOffset.args]]
 type = "number"
+required = false
 
 [[UDim2.fromScale.args]]
 type = "number"
+required = false
 
 [[UDim2.fromScale.args]]
 type = "number"
+required = false
 
 [UserSettings]
 args = []
