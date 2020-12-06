@@ -475,9 +475,11 @@ type = { display = "Vector3"}
 
 [[Region3int16.new.args]]
 type = { display = "Vector3" }
+required = false
 
 [[Region3int16.new.args]]
 type = { display = "Vector3"}
+required = false
 
 [[require.args]]
 type = "number"
@@ -600,9 +602,11 @@ type = "any"
 
 [[UDim.new.args]]
 type = "number"
+required = false
 
 [[UDim.new.args]]
 type = "number"
+required = false
 
 [[UDim2.new.args]]
 type = "any"
@@ -622,15 +626,19 @@ required = false
 
 [[UDim2.fromOffset.args]]
 type = "number"
+required = "use UDim2.new() if you want an empty UDim2"
 
 [[UDim2.fromOffset.args]]
 type = "number"
+required = false
 
 [[UDim2.fromScale.args]]
 type = "number"
+required = "use UDim2.new() if you want an empty UDim2"
 
 [[UDim2.fromScale.args]]
 type = "number"
+required = false
 
 [UserSettings]
 args = []
