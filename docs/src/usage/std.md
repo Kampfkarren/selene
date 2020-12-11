@@ -1,7 +1,7 @@
 # Standard Library Format
 selene provides a robust standard library format to allow for use with environments other than vanilla Lua. Standard libraries are defined in the form of [TOML](https://github.com/toml-lang/toml) files.
 
-# Examples
+## Examples
 For examples of the standard library format, see:
 - [`lua51.toml`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/default_std/lua51.toml) - The default standard library for Lua 5.1
 - [`lua52.toml`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/default_std/lua52.toml) - A standard library for Lua 5.2's additions and removals. Reference this if your standard library is based off another (it most likely is).
@@ -128,7 +128,7 @@ removed = true
 
 Used when your standard library is based off another, and your library removes something from the original.
 
-# Structs
+## Structs
 
 Structs are used in places such as Roblox Instances. Every Instance in Roblox, for example, declares a `:GetChildren()` method. We don't want to have to define this everywhere an Instance is declared globally, so instead we just define it once in a struct.
 
@@ -151,7 +151,7 @@ struct = "Event"
 
 ...and selene will know that `workspace.Changed:Connect(callback)` is valid, but `workspace.Changed:RandomNameHere()` is not.
 
-# Wildcards
+## Wildcards
 Fields can specify requirements if a field is referenced that is not explicitly named. For example, in Roblox, instances can have arbitrary fields of other instances (`workspace.Baseplate` indexes an instance named Baseplate inside `workspace`, but `Baseplate` is nowhere in the Roblox API).
 
 We can specify this behavior by using the special `"*"` field.
