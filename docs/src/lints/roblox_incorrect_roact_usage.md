@@ -15,7 +15,7 @@ Roact.createElement("BadClass", {})
 ```
 
 ## Remarks
-This lint is naiive and makes several assumptions about the way you write your code. The assumptions are based on idiomatic Roact.
+This lint is naive and makes several assumptions about the way you write your code. The assumptions are based on idiomatic Roact.
 
 1. It assumes you are either calling `Roact.createElement` directly or creating a local variable that's assigned to `Roact.createElement`.
 2. It assumes if you are using a local variable, you're not reassigning it.

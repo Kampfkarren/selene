@@ -3,7 +3,7 @@
 Checks for `type(foo == "type")`, instead of `type(foo) == "type"`.
 
 ## Why this is bad
-This will always return `"boolean"`, and is undoubtably not what you intended to write.
+This will always return `"boolean"`, and is undoubtedly not what you intended to write.
 
 ## Example
 ```lua

@@ -1,6 +1,6 @@
 # Motivation
 
-### Because bugs
+## Because bugs
 When writing any code, it's very easy to make silly mistakes that end up introducing bugs. A lot of the time, these bugs are hard to track down and debug, and sometimes are even harder to replicate.
 
 This risk is made ever more real because of the generally lax nature of Lua. Incorrect code is regularly passed off and isn't noticed until something breaks at runtime. Sometimes you'll get a clear error message, and will have to spend time going back, fixing the code, and making sure you actually fixed it. Other times, the effects are more hidden, and instead of getting an error your code will just pass through along, in an incorrect state.

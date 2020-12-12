@@ -1,4 +1,4 @@
-# unused_variable
+# unscoped_variables
 ## What it does
 Checks for variables that are unscoped (don't have a local variable attached).
 
