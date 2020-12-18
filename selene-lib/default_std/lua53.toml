@@ -11,8 +11,8 @@ required = false
 [[string.pack.args]]
 type = "string"
 
-[[string.unpack.args]]
+[[string.packsize.args]]
 type = "string"
 
-[[string.packsize.args]]
+[[string.unpack.args]]
 type = "string"
