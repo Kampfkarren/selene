@@ -296,6 +296,77 @@ type = { display = "Color3" }
 [coroutine.isyieldable]
 args = []
 
+[DateTime.now]
+args = []
+
+[[DateTime.fromUnixTimestamp.args]]
+required = true
+type = "number"
+
+[[DateTime.fromUnixTimestampMillis.args]]
+required = true
+type = "number"
+
+[[DateTime.fromUniversalTime.args]]
+required = false
+type = "number"
+
+[[DateTime.fromUniversalTime.args]]
+required = false
+type = "number"
+
+[[DateTime.fromUniversalTime.args]]
+required = false
+type = "number"
+
+[[DateTime.fromUniversalTime.args]]
+required = false
+type = "number"
+
+[[DateTime.fromUniversalTime.args]]
+required = false
+type = "number"
+
+[[DateTime.fromUniversalTime.args]]
+required = false
+type = "number"
+
+[[DateTime.fromUniversalTime.args]]
+required = false
+type = "number"
+
+[[DateTime.fromLocalTime.args]]
+required = false
+type = "number"
+
+[[DateTime.fromLocalTime.args]]
+required = false
+type = "number"
+
+[[DateTime.fromLocalTime.args]]
+required = false
+type = "number"
+
+[[DateTime.fromLocalTime.args]]
+required = false
+type = "number"
+
+[[DateTime.fromLocalTime.args]]
+required = false
+type = "number"
+
+[[DateTime.fromLocalTime.args]]
+required = false
+type = "number"
+
+[[DateTime.fromLocalTime.args]]
+required = false
+type = "number"
+
+[[DateTime.fromIsoDate.args]]
+required = true
+type = "string"
+
 [[debug.profilebegin.args]]
 type = "string"
 
