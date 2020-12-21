@@ -1,11 +1,14 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.10.0] - 2020-12-21
 ### Added
 - Added inline lint filtering, read [the documentation](https://kampfkarren.github.io/selene/usage/filtering.html) for more information.
 - More errors now set the exit code.
 - Added support for error({any}) to the Roblox standard library.
+
+### Changed
+- Updated full-moon, read [the full-moon changelog](https://github.com/Kampfkarren/full-moon/blob/master/CHANGELOG.md#080---2020-12-21) to learn more.
 
 ## [0.9.2] - 2020-11-06
 ### Changed
