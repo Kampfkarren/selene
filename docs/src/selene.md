@@ -7,6 +7,6 @@
 - **Interested in contributing to selene's codebase?** Read the [contribution guide](./contributing.md).
 - **Want to discuss selene or get help?** Join the [Roblox OS Community Discord](https://discord.gg/mhtGUS8). Note: selene is not Roblox exclusive, but it started its life for Roblox development.
 
-### License
+## License
 
 selene and all its source code are licensed under the [Mozilla Public License 2.0](https://www.mozilla.org/MPL/2.0/).

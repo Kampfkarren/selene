@@ -8,6 +8,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added support for error({any}) to the Roblox standard library.
 
 ### Changed
+- `UDim.new` and `Region3int16.new` no longer require parameters.
+- `UDim2.fromOffset` and `UDim2.fromScale` now require you to use `UDim.new` if no parameters are specified.
 - Updated full-moon, read [the full-moon changelog](https://github.com/Kampfkarren/full-moon/blob/master/CHANGELOG.md#080---2020-12-21) to learn more.
 
 ## [0.9.2] - 2020-11-06

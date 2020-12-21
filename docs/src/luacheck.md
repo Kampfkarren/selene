@@ -4,7 +4,7 @@
 selene is not the first Lua linter. The main inspiration behind selene is [luacheck](https://luacheck.readthedocs.io/en/stable/). However, the two have very little in common besides inception.
 
 - selene is actively maintained, while at the time of writing luacheck's last commit was in October 2018.
-- selene is written in Rust, while luacheck is written in Lua. In practice, this means that selene is much faster than luacheck while also being able to easily take advantage of features luacheck cannot because of the difficulty of using depenedencies in Lua.
+- selene is written in Rust, while luacheck is written in Lua. In practice, this means that selene is much faster than luacheck while also being able to easily take advantage of features luacheck cannot because of the difficulty of using dependencies in Lua.
 - selene is multithreaded, again leading to significantly better performance.
 - selene has rich output, while luacheck has basic output.
 
