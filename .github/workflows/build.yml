@@ -3,8 +3,6 @@ on:
   push:
     branches:
     - master
-    tags:
-    - v*
   pull_request:
     branches:
     - master
@@ -82,7 +80,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     needs: ['build_windows', 'build_mac', 'build_linux']
-    if: contains(github.ref, 'refs/tags')
+    if: contains(github.ref, 'refs/tags/v')
     steps:
     - uses: actions/checkout@v1
     - name: Download artifacts
