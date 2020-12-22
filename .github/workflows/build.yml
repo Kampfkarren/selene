@@ -83,3 +83,96 @@ jobs:
       with:
         name: selene-light-linux
         path: ./target/release/selene
+  release:
+    runs-on: ubuntu-latest
+    needs: ['build_windows', 'build_mac', 'build_linux']
+    if: contains(github.ref, 'refs/tags/v')
+    steps:
+    - uses: actions/checkout@v1
+    - name: Download artifacts
+      uses: actions/download-artifact@v2
+      with:
+        path: artifacts
+    - run: |
+        zip -rj selene-light-linux.zip ./artifacts/selene-light-linux/*
+        zip -rj selene-light-macos.zip ./artifacts/selene-light-macos/*
+        zip -rj selene-light-windows.zip ./artifacts/selene-light-windows/*
+        zip -rj selene-linux.zip ./artifacts/selene-linux/*
+        zip -rj selene-macos.zip ./artifacts/selene-macos/*
+        zip -rj selene-windows.zip ./artifacts/selene-windows/*
+
+        VERSION=`grep -Po '(?<=^version = ")([^"]+)' ./selene/Cargo.toml`
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+    - name: Get changelog
+      run: |
+        CHANGELOG_ENTRY=`grep --color=never -m 1 -Po '## \K(\[[0-9\.]+\].+)' CHANGELOG.md`
+        DESCRIPTION=`bash ./misc/extract-changelog.sh $CHANGELOG_ENTRY`
+
+        echo "CHANGELOG_ENTRY=$CHANGELOG_ENTRY" >> $GITHUB_ENV
+
+        echo "CHANGELOG_DESCRIPTION<<EOF" >> $GITHUB_ENV
+        echo "$DESCRIPTION" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+    - name: Create release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ env.CHANGELOG_ENTRY }}
+        body: ${{ env.CHANGELOG_DESCRIPTION }}
+    - name: Upload Linux build
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./selene-linux.zip
+        asset_name: selene-${{ env.VERSION }}-linux.zip
+        asset_content_type: application/zip
+    - name: Upload Linux build (light)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./selene-light-linux.zip
+        asset_name: selene-light-${{ env.VERSION }}-linux.zip
+        asset_content_type: application/zip
+    - name: Upload Windows build
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./selene-windows.zip
+        asset_name: selene-${{ env.VERSION }}-windows.zip
+        asset_content_type: application/zip
+    - name: Upload Windows build (light)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./selene-light-windows.zip
+        asset_name: selene-light-${{ env.VERSION }}-windows.zip
+        asset_content_type: application/zip
+    - name: Upload Mac build
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./selene-macos.zip
+        asset_name: selene-${{ env.VERSION }}-macos.zip
+        asset_content_type: application/zip
+    - name: Upload Mac build (light)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./selene-light-macos.zip
+        asset_name: selene-light-${{ env.VERSION }}-macos.zip
+        asset_content_type: application/zip
