@@ -93,7 +93,7 @@ jobs:
         mkdir artifacts
         touch ./artifacts/test.txt
         cd artifacts
-        echo "foo" > ./artifacts/test.txt
+        echo "foo" > ./test.txt
         cd ..
     - name: Get changelog
       run: |
