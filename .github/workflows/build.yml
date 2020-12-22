@@ -88,4 +88,32 @@ jobs:
         path: artifacts
     - run: |
         VERSION=`grep -Po '(?<=^version = ")([^"]+)' ./selene/Cargo.toml`
-        echo $VERSION
+        echo "VERSION=$VERSION" >> $VERSION
+
+        cd artifacts
+        echo "foo" > ./artifacts/test.txt
+        cd ..
+    - name: Get changelog
+      run: |
+        CHANGELOG_ENTRY=`grep --color=never -m 1 -Po '## \K(\[[0-9\.]+\].+)' CHANGELOG.md`
+        DESCRIPTION=`./misc/extract-changelog.sh $CHANGELOG_ENTRY`
+
+        echo "CHANGELOG_DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
+        echo "CHANGELOG_ENTRY=$CHANGELOG_ENTRY" >> $GITHUB_ENV
+    - name: Create release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ env.CHANGELOG_ENTRY }}
+        body: ${{ env.CHANGELOG_DESCRIPTION }}
+    - name: Upload test build
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/foo.txt
+        asset_name: foo-${{ env.VERSION }}.txt
+        asset_content_type: text/plain
