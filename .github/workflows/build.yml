@@ -90,6 +90,7 @@ jobs:
         VERSION=`grep -Po '(?<=^version = ")([^"]+)' ./selene/Cargo.toml`
         echo "VERSION=$VERSION" >> $VERSION
 
+        mkdir artifacts
         cd artifacts
         echo "foo" > ./artifacts/test.txt
         cd ..
