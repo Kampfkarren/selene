@@ -1,8 +1,4 @@
 name: Release selene
-# on:
-#   push:
-#     tags:
-#       - "v*"
 on:
   push:
     branches:
