@@ -87,12 +87,12 @@ jobs:
       with:
         path: artifacts
     - run: |
-        zip selene-light-linux.zip ./artifacts/selene-light-linux/*
-        zip selene-light-macos.zip ./artifacts/selene-light-macos/*
-        zip selene-light-windows.zip ./artifacts/selene-light-windows/*
-        zip selene-linux.zip ./artifacts/selene-linux/*
-        zip selene-macos.zip ./artifacts/selene-macos/*
-        zip selene-windows.zip ./artifacts/selene-windows/*
+        zip -rj selene-light-linux.zip ./artifacts/selene-light-linux/*
+        zip -rj selene-light-macos.zip ./artifacts/selene-light-macos/*
+        zip -rj selene-light-windows.zip ./artifacts/selene-light-windows/*
+        zip -rj selene-linux.zip ./artifacts/selene-linux/*
+        zip -rj selene-macos.zip ./artifacts/selene-macos/*
+        zip -rj selene-windows.zip ./artifacts/selene-windows/*
 
         VERSION=`grep -Po '(?<=^version = ")([^"]+)' ./selene/Cargo.toml`
         echo "VERSION=$VERSION" >> $GITHUB_ENV
