@@ -500,7 +500,7 @@ impl Visitor<'_> for ScopeVisitor {
     fn visit_function_body(&mut self, body: &ast::FunctionBody) {
         self.open_scope(body);
 
-        for parameter in body.iter_parameters() {
+        for parameter in body.parameters() {
             match parameter {
                 ast::Parameter::Ellipse(token) | ast::Parameter::Name(token) => {
                     self.define_name(token, range(token));

@@ -1,0 +1,18 @@
+[selene]
+base = "lua52"
+
+[[math.log.args]]
+type = "number"
+
+[[math.log.args]]
+type = "number"
+required = false
+
+[[string.pack.args]]
+type = "string"
+
+[[string.packsize.args]]
+type = "string"
+
+[[string.unpack.args]]
+type = "string"
