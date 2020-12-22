@@ -89,9 +89,6 @@ jobs:
     - run: |
         VERSION=`grep -Po '(?<=^version = ")([^"]+)' ./selene/Cargo.toml`
         echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-        mkdir artifacts
-        touch ./artifacts/test.txt
     - name: Get changelog
       run: |
         CHANGELOG_ENTRY=`grep --color=never -m 1 -Po '## \K(\[[0-9\.]+\].+)' CHANGELOG.md`
