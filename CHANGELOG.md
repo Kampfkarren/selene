@@ -6,7 +6,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added inline lint filtering, read [the documentation](https://kampfkarren.github.io/selene/usage/filtering.html) for more information.
 - More errors now set the exit code.
 - Added support for error({any}) to the Roblox standard library.
-- Add support for DateTime in the Roblox standard library
+- Added support for DateTime in the Roblox standard library.
 
 ### Changed
 - `UDim.new` and `Region3int16.new` no longer require parameters.
