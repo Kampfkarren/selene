@@ -91,6 +91,7 @@ jobs:
         echo "VERSION=$VERSION" >> $VERSION
 
         mkdir artifacts
+        touch ./artifacts/test.txt
         cd artifacts
         echo "foo" > ./artifacts/test.txt
         cd ..
