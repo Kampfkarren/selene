@@ -100,8 +100,11 @@ jobs:
         CHANGELOG_ENTRY=`grep --color=never -m 1 -Po '## \K(\[[0-9\.]+\].+)' CHANGELOG.md`
         DESCRIPTION=`bash ./misc/extract-changelog.sh $CHANGELOG_ENTRY`
 
-        echo "CHANGELOG_DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
         echo "CHANGELOG_ENTRY=$CHANGELOG_ENTRY" >> $GITHUB_ENV
+
+        echo "CHANGELOG_DESCRIPTION<<EOF" >> $GITHUB_ENV
+        echo "$DESCRIPTION" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
     - name: Create release
       uses: actions/create-release@v1
       env:
