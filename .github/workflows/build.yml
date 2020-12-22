@@ -87,6 +87,13 @@ jobs:
       with:
         path: artifacts
     - run: |
+        zip selene-light-linux.zip ./artifacts/selene-light-linux/*
+        zip selene-light-macos.zip ./artifacts/selene-light-macos/*
+        zip selene-light-windows.zip ./artifacts/selene-light-windows/*
+        zip selene-linux.zip ./artifacts/selene-linux/*
+        zip selene-macos.zip ./artifacts/selene-macos/*
+        zip selene-windows.zip ./artifacts/selene-windows/*
+
         VERSION=`grep -Po '(?<=^version = ")([^"]+)' ./selene/Cargo.toml`
         echo "VERSION=$VERSION" >> $GITHUB_ENV
     - name: Get changelog
@@ -150,8 +157,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/selene-mac
-        asset_name: selene-${{ env.VERSION }}-mac.zip
+        asset_path: ./artifacts/selene-macos
+        asset_name: selene-${{ env.VERSION }}-macos.zip
         asset_content_type: application/zip
     - name: Upload Mac build (light)
       uses: actions/upload-release-asset@v1
@@ -159,6 +166,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/selene-light-mac
-        asset_name: selene-light-${{ env.VERSION }}-mac.zip
+        asset_path: ./artifacts/selene-light-macos
+        asset_name: selene-light-${{ env.VERSION }}-macos.zip
         asset_content_type: application/zip
