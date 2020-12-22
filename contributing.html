@@ -1,0 +1,365 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Contributing - selene Documentation</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="selene.html"><strong aria-hidden="true">1.</strong> selene</a></li><li class="chapter-item expanded "><a href="motivation.html"><strong aria-hidden="true">2.</strong> Motivation</a></li><li class="chapter-item expanded "><a href="luacheck.html"><strong aria-hidden="true">3.</strong> Luacheck Comparison</a></li><li class="chapter-item expanded "><a href="cli/index.html"><strong aria-hidden="true">4.</strong> Command Line Interface</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="cli/installation.html"><strong aria-hidden="true">4.1.</strong> Installation</a></li><li class="chapter-item expanded "><a href="cli/usage.html"><strong aria-hidden="true">4.2.</strong> CLI Usage</a></li></ol></li><li class="chapter-item expanded "><a href="usage/index.html"><strong aria-hidden="true">5.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="usage/configuration.html"><strong aria-hidden="true">5.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="usage/filtering.html"><strong aria-hidden="true">5.2.</strong> Filtering</a></li><li class="chapter-item expanded "><a href="usage/std.html"><strong aria-hidden="true">5.3.</strong> Standard Library Format</a></li></ol></li><li class="chapter-item expanded "><a href="roblox.html"><strong aria-hidden="true">6.</strong> Roblox Guide</a></li><li class="chapter-item expanded "><a href="contributing.html" class="active"><strong aria-hidden="true">7.</strong> Contributing</a></li><li class="chapter-item expanded "><a href="lints/index.html"><strong aria-hidden="true">8.</strong> Lints</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="lints/almost_swapped.html"><strong aria-hidden="true">8.1.</strong> almost_swapped</a></li><li class="chapter-item expanded "><a href="lints/divide_by_zero.html"><strong aria-hidden="true">8.2.</strong> divide_by_zero</a></li><li class="chapter-item expanded "><a href="lints/empty_if.html"><strong aria-hidden="true">8.3.</strong> empty_if</a></li><li class="chapter-item expanded "><a href="lints/global_usage.html"><strong aria-hidden="true">8.4.</strong> global_usage</a></li><li class="chapter-item expanded "><a href="lints/if_same_then_else.html"><strong aria-hidden="true">8.5.</strong> if_same_then_else</a></li><li class="chapter-item expanded "><a href="lints/ifs_same_cond.html"><strong aria-hidden="true">8.6.</strong> ifs_same_cond</a></li><li class="chapter-item expanded "><a href="lints/multiple_statements.html"><strong aria-hidden="true">8.7.</strong> multiple_statements</a></li><li class="chapter-item expanded "><a href="lints/parenthese_conditions.html"><strong aria-hidden="true">8.8.</strong> parenthese_conditions</a></li><li class="chapter-item expanded "><a href="lints/roblox_incorrect_color3_new_bounds.html"><strong aria-hidden="true">8.9.</strong> roblox_incorrect_color3_new_bounds</a></li><li class="chapter-item expanded "><a href="lints/roblox_incorrect_roact_usage.html"><strong aria-hidden="true">8.10.</strong> roblox_incorrect_roact_usage</a></li><li class="chapter-item expanded "><a href="lints/shadowing.html"><strong aria-hidden="true">8.11.</strong> shadowing</a></li><li class="chapter-item expanded "><a href="lints/incorrect_standard_library_use.html"><strong aria-hidden="true">8.12.</strong> incorrect_standard_library_use</a></li><li class="chapter-item expanded "><a href="lints/suspicious_reverse_loop.html"><strong aria-hidden="true">8.13.</strong> suspicious_reverse_loop</a></li><li class="chapter-item expanded "><a href="lints/type_check_inside_call.html"><strong aria-hidden="true">8.14.</strong> type_check_inside_call</a></li><li class="chapter-item expanded "><a href="lints/unbalanced_assignments.html"><strong aria-hidden="true">8.15.</strong> unbalanced_assignments</a></li><li class="chapter-item expanded "><a href="lints/undefined_variable.html"><strong aria-hidden="true">8.16.</strong> undefined_variable</a></li><li class="chapter-item expanded "><a href="lints/unscoped_variables.html"><strong aria-hidden="true">8.17.</strong> unscoped_variables</a></li><li class="chapter-item expanded "><a href="lints/unused_variable.html"><strong aria-hidden="true">8.18.</strong> unused_variable</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">selene Documentation</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#contributing" id="contributing">Contributing</a></h1>
+<p>selene is written in Rust, so knowledge of the ecosystem is expected.</p>
+<p>selene uses <a href="https://github.com/Kampfkarren/full-moon">Full Moon</a> to parse the Lua code losslessly, meaning whitespace and comments are preserved. You can read the full documentation for Full Moon on its <a href="https://docs.rs/full_moon/latest/full_moon/">docs.rs</a> page.</p>
+<p>TODO: Upload selene-lib on crates.io and link the docs.rs page for that as well as throughout the rest of this article.</p>
+<h2><a class="header" href="#writing-a-lint" id="writing-a-lint">Writing a lint</a></h2>
+<p>In selene, lints are created in isolated modules. To start, create a file in <code>selene-lib/src/rules</code> with the name of your lint. In this example, we're going to call the lint <code>cool_lint.rs</code>.</p>
+<p>Let's now understand what a lint consists of. selene takes lints in the form of structs that implement the <code>Rule</code> trait. The <code>Rule</code> trait expects:</p>
+<ul>
+<li>A <code>Config</code> associated type that defines what the configuration format is expected to be. Whatever you pass must be <a href="https://serde.rs/">deserializable</a>.</li>
+<li>An <code>Error</code> associated type that implements <a href="https://doc.rust-lang.org/std/error/trait.Error.html"><code>std::error::Error</code></a>. This is used if configurations can be invalid (such as a parameter only being a number within a range). Most of the time, configurations cannot be invalid (other than deserializing errors, which are handled by selene), and so you can set this to <a href="https://doc.rust-lang.org/std/convert/enum.Infallible.html"><code>std::convert::Infallible</code></a>.</li>
+<li>A <code>new</code> function with the signature <code>fn new(config: Self::Config) -&gt; Result&lt;Self, Self::Error&gt;</code>. With the selene CLI, this is called once.</li>
+<li>A <code>pass</code> function with the signature <code>fn pass(&amp;self, ast: &amp;full_moon::ast::Ast&lt;'static&gt;, context: &amp;Context) -&gt; Vec&lt;Diagnostic&gt;</code>. The <code>ast</code> argument is the Full Moon representation of the code, and the context provides optional additional information, such as the standard library being used. Any <code>Diagnostic</code> structs returned here are displayed to the user.</li>
+<li>A <code>severity</code> function with the signature <code>fn severity(&amp;self) -&gt; Severity</code>. Returns either <code>Severity::Error</code> or <code>Severity::Warning</code>. Use <code>Error</code> if the code is positively impossible to be correct. The <code>&amp;self</code> is only provided due to limitations of Rust--the function should be completely constant and pure.</li>
+<li>A <code>rule_type</code> function with the signature <code>fn rule_type(&amp;self) -&gt; RuleType</code>. Returns either <code>Complexity</code>, <code>Correctness</code>, <code>Performance</code>, or <code>Style</code>. So far not used for anything. Has the same gotcha as <code>severity</code> in relation to <code>&amp;self</code>.</li>
+</ul>
+<p>For our purposes, we're going to write:</p>
+<pre><code class="language-rs">use super::*;
+use std::convert::Infallible;
+
+struct CoolLint;
+
+impl Rule for CoolLint {
+    type Config = ();
+    type Error = Infallible;
+
+    fn new(_: Self::Config) -&gt; Result&lt;Self, Self::Error&gt; {
+        Ok(CoolLint)
+    }
+
+    fn pass(&amp;self, ast: &amp;Ast, _: &amp;Context) -&gt; Vec&lt;Diagnostic&gt; {
+        unimplemented!()
+    }
+
+    fn severity(&amp;self) -&gt; Severity {
+        Severity::Warning
+    }
+
+    fn rule_type(&amp;self) -&gt; RuleType {
+        RuleType::Style
+    }
+}
+</code></pre>
+<p>The implementation of <code>pass</code> is completely up to you, but there are a few common patterns.</p>
+<ul>
+<li>Creating a visitor over the ast provided and creating diagnostics based off of that. See <a href="https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/rules/divide_by_zero.rs"><code>divide_by_zero</code></a> and <a href="https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/rules/suspicious_reverse_loop.rs"><code>suspicious_reverse_loop</code></a> for straight forward examples.</li>
+<li>Using the <code>ScopeManager</code> struct to lint based off of usage of variables and references. See <a href="https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/rules/shadowing.rs"><code>shadowing</code></a> and <a href="https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/rules/global_usage.rs"><code>global_usage</code></a>.</li>
+</ul>
+<h3><a class="header" href="#getting-selene-to-recognize-the-new-lint" id="getting-selene-to-recognize-the-new-lint">Getting selene to recognize the new lint</a></h3>
+<p>Now that we have our lint, we have to make sure selene actually knows to use it. There are two places you need to update.</p>
+<p>In selene-lib/src/lib.rs, search for <code>use_rules!</code>. You will see something such as:</p>
+<pre><code class="language-rs">use_rules! {
+    almost_swapped: rules::almost_swapped::AlmostSwappedLint,
+    divide_by_zero: rules::divide_by_zero::DivideByZeroLint,
+    empty_if: rules::empty_if::EmptyIfLint,
+    ...
+}
+</code></pre>
+<p>Put your lint in this list (alphabetical order) as the following format:</p>
+<pre><code>lint_name: rules::module_name::LintObject,
+</code></pre>
+<p>For us, this would be:</p>
+<pre><code>cool_lint: rules::cool_lint::CoolLint,
+</code></pre>
+<p>Next, in <code>selene-lib/src/rules.rs</code>, search for <code>pub mod</code>, and you will see:</p>
+<pre><code class="language-rs">pub mod almost_swapped;
+pub mod divide_by_zero;
+pub mod empty_if;
+...
+</code></pre>
+<p>Put your module name in this list, also in alphabetical order.</p>
+<pre><code class="language-rs">pub mod almost_swapped;
+pub mod cool_lint;
+pub mod divide_by_zero;
+pub mod empty_if;
+...
+</code></pre>
+<p>And we're done! You should be able to <code>cargo build --bin selene</code> and be able to use your new lint.</p>
+<h3><a class="header" href="#writing-tests" id="writing-tests">Writing tests</a></h3>
+<p>The selene codebase uses tests extensively for lints. It means we never have to actually build the CLI tool in order to test, and we can make sure we don't have any regressions. <strong>Testing is required if you want to submit your lint to the selene codebase.</strong></p>
+<p>To write a simple test, create a folder in <code>selene-lib/tests</code> with the name of your lint. Then, create as many <code>.lua</code> files as you want to test. These should contain both cases that do and do not lint. For our cases, we're going to assume our test is called <code>cool_lint.lua</code>.</p>
+<p>Then, in your lint module, add at the bottom:</p>
+<pre><code class="language-rs">#[cfg(test)]
+mod tests {
+    use super::{super::test_util::test_lint, *};
+
+    #[test]
+    fn test_cool_lint() {
+        test_lint(
+            CoolLint::new(()).unwrap(),
+            &quot;cool_lint&quot;,
+            &quot;cool_lint&quot;,
+        );
+    }
+}
+</code></pre>
+<p>Let's discuss what this code means, assuming you're familiar with <a href="https://doc.rust-lang.org/book/ch11-00-testing.html">the way tests are written and performed in Rust</a>.</p>
+<p>The <code>test_lint</code> function is the easiest way to test that a lint works. It'll search the source code we made before, run selene on it (only your lint), and check its results with the existing <code>[filename].stderr</code> file, or create one if it does not yet exist.</p>
+<p>The first argument is the lint object to use. <code>CoolLint::new(())</code> just means &quot;create <code>CoolLint</code> with a configuration of <code>()</code>&quot;. If your lint specifies a configuration, this will instead be something such as <code>CoolLintConfig::default()</code> or whatever you're specifically testing.</p>
+<p>The <code>.unwrap()</code> is just because <code>CoolLint::new</code> returns a <code>Result</code>. If you want to test configuration errors, you can avoid <code>test_lint</code> altogether and just test <code>CoolLint::new(...).is_err()</code> directly.</p>
+<p>The first <code>&quot;cool_lint&quot;</code> is the name of the folder we created. The second <code>&quot;cool_lint&quot;</code> is the name of the <em>Lua file</em> we created.</p>
+<p>Now, just run <code>cargo test</code>, and a <code>.stderr</code> file will be automatically generated! You can manipulate it however you see fit as well as modifying your rule, and so long as the file is there, selene will make sure that its accurate.</p>
+<p>Optionally, you can add a <code>.std.toml</code> with the same name as the test next to the lua file, where you can specify a custom <a href="./cli/std.html">standard library</a> to use. If you do not, the Lua 5.1 standard library will be used.</p>
+<h3><a class="header" href="#documenting-it" id="documenting-it">Documenting it</a></h3>
+<p>This step is only if you are contributing to the selene codebase, and not just writing personal lints (though I'm sure your other programmers would love if you did this).</p>
+<p>To document a new lint, edit <code>docs/src/SUMMARY.md</code>, and add your lint to the table of contents along the rest. As with everything else, make sure it's in alphabetical order.</p>
+<p>Then, edit the markdown file it creates (if you have <code>mdbook serve</code> on, it'll create it for you), and write it in this format:</p>
+<pre><code># rule_name
+## What it does
+Explain what your lint does, simply.
+
+## Why this is bad
+Explain why a user would want to lint this.
+
+## Configuration
+Specify any configuration if it exists.
+
+## Example
+```lua
+-- Bad code here
+```
+
+...should be written as...
+
+```lua
+-- Good code here
+```
+
+## Remarks
+If there's anything else a user should know when using this lint, write it here.
+</code></pre>
+<p>This isn't a strict format, and you can mess with it as appropriate. For example, <code>standard_library</code> does not have a &quot;Why this is bad&quot; section as not only is it a very encompassing rule, but it should be fairly obvious. Many rules don't specify a &quot;...should be written as...&quot; as it is either something with various potential fixes (such as <a href="./lints/global_usage.html"><code>global_usage</code></a>) or because the &quot;good code&quot; is just removing parts entirely (such as <a href="./lints/unbalanced_assignments.html"><code>unbalanced_assignments</code></a>).</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="roblox.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="lints/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="roblox.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="lints/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
