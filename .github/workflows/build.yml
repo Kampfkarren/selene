@@ -121,7 +121,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/selene-linux
+        asset_path: ./artifacts/selene-linux.zip
         asset_name: selene-${{ env.VERSION }}-linux.zip
         asset_content_type: application/zip
     - name: Upload Linux build (light)
@@ -130,7 +130,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/selene-light-linux
+        asset_path: ./artifacts/selene-light-linux.zip
         asset_name: selene-light-${{ env.VERSION }}-linux.zip
         asset_content_type: application/zip
     - name: Upload Windows build
@@ -139,7 +139,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/selene-windows
+        asset_path: ./artifacts/selene-windows.zip
         asset_name: selene-${{ env.VERSION }}-windows.zip
         asset_content_type: application/zip
     - name: Upload Windows build (light)
@@ -148,7 +148,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/selene-light-windows
+        asset_path: ./artifacts/selene-light-windows.zip
         asset_name: selene-light-${{ env.VERSION }}-windows.zip
         asset_content_type: application/zip
     - name: Upload Mac build
@@ -157,7 +157,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/selene-macos
+        asset_path: ./artifacts/selene-macos.zip
         asset_name: selene-${{ env.VERSION }}-macos.zip
         asset_content_type: application/zip
     - name: Upload Mac build (light)
@@ -166,6 +166,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/selene-light-macos
+        asset_path: ./artifacts/selene-light-macos.zip
         asset_name: selene-light-${{ env.VERSION }}-macos.zip
         asset_content_type: application/zip
