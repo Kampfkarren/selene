@@ -86,5 +86,5 @@ jobs:
       with:
         path: artifacts
     - run: |
-      VERSION=`grep -Po '(?<=^version = ")([^"]+)' ./selene/Cargo.toml`
-      echo $VERSION
+        VERSION=`grep -Po '(?<=^version = ")([^"]+)' ./selene/Cargo.toml`
+        echo $VERSION
