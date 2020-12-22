@@ -77,3 +77,13 @@ jobs:
       with:
         name: selene-light-linux
         path: ./target/release/selene
+  release:
+    runs-on: ubuntu-latest
+    needs: ['build_windows', 'build_mac', 'build_linux']
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v2
+      with:
+        path: artifacts
+    - run: ls -R
+      working-directory: artifacts
