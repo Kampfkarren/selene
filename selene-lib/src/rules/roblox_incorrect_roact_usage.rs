@@ -193,7 +193,7 @@ impl Visitor<'_> for IncorrectRoactUsageVisitor {
             }
         }
 
-        for field in arguments.iter_fields() {
+        for field in arguments.fields() {
             if let ast::Field::NameKey { key, .. } = field {
                 let property_name = key.token().to_string();
                 if !valid_properties.contains(property_name.as_str()) {

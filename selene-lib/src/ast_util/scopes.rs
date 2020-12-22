@@ -231,7 +231,7 @@ impl ScopeVisitor {
     }
 
     fn read_table_constructor(&mut self, table: &ast::TableConstructor) {
-        for field in table.iter_fields() {
+        for field in table.fields() {
             match field {
                 ast::Field::ExpressionKey { key, value, .. } => {
                     self.read_expression(key);
