@@ -7,41 +7,7 @@ on:
     branches:
     - master
 jobs:
-  test_windows:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: Run tests (selene, all features)
-      run: cargo test
-      working-directory: selene
-    - name: Run tests (selene, no features)
-      run: cargo test --no-default-features
-      working-directory: selene
-    - name: Run tests (selene-lib, all features)
-      run: cargo test
-      working-directory: selene-lib
-    - name: Run tests (selene-lib, no features)
-      run: cargo test --no-default-features
-      working-directory: selene-lib
-  test_mac:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: Install Rust
-      run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    - name: Run tests (selene, all features)
-      run: cargo test
-      working-directory: selene
-    - name: Run tests (selene, no features)
-      run: cargo test --no-default-features
-      working-directory: selene
-    - name: Run tests (selene-lib, all features)
-      run: cargo test
-      working-directory: selene-lib
-    - name: Run tests (selene-lib, no features)
-      run: cargo test --no-default-features
-      working-directory: selene-lib
-  test_linux:
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
