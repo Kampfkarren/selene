@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Added
+- Added support for DateTime in the Roblox standard library.
+
 ## [0.10.0] - 2020-12-21
 ### Added
 - Added inline lint filtering, read [the documentation](https://kampfkarren.github.io/selene/usage/filtering.html) for more information.
@@ -11,7 +15,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
     - New function `string.unpack`
     - New function `string.packsize`
     - New optional arg for `math.log`
-- Added support for DateTime in the Roblox standard library.
 
 ### Changed
 - `UDim.new` and `Region3int16.new` no longer require parameters.
