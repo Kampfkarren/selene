@@ -1,6 +1,6 @@
 [package]
 name = "selene-lib"
-version = "0.10.0"
+version = "0.10.1"
 license = "MPL-2.0"
 authors = ["Kampfkarren <kampfkarren@gmail.com>"]
 description = "A library for linting Lua code. You probably want selene instead."
@@ -12,7 +12,7 @@ edition = "2018"
 [dependencies]
 codespan = "0.9"
 codespan-reporting = "0.9"
-full_moon = "0.8"
+full_moon = "0.9"
 id-arena = "2.2"
 if_chain = "1.0"
 lazy_static = "1.4"

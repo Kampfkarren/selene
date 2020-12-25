@@ -1,0 +1,25 @@
+name: Test selene
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run tests (selene, all features)
+      run: cargo test
+      working-directory: selene
+    - name: Run tests (selene, no features)
+      run: cargo test --no-default-features
+      working-directory: selene
+    - name: Run tests (selene-lib, all features)
+      run: cargo test
+      working-directory: selene-lib
+    - name: Run tests (selene-lib, no features)
+      run: cargo test --no-default-features
+      working-directory: selene-lib

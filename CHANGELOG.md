@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Added support for DateTime in the Roblox standard library.
 
+## [0.10.1] - 2020-12-22
+### Fixed
+- Fixed regressions related to numeric for loops.
+
 ## [0.10.0] - 2020-12-21
 ### Added
 - Added inline lint filtering, read [the documentation](https://kampfkarren.github.io/selene/usage/filtering.html) for more information.
