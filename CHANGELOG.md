@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Added
+- Added support for DateTime in the Roblox standard library.
+
 ## [0.10.1] - 2020-12-22
 ### Fixed
 - Fixed regressions related to numeric for loops.
