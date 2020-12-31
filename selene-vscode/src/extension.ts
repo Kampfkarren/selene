@@ -26,10 +26,24 @@ enum Severity {
     Warning = "Warning",
 }
 
+function byteToCharOffset(document: vscode.TextDocument, byteOffset: number) {
+    const text = document.getText();
+    let currentOffset = 0;
+    // Iterate through each character in the string
+    for (let i = 0; i < byteOffset; i++) {
+        // Calculate the current byte offset we have reached so far
+        currentOffset += Buffer.byteLength(text[i], "utf-8");
+        if (currentOffset >= byteOffset) {
+            return i + 1
+        }
+    }
+    return currentOffset
+}
+
 function labelToRange(document: vscode.TextDocument, label: Label): vscode.Range {
     return new vscode.Range(
-        document.positionAt(label.span.start),
-        document.positionAt(label.span.end),
+        document.positionAt(byteToCharOffset(document, label.span.start)),
+        document.positionAt(byteToCharOffset(document, label.span.end)),
     )
 }
 
