@@ -26,24 +26,32 @@ enum Severity {
     Warning = "Warning",
 }
 
-function byteToCharOffset(document: vscode.TextDocument, byteOffset: number) {
+function byteToCharMap(document: vscode.TextDocument, byteOffsets: Set<number>) {
     const text = document.getText();
+    const byteOffsetMap = new Map<number, number>();
     let currentOffset = 0;
-    // Iterate through each character in the string
-    for (let i = 0; i < byteOffset; i++) {
+
+    // Iterate through each character in the string 
+    for (let i = 0; i < text.length; i++) {
         // Calculate the current byte offset we have reached so far
         currentOffset += Buffer.byteLength(text[i], "utf-8");
-        if (currentOffset >= byteOffset) {
-            return i + 1
+        for (const offset of byteOffsets) {
+            if (currentOffset >= offset) {
+                byteOffsetMap.set(offset, i + 1)
+                byteOffsets.delete(offset)
+
+                if (byteOffsets.size === 0) break
+            }
         }
     }
-    return currentOffset
+
+    return byteOffsetMap;
 }
 
-function labelToRange(document: vscode.TextDocument, label: Label): vscode.Range {
+function labelToRange(document: vscode.TextDocument, label: Label, byteOffsetMap: Map<number, number>): vscode.Range {
     return new vscode.Range(
-        document.positionAt(byteToCharOffset(document, label.span.start)),
-        document.positionAt(byteToCharOffset(document, label.span.end)),
+        document.positionAt(byteOffsetMap.get(label.span.start) ?? label.span.start),
+        document.positionAt(byteOffsetMap.get(label.span.end) ?? label.span.end),
     )
 }
 
@@ -94,6 +102,8 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
         const diagnostics: vscode.Diagnostic[] = []
+        const dataToAdd: Diagnostic[] = []
+        const byteOffsets = new Set<number>()
 
         for (const line of output.split("\n")) {
             if (line === "Results:") {
@@ -101,14 +111,25 @@ export async function activate(context: vscode.ExtensionContext) {
             }
 
             const data: Diagnostic = JSON.parse(line)
+            dataToAdd.push(data)
+            byteOffsets.add(data.primary_label.span.start)
+            byteOffsets.add(data.primary_label.span.end)
+            for (const label of data.secondary_labels) {
+                byteOffsets.add(label.span.start)
+                byteOffsets.add(label.span.end)
+            }
+        }
 
+        const byteOffsetMap = byteToCharMap(document, byteOffsets)
+
+        for (const data of dataToAdd) {
             let message = data.message
             if (data.notes.length > 0) {
                 message += `\n${data.notes.map(note => `note: ${note}\n`)}`
             }
 
             const diagnostic = new vscode.Diagnostic(
-                labelToRange(document, data.primary_label),
+                labelToRange(document, data.primary_label, byteOffsetMap),
                 message,
                 data.severity === Severity.Error ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning,
             )
@@ -124,7 +145,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     message: label.message,
                     location: {
                         uri: document.uri,
-                        range: labelToRange(document, label),
+                        range: labelToRange(document, label, byteOffsetMap),
                     },
                 }
             })
