@@ -588,6 +588,16 @@ type = "string"
 type = "number"
 required = false
 
+[[table.clear.args]]
+type = "table"
+
+[[table.create.args]]
+type = "number"
+
+[[table.create.args]]
+type = "any"
+required = false
+
 [[table.find.args]]
 type = "table"
 
@@ -596,13 +606,6 @@ type = "any"
 
 [[table.find.args]]
 type = "number"
-required = false
-
-[[table.create.args]]
-type = "number"
-
-[[table.create.args]]
-type = "any"
 required = false
 
 [[table.move.args]]
