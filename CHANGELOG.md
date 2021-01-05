@@ -1,7 +1,7 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## #[0.11.0] - 2021-01-04
 ### Added
 - Added support for DateTime in the Roblox standard library.
 - Added support for `table.clear` in the Roblox standard library.
