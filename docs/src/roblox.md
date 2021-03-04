@@ -19,3 +19,11 @@ Deprecated event members are not added by default. This means code such as `work
 ## Updating `roblox.toml`
 
 If you're wondering why selene is providing you with outdated information regarding API that it doesn't know, you'll need to delete your `roblox.toml` and re-generate it. The Roblox standard library will be automatically updated by running selene after you've deleted `roblox.toml`.
+
+## TestEZ Support
+
+Roblox has provided an open source testing utility called [TestEZ](https://roblox.github.io/testez/), which allows you to write unit tests for your code. Writing unit tests is good practice, but selene will get angry at you if you don't include a `testez.toml` file and set the standard library to the following:
+
+`std = "roblox+testez"`
+
+But first you'll need to create a `testez.toml` file, which you can do so [with this template.](https://gist.github.com/Nezuo/65af3108a6214a209ca4e329e22af73c)
