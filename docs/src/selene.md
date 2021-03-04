@@ -2,6 +2,7 @@
 **selene** is a command line tool designed to help write correct and idiomatic Lua code.
 
 - **New to selene?** Read the [motivation behind its creation](./motivation.md) and the [CLI guide](./cli/index.md). If you already use [Luacheck](https://luacheck.readthedocs.io/en/stable/), you can read the [Luacheck comparison and migration guide](./luacheck.md).
+- **Don't know what a linter is?** Check out [the wiki on linters](https://en.wikipedia.org/wiki/Lint_(software)) about what a linter does and how it's beneficial.
 - **Existing user?** Read the [changelog](https://github.com/Kampfkarren/selene/blob/master/CHANGELOG.md) to learn about any new features or bug fixes.
 - **Interested in what selene lints for?** Read the [list of lints](./lints/index.md).
 - **Interested in contributing to selene's codebase?** Read the [contribution guide](./contributing.md).
