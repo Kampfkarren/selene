@@ -163,19 +163,19 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#roblox_incorrect_roact_usage" id="roblox_incorrect_roact_usage">roblox_incorrect_roact_usage</a></h1>
-<h2><a class="header" href="#what-it-does" id="what-it-does">What it does</a></h2>
+                        <h1 id="roblox_incorrect_roact_usage"><a class="header" href="#roblox_incorrect_roact_usage">roblox_incorrect_roact_usage</a></h1>
+<h2 id="what-it-does"><a class="header" href="#what-it-does">What it does</a></h2>
 <p>Checks for valid uses of Roact.createElement. Verifies that class name given is valid and that the properties passed for it are valid for that class.</p>
-<h2><a class="header" href="#why-this-is-bad" id="why-this-is-bad">Why this is bad</a></h2>
+<h2 id="why-this-is-bad"><a class="header" href="#why-this-is-bad">Why this is bad</a></h2>
 <p>This is guaranteed to fail once it is rendered. Furthermore, the createElement itself will not error--only once its mounted will it error.</p>
-<h2><a class="header" href="#example" id="example">Example</a></h2>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
 <pre><code class="language-lua">Roact.createElement(&quot;Frame&quot;, {
     ThisPropertyDoesntExist = true,
 })
 
 Roact.createElement(&quot;BadClass&quot;, {})
 </code></pre>
-<h2><a class="header" href="#remarks" id="remarks">Remarks</a></h2>
+<h2 id="remarks"><a class="header" href="#remarks">Remarks</a></h2>
 <p>This lint is naive and makes several assumptions about the way you write your code. The assumptions are based on idiomatic Roact.</p>
 <ol>
 <li>It assumes you are either calling <code>Roact.createElement</code> directly or creating a local variable that's assigned to <code>Roact.createElement</code>.</li>

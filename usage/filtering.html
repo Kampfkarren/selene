@@ -163,9 +163,9 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#filtering" id="filtering">Filtering</a></h1>
+                        <h1 id="filtering"><a class="header" href="#filtering">Filtering</a></h1>
 <p>Lints can be toggled on and off in the middle of code when necessary through the use of special comments.</p>
-<h2><a class="header" href="#allowingdenying-lints-for-a-piece-of-code" id="allowingdenying-lints-for-a-piece-of-code">Allowing/denying lints for a piece of code</a></h2>
+<h2 id="allowingdenying-lints-for-a-piece-of-code"><a class="header" href="#allowingdenying-lints-for-a-piece-of-code">Allowing/denying lints for a piece of code</a></h2>
 <p>Suppose we have the following code:</p>
 <pre><code class="language-lua">local something = 1
 </code></pre>
@@ -199,7 +199,7 @@ do
 end
 </code></pre>
 <p>...will silence the unused variable warning for both <code>foo</code> and <code>bar</code>.</p>
-<h2><a class="header" href="#allowingdenying-lints-for-an-entire-file" id="allowingdenying-lints-for-an-entire-file">Allowing/denying lints for an entire file</a></h2>
+<h2 id="allowingdenying-lints-for-an-entire-file"><a class="header" href="#allowingdenying-lints-for-an-entire-file">Allowing/denying lints for an entire file</a></h2>
 <p>If you want to allow/deny a lint for an entire file, you can do this by attaching the following code to the beginning:</p>
 <pre><code class="language-lua">--# selene: allow(lint_name)
 </code></pre>
@@ -222,7 +222,7 @@ error[invalid_lint_filter]: global filters must come before any code
   │ ----------- global filter must be before this
 2 │ --# selene: allow(unused_variable)
 </code></pre>
-<h2><a class="header" href="#combining-multiple-lints" id="combining-multiple-lints">Combining multiple lints</a></h2>
+<h2 id="combining-multiple-lints"><a class="header" href="#combining-multiple-lints">Combining multiple lints</a></h2>
 <p>You can filter multiple lints in two ways:</p>
 <pre><code class="language-lua">-- selene: allow(lint_one)
 -- selene: allow(lint_two)

@@ -163,14 +163,14 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#global_usage" id="global_usage">global_usage</a></h1>
-<h2><a class="header" href="#what-it-does" id="what-it-does">What it does</a></h2>
+                        <h1 id="global_usage"><a class="header" href="#global_usage">global_usage</a></h1>
+<h2 id="what-it-does"><a class="header" href="#what-it-does">What it does</a></h2>
 <p>Prohibits use of <code>_G</code>.</p>
-<h2><a class="header" href="#why-this-is-bad" id="why-this-is-bad">Why this is bad</a></h2>
+<h2 id="why-this-is-bad"><a class="header" href="#why-this-is-bad">Why this is bad</a></h2>
 <p><code>_G</code> is global mutable state, which is heavily regarded as harmful. You should instead refactor your code to be more modular in nature.</p>
-<h2><a class="header" href="#remarks" id="remarks">Remarks</a></h2>
+<h2 id="remarks"><a class="header" href="#remarks">Remarks</a></h2>
 <p>If you are using the Roblox standard library, use of <code>shared</code> is prohibited under this rule.</p>
-<h2><a class="header" href="#example" id="example">Example</a></h2>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
 <pre><code class="language-lua">_G.foo = 1
 </code></pre>
 

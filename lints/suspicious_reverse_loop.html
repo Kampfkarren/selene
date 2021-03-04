@@ -163,12 +163,12 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#suspicious_reverse_loop" id="suspicious_reverse_loop">suspicious_reverse_loop</a></h1>
-<h2><a class="header" href="#what-it-does" id="what-it-does">What it does</a></h2>
+                        <h1 id="suspicious_reverse_loop"><a class="header" href="#suspicious_reverse_loop">suspicious_reverse_loop</a></h1>
+<h2 id="what-it-does"><a class="header" href="#what-it-does">What it does</a></h2>
 <p>Checks for <code>for _ = #x, 1 do</code> sequences without specifying a negative step.</p>
-<h2><a class="header" href="#why-this-is-bad" id="why-this-is-bad">Why this is bad</a></h2>
+<h2 id="why-this-is-bad"><a class="header" href="#why-this-is-bad">Why this is bad</a></h2>
 <p>This loop will only run at most once, instead of going in reverse. If you truly did mean to run your loop only once, just use <code>if #x &gt; 0</code> instead.</p>
-<h2><a class="header" href="#example" id="example">Example</a></h2>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
 <pre><code class="language-lua">for _ = #x, 1 do
 </code></pre>
 <p>...should be written as...</p>

@@ -163,14 +163,14 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#unscoped_variables" id="unscoped_variables">unscoped_variables</a></h1>
-<h2><a class="header" href="#what-it-does" id="what-it-does">What it does</a></h2>
+                        <h1 id="unscoped_variables"><a class="header" href="#unscoped_variables">unscoped_variables</a></h1>
+<h2 id="what-it-does"><a class="header" href="#what-it-does">What it does</a></h2>
 <p>Checks for variables that are unscoped (don't have a local variable attached).</p>
-<h2><a class="header" href="#why-this-is-bad" id="why-this-is-bad">Why this is bad</a></h2>
+<h2 id="why-this-is-bad"><a class="header" href="#why-this-is-bad">Why this is bad</a></h2>
 <p>Unscoped variables make code harder to read and debug, as well as making it harder for selene to analyze.</p>
-<h2><a class="header" href="#configuration" id="configuration">Configuration</a></h2>
+<h2 id="configuration"><a class="header" href="#configuration">Configuration</a></h2>
 <p><code>ignore_pattern</code> (default: <code>&quot;^_&quot;</code>) - A <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a> for variables that are allowed to be unscoped. The default allows for variables like <code>_</code> to be unscoped, as they shouldn't be used anyway.</p>
-<h2><a class="header" href="#example" id="example">Example</a></h2>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
 <pre><code class="language-lua">baz = 3
 </code></pre>
 

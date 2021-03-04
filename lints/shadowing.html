@@ -163,14 +163,14 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#shadowing" id="shadowing">shadowing</a></h1>
-<h2><a class="header" href="#what-it-does" id="what-it-does">What it does</a></h2>
+                        <h1 id="shadowing"><a class="header" href="#shadowing">shadowing</a></h1>
+<h2 id="what-it-does"><a class="header" href="#what-it-does">What it does</a></h2>
 <p>Checks for overriding of variables under the same name.</p>
-<h2><a class="header" href="#why-this-is-bad" id="why-this-is-bad">Why this is bad</a></h2>
+<h2 id="why-this-is-bad"><a class="header" href="#why-this-is-bad">Why this is bad</a></h2>
 <p>This can cause confusion when reading the code when trying to understand which variable is being used, and if you want to use the original variable you either have to redefine it under a temporary name or refactor the code that shadowed it.</p>
-<h2><a class="header" href="#configuration" id="configuration">Configuration</a></h2>
+<h2 id="configuration"><a class="header" href="#configuration">Configuration</a></h2>
 <p><code>ignore_pattern</code> (default: <code>&quot;^_&quot;</code>) - A <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a> that is used to specify names that are allowed to be shadowed. The default allows for variables like <code>_</code> to be shadowed, as they shouldn't be used anyway.</p>
-<h2><a class="header" href="#example" id="example">Example</a></h2>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
 <pre><code class="language-lua">local x = 1
 
 if foo then

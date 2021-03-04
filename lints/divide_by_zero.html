@@ -163,12 +163,12 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#divide_by_zero" id="divide_by_zero">divide_by_zero</a></h1>
-<h2><a class="header" href="#what-it-does" id="what-it-does">What it does</a></h2>
+                        <h1 id="divide_by_zero"><a class="header" href="#divide_by_zero">divide_by_zero</a></h1>
+<h2 id="what-it-does"><a class="header" href="#what-it-does">What it does</a></h2>
 <p>Checks for division by zero. Allows <code>0 / 0</code> as a way to get <a href="https://en.wikipedia.org/wiki/NaN">nan</a>.</p>
-<h2><a class="header" href="#why-this-is-bad" id="why-this-is-bad">Why this is bad</a></h2>
+<h2 id="why-this-is-bad"><a class="header" href="#why-this-is-bad">Why this is bad</a></h2>
 <p><code>n / 0</code> equals <code>math.huge</code> when n is positive, and <code>-math.huge</code> when n is negative. Use these values directly instead, as using the <code>/ 0</code> way is confusing to read and non-idiomatic.</p>
-<h2><a class="header" href="#example" id="example">Example</a></h2>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
 <pre><code class="language-lua">print(1 / 0)
 print(-1 / 0)
 </code></pre>

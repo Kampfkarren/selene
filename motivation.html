@@ -163,8 +163,8 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#motivation" id="motivation">Motivation</a></h1>
-<h2><a class="header" href="#because-bugs" id="because-bugs">Because bugs</a></h2>
+                        <h1 id="motivation"><a class="header" href="#motivation">Motivation</a></h1>
+<h2 id="because-bugs"><a class="header" href="#because-bugs">Because bugs</a></h2>
 <p>When writing any code, it's very easy to make silly mistakes that end up introducing bugs. A lot of the time, these bugs are hard to track down and debug, and sometimes are even harder to replicate.</p>
 <p>This risk is made ever more real because of the generally lax nature of Lua. Incorrect code is regularly passed off and isn't noticed until something breaks at runtime. Sometimes you'll get a clear error message, and will have to spend time going back, fixing the code, and making sure you actually fixed it. Other times, the effects are more hidden, and instead of getting an error your code will just pass through along, in an incorrect state.</p>
 <p>Take, for example, this code:</p>
@@ -212,7 +212,7 @@ end
 <p>This clues the developer into writing the code they meant to write:</p>
 <pre><code class="language-lua">for _, shop in pairs({ GoldShop, ItemShop, MedicineShop }) do
 </code></pre>
-<h3><a class="header" href="#because-idiomatic-lua" id="because-idiomatic-lua">Because idiomatic Lua</a></h3>
+<h3 id="because-idiomatic-lua"><a class="header" href="#because-idiomatic-lua">Because idiomatic Lua</a></h3>
 <p>While it's nice to write code however you want to, issues can arise when you are working with other people, or plan on open sourcing your work for others to contribute to. It's best for everyone involved if they stuck to the same way of writing Lua.</p>
 <p>Consider this contrived example:</p>
 <pre><code class="language-lua">call(1 / 0)

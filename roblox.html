@@ -163,14 +163,21 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#roblox-guide" id="roblox-guide">Roblox Guide</a></h1>
+                        <h1 id="roblox-guide"><a class="header" href="#roblox-guide">Roblox Guide</a></h1>
 <p>selene is built with Roblox development in mind, and has special features for Roblox developers.</p>
-<p>If you try to run selene on a Roblox codebase, you'll get a bunch of errors saying things such as &quot;<code>game</code> is not defined&quot;. This is because these are Roblox specific globals that selene does not know about. You'll need to install the Roblox <a href="./cli/std.html">standard library</a> in order to fix these issues, as well as get Roblox specific lints.</p>
+<p>If you try to run selene on a Roblox codebase, you'll get a bunch of errors saying things such as &quot;<code>game</code> is not defined&quot;. This is because these are Roblox specific globals that selene does not know about. You'll need to install the Roblox <a href="./usage/configuration">standard library</a> in order to fix these issues, as well as get Roblox specific lints.</p>
+<h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
 <p>Thankfully, this process is very simple. All you need to do is edit your <code>selene.toml</code> (or create one) and add the following:</p>
 <p><code>std = &quot;roblox&quot;</code></p>
-<p>The next time you run selene, a Roblox standard library will be automatically generated. and used.</p>
-<p>You can also initiate this process manually with <code>selene generate-roblox-std</code>.</p>
+<p>The next time you run selene, or if you use the Visual Studio Code extension and start typing Lua code, a Roblox standard library will be automatically generated and used. This is an automatic process that occurs whenever you don't have a <code>roblox.toml</code> file and your selene has <code>std = &quot;roblox&quot;</code>.</p>
+<p>You can also initiate this process manually with the CLI command <code>selene generate-roblox-std</code>.</p>
 <p>Deprecated event members are not added by default. This means code such as <code>workspace.ChildAdded:connect(...)</code> will error. If you don't want to lint these, use <code>selene generate-roblox-std --deprecated</code>.</p>
+<h2 id="updating-robloxtoml"><a class="header" href="#updating-robloxtoml">Updating <code>roblox.toml</code></a></h2>
+<p>If you're wondering why selene is providing you with outdated information regarding API that it doesn't know, you'll need to delete your <code>roblox.toml</code> and re-generate it. The Roblox standard library will be automatically updated by running selene after you've deleted <code>roblox.toml</code>.</p>
+<h2 id="testez-support"><a class="header" href="#testez-support">TestEZ Support</a></h2>
+<p>Roblox has provided an open source testing utility called <a href="https://roblox.github.io/testez/">TestEZ</a>, which allows you to write unit tests for your code. Writing unit tests is good practice, but selene will get angry at you if you don't include a <code>testez.toml</code> file and set the standard library to the following:</p>
+<p><code>std = &quot;roblox+testez&quot;</code></p>
+<p>But first you'll need to create a <code>testez.toml</code> file, which you can do so <a href="https://gist.github.com/Nezuo/65af3108a6214a209ca4e329e22af73c">with this template.</a></p>
 
                     </main>
 

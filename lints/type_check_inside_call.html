@@ -163,18 +163,18 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#type_check_inside_call" id="type_check_inside_call">type_check_inside_call</a></h1>
-<h2><a class="header" href="#what-it-does" id="what-it-does">What it does</a></h2>
+                        <h1 id="type_check_inside_call"><a class="header" href="#type_check_inside_call">type_check_inside_call</a></h1>
+<h2 id="what-it-does"><a class="header" href="#what-it-does">What it does</a></h2>
 <p>Checks for <code>type(foo == &quot;type&quot;)</code>, instead of <code>type(foo) == &quot;type&quot;</code>.</p>
-<h2><a class="header" href="#why-this-is-bad" id="why-this-is-bad">Why this is bad</a></h2>
+<h2 id="why-this-is-bad"><a class="header" href="#why-this-is-bad">Why this is bad</a></h2>
 <p>This will always return <code>&quot;boolean&quot;</code>, and is undoubtedly not what you intended to write.</p>
-<h2><a class="header" href="#example" id="example">Example</a></h2>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
 <pre><code class="language-lua">return type(foo == &quot;number&quot;)
 </code></pre>
 <p>...should be written as...</p>
 <pre><code class="language-lua">return type(foo) == &quot;number&quot;
 </code></pre>
-<h2><a class="header" href="#remarks" id="remarks">Remarks</a></h2>
+<h2 id="remarks"><a class="header" href="#remarks">Remarks</a></h2>
 <p>When using the Roblox standard library, this checks <code>typeof</code> as well.</p>
 
                     </main>

@@ -163,19 +163,19 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#ifs_same_cond" id="ifs_same_cond">ifs_same_cond</a></h1>
-<h2><a class="header" href="#what-it-does" id="what-it-does">What it does</a></h2>
+                        <h1 id="ifs_same_cond"><a class="header" href="#ifs_same_cond">ifs_same_cond</a></h1>
+<h2 id="what-it-does"><a class="header" href="#what-it-does">What it does</a></h2>
 <p>Checks for branches in if blocks with equivalent conditions.</p>
-<h2><a class="header" href="#why-this-is-bad" id="why-this-is-bad">Why this is bad</a></h2>
+<h2 id="why-this-is-bad"><a class="header" href="#why-this-is-bad">Why this is bad</a></h2>
 <p>This is most likely a copy and paste error.</p>
-<h2><a class="header" href="#example" id="example">Example</a></h2>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
 <pre><code class="language-lua">if foo then
     print(1)
 elseif foo then
     print(1)
 end
 </code></pre>
-<h2><a class="header" href="#remarks" id="remarks">Remarks</a></h2>
+<h2 id="remarks"><a class="header" href="#remarks">Remarks</a></h2>
 <p>This ignores conditions that could have side effects, such as function calls. This will not lint:</p>
 <pre><code class="language-lua">if foo() then
     print(1)

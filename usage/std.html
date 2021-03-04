@@ -163,30 +163,30 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#standard-library-format" id="standard-library-format">Standard Library Format</a></h1>
+                        <h1 id="standard-library-format"><a class="header" href="#standard-library-format">Standard Library Format</a></h1>
 <p>selene provides a robust standard library format to allow for use with environments other than vanilla Lua. Standard libraries are defined in the form of <a href="https://github.com/toml-lang/toml">TOML</a> files.</p>
-<h2><a class="header" href="#examples" id="examples">Examples</a></h2>
+<h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <p>For examples of the standard library format, see:</p>
 <ul>
 <li><a href="https://github.com/Kampfkarren/selene/blob/master/selene-lib/default_std/lua51.toml"><code>lua51.toml</code></a> - The default standard library for Lua 5.1</li>
 <li><a href="https://github.com/Kampfkarren/selene/blob/master/selene-lib/default_std/lua52.toml"><code>lua52.toml</code></a> - A standard library for Lua 5.2's additions and removals. Reference this if your standard library is based off another (it most likely is).</li>
 <li><a href="https://gist.github.com/evaera/13c96302d308c7a9ffb2a3fc5d28ac96"><code>roblox.toml</code></a> - A standard library for Roblox that incorporates all the advanced features of the format. If you are a Roblox developer, don't use this as anything other than reference--an up to date version of this library is available with every commit.</li>
 </ul>
-<h2><a class="header" href="#selene" id="selene">[selene]</a></h2>
+<h2 id="selene"><a class="header" href="#selene">[selene]</a></h2>
 <p>Anything under the key <code>[selene]</code> is used for meta information. The following paths are accepted:</p>
 <p><code>[selene.base]</code> - Used for specifying what standard library to be based off of. Currently only accepts built in standard libraries, meaning <code>lua51</code> or <code>lua52</code>.</p>
 <p><code>[selene.name]</code> - Used for specifying the name of the standard library. Used internally for cases such as only giving Roblox lints if the standard library is named <code>&quot;roblox&quot;</code>.</p>
 <p><code>[selene.structs]</code> - Used for declaring <a href="#structs">structs</a>.</p>
-<h2><a class="header" href="#globals" id="globals">[globals]</a></h2>
+<h2 id="globals"><a class="header" href="#globals">[globals]</a></h2>
 <p>This is where the magic happens. The <code>globals</code> field is a dictionary where the keys are the globals you want to define. The value you give tells selene what the value can be, do, and provide.</p>
 <p>If your standard library is based off another, overriding something defined there will use your implementation over the original.</p>
-<h2><a class="header" href="#any" id="any">Any</a></h2>
+<h2 id="any"><a class="header" href="#any">Any</a></h2>
 <p>Example:</p>
 <pre><code class="language-toml">[foo]
 any = true
 </code></pre>
 <p>Specifies that the field can be used in any possible way, meaning that <code>foo.x</code>, <code>foo:y()</code>, etc will all validate.</p>
-<h2><a class="header" href="#functions" id="functions">Functions</a></h2>
+<h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
 <p>Example:</p>
 <pre><code class="language-toml">[[tonumber.args]]
 type = &quot;any&quot;
@@ -203,13 +203,13 @@ type: &quot;any&quot; | &quot;bool&quot; | &quot;function&quot; | &quot;nil&quot
     | &quot;number&quot; | &quot;string&quot; | &quot;table&quot; | &quot;...&quot;
     | string[] | { &quot;display&quot;: string }
 </code></pre>
-<h2><a class="header" href="#required" id="required">&quot;required&quot;</a></h2>
+<h2 id="required"><a class="header" href="#required">&quot;required&quot;</a></h2>
 <ul>
 <li><code>true</code> - The default, this argument is required.</li>
 <li><code>false</code> - This argument is optional.</li>
 <li>A string - This argument is required, and not using it will give this as the reason why.</li>
 </ul>
-<h2><a class="header" href="#argument-types" id="argument-types">Argument types</a></h2>
+<h2 id="argument-types"><a class="header" href="#argument-types">Argument types</a></h2>
 <ul>
 <li><code>&quot;any&quot;</code> - Allows any value.</li>
 <li><code>&quot;bool&quot;</code>, <code>&quot;function&quot;</code>, <code>&quot;nil&quot;</code>, <code>&quot;number&quot;</code>, <code>&quot;string&quot;</code>, <code>&quot;table&quot;</code> - Expects a value of the respective type.</li>
@@ -220,7 +220,7 @@ type: &quot;any&quot; | &quot;bool&quot; | &quot;function&quot; | &quot;nil&quot
 <pre><code class="language-toml">[[Color3.toHSV.args]]
 type = { display = &quot;Color3&quot; }
 </code></pre>
-<h2><a class="header" href="#properties" id="properties">Properties</a></h2>
+<h2 id="properties"><a class="header" href="#properties">Properties</a></h2>
 <p>Example:</p>
 <pre><code class="language-toml">[_VERSION]
 property = true
@@ -238,13 +238,13 @@ writable = &quot;new-fields&quot;
 <li><code>&quot;full&quot;</code> - New fields can be added and entire variable can be overridden.</li>
 </ul>
 <p>If <code>writable</code> is not specified, selene will assume it can neither have new fields associated with it nor can be overridden.</p>
-<h2><a class="header" href="#struct" id="struct">Struct</a></h2>
+<h2 id="struct"><a class="header" href="#struct">Struct</a></h2>
 <p>Example:</p>
 <pre><code class="language-toml">[game]
 struct = &quot;DataModel&quot;
 </code></pre>
 <p>Specifies that the field is an instance of a <a href="#structs">struct</a>. The value is the name of the struct.</p>
-<h2><a class="header" href="#table" id="table">Table</a></h2>
+<h2 id="table"><a class="header" href="#table">Table</a></h2>
 <p>Example:</p>
 <pre><code class="language-toml">[math.huge]
 property = true
@@ -253,13 +253,13 @@ property = true
 property = true
 </code></pre>
 <p>A field is understood as a table if it has fields of its own. Notice that <code>[math]</code> is not defined anywhere, but its fields are. Fields are of the same type as globals.</p>
-<h2><a class="header" href="#removed" id="removed">Removed</a></h2>
+<h2 id="removed"><a class="header" href="#removed">Removed</a></h2>
 <p>Example:</p>
 <pre><code class="language-toml">[getfenv]
 removed = true
 </code></pre>
 <p>Used when your standard library is based off another, and your library removes something from the original.</p>
-<h2><a class="header" href="#structs" id="structs">Structs</a></h2>
+<h2 id="structs"><a class="header" href="#structs">Structs</a></h2>
 <p>Structs are used in places such as Roblox Instances. Every Instance in Roblox, for example, declares a <code>:GetChildren()</code> method. We don't want to have to define this everywhere an Instance is declared globally, so instead we just define it once in a struct.</p>
 <p>Structs are defined as fields of <code>[selene.structs]</code>. Any fields they have will be used for instances of that struct. For example, the Roblox standard library has the struct:</p>
 <pre><code class="language-toml">[selene.structs.Event.Connect]
@@ -273,7 +273,7 @@ type = &quot;function&quot;
 struct = &quot;Event&quot;
 </code></pre>
 <p>...and selene will know that <code>workspace.Changed:Connect(callback)</code> is valid, but <code>workspace.Changed:RandomNameHere()</code> is not.</p>
-<h2><a class="header" href="#wildcards" id="wildcards">Wildcards</a></h2>
+<h2 id="wildcards"><a class="header" href="#wildcards">Wildcards</a></h2>
 <p>Fields can specify requirements if a field is referenced that is not explicitly named. For example, in Roblox, instances can have arbitrary fields of other instances (<code>workspace.Baseplate</code> indexes an instance named Baseplate inside <code>workspace</code>, but <code>Baseplate</code> is nowhere in the Roblox API).</p>
 <p>We can specify this behavior by using the special <code>&quot;*&quot;</code> field.</p>
 <pre><code class="language-toml">[workspace.&quot;*&quot;]
