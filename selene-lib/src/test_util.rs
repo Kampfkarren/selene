@@ -9,8 +9,6 @@ use codespan_reporting::{
     diagnostic::Severity as CodespanSeverity, term::Config as CodespanConfig,
 };
 
-use full_moon::ast::owned::Owned;
-
 lazy_static::lazy_static! {
     static ref TEST_FULL_RUN_ROOT: PathBuf = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests").join("full_run");
 }
@@ -43,9 +41,7 @@ pub fn test_full_run_config(
     let lua_source =
         fs::read_to_string(path_base.with_extension("lua")).expect("Cannot find lua file");
 
-    let ast = full_moon::parse(&lua_source)
-        .expect("Cannot parse lua file")
-        .owned();
+    let ast = full_moon::parse(&lua_source).expect("Cannot parse lua file");
 
     let mut diagnostics = checker.test_on(&ast);
 

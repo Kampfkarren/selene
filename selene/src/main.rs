@@ -15,7 +15,6 @@ use codespan_reporting::{
     },
     term::DisplayStyle as CodespanDisplayStyle,
 };
-use full_moon::ast::owned::Owned;
 use selene_lib::{rules::Severity, standard_library::StandardLibrary, *};
 use structopt::{clap, StructOpt};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
@@ -150,7 +149,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
     let mut stdout = stdout.lock();
 
     let ast = match full_moon::parse(&contents) {
-        Ok(ast) => ast.owned(),
+        Ok(ast) => ast,
         Err(error) => {
             PARSE_ERRORS.fetch_add(1, Ordering::SeqCst);
 

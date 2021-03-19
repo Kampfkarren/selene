@@ -10,7 +10,6 @@ use codespan_reporting::{
     diagnostic::Severity as CodespanSeverity, term::Config as CodespanConfig,
 };
 
-use full_moon::ast::owned::Owned;
 use serde::de::DeserializeOwned;
 
 lazy_static::lazy_static! {
@@ -53,9 +52,7 @@ pub fn test_lint_config<
     let lua_source =
         fs::read_to_string(path_base.with_extension("lua")).expect("Cannot find lua file");
 
-    let ast = full_moon::parse(&lua_source)
-        .expect("Cannot parse lua file")
-        .owned();
+    let ast = full_moon::parse(&lua_source).expect("Cannot parse lua file");
     let mut diagnostics = rule.pass(
         &ast,
         &Context {

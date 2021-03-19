@@ -187,7 +187,7 @@ macro_rules! use_rules {
                 })
             }
 
-            pub fn test_on(&self, ast: &Ast<'static>) -> Vec<CheckerDiagnostic> {
+            pub fn test_on(&self, ast: &Ast) -> Vec<CheckerDiagnostic> {
                 let mut diagnostics = Vec::new();
 
                 macro_rules! check_rule {

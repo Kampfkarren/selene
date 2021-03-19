@@ -43,7 +43,7 @@ pub trait Rule {
     fn new(config: Self::Config) -> Result<Self, Self::Error>
     where
         Self: Sized;
-    fn pass(&self, ast: &full_moon::ast::Ast<'static>, context: &Context) -> Vec<Diagnostic>;
+    fn pass(&self, ast: &full_moon::ast::Ast, context: &Context) -> Vec<Diagnostic>;
 
     fn severity(&self) -> Severity;
     fn rule_type(&self) -> RuleType;
