@@ -155,6 +155,8 @@ pub enum ApiDataType {
     Content,
     Vector2,
     Vector3,
+    UDim,
+    UDim2,
 
     Other(String),
 }
@@ -166,7 +168,11 @@ impl ApiDataType {
     pub fn has_custom_methods(&self) -> bool {
         matches!(
             self,
-            &ApiDataType::CFrame | &ApiDataType::Vector2 | &ApiDataType::Vector3
+            &ApiDataType::CFrame
+                | &ApiDataType::UDim
+                | &ApiDataType::UDim2
+                | &ApiDataType::Vector2
+                | &ApiDataType::Vector3
         )
     }
 }
@@ -179,6 +185,8 @@ impl<'de> Deserialize<'de> for ApiDataType {
         Ok(match string.as_str() {
             "CFrame" => ApiDataType::CFrame,
             "Content" => ApiDataType::Content,
+            "UDim" => ApiDataType::UDim,
+            "UDim2" => ApiDataType::UDim2,
             "Vector2" => ApiDataType::Vector2,
             "Vector3" => ApiDataType::Vector3,
             _ => ApiDataType::Other(string),
