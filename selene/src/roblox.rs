@@ -206,17 +206,31 @@ impl RobloxGenerator {
                             None => &empty,
                         };
 
-                        if let ApiValueType::Class { name } = value_type {
-                            self.write_class_struct(api, name);
-                            Some(Field::Struct(name.to_owned()))
-                        } else {
-                            Some(Field::Property {
-                                writable: if tags.contains(&"ReadOnly".to_string()) {
-                                    None
+                        let default_field = Some(Field::Property {
+                            writable: if tags.contains(&"ReadOnly".to_string()) {
+                                None
+                            } else {
+                                Some(Writable::Overridden)
+                            },
+                        });
+
+                        match &value_type {
+                            ApiValueType::Class { name } => {
+                                self.write_class_struct(api, &name);
+                                Some(Field::Struct(name.to_owned()))
+                            }
+
+                            ApiValueType::DataType { value } => {
+                                // See comment on `has_custom_methods` for why we're taking
+                                // such a lax approach here.
+                                if value.has_custom_methods() {
+                                    Some(Field::Any)
                                 } else {
-                                    Some(Writable::Overridden)
-                                },
-                            })
+                                    default_field
+                                }
+                            }
+
+                            _ => default_field,
                         }
                     } else {
                         None
