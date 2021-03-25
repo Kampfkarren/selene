@@ -31,7 +31,7 @@ function byteToCharMap(document: vscode.TextDocument, byteOffsets: Set<number>) 
     const byteOffsetMap = new Map<number, number>()
     let currentOffset = 0
 
-    // Iterate through each character in the string 
+    // Iterate through each character in the string
     for (let charOffset = 0; charOffset < text.length; charOffset++) {
         // Calculate the current byte offset we have reached so far
         currentOffset += Buffer.byteLength(text[charOffset], "utf-8")
@@ -60,7 +60,7 @@ function labelToRange(document: vscode.TextDocument, label: Label, byteOffsetMap
 export async function activate(context: vscode.ExtensionContext) {
     console.log("selene-vscode activated")
 
-    trySelene = util.ensureSeleneExists(context.globalStoragePath).then(() => {
+    trySelene = util.ensureSeleneExists(context.globalStorageUri).then(() => {
         return true
     }).catch(error => {
         vscode.window.showErrorMessage(`An error occurred when finding Selene:\n${error}`)
@@ -69,10 +69,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
     await trySelene
 
-    console.log("selene path", await util.getSelenePath(context.globalStoragePath))
+    console.log("selene path", await util.getSelenePath(context.globalStorageUri))
 
     context.subscriptions.push(vscode.commands.registerCommand("selene.reinstall", () => {
-        trySelene = util.downloadSelene(context.globalStoragePath).then(() => true).catch(() => false)
+        trySelene = util.downloadSelene(context.globalStorageUri).then(() => true).catch(() => false)
         return trySelene
     }))
 
@@ -89,7 +89,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
         const output = await selene.seleneCommand(
-            context.globalStoragePath,
+            context.globalStorageUri,
             "--display-style=json -",
             selene.Expectation.Stderr,
             vscode.workspace.getWorkspaceFolder(
