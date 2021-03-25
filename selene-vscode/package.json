@@ -6,7 +6,7 @@
     "publisher": "Kampfkarren",
     "repository": "https://github.com/Kampfkarren/selene",
     "engines": {
-        "vscode": "^1.44.0"
+        "vscode": "^1.54.0"
     },
     "categories": [
         "Linters"
@@ -52,7 +52,7 @@
         "@types/request": "^2.48.4",
         "@types/request-promise-native": "^1.0.17",
         "@types/unzipper": "^0.10.3",
-        "@types/vscode": "^1.44.0",
+        "@types/vscode": "^1.54.0",
         "glob": "^7.1.5",
         "mocha": "^6.2.3",
         "tslint": "^5.20.0",
