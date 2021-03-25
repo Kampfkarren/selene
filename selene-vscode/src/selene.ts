@@ -9,7 +9,7 @@ export enum Expectation {
 }
 
 export async function seleneCommand(
-    storagePath: string,
+    storagePath: vscode.Uri,
     command: string,
     expectation: Expectation,
     cwd?: string,
