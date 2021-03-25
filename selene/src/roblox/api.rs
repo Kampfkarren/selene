@@ -69,6 +69,7 @@ pub struct ApiParameter {
     pub parameter_type: ApiValueType,
 }
 
+#[derive(Debug)]
 pub enum ApiValueType {
     Class { name: String },
     DataType { value: ApiDataType },
@@ -127,7 +128,7 @@ impl<'de> Visitor<'de> for ApiValueTypeVisitor {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub enum ApiGroupType {
     #[serde(alias = "Array")]
     #[serde(alias = "Dictionary")]
@@ -137,7 +138,7 @@ pub enum ApiGroupType {
     Variant,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ApiPrimitiveType {
     Bool,
@@ -148,20 +149,40 @@ pub enum ApiPrimitiveType {
     String,
 }
 
+#[derive(Debug)]
 pub enum ApiDataType {
+    CFrame,
     Content,
+    Vector2,
+    Vector3,
+
     Other(String),
 }
 
+impl ApiDataType {
+    // Ideally, we'd be creating typed structures for all of these, but they
+    // currently only exist on globals like `workspace`, and so it's not
+    // worth the effort to keep them always up to date with such low surface area.
+    pub fn has_custom_methods(&self) -> bool {
+        matches!(
+            self,
+            &ApiDataType::CFrame | &ApiDataType::Vector2 | &ApiDataType::Vector3
+        )
+    }
+}
+
+// Tagged enums do not support #[serde(other)]
 impl<'de> Deserialize<'de> for ApiDataType {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let string = String::deserialize(deserializer)?;
 
-        if string == "Content" {
-            Ok(ApiDataType::Content)
-        } else {
-            Ok(ApiDataType::Other(string))
-        }
+        Ok(match string.as_str() {
+            "CFrame" => ApiDataType::CFrame,
+            "Content" => ApiDataType::Content,
+            "Vector2" => ApiDataType::Vector2,
+            "Vector3" => ApiDataType::Vector3,
+            _ => ApiDataType::Other(string),
+        })
     }
 }
 
