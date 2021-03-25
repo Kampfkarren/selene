@@ -85,13 +85,11 @@ function getSeleneFilenamePattern(): RegExp {
 async function fileExists(filename: vscode.Uri): Promise<boolean> {
     try {
         await vscode.workspace.fs.stat(filename);
+        return true;
     } catch (err) {
-        if (err == vscode.FileSystemError.FileNotFound) {
-            return false;
-        }
+        // If an error was thrown, the file was not found
+        return false;
     }
-
-    return true;
 }
 
 export async function downloadSelene(directory: vscode.Uri) {

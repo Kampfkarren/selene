@@ -12,18 +12,17 @@ export async function seleneCommand(
     storagePath: vscode.Uri,
     command: string,
     expectation: Expectation,
-    cwd?: string,
+    workspace?: vscode.WorkspaceFolder,
     stdin?: string,
 ): Promise<string | null> {
     return new Promise(async (resolve, reject) => {
-        const child = childProcess.exec(`"${await util.getSelenePath(storagePath).then(path => {
-            if (path === undefined) {
-                return Promise.reject("Could not find selene.")
-            }
+        const selenePath = await util.getSelenePath(storagePath)
+        if (selenePath === undefined) {
+            return reject("Could not find selene.")
+        }
 
-            return path
-        })}" ${command}`, {
-            cwd,
+        const child = childProcess.exec(`"${selenePath.fsPath}" ${command}`, {
+            cwd: workspace?.uri.fsPath,
         }, (error, stdout) => {
             if (expectation === Expectation.Stderr) {
                 resolve(error && stdout)

@@ -92,9 +92,7 @@ export async function activate(context: vscode.ExtensionContext) {
             context.globalStorageUri,
             "--display-style=json -",
             selene.Expectation.Stderr,
-            vscode.workspace.getWorkspaceFolder(
-                vscode.Uri.file(document.uri.fsPath),
-            )?.uri?.fsPath,
+            vscode.workspace.getWorkspaceFolder(document.uri),
             document.getText(),
         )
 
