@@ -414,7 +414,10 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
 
         let (arguments, expecting_method) = match &field {
             standard_library::Field::Any => return,
-            standard_library::Field::Function { arguments, method } => (arguments, method),
+            standard_library::Field::Complex {
+                function: Some(function),
+                ..
+            } => (&function.arguments, &function.method),
             _ => {
                 self.diagnostics.push(Diagnostic::new(
                     "incorrect_standard_library_use",
@@ -710,6 +713,15 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "bad_call_signatures",
+        );
+    }
+
+    #[test]
+    fn test_callable_metatables() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "callable_metatables",
         );
     }
 

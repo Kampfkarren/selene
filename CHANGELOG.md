@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - `arg` is now defined in the Lua 5.1 standard library.
 - Root level `...` will no longer be declared an undefined variable.
 - Using `...` past the first depth will now error with `undefined_variable`, as it is guaranteed improper code.
+- You can now combine a function with fields inside standard libraries. This is useful for something like `expect()` and `expect.extend()`.
 
 ### Fixed
 - Fixed a bug where some indexes of Roblox structures would fail (such as `workspace.CurrentCamera.ViewportSize.X`)

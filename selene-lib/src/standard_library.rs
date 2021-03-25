@@ -191,8 +191,8 @@ impl StandardLibrary {
                         current = &ANY_TABLE;
                     }
 
-                    Field::Table(children) => {
-                        current = children;
+                    Field::Complex { table, .. } if !table.is_empty() => {
+                        current = table;
                     }
 
                     _ => return None,
@@ -228,12 +228,17 @@ impl StandardLibrary {
                     continue;
                 }
 
-                if let Some(conflict) = into.get_mut(&k) {
-                    if let Field::Table(ref mut from_children) = v {
-                        if let Field::Table(into_children) = conflict {
-                            merge(into_children, from_children);
-                            continue;
-                        }
+                if_chain::if_chain! {
+                    if let Some(conflict) = into.get_mut(&k);
+                    if let Field::Complex {
+                        table: ref mut from_children,
+                        ..
+                    } = v;
+                    if !from_children.is_empty();
+                    if let Field::Complex { table: into_children, .. } = conflict;
+                    then {
+                        merge(into_children, from_children);
+                        continue;
                     }
                 }
 
@@ -271,24 +276,34 @@ impl StandardLibrary {
             .cloned();
 
         for (name, children) in structs.unwrap_or_default() {
-            self.structs
-                .insert(name.to_owned(), Field::Table(children.clone()));
+            self.structs.insert(
+                name.to_owned(),
+                Field::Complex {
+                    function: None,
+                    table: children.clone(),
+                },
+            );
         }
     }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FunctionBehavior {
+    pub arguments: Vec<Argument>,
+    pub method: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Field {
     Any,
-    Function {
-        arguments: Vec<Argument>,
-        method: bool,
+    Complex {
+        function: Option<FunctionBehavior>,
+        table: BTreeMap<String, Field>,
     },
     Property {
         writable: Option<Writable>,
     },
     Struct(String),
-    Table(BTreeMap<String, Field>),
     Removed,
 }
 
@@ -330,15 +345,19 @@ impl<'de> Deserialize<'de> for Field {
             return Ok(Field::Struct(name));
         }
 
-        if is_function {
-            // TODO: Don't allow vararg in the middle
-            return Ok(Field::Function {
+        let function_behavior = if is_function {
+            Some(FunctionBehavior {
                 arguments: field_raw.args.unwrap_or_else(Vec::new),
                 method: field_raw.method,
-            });
-        }
+            })
+        } else {
+            None
+        };
 
-        Ok(Field::Table(field_raw.children))
+        Ok(Field::Complex {
+            function: function_behavior,
+            table: field_raw.children,
+        })
     }
 }
 
@@ -351,12 +370,20 @@ impl Serialize for Field {
                 map.end()
             }
 
-            Field::Function { arguments, method } => {
+            Field::Complex { function, table } => {
                 let mut map = serializer.serialize_map(None)?;
-                if *method {
-                    map.serialize_entry("method", &true)?;
+
+                if let Some(function) = function {
+                    if function.method {
+                        map.serialize_entry("method", &true)?;
+                    }
+                    map.serialize_entry("args", &function.arguments)?;
                 }
-                map.serialize_entry("args", arguments)?;
+
+                for (key, value) in table.iter() {
+                    map.serialize_entry(key, value)?;
+                }
+
                 map.end()
             }
 
@@ -373,11 +400,6 @@ impl Serialize for Field {
                 let mut map = serializer.serialize_map(Some(1))?;
                 map.serialize_entry("struct", name)?;
                 map.end()
-            }
-
-            Field::Table(table) => {
-                // TODO: Can this be generic?
-                toml::Value::try_from(table).unwrap().serialize(serializer)
             }
 
             Field::Removed => {

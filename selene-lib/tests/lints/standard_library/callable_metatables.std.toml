@@ -1,0 +1,7 @@
+[[expect.args]]
+required = true
+type = "any"
+
+[[expect.extend.args]]
+required = true
+type = "any"
