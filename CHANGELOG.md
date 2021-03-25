@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Fixed
+- Fixed a bug where some indexes of Roblox structures would fail (such as `workspace.CurrentCamera.ViewportSize.X`)
+
 ## [0.11.0] - 2021-01-04
 ### Added
 - Added support for DateTime in the Roblox standard library.
