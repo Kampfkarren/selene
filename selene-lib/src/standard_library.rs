@@ -276,13 +276,8 @@ impl StandardLibrary {
             .cloned();
 
         for (name, children) in structs.unwrap_or_default() {
-            self.structs.insert(
-                name.to_owned(),
-                Field::Complex {
-                    function: None,
-                    table: children.clone(),
-                },
-            );
+            self.structs
+                .insert(name.to_owned(), children.clone().into());
         }
     }
 }
@@ -305,6 +300,24 @@ pub enum Field {
     },
     Struct(String),
     Removed,
+}
+
+impl From<BTreeMap<String, Field>> for Field {
+    fn from(table: BTreeMap<String, Field>) -> Self {
+        Field::Complex {
+            function: None,
+            table,
+        }
+    }
+}
+
+impl From<FunctionBehavior> for Field {
+    fn from(function: FunctionBehavior) -> Self {
+        Field::Complex {
+            function: Some(function),
+            table: BTreeMap::new(),
+        }
+    }
 }
 
 impl<'de> Deserialize<'de> for Field {
