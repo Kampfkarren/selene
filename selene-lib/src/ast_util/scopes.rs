@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::{borrow::Cow, collections::HashSet};
 
 use full_moon::{
     ast,
@@ -15,6 +15,7 @@ pub struct ScopeManager {
     pub scopes: Arena<Scope>,
     pub references: Arena<Reference>,
     pub variables: Arena<Variable>,
+    pub initial_scope: Option<Id<Scope>>,
 }
 
 impl ScopeManager {
@@ -33,17 +34,21 @@ impl ScopeManager {
         None
     }
 
-    fn variable_in_scope(&self, scope: Id<Scope>, variable_name: &str) -> Option<Id<Variable>> {
+    fn variable_in_scope(&self, scope: Id<Scope>, variable_name: &str) -> VariableInScope {
         if let Some(scope) = self.scopes.get(scope) {
             for variable_id in scope.variables.iter().rev() {
                 let variable = &self.variables[*variable_id];
                 if variable.name == variable_name {
-                    return Some(*variable_id);
+                    return VariableInScope::Found(*variable_id);
                 }
+            }
+
+            if scope.blocked.iter().any(|blocked| blocked == variable_name) {
+                return VariableInScope::Blocked;
             }
         }
 
-        None
+        VariableInScope::NotFound
     }
 }
 
@@ -52,15 +57,17 @@ pub struct Scope {
     block: Range,
     references: Vec<Id<Reference>>,
     variables: Vec<Id<Variable>>,
+    blocked: Vec<Cow<'static, str>>,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Reference {
     pub identifier: Range,
     pub name: String,
     pub resolved: Option<Id<Variable>>,
     // TODO: Does this matter even?
     pub write_expr: Option<Range>,
+    pub scope_id: Id<Scope>,
     pub read: bool,
     pub write: bool,
 }
@@ -83,10 +90,18 @@ struct ScopeVisitor {
     else_blocks: HashSet<Range>,
 }
 
+#[derive(Debug)]
+pub enum VariableInScope {
+    Found(Id<Variable>),
+    NotFound,
+    Blocked,
+}
+
 fn create_scope<'a, N: Node<'a>>(node: N) -> Option<Scope> {
     if let Some((start, end)) = node.range() {
         Some(Scope {
             block: (start.bytes(), end.bytes()),
+            blocked: Vec::new(),
             references: Vec::new(),
             variables: Vec::new(),
         })
@@ -109,11 +124,13 @@ impl ScopeVisitor {
             let mut output = ScopeVisitor {
                 scope_manager: ScopeManager {
                     scopes,
-                    ..ScopeManager::default()
+                    references: Arena::new(),
+                    variables: Arena::new(),
+                    initial_scope: Some(id),
                 },
 
                 scope_stack: vec![id],
-                ..ScopeVisitor::default()
+                else_blocks: HashSet::new(),
             };
 
             assert!(output.scope_stack.len() == 1, "scopes not all popped");
@@ -138,11 +155,13 @@ impl ScopeVisitor {
 
     fn find_variable(&self, variable_name: &str) -> Option<(Id<Variable>, Id<Scope>)> {
         for scope_id in self.scope_stack.iter().rev().copied() {
-            if let Some(id) = self
+            match self
                 .scope_manager
                 .variable_in_scope(scope_id, variable_name)
             {
-                return Some((id, scope_id));
+                VariableInScope::Found(id) => return Some((id, scope_id)),
+                VariableInScope::NotFound => {}
+                VariableInScope::Blocked => return None,
             }
         }
 
@@ -224,7 +243,10 @@ impl ScopeVisitor {
                     identifier: range(token),
                     name: token.token().to_string(),
                     read: true,
-                    ..Reference::default()
+                    resolved: None,
+                    scope_id: self.current_scope_id(),
+                    write: false,
+                    write_expr: None,
                 },
             );
         }
@@ -269,9 +291,11 @@ impl ScopeVisitor {
                 Reference {
                     identifier: range(token),
                     name: token.token().to_string(),
+                    read: false,
+                    resolved: None,
+                    scope_id: self.current_scope_id(),
                     write: true,
                     write_expr,
-                    ..Reference::default()
                 },
             );
         }
@@ -499,6 +523,8 @@ impl Visitor<'_> for ScopeVisitor {
 
     fn visit_function_body(&mut self, body: &ast::FunctionBody) {
         self.open_scope(body);
+
+        self.current_scope().blocked.push(Cow::Borrowed("..."));
 
         for parameter in body.parameters() {
             match parameter {

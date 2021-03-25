@@ -6,6 +6,10 @@ writable = "new-fields"
 [_VERSION]
 property = true
 
+[arg]
+property = true
+writable = "new-fields"
+
 [[assert.args]]
 type = "any"
 
