@@ -1,10 +1,14 @@
 use super::*;
-use crate::ast_util::scopes::ScopeManager;
+use crate::ast_util::scopes::{Reference, ScopeManager};
 use std::{collections::HashSet, convert::Infallible};
 
 use full_moon::ast::Ast;
 
 pub struct UndefinedVariableLint;
+
+lazy_static::lazy_static! {
+    static ref VARARG_STRING: String = "...".to_owned();
+}
 
 impl Rule for UndefinedVariableLint {
     type Config = ();
@@ -25,6 +29,7 @@ impl Rule for UndefinedVariableLint {
             if reference.resolved.is_none()
                 && reference.read
                 && !read.contains(&reference.identifier)
+                && !is_valid_vararg_reference(&scope_manager, reference)
                 && !context
                     .standard_library
                     .globals
@@ -50,6 +55,12 @@ impl Rule for UndefinedVariableLint {
     fn rule_type(&self) -> RuleType {
         RuleType::Correctness
     }
+}
+
+// `...` is valid in the opening scope, but everywhere else must be explicitly defined.
+fn is_valid_vararg_reference(scope_manager: &ScopeManager, reference: &Reference) -> bool {
+    return Some(reference.scope_id) == scope_manager.initial_scope
+        && reference.name == *VARARG_STRING;
 }
 
 #[cfg(test)]

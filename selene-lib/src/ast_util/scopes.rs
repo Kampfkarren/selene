@@ -15,6 +15,7 @@ pub struct ScopeManager {
     pub scopes: Arena<Scope>,
     pub references: Arena<Reference>,
     pub variables: Arena<Variable>,
+    pub initial_scope: Option<Id<Scope>>,
 }
 
 impl ScopeManager {
@@ -59,13 +60,14 @@ pub struct Scope {
     blocked: Vec<Cow<'static, str>>,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Reference {
     pub identifier: Range,
     pub name: String,
     pub resolved: Option<Id<Variable>>,
     // TODO: Does this matter even?
     pub write_expr: Option<Range>,
+    pub scope_id: Id<Scope>,
     pub read: bool,
     pub write: bool,
 }
@@ -122,11 +124,13 @@ impl ScopeVisitor {
             let mut output = ScopeVisitor {
                 scope_manager: ScopeManager {
                     scopes,
-                    ..ScopeManager::default()
+                    references: Arena::new(),
+                    variables: Arena::new(),
+                    initial_scope: Some(id),
                 },
 
                 scope_stack: vec![id],
-                ..ScopeVisitor::default()
+                else_blocks: HashSet::new(),
             };
 
             assert!(output.scope_stack.len() == 1, "scopes not all popped");
@@ -239,7 +243,10 @@ impl ScopeVisitor {
                     identifier: range(token),
                     name: token.token().to_string(),
                     read: true,
-                    ..Reference::default()
+                    resolved: None,
+                    scope_id: self.current_scope_id(),
+                    write: false,
+                    write_expr: None,
                 },
             );
         }
@@ -284,9 +291,11 @@ impl ScopeVisitor {
                 Reference {
                     identifier: range(token),
                     name: token.token().to_string(),
+                    read: false,
+                    resolved: None,
+                    scope_id: self.current_scope_id(),
                     write: true,
                     write_expr,
-                    ..Reference::default()
                 },
             );
         }
