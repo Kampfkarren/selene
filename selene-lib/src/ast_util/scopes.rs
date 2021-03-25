@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::{borrow::Cow, collections::HashSet};
 
 use full_moon::{
     ast,
@@ -33,17 +33,21 @@ impl ScopeManager {
         None
     }
 
-    fn variable_in_scope(&self, scope: Id<Scope>, variable_name: &str) -> Option<Id<Variable>> {
+    fn variable_in_scope(&self, scope: Id<Scope>, variable_name: &str) -> VariableInScope {
         if let Some(scope) = self.scopes.get(scope) {
             for variable_id in scope.variables.iter().rev() {
                 let variable = &self.variables[*variable_id];
                 if variable.name == variable_name {
-                    return Some(*variable_id);
+                    return VariableInScope::Found(*variable_id);
                 }
+            }
+
+            if scope.blocked.iter().any(|blocked| blocked == variable_name) {
+                return VariableInScope::Blocked;
             }
         }
 
-        None
+        VariableInScope::NotFound
     }
 }
 
@@ -52,6 +56,7 @@ pub struct Scope {
     block: Range,
     references: Vec<Id<Reference>>,
     variables: Vec<Id<Variable>>,
+    blocked: Vec<Cow<'static, str>>,
 }
 
 #[derive(Debug, Default)]
@@ -83,10 +88,18 @@ struct ScopeVisitor {
     else_blocks: HashSet<Range>,
 }
 
+#[derive(Debug)]
+pub enum VariableInScope {
+    Found(Id<Variable>),
+    NotFound,
+    Blocked,
+}
+
 fn create_scope<'a, N: Node<'a>>(node: N) -> Option<Scope> {
     if let Some((start, end)) = node.range() {
         Some(Scope {
             block: (start.bytes(), end.bytes()),
+            blocked: Vec::new(),
             references: Vec::new(),
             variables: Vec::new(),
         })
@@ -138,11 +151,13 @@ impl ScopeVisitor {
 
     fn find_variable(&self, variable_name: &str) -> Option<(Id<Variable>, Id<Scope>)> {
         for scope_id in self.scope_stack.iter().rev().copied() {
-            if let Some(id) = self
+            match self
                 .scope_manager
                 .variable_in_scope(scope_id, variable_name)
             {
-                return Some((id, scope_id));
+                VariableInScope::Found(id) => return Some((id, scope_id)),
+                VariableInScope::NotFound => {}
+                VariableInScope::Blocked => return None,
             }
         }
 
@@ -499,6 +514,8 @@ impl Visitor<'_> for ScopeVisitor {
 
     fn visit_function_body(&mut self, body: &ast::FunctionBody) {
         self.open_scope(body);
+
+        self.current_scope().blocked.push(Cow::Borrowed("..."));
 
         for parameter in body.parameters() {
             match parameter {

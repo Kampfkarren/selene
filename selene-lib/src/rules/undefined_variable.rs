@@ -101,4 +101,13 @@ mod tests {
             "shadowing",
         );
     }
+
+    #[test]
+    fn test_varargs() {
+        test_lint(
+            UndefinedVariableLint::new(()).unwrap(),
+            "undefined_variable",
+            "varargs",
+        );
+    }
 }

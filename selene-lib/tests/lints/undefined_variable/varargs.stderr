@@ -1,0 +1,12 @@
+error[undefined_variable]: `...` is not defined
+  ┌─ varargs.lua:4:27
+  │
+4 │     local shouldntExist = ...
+  │                           ^^^
+
+error[undefined_variable]: `...` is not defined
+  ┌─ varargs.lua:8:39
+  │
+8 │             local alsoShouldntExist = ...
+  │                                       ^^^
+
