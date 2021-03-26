@@ -30,6 +30,8 @@ jobs:
         owner: ${{ github.event.repository.owner.name }}
         repo: ${{ github.event.repository.name }}
         number: ${{ github.event.issue.number }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Run selenology
       id: selenology
       uses: Kampfkarren/selenology@main
