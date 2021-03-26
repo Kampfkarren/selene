@@ -1,0 +1,37 @@
+name: Selenology
+on:
+  issue_comment:
+    types: [created]
+jobs:
+  selenology:
+    if: ${{ github.event.issue.pull_request }}
+    if: ${{ github.event.sender.login == "Kampfkarren" }}
+    if: ${{ contains(github.event.comment.body, '!selenology') }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Run selenology
+      id: selenology
+      uses: Kampfkarren/selenology@main
+      with:
+        new_selene_checkout: ${{ github.event.pull_request.head.sha }}
+        new_selene_repository: ${{ github.event.pull_request.head.repo.clone_url }}
+    - uses: actions/checkout@v2
+      branch: selenology-outputs
+    - name: Upload output
+      id: upload
+      run: |
+        FILENAME=selenology-outputs/output-$(date +%s).html
+        mkdir -p selenology-outputs
+        echo ${{ steps.selenology.output }} > $FILENAME
+        git config user.name "Selenology"
+        git config user.email "<>"
+        git add selenology-outputs/
+        git commit -m "Add selenology outputs."
+        git push origin HEAD
+        echo "::set-output name=filename::$FILENAME"
+    - name: Post comment
+      uses: peter-evans/create-or-update-comment@v1
+      with:
+        issue-number: ${{ github.event.issue.number }}
+        body: |
+          Selenology report was created, and can be viewed [at this link](https://htmlpreview.github.io/?https://github.com/Kampfkarren/selene/blob/selenology-outputs/${{ steps.upload.filename }}).
