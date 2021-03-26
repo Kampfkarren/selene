@@ -48,16 +48,16 @@ jobs:
         cd $GITHUB_WORKSPACE/selenology-outputs
         FILENAME=selenology-outputs/output-$(date +%s).html
         mkdir -p selenology-outputs
-        echo ${{ steps.selenology.output }} > $FILENAME
+        echo ${{ steps.selenology.outputs.output }} > $FILENAME
         git config user.name "Selenology"
         git config user.email "<>"
         git add selenology-outputs/
         git commit -m "Add selenology outputs."
-        git push origin HEAD
+        git push origin selenology-outputs
         echo "::set-output name=filename::$FILENAME"
     - name: Post comment
       uses: peter-evans/create-or-update-comment@v1
       with:
         issue-number: ${{ github.event.issue.number }}
         body: |
-          Selenology report was created, and can be viewed [at this link](https://htmlpreview.github.io/?https://github.com/Kampfkarren/selene/blob/selenology-outputs/${{ steps.upload.filename }}).
+          Selenology report was created, and can be viewed [at this link](https://htmlpreview.github.io/?https://github.com/${{ github.event.repository.owner.login }}/${{ github.event.repository.name }}/blob/selenology-outputs/${{ steps.upload.outputs.filename }}).
