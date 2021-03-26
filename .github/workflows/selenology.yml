@@ -4,7 +4,7 @@ on:
     types: [created]
 jobs:
   selenology:
-    if: ${{ github.event.issue.pull_request }} && ${{ github.event.sender.login == "Kampfkarren" }} && ${{ contains(github.event.comment.body, '!selenology') }}
+    if: ${{ github.event.issue.pull_request }} && ${{ github.event.sender.login }} == "Kampfkarren" && ${{ contains(github.event.comment.body, '!selenology') }}
     runs-on: ubuntu-latest
     steps:
     - name: Run selenology
