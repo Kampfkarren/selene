@@ -14,7 +14,8 @@ jobs:
         new_selene_checkout: ${{ github.event.pull_request.head.sha }}
         new_selene_repository: ${{ github.event.pull_request.head.repo.clone_url }}
     - uses: actions/checkout@v2
-      branch: selenology-outputs
+      with:
+        branch: selenology-outputs
     - name: Upload output
       id: upload
       run: |
