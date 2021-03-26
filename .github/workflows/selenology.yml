@@ -17,7 +17,7 @@ jobs:
               pullRequest(number:$number) {
                 baseRef {
                   repository {
-                    sshUrl
+                    url
                   }
 
                   target {
@@ -37,7 +37,7 @@ jobs:
       uses: Kampfkarren/selenology@main
       with:
         new_selene_checkout: ${{ fromJSON(steps.get_pr_info.outputs.data).repository.pullRequest.baseRef.target.oid }}
-        new_selene_repository: ${{ fromJSON(steps.get_pr_info.outputs.data).repository.pullRequest.baseRef.repository.sshUrl }}
+        new_selene_repository: ${{ fromJSON(steps.get_pr_info.outputs.data).repository.pullRequest.baseRef.repository.url }}
     - uses: actions/checkout@v2
       with:
         branch: selenology-outputs
