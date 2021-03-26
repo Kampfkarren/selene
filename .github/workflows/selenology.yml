@@ -8,8 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - run: |
-        echo new_selene_checkout = ${{ github.event.issue.pull_request.head.sha }}
-        echo new_selene_repository = ${{ github.event.issue.pull_request.head.repo.clone_url }}
+        cat $GITHUB_EVENT_PATH
     - name: Run selenology
       id: selenology
       uses: Kampfkarren/selenology@main
