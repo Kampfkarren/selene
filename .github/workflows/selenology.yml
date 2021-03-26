@@ -8,14 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - run: |
-        echo new_selene_checkout = ${{ github.event.pull_request.head.sha }}
-        echo new_selene_repository = ${{ github.event.pull_request.head.repo.clone_url }}
+        echo new_selene_checkout = ${{ github.event.issue.pull_request.head.sha }}
+        echo new_selene_repository = ${{ github.event.issue.pull_request.head.repo.clone_url }}
     - name: Run selenology
       id: selenology
       uses: Kampfkarren/selenology@main
       with:
-        new_selene_checkout: ${{ github.event.pull_request.head.sha }}
-        new_selene_repository: ${{ github.event.pull_request.head.repo.clone_url }}
+        new_selene_checkout: ${{ github.event.issue.pull_request.head.sha }}
+        new_selene_repository: ${{ github.event.issue.pull_request.head.repo.clone_url }}
     - uses: actions/checkout@v2
       with:
         branch: selenology-outputs
