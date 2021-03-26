@@ -7,14 +7,35 @@ jobs:
     if: ${{ github.event.issue.pull_request }} && ${{ github.event.sender.login }} == "Kampfkarren" && ${{ contains(github.event.comment.body, '!selenology') }}
     runs-on: ubuntu-latest
     steps:
-    - run: |
-        cat $GITHUB_EVENT_PATH
+    - name: Get PR info
+      uses: octokit/graphql-action@v2.x
+      id: get_pr_info
+      with:
+        query: |
+          query getPullRequestInfo($owner:String!,$repo:String!,$number:Int!) {
+            repository(owner: $owner, name: $repo) {
+              pullRequest(number:$number) {
+                baseRef {
+                  repository {
+                    sshUrl
+                  }
+
+                  target {
+                    oid
+                  }
+                }
+              }
+            }
+          }
+        owner: ${{ github.event.repository.owner.name }}
+        repo: ${{ github.event.repository.name }}
+        number: ${{ github.event.issue.number }}
     - name: Run selenology
       id: selenology
       uses: Kampfkarren/selenology@main
       with:
-        new_selene_checkout: ${{ github.event.issue.pull_request.head.sha }}
-        new_selene_repository: ${{ github.event.issue.pull_request.head.repo.clone_url }}
+        new_selene_checkout: ${{ fromJSON(steps.get_pr_info.outputs.data).repository.pullRequest.baseRef.target.oid }}
+        new_selene_repository: ${{ fromJSON(steps.get_pr_info.outputs.data).repository.pullRequest.baseRef.repository.sshUrl }}
     - uses: actions/checkout@v2
       with:
         branch: selenology-outputs
