@@ -48,7 +48,9 @@ jobs:
         cd $GITHUB_WORKSPACE/selenology-outputs
         FILENAME=selenology-outputs/output-$(date +%s).html
         mkdir -p selenology-outputs
-        echo ${{ steps.selenology.outputs.output }} > $FILENAME
+        cat <<'EOF' >>$FILENAME
+        ${{ steps.selenology.outputs.output }}
+        EOF
         git config user.name "Selenology"
         git config user.email "<>"
         git add selenology-outputs/
