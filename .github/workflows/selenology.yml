@@ -40,7 +40,7 @@ jobs:
         new_selene_repository: ${{ fromJSON(steps.get_pr_info.outputs.data).repository.pullRequest.baseRef.repository.url }}
     - uses: actions/checkout@v2
       with:
-        branch: selenology-outputs
+        ref: selenology-outputs
         path: selenology-outputs
     - name: Upload output
       id: upload
