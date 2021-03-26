@@ -41,7 +41,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         branch: selenology-outputs
-        path: $GITHUB_WORKSPACE/selenology-outputs
+        path: selenology-outputs
     - name: Upload output
       id: upload
       run: |
