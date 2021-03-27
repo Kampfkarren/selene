@@ -143,7 +143,7 @@ export async function ensureSeleneExists(storagePath: vscode.Uri) {
     const path = await getSelenePath(storagePath)
 
     if (path === undefined) {
-        await vscode.workspace.fs.createDirectory(storagePath);
+        await vscode.workspace.fs.createDirectory(storagePath)
         return downloadSelene(storagePath)
     } else {
         if (!await fileExists(path)) {
