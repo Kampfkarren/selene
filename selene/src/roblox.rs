@@ -134,63 +134,66 @@ impl RobloxGenerator {
                 } => (
                     name,
                     tags,
-                    Some(Field::Function {
-                        // TODO: Roblox doesn't tell us which parameters are nillable or not
-                        // So results from these are regularly wrong
-                        // The best solution is a manual patch for every method we *know* is nillable
-                        // e.g. WaitForChild
-                        // We can also let some parameters be required in the middle, and fix unused_variable to accept them
+                    Some(
+                        FunctionBehavior {
+                            // TODO: Roblox doesn't tell us which parameters are nillable or not
+                            // So results from these are regularly wrong
+                            // The best solution is a manual patch for every method we *know* is nillable
+                            // e.g. WaitForChild
+                            // We can also let some parameters be required in the middle, and fix unused_variable to accept them
 
-                        // arguments: parameters
-                        // .iter()
-                        // .map(|param| Argument {
-                        // required: if param.default.is_some() {
-                        // Required::NotRequired
-                        // } else {
-                        // Required::Required(None)
-                        // },
-                        // argument_type: match &param.parameter_type {
-                        // ApiValueType::Class { name } => {
-                        // ArgumentType::Display(name.to_owned())
-                        // }
-                        //
-                        // ApiValueType::DataType { value } => match value {
-                        // ApiDataType::Content => ArgumentType::String,
-                        // ApiDataType::Other(other) => {
-                        // ArgumentType::Display(other.to_owned())
-                        // }
-                        // },
-                        //
-                        // ApiValueType::Group { value } => match value {
-                        // ApiGroupType::Table => ArgumentType::Table,
-                        // ApiGroupType::Tuple => ArgumentType::Vararg,
-                        // ApiGroupType::Variant => ArgumentType::Any,
-                        // },
-                        //
-                        // ApiValueType::Primitive { value } => match value {
-                        // ApiPrimitiveType::Bool => ArgumentType::Bool,
-                        // ApiPrimitiveType::Double
-                        // | ApiPrimitiveType::Float
-                        // | ApiPrimitiveType::Int
-                        // | ApiPrimitiveType::Int64 => ArgumentType::Number,
-                        // ApiPrimitiveType::String => ArgumentType::String,
-                        // },
-                        //
-                        // ApiValueType::Other { name } => {
-                        // ArgumentType::Display(name.to_owned())
-                        // }
-                        // },
-                        // })
-                        // .collect(),
-                        arguments: parameters
-                            .iter()
-                            .map(|_| Argument {
-                                argument_type: ArgumentType::Any,
-                                required: Required::NotRequired,
-                            })
-                            .collect(),
-                        method: true,
-                    }),
+                            // arguments: parameters
+                            // .iter()
+                            // .map(|param| Argument {
+                            // required: if param.default.is_some() {
+                            // Required::NotRequired
+                            // } else {
+                            // Required::Required(None)
+                            // },
+                            // argument_type: match &param.parameter_type {
+                            // ApiValueType::Class { name } => {
+                            // ArgumentType::Display(name.to_owned())
+                            // }
+                            //
+                            // ApiValueType::DataType { value } => match value {
+                            // ApiDataType::Content => ArgumentType::String,
+                            // ApiDataType::Other(other) => {
+                            // ArgumentType::Display(other.to_owned())
+                            // }
+                            // },
+                            //
+                            // ApiValueType::Group { value } => match value {
+                            // ApiGroupType::Table => ArgumentType::Table,
+                            // ApiGroupType::Tuple => ArgumentType::Vararg,
+                            // ApiGroupType::Variant => ArgumentType::Any,
+                            // },
+                            //
+                            // ApiValueType::Primitive { value } => match value {
+                            // ApiPrimitiveType::Bool => ArgumentType::Bool,
+                            // ApiPrimitiveType::Double
+                            // | ApiPrimitiveType::Float
+                            // | ApiPrimitiveType::Int
+                            // | ApiPrimitiveType::Int64 => ArgumentType::Number,
+                            // ApiPrimitiveType::String => ArgumentType::String,
+                            // },
+                            //
+                            // ApiValueType::Other { name } => {
+                            // ArgumentType::Display(name.to_owned())
+                            // }
+                            // },
+                            // })
+                            // .collect(),
+                            arguments: parameters
+                                .iter()
+                                .map(|_| Argument {
+                                    argument_type: ArgumentType::Any,
+                                    required: Required::NotRequired,
+                                })
+                                .collect(),
+                            method: true,
+                        }
+                        .into(),
+                    ),
                 ),
 
                 ApiMember::Property {
@@ -265,22 +268,21 @@ impl RobloxGenerator {
             let mut enum_table = BTreeMap::new();
             enum_table.insert(
                 "GetEnumItems".to_owned(),
-                Field::Function {
+                FunctionBehavior {
                     arguments: vec![],
                     method: true,
-                },
+                }
+                .into(),
             );
 
             for item in &enuhm.items {
                 enum_table.insert(item.name.to_owned(), Field::Struct("EnumItem".to_owned()));
             }
 
-            children.insert(enuhm.name.to_owned(), Field::Table(enum_table));
+            children.insert(enuhm.name.to_owned(), enum_table.into());
         }
 
-        self.std
-            .globals
-            .insert("Enum".to_owned(), Field::Table(children));
+        self.std.globals.insert("Enum".to_owned(), children.into());
     }
 
     fn write_instance_new(&mut self, api: &api::ApiDump) {
@@ -298,14 +300,15 @@ impl RobloxGenerator {
 
         let mut instance = self.std.globals.get_mut("Instance").unwrap();
 
-        if let Field::Table(table) = &mut instance {
-            *table.get_mut("new").unwrap() = Field::Function {
+        if let Field::Complex { table, .. } = &mut instance {
+            *table.get_mut("new").unwrap() = FunctionBehavior {
                 arguments: vec![Argument {
                     argument_type: ArgumentType::Constant(instance_names),
                     required: Required::Required(None),
                 }],
                 method: false,
-            };
+            }
+            .into();
         } else {
             unreachable!()
         }
@@ -328,13 +331,14 @@ impl RobloxGenerator {
         let structs = meta.structs.as_mut().unwrap();
         let data_model = structs.get_mut("DataModel").unwrap();
 
-        *data_model.get_mut("GetService").unwrap() = Field::Function {
+        *data_model.get_mut("GetService").unwrap() = FunctionBehavior {
             arguments: vec![Argument {
                 argument_type: ArgumentType::Constant(service_names),
                 required: Required::Required(None),
             }],
             method: true,
-        };
+        }
+        .into();
     }
 
     fn deprecated_event_methods(&mut self) {
