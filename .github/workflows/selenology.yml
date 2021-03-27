@@ -1,0 +1,61 @@
+name: Selenology
+on:
+  issue_comment:
+    types: [created]
+jobs:
+  selenology:
+    if: ${{ github.event.issue.pull_request }} && ${{ github.event.sender.login }} == "Kampfkarren" && ${{ contains(github.event.comment.body, '!selenology') }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get PR info
+      uses: octokit/graphql-action@v2.x
+      id: get_pr_info
+      with:
+        query: |
+          query getPullRequestInfo($owner:String!,$repo:String!,$number:Int!) {
+            repository(owner: $owner, name: $repo) {
+              pullRequest(number:$number) {
+                repository {
+                  url
+                }
+
+                headRefOid
+              }
+            }
+          }
+        owner: ${{ github.event.repository.owner.login }}
+        repo: ${{ github.event.repository.name }}
+        number: ${{ github.event.issue.number }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Run selenology
+      id: selenology
+      uses: Kampfkarren/selenology@main
+      with:
+        new_selene_checkout: ${{ fromJSON(steps.get_pr_info.outputs.data).repository.pullRequest.headRefOid }}
+        new_selene_repository: ${{ fromJSON(steps.get_pr_info.outputs.data).repository.pullRequest.repository.url }}
+    - uses: actions/checkout@v2
+      with:
+        ref: selenology-outputs
+        path: selenology-outputs
+    - name: Upload output
+      id: upload
+      run: |
+        cd $GITHUB_WORKSPACE/selenology-outputs
+        FILENAME=selenology-outputs/output-$(date +%s).html
+        mkdir -p selenology-outputs
+        cat <<'EOF' >>$FILENAME
+        ${{ steps.selenology.outputs.output }}
+        EOF
+        git config user.name "Selenology"
+        git config user.email "<>"
+        git add selenology-outputs/
+        git commit -m "Add selenology outputs."
+        git push origin selenology-outputs
+        echo "::set-output name=filename::$FILENAME"
+    - name: Post comment
+      uses: peter-evans/create-or-update-comment@v1
+      with:
+        issue-number: ${{ github.event.issue.number }}
+        body: |
+          Selenology report was created, and can be viewed [at this link](https://htmlpreview.github.io/?https://github.com/${{ github.event.repository.owner.login }}/${{ github.event.repository.name }}/blob/selenology-outputs/${{ steps.upload.outputs.filename }}).
