@@ -1,6 +1,4 @@
-import * as fs from "fs"
 import * as os from "os"
-import * as path from "path"
 import * as selene from "./selene"
 import * as requestNative from "request"
 import * as request from "request-promise-native"
@@ -84,13 +82,16 @@ function getSeleneFilenamePattern(): RegExp {
     }
 }
 
-async function fileExists(filename: string): Promise<boolean> {
-    return fs.promises.stat(filename)
-        .then(() => true)
-        .catch((error) => error.code !== "ENOENT")
+async function fileExists(filename: vscode.Uri): Promise<boolean> {
+    try {
+        await vscode.workspace.fs.stat(filename)
+        return true
+    } catch (err) {
+        return err !== vscode.FileSystemError.FileNotFound
+    }
 }
 
-export async function downloadSelene(directory: string) {
+export async function downloadSelene(directory: vscode.Uri) {
     vscode.window.showInformationMessage("Downloading Selene...")
 
     const filename = getSeleneFilename()
@@ -99,7 +100,7 @@ export async function downloadSelene(directory: string) {
 
     for (const asset of release.assets) {
         if (filenamePattern.test(asset.name)) {
-            const file = fsWriteFileAtomic(path.join(directory, filename), {
+            const file = fsWriteFileAtomic(vscode.Uri.joinPath(directory, filename).fsPath, {
                 mode: 0o755,
             })
 
@@ -125,23 +126,23 @@ export async function downloadSelene(directory: string) {
     }
 }
 
-export async function getSelenePath(storagePath: string): Promise<string | undefined> {
+export async function getSelenePath(storagePath: vscode.Uri): Promise<vscode.Uri | undefined> {
     const settingPath = vscode.workspace.getConfiguration("selene").get<string | null>("selenePath")
     if (settingPath) {
-        return settingPath
+        return vscode.Uri.file(settingPath)
     }
 
-    const downloadPath = path.join(storagePath, getSeleneFilename())
+    const downloadPath = vscode.Uri.joinPath(storagePath, getSeleneFilename())
     if (await fileExists(downloadPath)) {
         return downloadPath
     }
 }
 
-export async function ensureSeleneExists(storagePath: string) {
+export async function ensureSeleneExists(storagePath: vscode.Uri) {
     const path = await getSelenePath(storagePath)
 
     if (path === undefined) {
-        await fs.promises.mkdir(storagePath, { recursive: true })
+        await vscode.workspace.fs.createDirectory(storagePath)
         return downloadSelene(storagePath)
     } else {
         if (!await fileExists(path)) {
@@ -156,7 +157,7 @@ export async function ensureSeleneExists(storagePath: string) {
     }
 }
 
-function openUpdatePrompt(directory: string, release: GithubRelease) {
+function openUpdatePrompt(directory: vscode.Uri, release: GithubRelease) {
     vscode.window.showInformationMessage(
         `There's an update available for selene: ${release.tag_name}`,
         "Install Update",
