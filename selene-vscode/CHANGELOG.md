@@ -4,6 +4,9 @@ All notable changes to the "selene-vscode" extension will be documented in this 
 
 If you want to stay up to date with selene itself, you can find the changelog in [selene's CHANGELOG.md](https://github.com/Kampfkarren/selene/blob/master/CHANGELOG.md).
 
+## [Unreleased]
+-   Updated the internal `fs` code to use VSCode FileSystem rather than Node.js fs methods.
+
 ## [1.0.3]
 -   Fixed incorrect diagnostics positions when using Unicode characters
 
