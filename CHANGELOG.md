@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 - Fixed a bug where some indexes of Roblox structures would fail (such as `workspace.CurrentCamera.ViewportSize.X`)
+- Fixed a bug where chaining `roblox` with another standard library would not read the other standard library if `roblox` was being generated.
 
 ## [0.11.0] - 2021-01-04
 ### Added
