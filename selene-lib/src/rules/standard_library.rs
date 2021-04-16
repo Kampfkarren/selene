@@ -89,7 +89,7 @@ fn name_path<'a, 'ast>(expression: &'a ast::Expression<'ast>) -> Option<Vec<Stri
         if let ast::Value::Var(var) = &**value {
             match var {
                 ast::Var::Expression(expression) => {
-                    name_path_from_prefix_suffix(expression.prefix(), expression.iter_suffixes())
+                    name_path_from_prefix_suffix(expression.prefix(), expression.suffixes())
                 }
 
                 ast::Var::Name(name) => Some(vec![name.to_string()]),
@@ -119,80 +119,74 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
             }
         }
 
-        ast::Expression::Value {
-            binop: rhs, value, ..
-        } => {
-            let base = match &**value {
-                ast::Value::Function(_) => Some(ArgumentType::Function.into()),
-                ast::Value::FunctionCall(_) => None,
-                ast::Value::Number(_) => Some(ArgumentType::Number.into()),
-                ast::Value::ParseExpression(expression) => get_argument_type(expression),
-                ast::Value::String(token) => {
-                    Some(PassedArgumentType::from_string(token.token().to_string()))
-                }
-                ast::Value::Symbol(symbol) => match *symbol.token_type() {
-                    TokenType::Symbol { symbol } => match symbol {
-                        Symbol::False => Some(ArgumentType::Bool.into()),
-                        Symbol::True => Some(ArgumentType::Bool.into()),
-                        Symbol::Nil => Some(ArgumentType::Nil.into()),
-                        Symbol::Ellipse => Some(ArgumentType::Vararg.into()),
-                        ref other => {
-                            unreachable!("TokenType::Symbol was not expected ({:?})", other)
-                        }
-                    },
-
-                    ref other => unreachable!(
-                        "ast::Value::Symbol token_type != TokenType::Symbol ({:?})",
-                        other
-                    ),
+        ast::Expression::Value { value, .. } => match &**value {
+            ast::Value::Function(_) => Some(ArgumentType::Function.into()),
+            ast::Value::FunctionCall(_) => None,
+            ast::Value::Number(_) => Some(ArgumentType::Number.into()),
+            ast::Value::ParenthesesExpression(expression) => get_argument_type(expression),
+            ast::Value::String(token) => {
+                Some(PassedArgumentType::from_string(token.token().to_string()))
+            }
+            ast::Value::Symbol(symbol) => match *symbol.token_type() {
+                TokenType::Symbol { symbol } => match symbol {
+                    Symbol::False => Some(ArgumentType::Bool.into()),
+                    Symbol::True => Some(ArgumentType::Bool.into()),
+                    Symbol::Nil => Some(ArgumentType::Nil.into()),
+                    Symbol::Ellipse => Some(ArgumentType::Vararg.into()),
+                    ref other => {
+                        unreachable!("TokenType::Symbol was not expected ({:?})", other)
+                    }
                 },
-                ast::Value::TableConstructor(_) => Some(ArgumentType::Table.into()),
-                ast::Value::Var(_) => None,
-            };
 
-            if let Some(rhs) = rhs {
-                // Nearly all of these will return wrong results if you have a non-idiomatic metatable
-                // I intentionally omitted common metamethod re-typings, like __mul
-                match rhs.bin_op() {
-                    ast::BinOp::Caret(_) => Some(ArgumentType::Number.into()),
+                ref other => unreachable!(
+                    "ast::Value::Symbol token_type != TokenType::Symbol ({:?})",
+                    other
+                ),
+            },
+            ast::Value::TableConstructor(_) => Some(ArgumentType::Table.into()),
+            ast::Value::Var(_) => None,
+        },
 
-                    ast::BinOp::GreaterThan(_)
-                    | ast::BinOp::GreaterThanEqual(_)
-                    | ast::BinOp::LessThan(_)
-                    | ast::BinOp::LessThanEqual(_)
-                    | ast::BinOp::TwoEqual(_)
-                    | ast::BinOp::TildeEqual(_) => {
-                        if_chain::if_chain! {
-                            if let ast::Expression::Value { binop: rhs, .. } = rhs.rhs();
-                            if let Some(rhs) = rhs;
-                            if let ast::BinOp::And(_) | ast::BinOp::Or(_) = rhs.bin_op();
-                            then {
-                                None
-                            } else {
-                                Some(ArgumentType::Bool.into())
-                            }
+        ast::Expression::BinaryOperator { lhs, binop, rhs } => {
+            // Nearly all of these will return wrong results if you have a non-idiomatic metatable.
+            // I intentionally omitted common metamethod re-typings, like `__mul`.
+            match binop {
+                ast::BinOp::Caret(_) => Some(ArgumentType::Number.into()),
+
+                ast::BinOp::GreaterThan(_)
+                | ast::BinOp::GreaterThanEqual(_)
+                | ast::BinOp::LessThan(_)
+                | ast::BinOp::LessThanEqual(_)
+                | ast::BinOp::TwoEqual(_)
+                | ast::BinOp::TildeEqual(_) => {
+                    if_chain::if_chain! {
+                        if let ast::Expression::BinaryOperator { binop, .. } = &**rhs;
+                        if let ast::BinOp::And(_) | ast::BinOp::Or(_) = binop;
+
+                        then {
+                            None
+                        } else {
+                            Some(ArgumentType::Bool.into())
                         }
                     }
-
-                    // Basic types will often re-implement these (e.g. Roblox's Vector3)
-                    ast::BinOp::Plus(_)
-                    | ast::BinOp::Minus(_)
-                    | ast::BinOp::Star(_)
-                    | ast::BinOp::Slash(_) => base,
-
-                    ast::BinOp::Percent(_) => Some(ArgumentType::Number.into()),
-
-                    ast::BinOp::TwoDots(_) => Some(ArgumentType::String.into()),
-
-                    ast::BinOp::And(_) | ast::BinOp::Or(_) => {
-                        // We could potentially support union types here
-                        // Or even just produce one type if both the left and right sides can be evaluated
-                        // But for now, the evaluation just isn't smart enough to where this would be practical
-                        None
-                    }
                 }
-            } else {
-                base
+
+                // Basic types will often re-implement these (e.g. Roblox's Vector3)
+                ast::BinOp::Plus(_)
+                | ast::BinOp::Minus(_)
+                | ast::BinOp::Star(_)
+                | ast::BinOp::Slash(_) => get_argument_type(expression),
+
+                ast::BinOp::Percent(_) => Some(ArgumentType::Number.into()),
+
+                ast::BinOp::TwoDots(_) => Some(ArgumentType::String.into()),
+
+                ast::BinOp::And(_) | ast::BinOp::Or(_) => {
+                    // We could potentially support union types here
+                    // Or even just produce one type if both the left and right sides can be evaluated
+                    // But for now, the evaluation just isn't smart enough to where this would be practical
+                    None
+                }
             }
         }
     }
@@ -259,7 +253,7 @@ impl StandardLibraryVisitor<'_> {
 
 impl Visitor<'_> for StandardLibraryVisitor<'_> {
     fn visit_assignment(&mut self, assignment: &ast::Assignment) {
-        for var in assignment.var_list() {
+        for var in assignment.variables() {
             if let Some(reference) = self
                 .scope_manager
                 .reference_at_byte(var.start_position().unwrap().bytes())
@@ -273,17 +267,17 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                 ast::Var::Expression(var_expr) => {
                     let mut keep_going = true;
                     if var_expr
-                        .iter_suffixes()
+                        .suffixes()
                         .take_while(|suffix| take_while_keep_going(suffix, &mut keep_going))
                         .count()
-                        != var_expr.iter_suffixes().count()
+                        != var_expr.suffixes().count()
                     {
                         // Modifying the return value, which we don't lint yet
                         continue;
                     }
 
                     if let Some(name_path) =
-                        name_path_from_prefix_suffix(var_expr.prefix(), var_expr.iter_suffixes())
+                        name_path_from_prefix_suffix(var_expr.prefix(), var_expr.suffixes())
                     {
                         match self.standard_library.find_global(&name_path) {
                             Some(field) => {
@@ -379,7 +373,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
 
         let mut keep_going = true;
         let mut suffixes: Vec<&ast::Suffix> = call
-            .iter_suffixes()
+            .suffixes()
             .take_while(|suffix| take_while_keep_going(suffix, &mut keep_going))
             .collect();
 
@@ -670,7 +664,7 @@ mod tests {
         impl Visitor<'_> for NamePathTestVisitor {
             fn visit_local_assignment(&mut self, node: &ast::LocalAssignment) {
                 self.paths.push(
-                    name_path(node.expr_list().into_iter().next().unwrap())
+                    name_path(node.expressions().into_iter().next().unwrap())
                         .expect("name_path returned None"),
                 );
             }

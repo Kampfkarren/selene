@@ -83,7 +83,6 @@ macro_rules! make_node_visitor {
 make_node_visitor!({
     visit_anonymous_call(FunctionArgs),
     visit_assignment(Assignment),
-    visit_bin_op(BinOpRhs),
     visit_block(Block),
     visit_call(Call),
     visit_do(Do),
@@ -118,12 +117,12 @@ make_node_visitor!({
     visit_while(While),
 
     #[cfg(feature = "roblox")] {
-        visit_as_assertion(AsAssertion),
         visit_compound_assignment(CompoundAssignment),
         visit_compound_op(CompoundOp),
         visit_exported_type_declaration(ExportedTypeDeclaration),
         visit_generic_declaration(GenericDeclaration),
         visit_indexed_type_info(IndexedTypeInfo),
+        visit_type_assertion(TypeAssertion),
         visit_type_declaration(TypeDeclaration),
         visit_type_field(TypeField),
         visit_type_field_key(TypeFieldKey),

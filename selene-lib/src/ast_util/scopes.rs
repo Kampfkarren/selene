@@ -175,44 +175,43 @@ impl ScopeVisitor {
                 self.read_expression(expression);
             }
 
-            ast::Expression::Value { value, binop, .. } => {
-                if let Some(binop) = binop {
-                    self.read_expression(binop.rhs());
-                }
-
-                match &**value {
-                    ast::Value::Function((name, _)) => {
-                        self.read_name(name);
-                    }
-
-                    ast::Value::FunctionCall(call) => {
-                        self.read_prefix(call.prefix());
-                        for suffix in call.iter_suffixes() {
-                            self.read_suffix(suffix);
-                        }
-                    }
-
-                    ast::Value::TableConstructor(table) => {
-                        self.read_table_constructor(table);
-                    }
-
-                    ast::Value::ParseExpression(expression) => self.read_expression(expression),
-
-                    ast::Value::Symbol(symbol) => {
-                        if *symbol.token_type()
-                            == (TokenType::Symbol {
-                                symbol: Symbol::Ellipse,
-                            })
-                        {
-                            self.read_name(symbol);
-                        }
-                    }
-
-                    ast::Value::Var(var) => self.read_var(var),
-
-                    _ => {}
-                }
+            ast::Expression::BinaryOperator { lhs, binop, rhs } => {
+                self.read_expression(lhs);
+                self.read_expression(rhs);
             }
+
+            ast::Expression::Value { value, .. } => match &**value {
+                ast::Value::Function((name, _)) => {
+                    self.read_name(name);
+                }
+
+                ast::Value::FunctionCall(call) => {
+                    self.read_prefix(call.prefix());
+                    for suffix in call.suffixes() {
+                        self.read_suffix(suffix);
+                    }
+                }
+
+                ast::Value::TableConstructor(table) => {
+                    self.read_table_constructor(table);
+                }
+
+                ast::Value::ParenthesesExpression(expression) => self.read_expression(expression),
+
+                ast::Value::Symbol(symbol) => {
+                    if *symbol.token_type()
+                        == (TokenType::Symbol {
+                            symbol: Symbol::Ellipse,
+                        })
+                    {
+                        self.read_name(symbol);
+                    }
+                }
+
+                ast::Value::Var(var) => self.read_var(var),
+
+                _ => {}
+            },
         }
     }
 
@@ -275,7 +274,7 @@ impl ScopeVisitor {
         match var {
             ast::Var::Expression(var_expr) => {
                 self.read_prefix(var_expr.prefix());
-                for suffix in var_expr.iter_suffixes() {
+                for suffix in var_expr.suffixes() {
                     self.read_suffix(suffix);
                 }
             }
@@ -394,9 +393,9 @@ impl ScopeVisitor {
 
 impl Visitor<'_> for ScopeVisitor {
     fn visit_assignment(&mut self, assignment: &ast::Assignment) {
-        let mut expressions = assignment.expr_list().iter();
+        let mut expressions = assignment.expressions().iter();
 
-        for var in assignment.var_list() {
+        for var in assignment.variables() {
             let expression = expressions.next();
             if let Some(expression) = expression {
                 self.read_expression(expression);
@@ -410,7 +409,7 @@ impl Visitor<'_> for ScopeVisitor {
                     }
 
                     ast::Prefix::Name(name) => {
-                        if var_expr.iter_suffixes().next().is_some() {
+                        if var_expr.suffixes().next().is_some() {
                             self.read_name(name);
                         }
 
@@ -429,9 +428,9 @@ impl Visitor<'_> for ScopeVisitor {
     }
 
     fn visit_local_assignment(&mut self, local_assignment: &ast::LocalAssignment) {
-        let mut expressions = local_assignment.expr_list().iter();
+        let mut expressions = local_assignment.expressions().iter();
 
-        for name_token in local_assignment.name_list() {
+        for name_token in local_assignment.names() {
             let expression = expressions.next();
 
             if let Some(expression) = expression {
@@ -572,7 +571,7 @@ impl Visitor<'_> for ScopeVisitor {
     }
 
     fn visit_generic_for(&mut self, generic_for: &ast::GenericFor) {
-        for expression in generic_for.expr_list().iter() {
+        for expression in generic_for.expressions().iter() {
             self.read_expression(expression);
         }
 
@@ -614,7 +613,7 @@ impl Visitor<'_> for ScopeVisitor {
 
     fn visit_local_function(&mut self, local_function: &ast::LocalFunction) {
         self.define_name(local_function.name(), range(local_function.name()));
-        self.open_scope(local_function.func_body());
+        self.open_scope(local_function.body());
     }
 
     fn visit_local_function_end(&mut self, _: &ast::LocalFunction) {

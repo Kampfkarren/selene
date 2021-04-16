@@ -31,7 +31,7 @@ where
 }
 
 pub fn first_code<'ast>(ast: &Ast<'ast>) -> Option<(Position, Position)> {
-    match ast.nodes().iter_stmts().next() {
+    match ast.nodes().stmts().next() {
         Some(first_stmt) => first_stmt.range(),
         None => ast.nodes().last_stmt().and_then(Node::range),
     }

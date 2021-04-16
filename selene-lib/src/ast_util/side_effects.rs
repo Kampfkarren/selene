@@ -40,7 +40,7 @@ impl HasSideEffects for ast::Value<'_> {
             | ast::Value::String(_)
             | ast::Value::Symbol(_) => false,
             ast::Value::FunctionCall(_) => true,
-            ast::Value::ParseExpression(expression) => expression.has_side_effects(),
+            ast::Value::ParenthesesExpression(expression) => expression.has_side_effects(),
             ast::Value::TableConstructor(table_constructor) => table_constructor
                 .fields()
                 .into_iter()
@@ -69,7 +69,6 @@ impl HasSideEffects for ast::Var<'_> {
 
 impl HasSideEffects for ast::VarExpression<'_> {
     fn has_side_effects(&self) -> bool {
-        self.prefix().has_side_effects()
-            || self.iter_suffixes().any(HasSideEffects::has_side_effects)
+        self.prefix().has_side_effects() || self.suffixes().any(HasSideEffects::has_side_effects)
     }
 }

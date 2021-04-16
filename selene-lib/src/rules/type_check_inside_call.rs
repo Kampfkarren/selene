@@ -62,20 +62,18 @@ impl Visitor<'_> for TypeCheckInsideCallVisitor {
             if is_type_function(&name.to_string(), self.roblox);
 
             // Check that we're calling it with an argument
-            if let ast::Suffix::Call(call) = call.iter_suffixes().next().unwrap();
+            if let ast::Suffix::Call(call) = call.suffixes().next().unwrap();
             if let ast::Call::AnonymousCall(args) = call;
             if let ast::FunctionArgs::Parentheses { arguments, .. } = args;
             if let Some(argument) = arguments.iter().next();
 
             // Check that the argument is in the form of x == y
-            if let ast::Expression::Value { binop: rhs, .. } = argument;
-            if let Some(rhs) = rhs;
-            if let ast::BinOp::TwoEqual(_) = rhs.bin_op();
+            if let ast::Expression::BinaryOperator { lhs, binop, rhs, .. } = &*argument;
+            if let ast::BinOp::TwoEqual(_) = binop;
 
             // Check that rhs is a constant string
-            if let ast::Expression::Value { binop: rhs, value, .. } = rhs.rhs();
-            if rhs.is_none();
-            if let ast::Value::String(_) = &**value;
+            if let ast::Expression::Value { value: rhs_value, .. } = &**rhs;
+            if let ast::Value::String(_) = &**rhs_value;
 
             then {
                 self.positions.push(range(call));

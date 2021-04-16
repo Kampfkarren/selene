@@ -60,7 +60,7 @@ impl Visitor<'_> for Color3BoundsVisitor {
         if_chain::if_chain! {
             if let ast::Prefix::Name(token) = call.prefix();
             if token.to_string() == "Color3";
-            let mut suffixes = call.iter_suffixes().collect::<Vec<_>>();
+            let mut suffixes = call.suffixes().collect::<Vec<_>>();
 
             if suffixes.len() == 2; // .new and ()
             let call_suffix = suffixes.pop().unwrap();
@@ -78,8 +78,7 @@ impl Visitor<'_> for Color3BoundsVisitor {
                 for argument in arguments {
                     // Check if the argument is a constant number
                     if_chain::if_chain! {
-                        if let ast::Expression::Value { value, binop, .. } = argument;
-                        if binop.is_none();
+                        if let ast::Expression::Value { value, .. } = argument;
                         if let ast::Value::Number(value) = &**value;
                         if let Ok(number) = value.to_string().parse::<f32>();
                         if number > 1.0;
