@@ -75,6 +75,8 @@ fn name_path_from_prefix_suffix<'a, 'ast, S: Iterator<Item = &'a ast::Suffix<'as
                         return None;
                     }
                 }
+
+                _ => return None,
             }
         }
 
@@ -93,6 +95,8 @@ fn name_path<'a, 'ast>(expression: &'a ast::Expression<'ast>) -> Option<Vec<Stri
                 }
 
                 ast::Var::Name(name) => Some(vec![name.to_string()]),
+
+                _ => None,
             }
         } else {
             None
@@ -116,6 +120,7 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                 ast::UnOp::Hash(_) => Some(ArgumentType::Number.into()),
                 ast::UnOp::Minus(_) => get_argument_type(expression),
                 ast::UnOp::Not(_) => Some(ArgumentType::Bool.into()),
+                _ => None,
             }
         }
 
@@ -145,9 +150,10 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
             },
             ast::Value::TableConstructor(_) => Some(ArgumentType::Table.into()),
             ast::Value::Var(_) => None,
+            _ => None,
         },
 
-        ast::Expression::BinaryOperator { lhs, binop, rhs } => {
+        ast::Expression::BinaryOperator { binop, rhs, .. } => {
             // Nearly all of these will return wrong results if you have a non-idiomatic metatable.
             // I intentionally omitted common metamethod re-typings, like `__mul`.
             match binop {
@@ -187,8 +193,12 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                     // But for now, the evaluation just isn't smart enough to where this would be practical
                     None
                 }
+
+                _ => None,
             }
         }
+
+        _ => None,
     }
 }
 
@@ -342,6 +352,8 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
                         ));
                     }
                 }
+
+                _ => {}
             }
         }
     }
@@ -430,6 +442,7 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
             ast::Suffix::Call(call) => match call {
                 ast::Call::AnonymousCall(args) => (args, false),
                 ast::Call::MethodCall(method_call) => (method_call.args(), true),
+                _ => return,
             },
 
             _ => unreachable!("function_call.call_suffix != ast::Suffix::Call"),
@@ -488,6 +501,8 @@ impl Visitor<'_> for StandardLibraryVisitor<'_> {
             ast::FunctionArgs::TableConstructor(table) => {
                 argument_types.push((table.range().unwrap(), Some(ArgumentType::Table.into())));
             }
+
+            _ => {}
         }
 
         let mut expected_args = arguments

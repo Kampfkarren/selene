@@ -1,3 +1,5 @@
+// Unimplemented methods will report having side effects for safety reasons.
+
 use full_moon::ast;
 
 pub trait HasSideEffects {
@@ -10,6 +12,7 @@ impl HasSideEffects for ast::Expression<'_> {
             ast::Expression::Parentheses { expression, .. }
             | ast::Expression::UnaryOperator { expression, .. } => expression.has_side_effects(),
             ast::Expression::Value { value, .. } => value.has_side_effects(),
+            _ => false,
         }
     }
 }
@@ -19,6 +22,7 @@ impl HasSideEffects for ast::Prefix<'_> {
         match self {
             ast::Prefix::Expression(expression) => expression.has_side_effects(),
             ast::Prefix::Name(_) => false,
+            _ => true,
         }
     }
 }
@@ -28,6 +32,7 @@ impl HasSideEffects for ast::Suffix<'_> {
         match self {
             ast::Suffix::Call(_) => true,
             ast::Suffix::Index(_) => false,
+            _ => true,
         }
     }
 }
@@ -52,8 +57,11 @@ impl HasSideEffects for ast::Value<'_> {
                     ast::Field::NameKey { value, .. } => value.has_side_effects(),
 
                     ast::Field::NoKey(expression) => expression.has_side_effects(),
+
+                    _ => true,
                 }),
             ast::Value::Var(var) => var.has_side_effects(),
+            _ => true,
         }
     }
 }
@@ -63,6 +71,7 @@ impl HasSideEffects for ast::Var<'_> {
         match self {
             ast::Var::Expression(var_expr) => var_expr.has_side_effects(),
             ast::Var::Name(_) => false,
+            _ => true,
         }
     }
 }

@@ -175,7 +175,7 @@ impl ScopeVisitor {
                 self.read_expression(expression);
             }
 
-            ast::Expression::BinaryOperator { lhs, binop, rhs } => {
+            ast::Expression::BinaryOperator { lhs, rhs, .. } => {
                 self.read_expression(lhs);
                 self.read_expression(rhs);
             }
@@ -212,6 +212,8 @@ impl ScopeVisitor {
 
                 _ => {}
             },
+
+            _ => {}
         }
     }
 
@@ -219,6 +221,7 @@ impl ScopeVisitor {
         match prefix {
             ast::Prefix::Expression(expression) => self.read_expression(expression),
             ast::Prefix::Name(name) => self.read_name(name),
+            _ => {}
         }
     }
 
@@ -226,6 +229,7 @@ impl ScopeVisitor {
         match suffix {
             ast::Suffix::Call(call) => self.visit_call(call),
             ast::Suffix::Index(index) => self.visit_index(index),
+            _ => {}
         }
     }
 
@@ -266,6 +270,8 @@ impl ScopeVisitor {
                 ast::Field::NoKey(value) => {
                     self.read_expression(value);
                 }
+
+                _ => {}
             }
         }
     }
@@ -280,6 +286,8 @@ impl ScopeVisitor {
             }
 
             ast::Var::Name(name) => self.read_name(name),
+
+            _ => {}
         }
     }
 
@@ -415,9 +423,13 @@ impl Visitor<'_> for ScopeVisitor {
 
                         name
                     }
+
+                    _ => continue,
                 },
 
                 ast::Var::Name(name) => name,
+
+                _ => continue,
             };
 
             self.write_name(&name, expression.map(range));
@@ -473,8 +485,8 @@ impl Visitor<'_> for ScopeVisitor {
     fn visit_call(&mut self, call: &ast::Call) {
         let arguments = match call {
             ast::Call::AnonymousCall(args) => args,
-
             ast::Call::MethodCall(method_call) => method_call.args(),
+            _ => return,
         };
 
         match arguments {
@@ -526,10 +538,8 @@ impl Visitor<'_> for ScopeVisitor {
         self.current_scope().blocked.push(Cow::Borrowed("..."));
 
         for parameter in body.parameters() {
-            match parameter {
-                ast::Parameter::Ellipse(token) | ast::Parameter::Name(token) => {
-                    self.define_name(token, range(token));
-                }
+            if let ast::Parameter::Ellipse(token) | ast::Parameter::Name(token) = parameter {
+                self.define_name(token, range(token));
             }
         }
     }

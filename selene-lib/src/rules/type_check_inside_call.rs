@@ -68,7 +68,7 @@ impl Visitor<'_> for TypeCheckInsideCallVisitor {
             if let Some(argument) = arguments.iter().next();
 
             // Check that the argument is in the form of x == y
-            if let ast::Expression::BinaryOperator { lhs, binop, rhs, .. } = &*argument;
+            if let ast::Expression::BinaryOperator { binop, rhs, .. } = &*argument;
             if let ast::BinOp::TwoEqual(_) = binop;
 
             // Check that rhs is a constant string

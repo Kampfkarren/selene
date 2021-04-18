@@ -4,3 +4,7 @@ members = [
 	"selene",
     "selene-lib",
 ]
+
+# Until full-moon's debug stack overflow problem is fixed, this is necessary
+[profile.dev.package.full_moon]
+opt-level = 3
