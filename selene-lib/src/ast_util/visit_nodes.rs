@@ -1,14 +1,9 @@
-use full_moon::{
-    ast::*,
-    node::Node,
-    tokenizer::{Token, TokenReference},
-    visitors::Visitor,
-};
+use full_moon::{ast::*, node::Node, tokenizer::TokenReference, visitors::Visitor};
 
 #[cfg(feature = "roblox")]
 use full_moon::ast::types::*;
 
-pub trait NodeVisitor<'ast> {
+pub(crate) trait NodeVisitor<'ast> {
     fn visit_node<'a>(&mut self, node: &'a dyn Node<'ast>, visitor_type: VisitorType);
 
     fn visit_nodes<'a>(&mut self, ast: &'a Ast<'ast>)
@@ -32,20 +27,12 @@ macro_rules! make_node_visitor {
         $(#[$meta:meta] {
             $($meta_visitor:ident($meta_ast_type:ident),)+
         })+
-    }, {
-        $($token_visitor:ident,)+
     }) => {
         paste::paste! {
             impl<'ast> Visitor<'ast> for NodeVisitorLogic<'_, 'ast> {
                 $(
                     fn $visitor(&mut self, node: &$struct<'ast>) {
                         self.callback.visit_node(node, VisitorType::[<$visitor:camel>]);
-                    }
-                )+
-
-                $(
-                    fn $token_visitor(&mut self, node: &Token<'ast>) {
-                        self.callback.visit_node(node, VisitorType::[<$token_visitor:camel>]);
                     }
                 )+
 
@@ -63,10 +50,6 @@ macro_rules! make_node_visitor {
             pub enum VisitorType {
                 $(
                     [<$visitor:camel>],
-                )+
-
-                $(
-                    [<$token_visitor:camel>],
                 )+
 
                 $(
@@ -129,15 +112,6 @@ make_node_visitor!({
         visit_type_info(TypeInfo),
         visit_type_specifier(TypeSpecifier),
     }
-}, {
-    visit_identifier,
-    visit_multi_line_comment,
-    visit_number,
-    visit_single_line_comment,
-    visit_string_literal,
-    visit_symbol,
-    visit_token,
-    visit_whitespace,
 });
 
 #[cfg(test)]
