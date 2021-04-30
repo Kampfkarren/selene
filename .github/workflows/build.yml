@@ -2,10 +2,10 @@ name: Build selene
 on:
   push:
     branches:
-    - master
+    - main
   pull_request:
     branches:
-    - master
+    - main
 jobs:
   build_windows:
     runs-on: windows-latest
