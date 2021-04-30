@@ -6,6 +6,7 @@ If you want to stay up to date with selene itself, you can find the changelog in
 
 ## [Unreleased]
 -   Updated the internal `fs` code to use VSCode FileSystem rather than Node.js fs methods.
+-   Fixed some information (mainly parse error information) missing from diagnostics which were available in the selene CLI
 
 ## [1.0.3]
 -   Fixed incorrect diagnostics positions when using Unicode characters
