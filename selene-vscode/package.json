@@ -40,13 +40,13 @@
                         "null"
                     ],
                     "default": null,
-                    "description": "Specifies the path of selene. If not specified, selene will be automatically downloaded from the GitHub releases."
+                    "description": "Specifies the path of selene. If not specified, selene will automatically download from the GitHub releases."
                 },
                 "selene.run": {
                     "type": "string",
                     "default": "onType",
                     "enum": ["onSave", "onType"],
-                    "description": "Run the linter `onSave` or `onType`."
+                    "description": "Run the linter as you type (onType) or when the file is saved (onSave)."
                 }
             }
         }
