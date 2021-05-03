@@ -160,9 +160,28 @@ export async function activate(context: vscode.ExtensionContext) {
         diagnosticsCollection.set(document.uri, diagnostics)
     }
 
-    vscode.workspace.onDidSaveTextDocument(lint)
+    let disposable: vscode.Disposable
+    function listenToChange() {
+        if (disposable) {
+            disposable.dispose()
+        }
+
+        const lintOn = vscode.workspace.getConfiguration("selene").get<string>("run")
+        if (lintOn === "onSave") {
+            disposable = vscode.workspace.onDidSaveTextDocument(lint)
+        } else { // onType
+            disposable = vscode.workspace.onDidChangeTextDocument(event => lint(event.document))
+        }
+    }
+
+    listenToChange()
+    vscode.workspace.onDidChangeConfiguration(event => {
+        if (event.affectsConfiguration("selene.run")) {
+            listenToChange()
+        }
+    })
+
     vscode.workspace.onDidOpenTextDocument(lint)
-    vscode.workspace.onDidChangeTextDocument(event => lint(event.document))
     vscode.workspace.onWillDeleteFiles(event => {
         for (const documentUri of event.files) {
             diagnosticsCollection.set(documentUri, [])
