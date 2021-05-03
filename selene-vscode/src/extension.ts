@@ -26,6 +26,11 @@ enum Severity {
     Warning = "Warning",
 }
 
+enum RunType {
+    OnSave = "onSave",
+    OnType = "onType",
+}
+
 function byteToCharMap(document: vscode.TextDocument, byteOffsets: Set<number>) {
     const text = document.getText()
     const byteOffsetMap = new Map<number, number>()
@@ -161,11 +166,11 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     function listenToChange() {
-		switch (vscode.workspace.getConfiguration("selene").get<string>("run")) {
-            case "onSave": {
+		switch (vscode.workspace.getConfiguration("selene").get<RunType>("run")) {
+            case RunType.OnSave: {
                 return vscode.workspace.onDidSaveTextDocument(lint)
             }
-            case "onType": {
+            case RunType.OnType: {
                 return vscode.workspace.onDidChangeTextDocument(event => lint(event.document))
             }
 		}
