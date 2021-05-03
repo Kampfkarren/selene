@@ -40,7 +40,7 @@
                         "null"
                     ],
                     "default": null,
-                    "description": "Specifies the path of selene. If not specified, selene will be automatically download from the GitHub releases."
+                    "description": "Specifies the path of selene. If not specified, selene will be automatically downloaded from the GitHub releases."
                 },
                 "selene.run": {
                     "type": "string",
