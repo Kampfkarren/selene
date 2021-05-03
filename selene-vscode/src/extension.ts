@@ -160,24 +160,22 @@ export async function activate(context: vscode.ExtensionContext) {
         diagnosticsCollection.set(document.uri, diagnostics)
     }
 
-    let disposable: vscode.Disposable
     function listenToChange() {
-        if (disposable) {
-            disposable.dispose()
-        }
-
-        const lintOn = vscode.workspace.getConfiguration("selene").get<string>("run")
-        if (lintOn === "onSave") {
-            disposable = vscode.workspace.onDidSaveTextDocument(lint)
-        } else { // onType
-            disposable = vscode.workspace.onDidChangeTextDocument(event => lint(event.document))
-        }
+		switch (vscode.workspace.getConfiguration("selene").get<string>("run")) {
+            case "onSave": {
+                return vscode.workspace.onDidSaveTextDocument(lint)
+            }
+            case "onType": {
+                return vscode.workspace.onDidChangeTextDocument(event => lint(event.document))
+            }
+		}
     }
 
-    listenToChange()
+    let disposable = listenToChange()
     vscode.workspace.onDidChangeConfiguration(event => {
         if (event.affectsConfiguration("selene.run")) {
-            listenToChange()
+            disposable?.dispose()
+            disposable = listenToChange()
         }
     })
 
