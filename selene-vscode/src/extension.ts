@@ -166,14 +166,13 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     function listenToChange() {
-		switch (vscode.workspace.getConfiguration("selene").get<RunType>("run")) {
-            case RunType.OnSave: {
+        switch (vscode.workspace.getConfiguration("selene").get<RunType>("run")) {
+            case RunType.OnSave:
                 return vscode.workspace.onDidSaveTextDocument(lint)
-            }
-            case RunType.OnType: {
+            case RunType.OnType:
                 return vscode.workspace.onDidChangeTextDocument(event => lint(event.document))
-            }
-		}
+
+        }
     }
 
     let disposable = listenToChange()
