@@ -136,13 +136,15 @@
                         </a>
                         
                         
+                        
+
                     </div>
                 </div>
 
                 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -172,7 +174,7 @@
 </code></pre>
 <p>(Note: Currently, the above method will give you an outdated selene, as the selene crate on Cargo is not yet maintained.)</p>
 <p><strong>If you want the most up to date version of selene</strong></p>
-<pre><code>cargo install --git https://github.com/Kampfkarren/selene selene
+<pre><code>cargo install --branch main --git https://github.com/Kampfkarren/selene selene
 </code></pre>
 <h3 id="roblox-developers"><a class="header" href="#roblox-developers">Roblox developers</a></h3>
 <p>selene is built with Roblox specific lints by default. If you don't want these, type <code>--no-default-features</code> after whichever command you choose.</p>
