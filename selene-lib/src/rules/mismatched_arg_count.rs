@@ -367,4 +367,13 @@ mod tests {
             "alternative_function_definition",
         );
     }
+
+    #[test]
+    fn test_mismatched_args_shadowing_definition() {
+        test_lint(
+            MismatchedArgCountLint::new(()).unwrap(),
+            "mismatched_arg_count",
+            "overriden_variables",
+        );
+    }
 }
