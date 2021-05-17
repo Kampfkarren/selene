@@ -230,6 +230,72 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
                 .insert(id, ParameterCount::from_function_body(function.func_body()));
         }
     }
+
+    fn visit_function_declaration(&mut self, function: &ast::FunctionDeclaration<'_>) {
+        let identifier = range(function.name());
+        let variable = self
+            .scope_manager
+            .variables
+            .iter()
+            .find(|v| v.1.identifiers.contains(&identifier));
+
+        if let Some((id, _)) = variable {
+            self.definitions
+                .insert(id, ParameterCount::from_function_body(function.body()));
+        }
+    }
+
+    fn visit_local_assignment(&mut self, local_assignment: &ast::LocalAssignment) {
+        let mut expressions = local_assignment.expr_list().iter();
+
+        for name_token in local_assignment.name_list() {
+            let expression = expressions.next();
+
+            if let Some(expression) = expression {
+                if let ast::Expression::Value { value, .. } = expression {
+                    if let ast::Value::Function((_, function_body)) = &**value {
+                        let identifier = range(name_token);
+                        let variable = self
+                            .scope_manager
+                            .variables
+                            .iter()
+                            .find(|v| v.1.identifiers.contains(&identifier));
+
+                        if let Some((id, _)) = variable {
+                            self.definitions
+                                .insert(id, ParameterCount::from_function_body(&function_body));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fn visit_assignment(&mut self, assignment: &ast::Assignment) {
+        let mut expressions = assignment.expr_list().iter();
+
+        for var in assignment.var_list() {
+            let expression = expressions.next();
+
+            if let Some(expression) = expression {
+                if let ast::Expression::Value { value, .. } = expression {
+                    if let ast::Value::Function((_, function_body)) = &**value {
+                        let identifier = range(var);
+                        let variable = self
+                            .scope_manager
+                            .variables
+                            .iter()
+                            .find(|v| v.1.identifiers.contains(&identifier));
+
+                        if let Some((id, _)) = variable {
+                            self.definitions
+                                .insert(id, ParameterCount::from_function_body(&function_body));
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 struct MismatchedArgCountVisitor {
@@ -296,6 +362,15 @@ mod tests {
             MismatchedArgCountLint::new(()).unwrap(),
             "mismatched_arg_count",
             "call_side_effects",
+        );
+    }
+
+    #[test]
+    fn test_mismatched_args_alt_definition() {
+        test_lint(
+            MismatchedArgCountLint::new(()).unwrap(),
+            "mismatched_arg_count",
+            "alternative_function_definition",
         );
     }
 }
