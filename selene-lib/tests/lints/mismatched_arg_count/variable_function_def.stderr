@@ -1,0 +1,9 @@
+error[mismatched_arg_count]: this function takes atleast 2 arguments but 0 arguments were supplied
+   ┌─ variable_function_def.lua:8:16
+   │
+ 8 │ local function bar(a, b, ...)
+   │                --- note: function defined here
+   ·
+11 │ bar()
+   │ ^^^ expected atleast 2 arguments
+
