@@ -16,3 +16,15 @@ error[roblox_incorrect_roact_usage]: `ThisDoesntExist` is not a valid class
 13 │ e("ThisDoesntExist", {})
    │   ^^^^^^^^^^^^^^^^^
 
+error[roblox_incorrect_roact_usage]: `Name` will never be applied for `Instance`
+   ┌─ roblox_incorrect_roact_usage.lua:22:2
+   │
+22 │     Name = "MyFrame",
+   │     ^^^^
+
+error[roblox_incorrect_roact_usage]: `Parent` will never be applied for `Instance`
+   ┌─ roblox_incorrect_roact_usage.lua:24:2
+   │
+24 │     Parent = workspace,
+   │     ^^^^^^
+

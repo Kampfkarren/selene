@@ -40,6 +40,17 @@ impl Rule for IncorrectRoactUsageLint {
             ));
         }
 
+        for unused_property in visitor.unused_properties {
+            diagnostics.push(Diagnostic::new(
+                "roblox_incorrect_roact_usage",
+                format!(
+                    "`{}` will never be applied for `{}`",
+                    unused_property.property_name, unused_property.class_name
+                ),
+                Label::new(unused_property.range),
+            ));
+        }
+
         for unknown_class in visitor.unknown_class {
             diagnostics.push(Diagnostic::new(
                 "roblox_incorrect_roact_usage",
@@ -79,6 +90,7 @@ fn is_roact_create_element(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]) -> b
 struct IncorrectRoactUsageVisitor {
     definitions_of_create_element: HashSet<String>,
     invalid_properties: Vec<InvalidProperty>,
+    unused_properties: Vec<InvalidProperty>,
     unknown_class: Vec<UnknownClass>,
 }
 
@@ -202,6 +214,12 @@ impl Visitor<'_> for IncorrectRoactUsageVisitor {
                         property_name,
                         range: range(key),
                     });
+                } else if property_name == "Name" || property_name == "Parent" {
+                    self.unused_properties.push(InvalidProperty {
+                        class_name: class.name().to_string(),
+                        property_name,
+                        range: range(key),
+                    })
                 }
             }
         }
