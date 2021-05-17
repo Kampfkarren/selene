@@ -255,6 +255,7 @@ use_rules! {
     ifs_same_cond: rules::ifs_same_cond::IfsSameCondLint,
     incorrect_standard_library_use: rules::standard_library::StandardLibraryLint,
     invalid_lint_filter: rules::invalid_lint_filter::InvalidLintFilterLint,
+    mismatched_arg_count: rules::mismatched_arg_count::MismatchedArgCountLint,
     multiple_statements: rules::multiple_statements::MultipleStatementsLint,
     parenthese_conditions: rules::parenthese_conditions::ParentheseConditionsLint,
     shadowing: rules::shadowing::ShadowingLint,
