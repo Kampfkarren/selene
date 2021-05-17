@@ -121,7 +121,6 @@ impl ParameterCount {
 
     /// Checks the provided number of arguments to see if it satisfies the number of arguments required
     pub fn correct_num_args_provided(&self, provided: PassedArgumentCount) -> bool {
-        println!("examining {:?} against {:?}", self, provided);
         match self {
             ParameterCount::Fixed(required) => match provided {
                 PassedArgumentCount::Fixed(provided) => provided == *required,
