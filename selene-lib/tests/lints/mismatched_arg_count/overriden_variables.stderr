@@ -1,12 +1,3 @@
-error[mismatched_arg_count]: this function takes 3 arguments but 2 arguments were supplied
-  ┌─ overriden_variables.lua:1:10
-  │
-1 │ function foo(a, b, c)
-  │          --- note: function defined here
-  ·
-9 │ foo(1, 2)
-  │ ^^^ expected 3 arguments
-
 error[mismatched_arg_count]: this function takes 1 arguments but 2 arguments were supplied
    ┌─ overriden_variables.lua:11:16
    │

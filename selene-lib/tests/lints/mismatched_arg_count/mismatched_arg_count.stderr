@@ -1,12 +1,3 @@
-error[mismatched_arg_count]: this function takes 3 arguments but 2 arguments were supplied
-  ┌─ mismatched_arg_count.lua:1:16
-  │
-1 │ local function foo(a, b, c)
-  │                --- note: function defined here
-  ·
-4 │ foo("a", "b")
-  │ ^^^ expected 3 arguments
-
 error[mismatched_arg_count]: this function takes 3 arguments but 4 arguments were supplied
   ┌─ mismatched_arg_count.lua:1:16
   │

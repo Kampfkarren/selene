@@ -120,21 +120,19 @@ impl ParameterCount {
     }
 
     /// Checks the provided number of arguments to see if it satisfies the number of arguments required
+    /// We will only lint an upper bound. If we have a function(a, b, c) and we call foo(a, b), this will
+    /// pass the lint, since the `nil` could be implicitly provided.
     pub fn correct_num_args_provided(&self, provided: PassedArgumentCount) -> bool {
         match self {
             ParameterCount::Fixed(required) => match provided {
-                PassedArgumentCount::Fixed(provided) => provided == *required,
+                PassedArgumentCount::Fixed(provided) => provided <= *required,
                 // If we have function(a, b, c), but we provide foo(a, call()), we cannot infer anything
                 // but if we provide foo(a, b, c, call()), we know we have too many
                 PassedArgumentCount::Variable(atleast_provided) => atleast_provided <= *required,
             },
-            ParameterCount::Minimum(required) => match provided {
-                PassedArgumentCount::Fixed(provided) => provided >= *required,
-                // We have a function(a, b, ...), and we provided foo(a, call()) or foo(a, ...)
-                // We need to have provided atleast 2 arguments to satisfy parameters "a" and "b"
-                // but there is no upper bound
-                PassedArgumentCount::Variable(atleast_provided) => atleast_provided >= *required,
-            },
+            // function(a, b, ...) - if we call it through foo(a), b and the varargs could be implicitly nil.
+            // there is no upper bound since foo(a, b, c, d) is valid - therefore any amount of arguments provided is valid
+            ParameterCount::Minimum(_) => true,
             // Any amount of arguments could be provided
             ParameterCount::Variable => true,
         }
