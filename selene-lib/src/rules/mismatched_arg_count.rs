@@ -251,20 +251,18 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
         for name_token in local_assignment.name_list() {
             let expression = expressions.next();
 
-            if let Some(expression) = expression {
-                if let ast::Expression::Value { value, .. } = expression {
-                    if let ast::Value::Function((_, function_body)) = &**value {
-                        let identifier = range(name_token);
-                        let variable = self
-                            .scope_manager
-                            .variables
-                            .iter()
-                            .find(|v| v.1.identifiers.contains(&identifier));
+            if let Some(ast::Expression::Value { value, .. }) = expression {
+                if let ast::Value::Function((_, function_body)) = &**value {
+                    let identifier = range(name_token);
+                    let variable = self
+                        .scope_manager
+                        .variables
+                        .iter()
+                        .find(|v| v.1.identifiers.contains(&identifier));
 
-                        if let Some((id, _)) = variable {
-                            self.definitions
-                                .insert(id, ParameterCount::from_function_body(&function_body));
-                        }
+                    if let Some((id, _)) = variable {
+                        self.definitions
+                            .insert(id, ParameterCount::from_function_body(&function_body));
                     }
                 }
             }
@@ -277,20 +275,18 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
         for var in assignment.var_list() {
             let expression = expressions.next();
 
-            if let Some(expression) = expression {
-                if let ast::Expression::Value { value, .. } = expression {
-                    if let ast::Value::Function((_, function_body)) = &**value {
-                        let identifier = range(var);
-                        let variable = self
-                            .scope_manager
-                            .variables
-                            .iter()
-                            .find(|v| v.1.identifiers.contains(&identifier));
+            if let Some(ast::Expression::Value { value, .. }) = expression {
+                if let ast::Value::Function((_, function_body)) = &**value {
+                    let identifier = range(var);
+                    let variable = self
+                        .scope_manager
+                        .variables
+                        .iter()
+                        .find(|v| v.1.identifiers.contains(&identifier));
 
-                        if let Some((id, _)) = variable {
-                            self.definitions
-                                .insert(id, ParameterCount::from_function_body(&function_body));
-                        }
+                    if let Some((id, _)) = variable {
+                        self.definitions
+                            .insert(id, ParameterCount::from_function_body(&function_body));
                     }
                 }
             }
@@ -309,8 +305,7 @@ impl Visitor<'_> for MismatchedArgCountVisitor {
         if_chain::if_chain! {
             // Check that we're using a named function call, with an anonymous call suffix
             if let ast::Prefix::Name(name) = call.prefix();
-            if let ast::Suffix::Call(call) = call.iter_suffixes().next().unwrap();
-            if let ast::Call::AnonymousCall(args) = call;
+            if let ast::Suffix::Call(ast::Call::AnonymousCall(args)) = call.iter_suffixes().next().unwrap();
 
             // Find the corresponding function definition
             let identifier = range(name);
