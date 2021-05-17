@@ -43,10 +43,7 @@ impl Rule for IncorrectRoactUsageLint {
         for unused_property in visitor.unused_properties {
             diagnostics.push(Diagnostic::new(
                 "roblox_incorrect_roact_usage",
-                format!(
-                    "`{}` will never be applied for `{}`",
-                    unused_property.property_name, unused_property.class_name
-                ),
+                format!("`{}` will never be applied", unused_property.property_name),
                 Label::new(unused_property.range),
             ));
         }
