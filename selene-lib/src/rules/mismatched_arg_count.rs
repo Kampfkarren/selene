@@ -5,7 +5,7 @@ use crate::ast_util::{
     HasSideEffects,
 };
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     convert::Infallible,
     fmt::{self, Display},
     usize,
@@ -35,6 +35,7 @@ impl Rule for MismatchedArgCountLint {
         let mut definitions_visitor = MapFunctionDefinitionVisitor {
             scope_manager: &scope_manager,
             definitions: &mut definitions,
+            blacklisted_variables: HashSet::new(),
         };
         definitions_visitor.visit_ast(&ast);
 
@@ -212,6 +213,9 @@ fn function_call_argument_count(function_args: &ast::FunctionArgs) -> PassedArgu
 struct MapFunctionDefinitionVisitor<'a> {
     scope_manager: &'a ScopeManager,
     definitions: &'a mut HashMap<Id<Variable>, ParameterCount>,
+    /// Blacklisted variables are ones we will ignore completely - this may be because its a reassigned global variable
+    /// so we cannot determine which function body/parameter count matches.
+    blacklisted_variables: HashSet<Id<Variable>>,
 }
 impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
     fn visit_local_function(&mut self, function: &ast::LocalFunction<'_>) {
@@ -230,15 +234,28 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
 
     fn visit_function_declaration(&mut self, function: &ast::FunctionDeclaration<'_>) {
         let identifier = range(function.name());
-        let variable = self
+        if let Some((_, reference)) = self
             .scope_manager
-            .variables
+            .references
             .iter()
-            .find(|v| v.1.identifiers.contains(&identifier));
-
-        if let Some((id, _)) = variable {
-            self.definitions
-                .insert(id, ParameterCount::from_function_body(function.body()));
+            .find(|r| r.1.identifier == identifier)
+        {
+            if let Some(variable) = reference.resolved {
+                // Ignore blacklisted variables
+                // Check to see we aren't reassigning an already assigned variable
+                // If we are - bail out of this and blacklist it, as we don't know which function definition is correct
+                if self.blacklisted_variables.contains(&variable) {
+                    return;
+                } else if self.definitions.contains_key(&variable) {
+                    self.definitions.remove(&variable);
+                    self.blacklisted_variables.insert(variable);
+                } else {
+                    self.definitions.insert(
+                        variable,
+                        ParameterCount::from_function_body(function.body()),
+                    );
+                }
+            }
         }
     }
 
@@ -275,15 +292,28 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
             if let Some(ast::Expression::Value { value, .. }) = expression {
                 if let ast::Value::Function((_, function_body)) = &**value {
                     let identifier = range(var);
-                    let variable = self
+                    if let Some((_, reference)) = self
                         .scope_manager
-                        .variables
+                        .references
                         .iter()
-                        .find(|v| v.1.identifiers.contains(&identifier));
-
-                    if let Some((id, _)) = variable {
-                        self.definitions
-                            .insert(id, ParameterCount::from_function_body(&function_body));
+                        .find(|r| r.1.identifier == identifier)
+                    {
+                        if let Some(variable) = reference.resolved {
+                            // Ignore blacklisted variables
+                            // Check to see we aren't reassigning an already assigned variable
+                            // If we are - bail out of this and blacklist it, as we don't know which function definition is correct
+                            if self.blacklisted_variables.contains(&variable) {
+                                return;
+                            } else if self.definitions.contains_key(&variable) {
+                                self.definitions.remove(&variable);
+                                self.blacklisted_variables.insert(variable);
+                            } else {
+                                self.definitions.insert(
+                                    variable,
+                                    ParameterCount::from_function_body(&function_body),
+                                );
+                            }
+                        }
                     }
                 }
             }

@@ -10,7 +10,8 @@ end
 foo(1, 2, 3, 4)
 
 do
-	foo = function(l, m)
+	-- still lint a local function
+	local function foo(l, m)
 	end
 
 	foo(1, 2)
