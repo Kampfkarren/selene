@@ -348,7 +348,7 @@ impl Visitor<'_> for MismatchedArgCountVisitor {
                 self.mismatched_arg_counts.push(MismatchedArgCount {
                     num_provided: num_args_provided,
                     parameter_count: *parameter_count,
-                    call_range: identifier,
+                    call_range: range(call),
                     function_definition_range: self.scope_manager.variables.get(defined_variable).unwrap().identifiers[0],
                 });
             }

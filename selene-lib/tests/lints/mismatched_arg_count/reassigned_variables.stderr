@@ -5,5 +5,5 @@ error[mismatched_arg_count]: this function takes 2 arguments but 3 arguments wer
    │                    --- note: function defined here
    ·
 18 │     foo(1, 2, 3)
-   │     ^^^ expected 2 arguments
+   │     ^^^^^^^^^^^^ expected 2 arguments
 
