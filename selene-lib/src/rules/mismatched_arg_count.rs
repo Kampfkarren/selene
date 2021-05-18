@@ -383,4 +383,13 @@ mod tests {
             "reassigned_variables",
         );
     }
+
+    #[test]
+    fn test_mismatched_args_reassigned_definition_2() {
+        test_lint(
+            MismatchedArgCountLint::new(()).unwrap(),
+            "mismatched_arg_count",
+            "reassigned_variables_2",
+        );
+    }
 }
