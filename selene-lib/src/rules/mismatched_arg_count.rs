@@ -371,7 +371,7 @@ mod tests {
         test_lint(
             MismatchedArgCountLint::new(()).unwrap(),
             "mismatched_arg_count",
-            "overriden_variables",
+            "shadowing_variables",
         );
     }
 }
