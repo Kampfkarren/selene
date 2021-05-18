@@ -374,4 +374,13 @@ mod tests {
             "shadowing_variables",
         );
     }
+
+    #[test]
+    fn test_mismatched_args_reassigned_definition() {
+        test_lint(
+            MismatchedArgCountLint::new(()).unwrap(),
+            "mismatched_arg_count",
+            "reassigned_variables",
+        );
+    }
 }
