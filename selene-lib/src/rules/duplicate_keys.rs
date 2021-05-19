@@ -52,11 +52,13 @@ impl Rule for DuplicateKeysLint {
         RuleType::Complexity
     }
 }
+
 struct DuplicateKey {
     name: String,
     position: (usize, usize),
     original_declaration: (usize, usize),
 }
+
 struct DuplicateKeysVisitor {
     duplicates: Vec<DuplicateKey>,
 }
@@ -107,11 +109,13 @@ impl Visitor<'_> for DuplicateKeysVisitor {
                     let key = key.token().to_string();
                     self.check_field(&mut declared_fields, key, field_range);
                 }
+
                 ast::Field::ExpressionKey { key, .. } => {
                     if let Some(key) = key_expression_to_name(key) {
                         self.check_field(&mut declared_fields, key, field_range);
                     }
                 }
+
                 _ => (),
             }
         }
