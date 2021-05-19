@@ -1,9 +1,8 @@
 use super::*;
 use crate::{
     ast_util::{
-        range,
+        is_function_call, is_vararg, range,
         scopes::{Reference, ScopeManager, Variable},
-        HasSideEffects,
     },
     util::plural,
 };
@@ -15,7 +14,6 @@ use std::{
 
 use full_moon::{
     ast::{self, Ast},
-    tokenizer,
     visitors::Visitor,
 };
 use id_arena::Id;
@@ -190,27 +188,13 @@ enum PassedArgumentCount {
     Variable(usize),
 }
 
-fn is_vararg(expression: &ast::Expression) -> bool {
-    if let ast::Expression::Value { value, .. } = expression {
-        if let ast::Value::Symbol(token) = &**value {
-            if let tokenizer::TokenType::Symbol { symbol } = token.token().token_type() {
-                if let tokenizer::Symbol::Ellipse = symbol {
-                    return true;
-                }
-            }
-        }
-    }
-
-    false
-}
-
 impl PassedArgumentCount {
     fn from_function_args(function_args: &ast::FunctionArgs) -> Self {
         match function_args {
             ast::FunctionArgs::Parentheses { arguments, .. } => {
-                // We need to be wary of items with side effects, such as function calls or ... being the last argument passed
+                // We need to be wary of function calls or ... being the last argument passed
                 // e.g. foo(a, b, call()) or foo(a, b, ...) - we don't know how many arguments were passed.
-                // However, if the call is NOT the last argument, as per Lua semantics, it is only classed as one argument, and no side effects occur
+                // However, if the call is NOT the last argument, as per Lua semantics, it is only classed as one argument,
                 // e.g. foo(a, call(), b) or foo(a, ..., c)
 
                 let mut passed_argument_count = 0;
@@ -219,7 +203,7 @@ impl PassedArgumentCount {
                     passed_argument_count += 1;
 
                     if let ast::punctuated::Pair::End(expression) = argument {
-                        if expression.has_side_effects() || is_vararg(expression) {
+                        if is_function_call(expression) || is_vararg(expression) {
                             return PassedArgumentCount::Variable(passed_argument_count);
                         }
                     }
