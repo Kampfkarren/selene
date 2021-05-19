@@ -177,13 +177,13 @@ export async function activate(context: vscode.ExtensionContext) {
             case RunType.OnType:
                 return vscode.workspace.onDidChangeTextDocument(event => lint(event.document))
             case RunType.OnNewLine:
-                return vscode.workspace.onDidChangeTextDocument(event => {
-                    for (const content of event.contentChanges) {
-                        // Contrary to removing lines, adding new lines will leave the range at the same value hence the string comparisons
-                        if (!content.range.isSingleLine || content.text == "\n" || content.text == "\r\n") {
-                            return lint(event.document);
-                        }
-                    }
+				return vscode.workspace.onDidChangeTextDocument(event => {
+					// Contrary to removing lines, adding new lines will leave the range at the same value hence the string comparisons
+					if (event.contentChanges.some(content =>
+						!content.range.isSingleLine || content.text == "\n" || content.text == "\r\n"
+					)) {
+						lint(event.document)
+					}
                 })
             case RunType.OnIdle:
                 return vscode.workspace.onDidChangeTextDocument(event => {
