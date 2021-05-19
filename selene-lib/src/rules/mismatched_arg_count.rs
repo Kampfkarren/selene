@@ -13,10 +13,7 @@ use std::{
     fmt::{self, Display},
 };
 
-use full_moon::{
-    ast::{self, Ast},
-    visitors::Visitor,
-};
+use full_moon::{ast::{self, Ast}, tokenizer, visitors::Visitor};
 use id_arena::Id;
 
 pub struct MismatchedArgCountLint;
@@ -197,6 +194,20 @@ impl Display for PassedArgumentCount {
     }
 }
 
+fn is_vararg(expression: &ast::Expression) -> bool {
+    if let ast::Expression::Value { value, .. } = expression {
+        if let ast::Value::Symbol(token) = &**value {
+            if let tokenizer::TokenType::Symbol { symbol } = token.token().token_type() {
+                if let tokenizer::Symbol::Ellipse = symbol {
+                    return true;
+                }
+            }
+        }
+    }
+
+    false
+}
+
 fn function_call_argument_count(function_args: &ast::FunctionArgs) -> PassedArgumentCount {
     match function_args {
         ast::FunctionArgs::Parentheses { arguments, .. } => {
@@ -211,7 +222,7 @@ fn function_call_argument_count(function_args: &ast::FunctionArgs) -> PassedArgu
                 passed_argument_count += 1;
 
                 if let ast::punctuated::Pair::End(expression) = argument {
-                    if expression.has_side_effects() {
+                    if expression.has_side_effects() || is_vararg(expression) {
                         return PassedArgumentCount::Variable(passed_argument_count);
                     }
                 }

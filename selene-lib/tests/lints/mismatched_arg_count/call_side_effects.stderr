@@ -7,3 +7,12 @@ error[mismatched_arg_count]: this function takes 3 arguments but at least 4 argu
 7 │ foo(a, b, c, call())
   │ ^^^^^^^^^^^^^^^^^^^^ expected 3 arguments
 
+error[mismatched_arg_count]: this function takes 3 arguments but at least 4 arguments were supplied
+   ┌─ call_side_effects.lua:1:16
+   │
+ 1 │ local function foo(a, b, c)
+   │                --- note: function defined here
+   ·
+10 │     foo(1, 2, 3, ...)
+   │     ^^^^^^^^^^^^^^^^^ expected 3 arguments
+
