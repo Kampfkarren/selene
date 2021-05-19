@@ -35,18 +35,37 @@
             "title": "Selene",
             "properties": {
                 "selene.selenePath": {
+                    "title": "Path",
                     "type": [
                         "string",
-                        "null"
+                        null
                     ],
                     "default": null,
                     "description": "Specifies the path of selene. If not specified, selene will automatically download from the GitHub releases."
                 },
                 "selene.run": {
+                    "title": "Run",
                     "type": "string",
                     "default": "onType",
-                    "enum": ["onSave", "onType"],
-                    "description": "Run the linter as you type (onType) or when the file is saved (onSave)."
+                    "enum": [
+                        "onSave",
+                        "onType",
+                        "onNewLine",
+                        "onIdle"
+                    ],
+                    "enumDescriptions": [
+                        "Run the linter on file save.",
+                        "Run the linter as you type.",
+                        "Run the linter when a new line is added or removed.",
+                        "Run the linter after the configured \"Idle Delay\"."
+                    ],
+                    "description": "Controls when the linter is ran."
+                },
+                "selene.idleDelay": {
+                    "title": "Idle Delay",
+                    "type": "number",
+                    "default": 500,
+                    "markdownDescription": "Controls the delay in ms after which the file is linted. Only applies when `#selene.run#` is set to `onIdle`."
                 }
             }
         }
