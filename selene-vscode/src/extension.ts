@@ -31,7 +31,7 @@ enum RunType {
     OnSave = "onSave",
     OnType = "onType",
     OnNewLine = "onNewLine",
-    OnIdle = "onIdle"
+    OnIdle = "onIdle",
 }
 
 function byteToCharMap(document: vscode.TextDocument, byteOffsets: Set<number>) {
