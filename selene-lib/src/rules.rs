@@ -11,6 +11,7 @@ pub mod almost_swapped;
 pub mod bad_string_escape;
 pub mod compare_nan;
 pub mod divide_by_zero;
+pub mod duplicate_keys;
 pub mod empty_if;
 pub mod global_usage;
 pub mod if_same_then_else;
