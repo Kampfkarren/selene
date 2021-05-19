@@ -13,7 +13,11 @@ use std::{
     fmt::{self, Display},
 };
 
-use full_moon::{ast::{self, Ast}, tokenizer, visitors::Visitor};
+use full_moon::{
+    ast::{self, Ast},
+    tokenizer,
+    visitors::Visitor,
+};
 use id_arena::Id;
 
 pub struct MismatchedArgCountLint;
@@ -155,6 +159,7 @@ impl ParameterCount {
         }
     }
 }
+
 impl Display for ParameterCount {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -185,15 +190,6 @@ enum PassedArgumentCount {
     Variable(usize),
 }
 
-impl Display for PassedArgumentCount {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            PassedArgumentCount::Fixed(amount) => write!(f, "{} arguments", amount),
-            PassedArgumentCount::Variable(amount) => write!(f, "at least {} arguments", amount),
-        }
-    }
-}
-
 fn is_vararg(expression: &ast::Expression) -> bool {
     if let ast::Expression::Value { value, .. } = expression {
         if let ast::Value::Symbol(token) = &**value {
@@ -208,30 +204,41 @@ fn is_vararg(expression: &ast::Expression) -> bool {
     false
 }
 
-fn function_call_argument_count(function_args: &ast::FunctionArgs) -> PassedArgumentCount {
-    match function_args {
-        ast::FunctionArgs::Parentheses { arguments, .. } => {
-            // We need to be wary of items with side effects, such as function calls or ... being the last argument passed
-            // e.g. foo(a, b, call()) or foo(a, b, ...) - we don't know how many arguments were passed.
-            // However, if the call is NOT the last argument, as per Lua semantics, it is only classed as one argument, and no side effects occur
-            // e.g. foo(a, call(), b) or foo(a, ..., c)
+impl PassedArgumentCount {
+    fn from_function_args(function_args: &ast::FunctionArgs) -> Self {
+        match function_args {
+            ast::FunctionArgs::Parentheses { arguments, .. } => {
+                // We need to be wary of items with side effects, such as function calls or ... being the last argument passed
+                // e.g. foo(a, b, call()) or foo(a, b, ...) - we don't know how many arguments were passed.
+                // However, if the call is NOT the last argument, as per Lua semantics, it is only classed as one argument, and no side effects occur
+                // e.g. foo(a, call(), b) or foo(a, ..., c)
 
-            let mut passed_argument_count = 0;
+                let mut passed_argument_count = 0;
 
-            for argument in arguments.pairs() {
-                passed_argument_count += 1;
+                for argument in arguments.pairs() {
+                    passed_argument_count += 1;
 
-                if let ast::punctuated::Pair::End(expression) = argument {
-                    if expression.has_side_effects() || is_vararg(expression) {
-                        return PassedArgumentCount::Variable(passed_argument_count);
+                    if let ast::punctuated::Pair::End(expression) = argument {
+                        if expression.has_side_effects() || is_vararg(expression) {
+                            return PassedArgumentCount::Variable(passed_argument_count);
+                        }
                     }
                 }
-            }
 
-            PassedArgumentCount::Fixed(passed_argument_count)
+                Self::Fixed(passed_argument_count)
+            }
+            ast::FunctionArgs::String(_) => Self::Fixed(1),
+            ast::FunctionArgs::TableConstructor(_) => Self::Fixed(1),
         }
-        ast::FunctionArgs::String(_) => PassedArgumentCount::Fixed(1),
-        ast::FunctionArgs::TableConstructor(_) => PassedArgumentCount::Fixed(1),
+    }
+}
+
+impl Display for PassedArgumentCount {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            PassedArgumentCount::Fixed(amount) => write!(f, "{} arguments", amount),
+            PassedArgumentCount::Variable(amount) => write!(f, "at least {} arguments", amount),
+        }
     }
 }
 
@@ -358,7 +365,7 @@ impl Visitor<'_> for MismatchedArgCountVisitor {
             if let Some(parameter_count) = self.definitions.get(&defined_variable);
 
             // Count the number of arguments provided
-            let num_args_provided = function_call_argument_count(args);
+            let num_args_provided = PassedArgumentCount::from_function_args(args);
             if !parameter_count.correct_num_args_provided(num_args_provided);
 
             then {
