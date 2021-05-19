@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     ast_util::{
         range,
-        scopes::{ScopeManager, Variable},
+        scopes::{Reference, ScopeManager, Variable},
         HasSideEffects,
     },
     util::plural,
@@ -233,16 +233,46 @@ struct MapFunctionDefinitionVisitor<'a> {
     blacklisted_variables: HashSet<Id<Variable>>,
 }
 
+impl MapFunctionDefinitionVisitor<'_> {
+    fn find_variable(&self, identifier: (usize, usize)) -> Option<Id<Variable>> {
+        self.scope_manager
+            .variables
+            .iter()
+            .find(|variable| variable.1.identifiers.contains(&identifier))
+            .map(|variable| variable.0)
+    }
+
+    fn find_reference(&self, identifier: (usize, usize)) -> Option<&Reference> {
+        self.scope_manager
+            .references
+            .iter()
+            .find(|reference| reference.1.identifier == identifier)
+            .map(|reference| reference.1)
+    }
+
+    /// Checks the provided variable to see if it is blacklisted, or it has already been stored.
+    /// If so, we can no longer verify which function definition is correct for a specific function call
+    /// so we bail out and blacklist it. This does not apply to locally assignment/reassigned variables (i.e. shadowing),
+    /// as that is handled properly.
+    /// If it is safe to use, the function body is stored.
+    fn verify_assignment(&mut self, variable: Id<Variable>, function_body: &ast::FunctionBody) {
+        if self.blacklisted_variables.contains(&variable) {
+            return;
+        } else if self.definitions.contains_key(&variable) {
+            self.definitions.remove(&variable);
+            self.blacklisted_variables.insert(variable);
+        } else {
+            self.definitions
+                .insert(variable, ParameterCount::from_function_body(function_body));
+        }
+    }
+}
+
 impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
     fn visit_local_function(&mut self, function: &ast::LocalFunction<'_>) {
         let identifier = range(function.name());
-        let variable = self
-            .scope_manager
-            .variables
-            .iter()
-            .find(|variable| variable.1.identifiers.contains(&identifier));
 
-        if let Some((id, _)) = variable {
+        if let Some(id) = self.find_variable(identifier) {
             self.definitions
                 .insert(id, ParameterCount::from_function_body(function.func_body()));
         }
@@ -250,27 +280,10 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
 
     fn visit_function_declaration(&mut self, function: &ast::FunctionDeclaration<'_>) {
         let identifier = range(function.name());
-        if let Some((_, reference)) = self
-            .scope_manager
-            .references
-            .iter()
-            .find(|reference| reference.1.identifier == identifier)
-        {
+
+        if let Some(reference) = self.find_reference(identifier) {
             if let Some(variable) = reference.resolved {
-                // Ignore blacklisted variables
-                // Check to see we aren't reassigning an already assigned variable
-                // If we are - bail out of this and blacklist it, as we don't know which function definition is correct
-                if self.blacklisted_variables.contains(&variable) {
-                    return;
-                } else if self.definitions.contains_key(&variable) {
-                    self.definitions.remove(&variable);
-                    self.blacklisted_variables.insert(variable);
-                } else {
-                    self.definitions.insert(
-                        variable,
-                        ParameterCount::from_function_body(function.body()),
-                    );
-                }
+                self.verify_assignment(variable, function.body())
             }
         }
     }
@@ -285,13 +298,8 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
             if let ast::Expression::Value { value, .. } = expression {
                 if let ast::Value::Function((_, function_body)) = &**value {
                     let identifier = range(name_token);
-                    let variable = self
-                        .scope_manager
-                        .variables
-                        .iter()
-                        .find(|variable| variable.1.identifiers.contains(&identifier));
 
-                    if let Some((id, _)) = variable {
+                    if let Some(id) = self.find_variable(identifier) {
                         self.definitions
                             .insert(id, ParameterCount::from_function_body(&function_body));
                     }
@@ -307,27 +315,10 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
             if let ast::Expression::Value { value, .. } = expression {
                 if let ast::Value::Function((_, function_body)) = &**value {
                     let identifier = range(var);
-                    if let Some((_, reference)) = self
-                        .scope_manager
-                        .references
-                        .iter()
-                        .find(|reference| reference.1.identifier == identifier)
-                    {
+
+                    if let Some(reference) = self.find_reference(identifier) {
                         if let Some(variable) = reference.resolved {
-                            // Ignore blacklisted variables
-                            // Check to see we aren't reassigning an already assigned variable
-                            // If we are - bail out of this and blacklist it, as we don't know which function definition is correct
-                            if self.blacklisted_variables.contains(&variable) {
-                                return;
-                            } else if self.definitions.contains_key(&variable) {
-                                self.definitions.remove(&variable);
-                                self.blacklisted_variables.insert(variable);
-                            } else {
-                                self.definitions.insert(
-                                    variable,
-                                    ParameterCount::from_function_body(&function_body),
-                                );
-                            }
+                            self.verify_assignment(variable, function_body)
                         }
                     }
                 }
