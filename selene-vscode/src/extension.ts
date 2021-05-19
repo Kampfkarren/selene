@@ -1,7 +1,7 @@
 import * as selene from "./selene"
+import * as timers from "timers"
 import * as util from "./util"
 import * as vscode from "vscode"
-import * as timers from "timers"
 
 let trySelene: Promise<boolean>
 
@@ -170,7 +170,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     let lastTimeout: NodeJS.Timeout
     function listenToChange() {
-        const idleDelay = vscode.workspace.getConfiguration("selene").get<number>("idleDelay") as number
         switch (vscode.workspace.getConfiguration("selene").get<RunType>("run")) {
             case RunType.OnSave:
                 return vscode.workspace.onDidSaveTextDocument(lint)
@@ -180,12 +179,13 @@ export async function activate(context: vscode.ExtensionContext) {
 				return vscode.workspace.onDidChangeTextDocument(event => {
 					// Contrary to removing lines, adding new lines will leave the range at the same value hence the string comparisons
 					if (event.contentChanges.some(content =>
-						!content.range.isSingleLine || content.text == "\n" || content.text == "\r\n"
+						!content.range.isSingleLine || content.text === "\n" || content.text === "\r\n"
 					)) {
 						lint(event.document)
 					}
                 })
             case RunType.OnIdle:
+                const idleDelay = vscode.workspace.getConfiguration("selene").get<number>("idleDelay") as number
                 return vscode.workspace.onDidChangeTextDocument(event => {
                     timers.clearTimeout(lastTimeout)
                     lastTimeout = timers.setTimeout(lint, idleDelay, event.document)
