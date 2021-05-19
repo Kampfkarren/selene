@@ -11,6 +11,7 @@ mod ast_util;
 mod lint_filtering;
 pub mod rules;
 pub mod standard_library;
+mod util;
 
 #[cfg(test)]
 mod test_util;

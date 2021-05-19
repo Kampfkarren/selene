@@ -1,14 +1,16 @@
 use super::*;
-use crate::ast_util::{
-    range,
-    scopes::{ScopeManager, Variable},
-    HasSideEffects,
+use crate::{
+    ast_util::{
+        range,
+        scopes::{ScopeManager, Variable},
+        HasSideEffects,
+    },
+    util::plural,
 };
 use std::{
     collections::{HashMap, HashSet},
     convert::Infallible,
     fmt::{self, Display},
-    usize,
 };
 
 use full_moon::{
@@ -53,12 +55,9 @@ impl Rule for MismatchedArgCountLint {
             .map(|mismatched_arg| {
                 Diagnostic::new_complete(
                     "mismatched_arg_count",
-                    format!(
-                        "this function takes {}",
-                        mismatched_arg
-                            .parameter_count
-                            .to_message(mismatched_arg.num_provided)
-                    ),
+                    mismatched_arg
+                        .parameter_count
+                        .to_message(mismatched_arg.num_provided),
                     Label::new_with_message(
                         mismatched_arg.call_range,
                         mismatched_arg.parameter_count.to_string(),
@@ -123,13 +122,13 @@ impl ParameterCount {
     /// Checks the provided number of arguments to see if it satisfies the number of arguments required
     /// We will only lint an upper bound. If we have a function(a, b, c) and we call foo(a, b), this will
     /// pass the lint, since the `nil` could be implicitly provided.
-    pub fn correct_num_args_provided(&self, provided: PassedArgumentCount) -> bool {
+    pub fn correct_num_args_provided(self, provided: PassedArgumentCount) -> bool {
         match self {
             ParameterCount::Fixed(required) => match provided {
-                PassedArgumentCount::Fixed(provided) => provided <= *required,
+                PassedArgumentCount::Fixed(provided) => provided <= required,
                 // If we have function(a, b, c), but we provide foo(a, call()), we cannot infer anything
                 // but if we provide foo(a, b, c, call()), we know we have too many
-                PassedArgumentCount::Variable(atleast_provided) => atleast_provided <= *required,
+                PassedArgumentCount::Variable(atleast_provided) => atleast_provided <= required,
             },
             // function(a, b, ...) - if we call it through foo(a), b and the varargs could be implicitly nil.
             // there is no upper bound since foo(a, b, c, d) is valid - therefore any amount of arguments provided is valid
@@ -139,14 +138,21 @@ impl ParameterCount {
         }
     }
 
-    pub fn to_message(&self, provided: PassedArgumentCount) -> String {
+    pub fn to_message(self, provided: PassedArgumentCount) -> String {
         match self {
             ParameterCount::Fixed(required) => {
-                format!("{} arguments but {} were supplied", required, provided)
+                format!(
+                    "this function takes {} {} but {} were supplied",
+                    required,
+                    plural(required, "argument", "arguments"),
+                    provided
+                )
             }
             ParameterCount::Minimum(required) => format!(
-                "atleast {} arguments but {} were supplied",
-                required, provided
+                "this function takes at least {} {} but {} were supplied",
+                required,
+                plural(required, "argument", "arguments"),
+                provided
             ),
             ParameterCount::Variable => "a variable amount of arguments".to_owned(),
         }
@@ -155,9 +161,19 @@ impl ParameterCount {
 impl Display for ParameterCount {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ParameterCount::Fixed(required) => write!(f, "expected {} arguments", required),
+            ParameterCount::Fixed(required) => write!(
+                f,
+                "expected {} {}",
+                required,
+                plural(*required, "argument", "arguments")
+            ),
             ParameterCount::Minimum(required) => {
-                write!(f, "expected atleast {} arguments", required)
+                write!(
+                    f,
+                    "expected at least {} {}",
+                    required,
+                    plural(*required, "argument", "arguments")
+                )
             }
             ParameterCount::Variable => write!(f, "expected any number of arguments"),
         }
@@ -171,11 +187,12 @@ enum PassedArgumentCount {
     /// Passed a variable of arguments - but we know the lower bound: e.g. foo(a, b, call()) or foo(a, b, ...)
     Variable(usize),
 }
+
 impl Display for PassedArgumentCount {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             PassedArgumentCount::Fixed(amount) => write!(f, "{} arguments", amount),
-            PassedArgumentCount::Variable(amount) => write!(f, "atleast {} arguments", amount),
+            PassedArgumentCount::Variable(amount) => write!(f, "at least {} arguments", amount),
         }
     }
 }
@@ -191,13 +208,11 @@ fn function_call_argument_count(function_args: &ast::FunctionArgs) -> PassedArgu
             let mut passed_argument_count = 0;
 
             for argument in arguments.pairs() {
-                match argument {
-                    ast::punctuated::Pair::Punctuated(_, _) => passed_argument_count += 1,
-                    ast::punctuated::Pair::End(expression) => {
-                        passed_argument_count += 1;
-                        if expression.has_side_effects() {
-                            return PassedArgumentCount::Variable(passed_argument_count);
-                        }
+                passed_argument_count += 1;
+
+                if let ast::punctuated::Pair::End(expression) = argument {
+                    if expression.has_side_effects() {
+                        return PassedArgumentCount::Variable(passed_argument_count);
                     }
                 }
             }
@@ -217,6 +232,7 @@ struct MapFunctionDefinitionVisitor<'a> {
     /// so we cannot determine which function body/parameter count matches.
     blacklisted_variables: HashSet<Id<Variable>>,
 }
+
 impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
     fn visit_local_function(&mut self, function: &ast::LocalFunction<'_>) {
         let identifier = range(function.name());
@@ -224,7 +240,7 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
             .scope_manager
             .variables
             .iter()
-            .find(|v| v.1.identifiers.contains(&identifier));
+            .find(|variable| variable.1.identifiers.contains(&identifier));
 
         if let Some((id, _)) = variable {
             self.definitions
@@ -238,7 +254,7 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
             .scope_manager
             .references
             .iter()
-            .find(|r| r.1.identifier == identifier)
+            .find(|reference| reference.1.identifier == identifier)
         {
             if let Some(variable) = reference.resolved {
                 // Ignore blacklisted variables
@@ -260,19 +276,20 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
     }
 
     fn visit_local_assignment(&mut self, local_assignment: &ast::LocalAssignment) {
-        let mut expressions = local_assignment.expr_list().iter();
+        let assignment_expressions = local_assignment
+            .name_list()
+            .iter()
+            .zip(local_assignment.expr_list());
 
-        for name_token in local_assignment.name_list() {
-            let expression = expressions.next();
-
-            if let Some(ast::Expression::Value { value, .. }) = expression {
+        for (name_token, expression) in assignment_expressions {
+            if let ast::Expression::Value { value, .. } = expression {
                 if let ast::Value::Function((_, function_body)) = &**value {
                     let identifier = range(name_token);
                     let variable = self
                         .scope_manager
                         .variables
                         .iter()
-                        .find(|v| v.1.identifiers.contains(&identifier));
+                        .find(|variable| variable.1.identifiers.contains(&identifier));
 
                     if let Some((id, _)) = variable {
                         self.definitions
@@ -284,19 +301,17 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
     }
 
     fn visit_assignment(&mut self, assignment: &ast::Assignment) {
-        let mut expressions = assignment.expr_list().iter();
+        let assignment_expressions = assignment.var_list().iter().zip(assignment.expr_list());
 
-        for var in assignment.var_list() {
-            let expression = expressions.next();
-
-            if let Some(ast::Expression::Value { value, .. }) = expression {
+        for (var, expression) in assignment_expressions {
+            if let ast::Expression::Value { value, .. } = expression {
                 if let ast::Value::Function((_, function_body)) = &**value {
                     let identifier = range(var);
                     if let Some((_, reference)) = self
                         .scope_manager
                         .references
                         .iter()
-                        .find(|r| r.1.identifier == identifier)
+                        .find(|reference| reference.1.identifier == identifier)
                     {
                         if let Some(variable) = reference.resolved {
                             // Ignore blacklisted variables
@@ -332,11 +347,11 @@ impl Visitor<'_> for MismatchedArgCountVisitor {
         if_chain::if_chain! {
             // Check that we're using a named function call, with an anonymous call suffix
             if let ast::Prefix::Name(name) = call.prefix();
-            if let ast::Suffix::Call(ast::Call::AnonymousCall(args)) = call.iter_suffixes().next().unwrap();
+            if let Some(ast::Suffix::Call(ast::Call::AnonymousCall(args))) = call.iter_suffixes().next();
 
             // Find the corresponding function definition
             let identifier = range(name);
-            if let Some((_, reference)) = self.scope_manager.references.iter().find(|r| r.1.identifier == identifier);
+            if let Some((_, reference)) = self.scope_manager.references.iter().find(|reference| reference.1.identifier == identifier);
             if let Some(defined_variable) = reference.resolved;
             if let Some(parameter_count) = self.definitions.get(&defined_variable);
 
