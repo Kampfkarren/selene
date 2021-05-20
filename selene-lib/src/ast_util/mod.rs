@@ -57,16 +57,13 @@ pub fn is_vararg(expression: &ast::Expression) -> bool {
 }
 
 pub fn is_function_call(expression: &ast::Expression) -> bool {
-    if_chain::if_chain! {
-        if let ast::Expression::Value { value, .. } = expression;
-        if let ast::Value::FunctionCall(_) = &**value;
-
-        then {
-            true
-        } else {
-            false
+    if let ast::Expression::Value { value, .. } = expression {
+        if let ast::Value::FunctionCall(_) = &**value {
+            return true;
         }
     }
+
+    false
 }
 
 #[cfg(test)]

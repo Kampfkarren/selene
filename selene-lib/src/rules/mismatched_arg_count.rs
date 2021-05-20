@@ -112,6 +112,7 @@ impl ParameterCount {
                         return Self::Minimum(necessary_params);
                     }
                 }
+                other => panic!("unknown node {:?}", other),
             }
         }
 
@@ -213,6 +214,7 @@ impl PassedArgumentCount {
             }
             ast::FunctionArgs::String(_) => Self::Fixed(1),
             ast::FunctionArgs::TableConstructor(_) => Self::Fixed(1),
+            other => panic!("unknown node {:?}", other),
         }
     }
 }
@@ -276,7 +278,7 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
 
         if let Some(id) = self.find_variable(identifier) {
             self.definitions
-                .insert(id, ParameterCount::from_function_body(function.func_body()));
+                .insert(id, ParameterCount::from_function_body(function.body()));
         }
     }
 
@@ -292,9 +294,9 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
 
     fn visit_local_assignment(&mut self, local_assignment: &ast::LocalAssignment) {
         let assignment_expressions = local_assignment
-            .name_list()
+            .names()
             .iter()
-            .zip(local_assignment.expr_list());
+            .zip(local_assignment.expressions());
 
         for (name_token, expression) in assignment_expressions {
             if let ast::Expression::Value { value, .. } = expression {
@@ -311,7 +313,7 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
     }
 
     fn visit_assignment(&mut self, assignment: &ast::Assignment) {
-        let assignment_expressions = assignment.var_list().iter().zip(assignment.expr_list());
+        let assignment_expressions = assignment.variables().iter().zip(assignment.expressions());
 
         for (var, expression) in assignment_expressions {
             if let ast::Expression::Value { value, .. } = expression {
@@ -340,7 +342,7 @@ impl Visitor<'_> for MismatchedArgCountVisitor {
         if_chain::if_chain! {
             // Check that we're using a named function call, with an anonymous call suffix
             if let ast::Prefix::Name(name) = call.prefix();
-            if let Some(ast::Suffix::Call(ast::Call::AnonymousCall(args))) = call.iter_suffixes().next();
+            if let Some(ast::Suffix::Call(ast::Call::AnonymousCall(args))) = call.suffixes().next();
 
             // Find the corresponding function definition
             let identifier = range(name);
