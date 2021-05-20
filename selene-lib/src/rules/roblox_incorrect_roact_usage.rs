@@ -124,7 +124,7 @@ impl IncorrectRoactUsageVisitor {
 impl Visitor<'_> for IncorrectRoactUsageVisitor {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         // Check if caller is Roact.createElement or a variable defined to it
-        let mut suffixes = call.iter_suffixes().collect::<Vec<_>>();
+        let mut suffixes = call.suffixes().collect::<Vec<_>>();
         let call_suffix = suffixes.pop();
 
         let mut check = false;
@@ -159,15 +159,13 @@ impl Visitor<'_> for IncorrectRoactUsageVisitor {
 
             // Get first argument, check if it is a Roblox class
             let name_arg = iter.next().unwrap();
-            if let ast::Expression::Value { value, binop, .. } = name_arg;
-            if binop.is_none();
+            if let ast::Expression::Value { value, .. } = name_arg;
             if let ast::Value::String(token) = &**value;
             if let Some(class) = self.check_class_name(&token);
 
             // Get second argument, check if it is a table
             let arg = iter.next().unwrap();
-            if let ast::Expression::Value { value, binop, .. } = arg;
-            if binop.is_none();
+            if let ast::Expression::Value { value, .. } = arg;
             if let ast::Value::TableConstructor(table) = &**value;
 
             then {
@@ -208,13 +206,12 @@ impl Visitor<'_> for IncorrectRoactUsageVisitor {
     }
 
     fn visit_local_assignment(&mut self, node: &ast::LocalAssignment) {
-        for (name, expr) in node.name_list().iter().zip(node.expr_list().iter()) {
+        for (name, expr) in node.names().iter().zip(node.expressions().iter()) {
             if_chain! {
-                if let ast::Expression::Value { value, binop, .. } = expr;
-                if binop.is_none();
+                if let ast::Expression::Value { value, .. } = expr;
                 if let ast::Value::Var(var) = &**value;
                 if let ast::Var::Expression(var_expr) = var;
-                if is_roact_create_element(var_expr.prefix(), &var_expr.iter_suffixes().collect::<Vec<_>>());
+                if is_roact_create_element(var_expr.prefix(), &var_expr.suffixes().collect::<Vec<_>>());
                 then {
                     self.definitions_of_create_element.insert(name.token().to_string());
                 }
