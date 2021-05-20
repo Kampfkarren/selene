@@ -83,7 +83,7 @@ impl Rule for EmptyIfLint {
 }
 
 fn block_is_empty(block: &ast::Block) -> bool {
-    block.last_stmt().is_none() && block.iter_stmts().next().is_none()
+    block.last_stmt().is_none() && block.stmts().next().is_none()
 }
 
 struct EmptyIfVisitor {

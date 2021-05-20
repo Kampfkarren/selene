@@ -83,7 +83,7 @@ impl MultipleStatementsVisitor {
 
         if self.config.one_line_if != OneLineIf::Deny {
             if self.config.one_line_if == OneLineIf::BreakReturnOnly
-                && (if_block.block().iter_stmts().next().is_some()
+                && (if_block.block().stmts().next().is_some()
                     || if_block.block().last_stmt().is_none())
             {
                 return;

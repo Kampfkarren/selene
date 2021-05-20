@@ -71,12 +71,12 @@ fn value_is_zero(value: &ast::Value) -> bool {
 
 fn expression_is_nan(node: &ast::Expression) -> bool {
     if_chain::if_chain! {
-        if let ast::Expression::Value { value, binop, .. } = node;
-        if let Some(rhs) = binop;
-        if let ast::BinOp::Slash(_) = rhs.bin_op();
+        if let ast::Expression::BinaryOperator { lhs, binop, rhs } = node;
+        if let ast::BinOp::Slash(_) = binop;
+        if let ast::Expression::Value { value, .. } = &**lhs;
         if let ast::Expression::Value {
             value: rhs_value, ..
-        } = rhs.rhs();
+        } = &**rhs;
         if value_is_zero(rhs_value) && value_is_zero(value);
         then {
             return true;
@@ -88,13 +88,13 @@ fn expression_is_nan(node: &ast::Expression) -> bool {
 impl Visitor<'_> for CompareNanVisitor {
     fn visit_expression(&mut self, node: &ast::Expression) {
         if_chain::if_chain! {
-            if let ast::Expression::Value {value, binop, ..} = node;
+            if let ast::Expression::BinaryOperator { lhs, binop, rhs } = node;
+            if let ast::Expression::Value { value, .. } = &**lhs;
             if let ast::Value::Var(_) = value.as_ref();
-            if let Some(rhs) = binop;
             then {
-                match rhs.bin_op() {
+                match binop {
                     ast::BinOp::TildeEqual(_) => {
-                        if expression_is_nan(rhs.rhs()) {
+                        if expression_is_nan(rhs) {
                             let range = node.range().unwrap();
                             self.comparisons.push(
                                 Comparison {
@@ -106,7 +106,7 @@ impl Visitor<'_> for CompareNanVisitor {
                         }
                     },
                     ast::BinOp::TwoEqual(_) => {
-                        if expression_is_nan(rhs.rhs()) {
+                        if expression_is_nan(rhs) {
                             let range = node.range().unwrap();
                             self.comparisons.push(
                                 Comparison {
