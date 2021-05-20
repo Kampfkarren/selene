@@ -18,14 +18,6 @@ local baz = {
 	["a"] = true,
 }
 
--- These ones are ignored
-local foobar = {
-	true,
-	false,
-	[1] = true,
-	[1] = false,
-}
-
 -- Ignore complex expressions
 local barbaz = {
 	[call()] = true,

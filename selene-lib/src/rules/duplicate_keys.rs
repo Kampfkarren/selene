@@ -53,6 +53,20 @@ impl Rule for DuplicateKeysLint {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Hash)]
+enum KeyType {
+    /// A number key type, such as `4` in `{ [4] = "foo" }`, or `1` inferred from `{"foo"}`
+    Number,
+    /// A string key type, or a named identifier, such as `foo` in `{ ["foo"] = "bar" }` or `{ foo = "bar" }`
+    String,
+}
+
+#[derive(Debug, PartialEq, Eq, Hash)]
+struct Key {
+    key_type: KeyType,
+    name: String,
+}
+
 struct DuplicateKey {
     name: String,
     position: (usize, usize),
@@ -64,14 +78,22 @@ struct DuplicateKeysVisitor {
 }
 
 /// Attempts to evaluate an expression key such as `"foobar"` in `["foobar"] = true` to a named identifier, `foobar`.
-/// Only works for string literal expression keys.
-fn key_expression_to_name(expression: &ast::Expression) -> Option<String> {
+/// Also extracts `5` from `[5] = true`.
+/// Only works for string literal expression keys, or constant number keys.
+fn expression_to_key(expression: &ast::Expression) -> Option<Key> {
     if let ast::Expression::Value { value, .. } = expression {
-        if let ast::Value::String(token) = &**value {
-            if let tokenizer::TokenType::StringLiteral { literal, .. } = token.token().token_type()
-            {
-                return Some(literal.to_string());
-            }
+        if let ast::Value::String(token) | ast::Value::Number(token) = &**value {
+            return match token.token().token_type() {
+                tokenizer::TokenType::StringLiteral { literal, .. } => Some(Key {
+                    key_type: KeyType::String,
+                    name: literal.to_string(),
+                }),
+                tokenizer::TokenType::Number { text, .. } => Some(Key {
+                    key_type: KeyType::Number,
+                    name: text.to_string(),
+                }),
+                _ => None,
+            };
         }
     }
 
@@ -81,13 +103,13 @@ fn key_expression_to_name(expression: &ast::Expression) -> Option<String> {
 impl DuplicateKeysVisitor {
     fn check_field(
         &mut self,
-        declared_fields: &mut HashMap<String, (usize, usize)>,
-        key: String,
+        declared_fields: &mut HashMap<Key, (usize, usize)>,
+        key: Key,
         field_range: (usize, usize),
     ) {
         if let Some(original_declaration) = declared_fields.get(&key) {
             self.duplicates.push(DuplicateKey {
-                name: key,
+                name: key.name,
                 position: field_range,
                 original_declaration: *original_declaration,
             });
@@ -100,23 +122,34 @@ impl DuplicateKeysVisitor {
 impl Visitor<'_> for DuplicateKeysVisitor {
     fn visit_table_constructor(&mut self, node: &ast::TableConstructor) {
         let mut declared_fields = HashMap::new();
+        let mut number_index: usize = 0;
 
         for field in node.fields() {
             let field_range = range(field);
 
             match field {
                 ast::Field::NameKey { key, .. } => {
-                    let key = key.token().to_string();
+                    let key = Key {
+                        key_type: KeyType::String,
+                        name: key.token().to_string(),
+                    };
                     self.check_field(&mut declared_fields, key, field_range);
                 }
 
                 ast::Field::ExpressionKey { key, .. } => {
-                    if let Some(key) = key_expression_to_name(key) {
+                    if let Some(key) = expression_to_key(key) {
                         self.check_field(&mut declared_fields, key, field_range);
                     }
                 }
 
-                _ => (),
+                ast::Field::NoKey(_) => {
+                    number_index += 1;
+                    let key = Key {
+                        key_type: KeyType::Number,
+                        name: number_index.to_string(),
+                    };
+                    self.check_field(&mut declared_fields, key, field_range)
+                }
             }
         }
     }
@@ -132,6 +165,15 @@ mod tests {
             DuplicateKeysLint::new(()).unwrap(),
             "duplicate_keys",
             "duplicate_keys",
+        );
+    }
+
+    #[test]
+    fn test_duplicate_keys_number_indices() {
+        test_lint(
+            DuplicateKeysLint::new(()).unwrap(),
+            "duplicate_keys",
+            "number_indices",
         );
     }
 }
