@@ -128,7 +128,6 @@ mod tests {
         struct TestVisitor {
             smallest_range: usize,
             largest_range: usize,
-            visited_something_called_foo: bool,
         }
 
         impl NodeVisitor<'_> for TestVisitor {
@@ -136,30 +135,16 @@ mod tests {
                 self.smallest_range =
                     min(self.smallest_range, node.start_position().unwrap().bytes());
                 self.largest_range = max(self.largest_range, node.end_position().unwrap().bytes());
-
-                if node
-                    .tokens()
-                    .into_iter()
-                    .fold(String::new(), |total, token| {
-                        format!("{}{}", total, token.to_string())
-                    })
-                    .trim()
-                    == "foo".to_owned()
-                {
-                    self.visited_something_called_foo = true;
-                }
             }
         }
 
         let mut visitor = TestVisitor {
             smallest_range: 100,
             largest_range: 0,
-            visited_something_called_foo: false,
         };
 
         visitor.visit_nodes(&ast);
 
-        assert!(visitor.visited_something_called_foo);
         assert_eq!(visitor.smallest_range, 0);
         assert_eq!(visitor.largest_range, code.len());
     }

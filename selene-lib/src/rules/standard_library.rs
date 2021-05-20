@@ -153,9 +153,13 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
             _ => None,
         },
 
-        ast::Expression::BinaryOperator { binop, rhs, .. } => {
-            // Nearly all of these will return wrong results if you have a non-idiomatic metatable.
-            // I intentionally omitted common metamethod re-typings, like `__mul`.
+        ast::Expression::BinaryOperator {
+            lhs, binop, rhs, ..
+        } => {
+            let base = get_argument_type(lhs);
+
+            // Nearly all of these will return wrong results if you have a non-idiomatic metatable
+            // I intentionally omitted common metamethod re-typings, like __mul
             match binop {
                 ast::BinOp::Caret(_) => Some(ArgumentType::Number.into()),
 
@@ -168,7 +172,6 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                     if_chain::if_chain! {
                         if let ast::Expression::BinaryOperator { binop, .. } = &**rhs;
                         if let ast::BinOp::And(_) | ast::BinOp::Or(_) = binop;
-
                         then {
                             None
                         } else {
@@ -181,7 +184,7 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                 ast::BinOp::Plus(_)
                 | ast::BinOp::Minus(_)
                 | ast::BinOp::Star(_)
-                | ast::BinOp::Slash(_) => get_argument_type(expression),
+                | ast::BinOp::Slash(_) => base,
 
                 ast::BinOp::Percent(_) => Some(ArgumentType::Number.into()),
 
