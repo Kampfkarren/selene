@@ -75,16 +75,8 @@ struct UnbalancedAssignmentsVisitor {
 fn expression_is_call(expression: &ast::Expression) -> bool {
     match expression {
         ast::Expression::Parentheses { expression, .. } => expression_is_call(expression),
-        ast::Expression::Value { value, binop, .. } => {
-            if binop.is_none() {
-                if let ast::Value::FunctionCall(_) = &**value {
-                    true
-                } else {
-                    false
-                }
-            } else {
-                false
-            }
+        ast::Expression::Value { value, .. } => {
+            matches!(&**value, ast::Value::FunctionCall(_))
         }
 
         _ => false,
@@ -94,16 +86,12 @@ fn expression_is_call(expression: &ast::Expression) -> bool {
 fn expression_is_nil(expression: &ast::Expression) -> bool {
     match expression {
         ast::Expression::Parentheses { expression, .. } => expression_is_call(expression),
-        ast::Expression::Value { value, binop, .. } => {
-            if binop.is_none() {
-                if let ast::Value::Symbol(symbol) = &**value {
-                    *symbol.token_type()
-                        == TokenType::Symbol {
-                            symbol: Symbol::Nil,
-                        }
-                } else {
-                    false
-                }
+        ast::Expression::Value { value, .. } => {
+            if let ast::Value::Symbol(symbol) = &**value {
+                *symbol.token_type()
+                    == TokenType::Symbol {
+                        symbol: Symbol::Nil,
+                    }
             } else {
                 false
             }
@@ -171,11 +159,11 @@ impl UnbalancedAssignmentsVisitor {
 
 impl Visitor<'_> for UnbalancedAssignmentsVisitor {
     fn visit_assignment(&mut self, assignment: &ast::Assignment) {
-        self.lint_assignment(assignment.var_list().len(), assignment.expr_list());
+        self.lint_assignment(assignment.variables().len(), assignment.expressions());
     }
 
     fn visit_local_assignment(&mut self, assignment: &ast::LocalAssignment) {
-        self.lint_assignment(assignment.name_list().len(), assignment.expr_list());
+        self.lint_assignment(assignment.names().len(), assignment.expressions());
     }
 }
 

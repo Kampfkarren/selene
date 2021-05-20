@@ -69,14 +69,14 @@ impl Visitor<'_> for AlmostSwappedVisitor {
     fn visit_block(&mut self, block: &ast::Block) {
         let mut last_swap: Option<AlmostSwap> = None;
 
-        for stmt in block.iter_stmts() {
+        for stmt in block.stmts() {
             if let ast::Stmt::Assignment(assignment) = stmt {
-                let expr_list = assignment.expr_list();
-                let var_list = assignment.var_list();
+                let expressions = assignment.expressions();
+                let variables = assignment.variables();
 
-                if var_list.len() == 1 && expr_list.len() == 1 {
-                    let expr = expr_list.into_iter().next().unwrap();
-                    let var = var_list.into_iter().next().unwrap();
+                if variables.len() == 1 && expressions.len() == 1 {
+                    let expr = expressions.into_iter().next().unwrap();
+                    let var = variables.into_iter().next().unwrap();
 
                     if !var.has_side_effects() {
                         let expr_end = range(expr).1;

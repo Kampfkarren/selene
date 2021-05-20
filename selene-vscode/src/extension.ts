@@ -1,4 +1,5 @@
 import * as selene from "./selene"
+import * as timers from "timers"
 import * as util from "./util"
 import * as vscode from "vscode"
 
@@ -29,6 +30,8 @@ enum Severity {
 enum RunType {
     OnSave = "onSave",
     OnType = "onType",
+    OnNewLine = "onNewLine",
+    OnIdle = "onIdle",
 }
 
 function byteToCharMap(document: vscode.TextDocument, byteOffsets: Set<number>) {
@@ -165,19 +168,34 @@ export async function activate(context: vscode.ExtensionContext) {
         diagnosticsCollection.set(document.uri, diagnostics)
     }
 
+    let lastTimeout: NodeJS.Timeout
     function listenToChange() {
         switch (vscode.workspace.getConfiguration("selene").get<RunType>("run")) {
             case RunType.OnSave:
                 return vscode.workspace.onDidSaveTextDocument(lint)
             case RunType.OnType:
                 return vscode.workspace.onDidChangeTextDocument(event => lint(event.document))
-
+            case RunType.OnNewLine:
+				return vscode.workspace.onDidChangeTextDocument(event => {
+					// Contrary to removing lines, adding new lines will leave the range at the same value hence the string comparisons
+					if (event.contentChanges.some(content =>
+						!content.range.isSingleLine || content.text === "\n" || content.text === "\r\n"
+					)) {
+						lint(event.document)
+					}
+                })
+            case RunType.OnIdle:
+                const idleDelay = vscode.workspace.getConfiguration("selene").get<number>("idleDelay") as number
+                return vscode.workspace.onDidChangeTextDocument(event => {
+                    timers.clearTimeout(lastTimeout)
+                    lastTimeout = timers.setTimeout(lint, idleDelay, event.document)
+                })
         }
     }
 
     let disposable = listenToChange()
     vscode.workspace.onDidChangeConfiguration(event => {
-        if (event.affectsConfiguration("selene.run")) {
+        if (event.affectsConfiguration("selene.run") || event.affectsConfiguration("selene.idleDelay")) {
             disposable?.dispose()
             disposable = listenToChange()
         }

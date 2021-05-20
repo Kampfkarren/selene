@@ -95,7 +95,7 @@ impl<'ast> NodeVisitor<'ast> for FilterVisitor {
         let leading_trivia = node.surrounding_trivia().0;
         for trivia in leading_trivia {
             let (trivia_start_position, trivia_end_position) =
-                trivia.range().expect("trivia has no range");
+                (trivia.start_position(), trivia.end_position());
             let hash = (trivia_start_position.bytes(), trivia_end_position.bytes());
 
             if self.comments_checked.contains(&hash) {
@@ -131,11 +131,12 @@ impl<'ast> NodeVisitor<'ast> for FilterVisitor {
                 self.ranges
                     .extend(configurations.into_iter().map(|configuration| {
                         if rule_exists(&configuration.lint) {
-                            let trivia_range = trivia.range().expect("no range for comment");
-
                             Ok(Filter {
                                 configuration,
-                                comment_range: (trivia_range.0.bytes(), trivia_range.1.bytes()),
+                                comment_range: (
+                                    trivia.start_position().bytes(),
+                                    trivia.end_position().bytes(),
+                                ),
                                 range: (range.0.bytes(), range.1.bytes()),
                             })
                         } else {
