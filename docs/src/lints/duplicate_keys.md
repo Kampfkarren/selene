@@ -3,7 +3,7 @@
 Checks for duplicate keys being defined inside of tables.
 
 ## Why this is bad
-Tables with a key defined more than once can lead to unexpected behaviour in your program.
+Tables with a key defined more than once will only use one of the values.
 
 ## Example
 ```lua
