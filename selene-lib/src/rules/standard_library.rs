@@ -156,8 +156,6 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
         ast::Expression::BinaryOperator {
             lhs, binop, rhs, ..
         } => {
-            let base = get_argument_type(lhs);
-
             // Nearly all of these will return wrong results if you have a non-idiomatic metatable
             // I intentionally omitted common metamethod re-typings, like __mul
             match binop {
@@ -184,7 +182,16 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                 ast::BinOp::Plus(_)
                 | ast::BinOp::Minus(_)
                 | ast::BinOp::Star(_)
-                | ast::BinOp::Slash(_) => base,
+                | ast::BinOp::Slash(_) => {
+                    let lhs_type = get_argument_type(lhs);
+                    let rhs_type = get_argument_type(rhs);
+
+                    if lhs_type == rhs_type {
+                        lhs_type
+                    } else {
+                        None
+                    }
+                }
 
                 ast::BinOp::Percent(_) => Some(ArgumentType::Number.into()),
 
@@ -765,6 +772,15 @@ mod tests {
                 standard_library: StandardLibrary::from_name("lua52").unwrap(),
                 ..TestUtilConfig::default()
             },
+        );
+    }
+
+    #[test]
+    fn test_math_on_types() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "math_on_types",
         );
     }
 
