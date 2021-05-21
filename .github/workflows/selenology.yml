@@ -1,10 +1,12 @@
 name: Selenology
 on:
-  issue_comment:
-    types: [created]
+  workflow_dispatch:
+    inputs:
+      prId:
+        description: 'PR #'
+        required: true
 jobs:
   selenology:
-    if: ${{ github.event.issue.pull_request }} && ${{ github.event.sender.login }} == "Kampfkarren" && ${{ contains(github.event.comment.body, '!selenology') }}
     runs-on: ubuntu-latest
     steps:
     - name: Get PR info
@@ -25,7 +27,7 @@ jobs:
           }
         owner: ${{ github.event.repository.owner.login }}
         repo: ${{ github.event.repository.name }}
-        number: ${{ github.event.issue.number }}
+        number: ${{ github.event.inputs.prId }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Run selenology
@@ -56,6 +58,6 @@ jobs:
     - name: Post comment
       uses: peter-evans/create-or-update-comment@v1
       with:
-        issue-number: ${{ github.event.issue.number }}
+        issue-number: ${{ github.event.inputs.prId }}
         body: |
           Selenology report was created, and can be viewed [at this link](https://htmlpreview.github.io/?https://github.com/${{ github.event.repository.owner.login }}/${{ github.event.repository.name }}/blob/selenology-outputs/${{ steps.upload.outputs.filename }}).
