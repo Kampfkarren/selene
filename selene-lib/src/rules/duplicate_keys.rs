@@ -49,7 +49,7 @@ impl Rule for DuplicateKeysLint {
     }
 
     fn rule_type(&self) -> RuleType {
-        RuleType::Complexity
+        RuleType::Correctness
     }
 }
 
