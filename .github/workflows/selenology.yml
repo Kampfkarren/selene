@@ -15,7 +15,7 @@ jobs:
           query getPullRequestInfo($owner:String!,$repo:String!,$number:Int!) {
             repository(owner: $owner, name: $repo) {
               pullRequest(number:$number) {
-                repository {
+                headRepository {
                   url
                 }
 
@@ -33,7 +33,7 @@ jobs:
       uses: Kampfkarren/selenology@main
       with:
         new_selene_checkout: ${{ fromJSON(steps.get_pr_info.outputs.data).repository.pullRequest.headRefOid }}
-        new_selene_repository: ${{ fromJSON(steps.get_pr_info.outputs.data).repository.pullRequest.repository.url }}
+        new_selene_repository: ${{ fromJSON(steps.get_pr_info.outputs.data).repository.pullRequest.headRepository.url }}
     - uses: actions/checkout@v2
       with:
         ref: selenology-outputs
