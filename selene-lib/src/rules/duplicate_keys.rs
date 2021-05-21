@@ -151,7 +151,7 @@ impl Visitor<'_> for DuplicateKeysVisitor {
                     self.check_field(&mut declared_fields, key, field_range)
                 }
 
-                other => panic!("unknown node {:?}", other),
+                other => {}
             }
         }
     }
