@@ -17,3 +17,14 @@ e(Components.FooComponent, {
 })
 
 call("foo", {})
+
+e("Frame", {
+	Name = "MyFrame",
+	Visible = false,
+	Parent = workspace,
+})
+
+e(BarComponent, {
+	Name = "BarComponent",
+	Parent = "Earth",
+})
