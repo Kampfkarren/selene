@@ -1,6 +1,6 @@
 # mismatched_arg_count
 ## What it does
-Checks for too many arguments passed to function calls of defined functions
+Checks for too many arguments passed to function calls of defined functions.
 
 ## Why this is bad
 These arguments provided are unnecessary, and can indicate that the function definition is not what was expected.
@@ -30,8 +30,8 @@ function updateFoo()
     end
 end
 
-foo(1, 2, 3, 4) --> "a" [mismatched args]
+foo(1, 2, 3, 4) --> "a" [mismatched args, but selene doesn't know]
 updateFoo()
 foo(1, 2, 3, 4) --> "b" [no more mismatched args]
 ```
-Selene can not tell that `foo` corresponds to a new definition because `updateFoo()` was called in the current context, without actually "running" the program.
+selene can not tell that `foo` corresponds to a new definition because `updateFoo()` was called in the current context, without actually *running* the program.
