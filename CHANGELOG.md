@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Fixed
 - Fixed a bug where some indexes of Roblox structures would fail (such as `workspace.CurrentCamera.ViewportSize.X`)
 - Fixed a bug where chaining `roblox` with another standard library would not read the other standard library if `roblox` was being generated.
+- Fixed a bug where `0.5 * x` would always resolve to a number.
 
 ### Changed
 - Updated internal parser. This has shown in practice to catch lints that the previous version did not.
