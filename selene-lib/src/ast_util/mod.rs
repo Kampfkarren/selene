@@ -1,6 +1,10 @@
 use std::convert::{TryFrom, TryInto};
 
-use full_moon::{ast::Ast, node::Node, tokenizer::Position};
+use full_moon::{
+    ast::{self, Ast},
+    node::Node,
+    tokenizer::{self, Position},
+};
 
 mod purge_trivia;
 pub mod scopes;
@@ -35,6 +39,31 @@ pub fn first_code<'ast>(ast: &Ast<'ast>) -> Option<(Position, Position)> {
         Some(first_stmt) => first_stmt.range(),
         None => ast.nodes().last_stmt().and_then(Node::range),
     }
+}
+
+pub fn is_vararg(expression: &ast::Expression) -> bool {
+    if_chain::if_chain! {
+        if let ast::Expression::Value { value, .. } = expression;
+        if let ast::Value::Symbol(token) = &**value;
+        if let tokenizer::TokenType::Symbol { symbol } = token.token().token_type();
+        if let tokenizer::Symbol::Ellipse = symbol;
+
+        then {
+            true
+        } else {
+            false
+        }
+    }
+}
+
+pub fn is_function_call(expression: &ast::Expression) -> bool {
+    if let ast::Expression::Value { value, .. } = expression {
+        if let ast::Value::FunctionCall(_) = &**value {
+            return true;
+        }
+    }
+
+    false
 }
 
 #[cfg(test)]

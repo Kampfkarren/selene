@@ -21,6 +21,7 @@
   - [if_same_then_else](./lints/if_same_then_else.md)
   - [ifs_same_cond](./lints/ifs_same_cond.md)
   - [multiple_statements](./lints/multiple_statements.md)
+  - [mismatched_arg_count](./lints/mismatched_arg_count.md)
   - [parenthese_conditions](./lints/parenthese_conditions.md)
   - [roblox_incorrect_color3_new_bounds](./lints/roblox_incorrect_color3_new_bounds.md)
   - [roblox_incorrect_roact_usage](./lints/roblox_incorrect_roact_usage.md)
