@@ -1,7 +1,7 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.12.0] - 2021-05-26
 ### Added
 - `arg` is now defined in the Lua 5.1 standard library.
 - Root level `...` will no longer be declared an undefined variable.
