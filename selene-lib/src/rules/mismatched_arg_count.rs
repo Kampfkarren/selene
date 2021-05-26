@@ -112,7 +112,7 @@ impl ParameterCount {
                         return Self::Minimum(necessary_params);
                     }
                 }
-                other => {}
+                _ => {}
             }
         }
 
@@ -214,7 +214,7 @@ impl PassedArgumentCount {
             }
             ast::FunctionArgs::String(_) => Self::Fixed(1),
             ast::FunctionArgs::TableConstructor(_) => Self::Fixed(1),
-            other => Self::Fixed(0),
+            _ => Self::Fixed(0),
         }
     }
 }
