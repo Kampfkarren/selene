@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.1] - 2021-05-26
+### Fixed
+- Fixed compile warning about unused variables.
+
 ## [0.12.0] - 2021-05-26
 ### Added
 - `arg` is now defined in the Lua 5.1 standard library.
