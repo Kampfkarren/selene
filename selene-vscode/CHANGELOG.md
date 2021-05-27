@@ -4,7 +4,7 @@ All notable changes to the "selene-vscode" extension will be documented in this 
 
 If you want to stay up to date with selene itself, you can find the changelog in [selene's CHANGELOG.md](https://github.com/Kampfkarren/selene/blob/master/CHANGELOG.md).
 
-## [Unreleased]
+## [1.1.0]
 -   Added `onSave`, `onType`, `onNewLint`, and `onIdle` configurations to choose when selene lints.
 -   Updated the internal `fs` code to use VSCode FileSystem rather than Node.js fs methods.
 -   Fixed some information (mainly parse error information) missing from diagnostics which were available in the selene CLI.
