@@ -71,7 +71,7 @@ export async function activate(context: vscode.ExtensionContext) {
     trySelene = util.ensureSeleneExists(context.globalStorageUri).then(() => {
         return true
     }).catch(error => {
-        vscode.window.showErrorMessage(`An error occurred when finding Selene:\n${error}`)
+        vscode.window.showErrorMessage(`An error occurred when finding selene:\n${error}`)
         return false
     })
 
