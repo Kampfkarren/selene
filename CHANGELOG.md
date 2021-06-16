@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.2] - 2021-06-16
+### Changed
+- Updated internal parser.
+
 ## [0.12.1] - 2021-05-26
 ### Fixed
 - Fixed compile warning about unused variables.
