@@ -87,7 +87,7 @@ async function fileExists(filename: vscode.Uri): Promise<boolean> {
         await vscode.workspace.fs.stat(filename)
         return true
     } catch (err) {
-        return err !== vscode.FileSystemError.FileNotFound
+        return err.code !== "FileNotFound"
     }
 }
 

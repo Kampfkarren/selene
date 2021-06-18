@@ -11,6 +11,7 @@ mod ast_util;
 mod lint_filtering;
 pub mod rules;
 pub mod standard_library;
+mod util;
 
 #[cfg(test)]
 mod test_util;
@@ -249,12 +250,14 @@ use_rules! {
     bad_string_escape: rules::bad_string_escape::BadStringEscapeLint,
     compare_nan: rules::compare_nan::CompareNanLint,
     divide_by_zero: rules::divide_by_zero::DivideByZeroLint,
+    duplicate_keys: rules::duplicate_keys::DuplicateKeysLint,
     empty_if: rules::empty_if::EmptyIfLint,
     global_usage: rules::global_usage::GlobalLint,
     if_same_then_else: rules::if_same_then_else::IfSameThenElseLint,
     ifs_same_cond: rules::ifs_same_cond::IfsSameCondLint,
     incorrect_standard_library_use: rules::standard_library::StandardLibraryLint,
     invalid_lint_filter: rules::invalid_lint_filter::InvalidLintFilterLint,
+    mismatched_arg_count: rules::mismatched_arg_count::MismatchedArgCountLint,
     multiple_statements: rules::multiple_statements::MultipleStatementsLint,
     parenthese_conditions: rules::parenthese_conditions::ParentheseConditionsLint,
     shadowing: rules::shadowing::ShadowingLint,

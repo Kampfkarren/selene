@@ -71,7 +71,7 @@ export async function activate(context: vscode.ExtensionContext) {
     trySelene = util.ensureSeleneExists(context.globalStorageUri).then(() => {
         return true
     }).catch(error => {
-        vscode.window.showErrorMessage(`An error occurred when finding Selene:\n${error}`)
+        vscode.window.showErrorMessage(`An error occurred when finding selene:\n${error}`)
         return false
     })
 
@@ -133,7 +133,7 @@ export async function activate(context: vscode.ExtensionContext) {
         for (const data of dataToAdd) {
             let message = data.message
             if (data.primary_label.message.length > 0) {
-                message += `, ${data.primary_label.message}`
+                message += `\n${data.primary_label.message}`
             }
 
             if (data.notes.length > 0) {

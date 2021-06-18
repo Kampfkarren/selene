@@ -42,3 +42,17 @@ error[incorrect_standard_library_use]: use of standard_library function `string.
 19 │ string.format(-2, "foo")
    │               ^^ expected `string`, received `number`
 
+error[incorrect_standard_library_use]: standard library function `string.format` requires use of the vararg
+   ┌─ bad_call_signatures.lua:20:1
+   │
+20 │ string.format(1 + 1)
+   │ ^^^^^^^^^^^^^^^^^^^^
+   │
+   = string.format should only be used for strings that need formatting
+
+error[incorrect_standard_library_use]: use of standard_library function `string.format` is incorrect
+   ┌─ bad_call_signatures.lua:20:15
+   │
+20 │ string.format(1 + 1)
+   │               ^^^^^ expected `string`, received `number`
+

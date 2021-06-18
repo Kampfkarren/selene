@@ -1,0 +1,9 @@
+error[mismatched_arg_count]: this function takes 2 arguments but 3 arguments were supplied
+  ┌─ alternative_function_definition.lua:1:10
+  │
+1 │ function foo(a, b)
+  │          --- note: function defined here
+  ·
+6 │ foo(1, 2, 3)
+  │ ^^^^^^^^^^^^ expected 2 arguments
+
