@@ -1,6 +1,12 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Tokenization errors now form rich diagnostics.
+### Fixed
+- Fixed internal selene panics exiting with a zero code. Panics will now exit with status code 1, allowing it to be picked up by CI.
+
 ## [0.12.1] - 2021-05-26
 ### Fixed
 - Fixed compile warning about unused variables.
