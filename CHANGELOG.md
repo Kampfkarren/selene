@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Added
+- Added `debug.getinfo` to the Roblox standard library. [(#260)](https://github.com/Kampfkarren/selene/issues/260)
+
 ## [0.12.1] - 2021-05-26
 ### Fixed
 - Fixed compile warning about unused variables.
