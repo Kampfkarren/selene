@@ -1,0 +1,22 @@
+name: Lint selene-vscode
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: npm i -D
+      working-directory: selene-vscode
+    - name: Run ESLint
+      run: eslint src/
+      working-directory: selene-vscode
+    - name: Prettier
+      run: prettier src/**/*.ts
+      working-directory: selene-vscode
