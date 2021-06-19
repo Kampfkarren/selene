@@ -76,7 +76,9 @@ function labelToRange(
     )
 }
 
-export async function activate(context: vscode.ExtensionContext) {
+export async function activate(
+    context: vscode.ExtensionContext,
+): Promise<void> {
     console.log("selene-vscode activated")
 
     trySelene = util
@@ -222,10 +224,11 @@ export async function activate(context: vscode.ExtensionContext) {
                         lint(event.document)
                     }
                 })
-            case RunType.OnIdle:
+            case RunType.OnIdle: {
                 const idleDelay = vscode.workspace
                     .getConfiguration("selene")
                     .get<number>("idleDelay") as number
+
                 return vscode.workspace.onDidChangeTextDocument((event) => {
                     timers.clearTimeout(lastTimeout)
                     lastTimeout = timers.setTimeout(
@@ -234,6 +237,7 @@ export async function activate(context: vscode.ExtensionContext) {
                         event.document,
                     )
                 })
+            }
         }
     }
 
@@ -262,4 +266,6 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate(): void {
+    return
+}

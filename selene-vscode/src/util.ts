@@ -5,7 +5,7 @@ import * as request from "request-promise-native"
 import * as unzip from "unzipper"
 import * as vscode from "vscode"
 
-const fsWriteFileAtomic = require("fs-write-stream-atomic")
+import fsWriteFileAtomic = require("fs-write-stream-atomic")
 
 const GITHUB_RELEASES = "https://summer-bonus-a893.boyned.workers.dev"
 
@@ -92,7 +92,7 @@ async function fileExists(filename: vscode.Uri): Promise<boolean> {
     }
 }
 
-export async function downloadSelene(directory: vscode.Uri) {
+export async function downloadSelene(directory: vscode.Uri): Promise<void> {
     vscode.window.showInformationMessage("Downloading Selene...")
 
     const filename = getSeleneFilename()
@@ -147,7 +147,9 @@ export async function getSelenePath(
     }
 }
 
-export async function ensureSeleneExists(storagePath: vscode.Uri) {
+export async function ensureSeleneExists(
+    storagePath: vscode.Uri,
+): Promise<void> {
     const path = await getSelenePath(storagePath)
 
     if (path === undefined) {
