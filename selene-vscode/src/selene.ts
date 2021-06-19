@@ -21,21 +21,27 @@ export async function seleneCommand(
             return reject("Could not find selene.")
         }
 
-        const workspaceFolders = vscode.workspace.workspaceFolders;
+        const workspaceFolders = vscode.workspace.workspaceFolders
 
-        const child = childProcess.exec(`"${selenePath.fsPath}" ${command}`, {
-            cwd: workspace?.uri.fsPath || (workspaceFolders && workspaceFolders[0])?.uri?.fsPath,
-        }, (error, stdout) => {
-            if (expectation === Expectation.Stderr) {
-                resolve(error && stdout)
-            } else {
-                if (error) {
-                    reject(error)
+        const child = childProcess.exec(
+            `"${selenePath.fsPath}" ${command}`,
+            {
+                cwd:
+                    workspace?.uri.fsPath ||
+                    (workspaceFolders && workspaceFolders[0])?.uri?.fsPath,
+            },
+            (error, stdout) => {
+                if (expectation === Expectation.Stderr) {
+                    resolve(error && stdout)
                 } else {
-                    resolve(stdout)
+                    if (error) {
+                        reject(error)
+                    } else {
+                        resolve(stdout)
+                    }
                 }
-            }
-        })
+            },
+        )
 
         if (stdin !== undefined) {
             child.stdin?.write(stdin)

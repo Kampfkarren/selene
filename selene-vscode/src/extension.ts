@@ -6,19 +6,19 @@ import * as vscode from "vscode"
 let trySelene: Promise<boolean>
 
 interface Diagnostic {
-    code: string,
-    message: string,
-    severity: Severity,
-    notes: string[],
-    primary_label: Label,
-    secondary_labels: Label[],
+    code: string
+    message: string
+    severity: Severity
+    notes: string[]
+    primary_label: Label
+    secondary_labels: Label[]
 }
 
 interface Label {
-    message: string,
+    message: string
     span: {
-        start: number,
-        end: number,
+        start: number
+        end: number
     }
 }
 
@@ -34,7 +34,10 @@ enum RunType {
     OnIdle = "onIdle",
 }
 
-function byteToCharMap(document: vscode.TextDocument, byteOffsets: Set<number>) {
+function byteToCharMap(
+    document: vscode.TextDocument,
+    byteOffsets: Set<number>,
+) {
     const text = document.getText()
     const byteOffsetMap = new Map<number, number>()
     let currentOffset = 0
@@ -58,33 +61,55 @@ function byteToCharMap(document: vscode.TextDocument, byteOffsets: Set<number>) 
     return byteOffsetMap
 }
 
-function labelToRange(document: vscode.TextDocument, label: Label, byteOffsetMap: Map<number, number>): vscode.Range {
+function labelToRange(
+    document: vscode.TextDocument,
+    label: Label,
+    byteOffsetMap: Map<number, number>,
+): vscode.Range {
     return new vscode.Range(
-        document.positionAt(byteOffsetMap.get(label.span.start) ?? label.span.start),
-        document.positionAt(byteOffsetMap.get(label.span.end) ?? label.span.end),
+        document.positionAt(
+            byteOffsetMap.get(label.span.start) ?? label.span.start,
+        ),
+        document.positionAt(
+            byteOffsetMap.get(label.span.end) ?? label.span.end,
+        ),
     )
 }
 
 export async function activate(context: vscode.ExtensionContext) {
     console.log("selene-vscode activated")
 
-    trySelene = util.ensureSeleneExists(context.globalStorageUri).then(() => {
-        return true
-    }).catch(error => {
-        vscode.window.showErrorMessage(`An error occurred when finding selene:\n${error}`)
-        return false
-    })
+    trySelene = util
+        .ensureSeleneExists(context.globalStorageUri)
+        .then(() => {
+            return true
+        })
+        .catch((error) => {
+            vscode.window.showErrorMessage(
+                `An error occurred when finding selene:\n${error}`,
+            )
+            return false
+        })
 
     await trySelene
 
-    console.log("selene path", await util.getSelenePath(context.globalStorageUri))
+    console.log(
+        "selene path",
+        await util.getSelenePath(context.globalStorageUri),
+    )
 
-    context.subscriptions.push(vscode.commands.registerCommand("selene.reinstall", () => {
-        trySelene = util.downloadSelene(context.globalStorageUri).then(() => true).catch(() => false)
-        return trySelene
-    }))
+    context.subscriptions.push(
+        vscode.commands.registerCommand("selene.reinstall", () => {
+            trySelene = util
+                .downloadSelene(context.globalStorageUri)
+                .then(() => true)
+                .catch(() => false)
+            return trySelene
+        }),
+    )
 
-    const diagnosticsCollection = vscode.languages.createDiagnosticCollection("selene")
+    const diagnosticsCollection =
+        vscode.languages.createDiagnosticCollection("selene")
     context.subscriptions.push(diagnosticsCollection)
 
     async function lint(document: vscode.TextDocument) {
@@ -92,7 +117,7 @@ export async function activate(context: vscode.ExtensionContext) {
             return
         }
 
-        if (!await trySelene) {
+        if (!(await trySelene)) {
             return
         }
 
@@ -137,13 +162,15 @@ export async function activate(context: vscode.ExtensionContext) {
             }
 
             if (data.notes.length > 0) {
-                message += `\n${data.notes.map(note => `note: ${note}\n`)}`
+                message += `\n${data.notes.map((note) => `note: ${note}\n`)}`
             }
 
             const diagnostic = new vscode.Diagnostic(
                 labelToRange(document, data.primary_label, byteOffsetMap),
                 message,
-                data.severity === Severity.Error ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning,
+                data.severity === Severity.Error
+                    ? vscode.DiagnosticSeverity.Error
+                    : vscode.DiagnosticSeverity.Warning,
             )
 
             diagnostic.source = `selene::${data.code}`
@@ -152,15 +179,17 @@ export async function activate(context: vscode.ExtensionContext) {
                 diagnostic.tags = [vscode.DiagnosticTag.Unnecessary]
             }
 
-            diagnostic.relatedInformation = data.secondary_labels.map(label => {
-                return {
-                    message: label.message,
-                    location: {
-                        uri: document.uri,
-                        range: labelToRange(document, label, byteOffsetMap),
-                    },
-                }
-            })
+            diagnostic.relatedInformation = data.secondary_labels.map(
+                (label) => {
+                    return {
+                        message: label.message,
+                        location: {
+                            uri: document.uri,
+                            range: labelToRange(document, label, byteOffsetMap),
+                        },
+                    }
+                },
+            )
 
             diagnostics.push(diagnostic)
         }
@@ -170,44 +199,62 @@ export async function activate(context: vscode.ExtensionContext) {
 
     let lastTimeout: NodeJS.Timeout
     function listenToChange() {
-        switch (vscode.workspace.getConfiguration("selene").get<RunType>("run")) {
+        switch (
+            vscode.workspace.getConfiguration("selene").get<RunType>("run")
+        ) {
             case RunType.OnSave:
                 return vscode.workspace.onDidSaveTextDocument(lint)
             case RunType.OnType:
-                return vscode.workspace.onDidChangeTextDocument(event => lint(event.document))
+                return vscode.workspace.onDidChangeTextDocument((event) =>
+                    lint(event.document),
+                )
             case RunType.OnNewLine:
-				return vscode.workspace.onDidChangeTextDocument(event => {
-					// Contrary to removing lines, adding new lines will leave the range at the same value hence the string comparisons
-					if (event.contentChanges.some(content =>
-						!content.range.isSingleLine || content.text === "\n" || content.text === "\r\n"
-					)) {
-						lint(event.document)
-					}
+                return vscode.workspace.onDidChangeTextDocument((event) => {
+                    // Contrary to removing lines, adding new lines will leave the range at the same value hence the string comparisons
+                    if (
+                        event.contentChanges.some(
+                            (content) =>
+                                !content.range.isSingleLine ||
+                                content.text === "\n" ||
+                                content.text === "\r\n",
+                        )
+                    ) {
+                        lint(event.document)
+                    }
                 })
             case RunType.OnIdle:
-                const idleDelay = vscode.workspace.getConfiguration("selene").get<number>("idleDelay") as number
-                return vscode.workspace.onDidChangeTextDocument(event => {
+                const idleDelay = vscode.workspace
+                    .getConfiguration("selene")
+                    .get<number>("idleDelay") as number
+                return vscode.workspace.onDidChangeTextDocument((event) => {
                     timers.clearTimeout(lastTimeout)
-                    lastTimeout = timers.setTimeout(lint, idleDelay, event.document)
+                    lastTimeout = timers.setTimeout(
+                        lint,
+                        idleDelay,
+                        event.document,
+                    )
                 })
         }
     }
 
     let disposable = listenToChange()
-    vscode.workspace.onDidChangeConfiguration(event => {
-        if (event.affectsConfiguration("selene.run") || event.affectsConfiguration("selene.idleDelay")) {
+    vscode.workspace.onDidChangeConfiguration((event) => {
+        if (
+            event.affectsConfiguration("selene.run") ||
+            event.affectsConfiguration("selene.idleDelay")
+        ) {
             disposable?.dispose()
             disposable = listenToChange()
         }
     })
 
     vscode.workspace.onDidOpenTextDocument(lint)
-    vscode.workspace.onWillDeleteFiles(event => {
+    vscode.workspace.onWillDeleteFiles((event) => {
         for (const documentUri of event.files) {
             diagnosticsCollection.set(documentUri, [])
         }
     })
-    vscode.window.onDidChangeActiveTextEditor(editor => {
+    vscode.window.onDidChangeActiveTextEditor((editor) => {
         if (editor !== undefined) {
             lint(editor.document)
         }
@@ -215,4 +262,4 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() { }
+export function deactivate() {}
