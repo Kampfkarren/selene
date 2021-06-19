@@ -25,26 +25,13 @@ export async function getLatestSeleneRelease(): Promise<GithubRelease> {
         return getLatestSeleneReleasePromise
     }
 
-    // getLatestSeleneReleasePromise = new Promise(async () => {
-    //     return JSON.parse(await ) as GithubRelease
-    // })
-
-    getLatestSeleneReleasePromise = request(GITHUB_RELEASES, {
+    return request(GITHUB_RELEASES, {
         headers: {
             "User-Agent": "selene-vscode",
         },
+    }).then((body) => {
+        return JSON.parse(body) as GithubRelease
     })
-        .then((body) => {
-            return JSON.parse(body) as GithubRelease
-        })
-        .catch((error) => {
-            vscode.window.showErrorMessage(
-                `Error downloading selene.\n${error.toString()}`,
-            )
-            return Promise.reject(error)
-        })
-
-    return getLatestSeleneReleasePromise
 }
 
 export function platformIsSupported(): boolean {
@@ -97,7 +84,13 @@ export async function downloadSelene(directory: vscode.Uri): Promise<void> {
 
     const filename = getSeleneFilename()
     const filenamePattern = getSeleneFilenamePattern()
-    const release = await getLatestSeleneRelease()
+    const release = await getLatestSeleneRelease().catch((error) => {
+        vscode.window.showErrorMessage(
+            `Couldn't look for new selene release to download.\n\n${error.toString()}`,
+        )
+
+        return Promise.reject(error)
+    })
 
     for (const asset of release.assets) {
         if (filenamePattern.test(asset.name)) {
@@ -167,10 +160,18 @@ export async function ensureSeleneExists(
                 selene.Expectation.Stdout,
             )
         )?.trim()
-        const release = await getLatestSeleneRelease()
-        if (version !== `selene ${release.tag_name}`) {
-            openUpdatePrompt(storagePath, release)
-        }
+
+        return getLatestSeleneRelease()
+            .then((release) => {
+                if (version !== `selene ${release.tag_name}`) {
+                    openUpdatePrompt(storagePath, release)
+                }
+            })
+            .catch((error) => {
+                vscode.window.showErrorMessage(
+                    `Couldn't look for new selene releases.\n\n${error.toString()}`,
+                )
+            })
     }
 }
 

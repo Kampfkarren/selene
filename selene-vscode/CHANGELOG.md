@@ -6,6 +6,7 @@ If you want to stay up to date with selene itself, you can find the changelog in
 
 ## Unreleased
 - Temporary paths, such as Git diff previews, will now use your current workspace folder for configuration.
+- Fixed a bug where the extension would become unusable if it couldn't connect to the internet.
 
 ## [1.1.1]
 - Fixed a bug that made new installations impossible.
