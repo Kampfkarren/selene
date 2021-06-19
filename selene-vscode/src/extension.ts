@@ -1,31 +1,11 @@
+import * as roblox from "./roblox"
 import * as selene from "./selene"
 import * as timers from "timers"
 import * as util from "./util"
 import * as vscode from "vscode"
+import { Diagnostic, Severity, Label } from "./diagnostic"
 
 let trySelene: Promise<boolean>
-
-interface Diagnostic {
-    code: string
-    message: string
-    severity: Severity
-    notes: string[]
-    primary_label: Label
-    secondary_labels: Label[]
-}
-
-interface Label {
-    message: string
-    span: {
-        start: number
-        end: number
-    }
-}
-
-enum Severity {
-    Error = "Error",
-    Warning = "Warning",
-}
 
 enum RunType {
     OnSave = "onSave",
@@ -95,11 +75,6 @@ export async function activate(
 
     await trySelene
 
-    console.log(
-        "selene path",
-        await util.getSelenePath(context.globalStorageUri),
-    )
-
     context.subscriptions.push(
         vscode.commands.registerCommand("selene.reinstall", () => {
             trySelene = util
@@ -113,6 +88,8 @@ export async function activate(
     const diagnosticsCollection =
         vscode.languages.createDiagnosticCollection("selene")
     context.subscriptions.push(diagnosticsCollection)
+
+    let hasWarnedAboutRoblox = false
 
     async function lint(document: vscode.TextDocument) {
         if (document.languageId !== "lua") {
@@ -192,6 +169,19 @@ export async function activate(
                     }
                 },
             )
+
+            if (
+                vscode.workspace
+                    .getConfiguration("selene")
+                    .get<boolean>("warnRoblox")
+            ) {
+                if (
+                    !hasWarnedAboutRoblox &&
+                    roblox.processDiagnostic(data, document)
+                ) {
+                    hasWarnedAboutRoblox = true
+                }
+            }
 
             diagnostics.push(diagnostic)
         }

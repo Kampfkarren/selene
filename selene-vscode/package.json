@@ -24,13 +24,11 @@
         "test": "node ./out/test/runTest.js"
     },
     "contributes": {
-        "commands": [
-            {
-                "command": "selene.reinstall",
-                "title": "Reinstall Selene",
-                "category": "Selene"
-            }
-        ],
+        "commands": [{
+            "command": "selene.reinstall",
+            "title": "Reinstall Selene",
+            "category": "Selene"
+        }],
         "configuration": {
             "title": "Selene",
             "properties": {
@@ -66,6 +64,12 @@
                     "type": "number",
                     "default": 500,
                     "markdownDescription": "Controls the delay in ms after which the file is linted. Only applies when `#selene.run#` is set to `onIdle`."
+                },
+                "selene.warnRoblox": {
+                    "title": "Warn for Roblox codebases",
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Whether or not to warn when a Roblox codebase is detected without a standard library."
                 }
             }
         }
