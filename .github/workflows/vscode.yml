@@ -19,8 +19,8 @@ jobs:
       run: npm ci
       working-directory: selene-vscode
     - name: Run ESLint
-      run: eslint src/
+      run: ./node_modules/.bin/eslint src/
       working-directory: selene-vscode
     - name: Prettier
-      run: prettier src/**/*.ts
+      run: ./node_modules/.bin/prettier src/**/*.ts
       working-directory: selene-vscode
