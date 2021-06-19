@@ -8,8 +8,8 @@ export enum Expectation {
 }
 
 export async function seleneCommand(
-    storagePath: vscode.Uri,
-    command: string,
+    storagePath: vscode.Uri,                             command: string,
+
     expectation: Expectation,
     workspace?: vscode.WorkspaceFolder,
     stdin?: string,
