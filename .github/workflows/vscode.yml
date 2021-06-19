@@ -22,5 +22,7 @@ jobs:
       run: ./node_modules/.bin/eslint src/
       working-directory: selene-vscode
     - name: Prettier
-      run: ./node_modules/.bin/prettier src/**/*.ts
+      run: |
+        shopt -s globstar
+        ./node_modules/.bin/prettier src/**/*.ts
       working-directory: selene-vscode
