@@ -3,7 +3,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Unreleased
 ### Added
-- Added `debug.getinfo` to the Roblox standard library. [(#260)](https://github.com/Kampfkarren/selene/issues/260)
+- Added `debug.info` to the Roblox standard library. [(#260)](https://github.com/Kampfkarren/selene/issues/260)
 - Tokenization errors now form rich diagnostics.
 
 ### Fixed
