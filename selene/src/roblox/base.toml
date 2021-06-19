@@ -364,6 +364,16 @@ type = "number"
 [[DateTime.fromUnixTimestampMillis.args]]
 type = "number"
 
+[[debug.info.args]]
+type = "any"
+
+[[debug.info.args]]
+type = "any"
+
+[[debug.info.args]]
+type = "string"
+required = false
+
 [[debug.profilebegin.args]]
 type = "string"
 
