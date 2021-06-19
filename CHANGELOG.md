@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Added `debug.getinfo` to the Roblox standard library. [(#260)](https://github.com/Kampfkarren/selene/issues/260)
 - Tokenization errors now form rich diagnostics.
+
 ### Fixed
 - Fixed internal selene panics exiting with a zero code. Panics will now exit with status code 1, allowing it to be picked up by CI.
 
