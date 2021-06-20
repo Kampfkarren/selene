@@ -153,12 +153,11 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
         Err(error) => {
             PARSE_ERRORS.fetch_add(1, Ordering::SeqCst);
 
-            if let full_moon::Error::AstError(full_moon::ast::AstError::UnexpectedToken {
-                token,
-                additional,
-            }) = error
-            {
-                emit_codespan(
+            match error {
+                full_moon::Error::AstError(full_moon::ast::AstError::UnexpectedToken {
+                    token,
+                    additional,
+                }) => emit_codespan(
                     &mut stdout,
                     &files,
                     &CodespanDiagnostic {
@@ -175,9 +174,43 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                         .with_message(additional.unwrap_or_default())],
                         notes: Vec::new(),
                     },
-                );
-            } else {
-                error!("Error parsing {}: {}", filename.display(), error);
+                ),
+                full_moon::Error::TokenizerError(error) => emit_codespan(
+                    &mut stdout,
+                    &files,
+                    &CodespanDiagnostic {
+                        severity: CodespanSeverity::Error,
+                        code: Some("parse_error".to_owned()),
+                        message: match error.error() {
+                            full_moon::tokenizer::TokenizerErrorType::UnclosedComment => {
+                                "unclosed comment".to_string()
+                            }
+                            full_moon::tokenizer::TokenizerErrorType::UnclosedString => {
+                                "unclosed string".to_string()
+                            }
+                            full_moon::tokenizer::TokenizerErrorType::UnexpectedShebang => {
+                                "unexpected shebang".to_string()
+                            }
+                            full_moon::tokenizer::TokenizerErrorType::UnexpectedToken(
+                                character,
+                            ) => {
+                                format!("unexpected character {}", character)
+                            }
+                            full_moon::tokenizer::TokenizerErrorType::InvalidSymbol(symbol) => {
+                                format!("invalid symbol {}", symbol)
+                            }
+                        },
+                        labels: vec![CodespanLabel::primary(
+                            source_id,
+                            codespan::Span::new(
+                                error.position().bytes() as u32,
+                                error.position().bytes() as u32,
+                            ),
+                        )],
+                        notes: Vec::new(),
+                    },
+                ),
+                _ => error!("Error parsing {}: {}", filename.display(), error),
             }
 
             return;
@@ -372,20 +405,22 @@ fn start(matches: opts::Options) {
                 eprintln!("`selene generate-roblox-std`.");
 
                 match generate_roblox_std(false) {
-                    Ok(_) => match StandardLibrary::from_config_name(&config.std, Some(&current_dir)) {
-                        Ok(Some(library)) => library,
+                    Ok(_) => {
+                        match StandardLibrary::from_config_name(&config.std, Some(&current_dir)) {
+                            Ok(Some(library)) => library,
 
-                        // This is technically reachable if you edit your config while it is generating.
-                        Ok(None) => {
-                            error!("Standard library was empty after generating roblox standard library, did you edit your config while running selene?");
-                            std::process::exit(1);
-                        }
+                            // This is technically reachable if you edit your config while it is generating.
+                            Ok(None) => {
+                                error!("Standard library was empty after generating roblox standard library, did you edit your config while running selene?");
+                                std::process::exit(1);
+                            }
 
-                        Err(error) => {
-                            error!("Even after generating the `roblox` standard library, we couldn't retrieve the standard library: {}", error);
-                            std::process::exit(1);
+                            Err(error) => {
+                                error!("Even after generating the `roblox` standard library, we couldn't retrieve the standard library: {}", error);
+                                std::process::exit(1);
+                            }
                         }
-                    },
+                    }
 
                     Err(err) => {
                         error!("Could not create roblox standard library: {}", err);
@@ -482,7 +517,7 @@ fn start(matches: opts::Options) {
         log_total(parse_errors, lint_errors, lint_warnings).ok();
     }
 
-    if parse_errors + lint_errors + lint_warnings > 0 {
+    if parse_errors + lint_errors + lint_warnings + pool.panic_count() > 0 {
         std::process::exit(1);
     }
 }

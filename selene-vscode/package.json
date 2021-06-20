@@ -2,7 +2,7 @@
     "name": "selene-vscode",
     "displayName": "Selene",
     "description": "A blazing-fast modern Lua linter written in Rust",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "publisher": "Kampfkarren",
     "repository": "https://github.com/Kampfkarren/selene",
     "engines": {
@@ -66,6 +66,12 @@
                     "type": "number",
                     "default": 500,
                     "markdownDescription": "Controls the delay in ms after which the file is linted. Only applies when `#selene.run#` is set to `onIdle`."
+                },
+                "selene.warnRoblox": {
+                    "title": "Warn for Roblox codebases",
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Whether or not to warn when a Roblox codebase is detected without a standard library."
                 }
             }
         }
@@ -78,8 +84,13 @@
         "@types/request-promise-native": "^1.0.17",
         "@types/unzipper": "^0.10.3",
         "@types/vscode": "^1.54.0",
+        "@typescript-eslint/eslint-plugin": "^4.27.0",
+        "eslint": "^7.29.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-prettier": "^3.4.0",
         "glob": "^7.1.5",
         "mocha": "^6.2.3",
+        "prettier": "2.3.1",
         "tslint": "^5.20.0",
         "typescript": "^3.8.3",
         "vscode-test": "^1.3.0"

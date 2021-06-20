@@ -4,6 +4,11 @@ All notable changes to the "selene-vscode" extension will be documented in this 
 
 If you want to stay up to date with selene itself, you can find the changelog in [selene's CHANGELOG.md](https://github.com/Kampfkarren/selene/blob/master/CHANGELOG.md).
 
+## [1.2.0]
+- Temporary paths, such as Git diff previews, will now use your current workspace folder for configuration.
+- Fixed a bug where the extension would become unusable if it couldn't connect to the internet.
+- If a Roblox codebase is detected without a standard library, you will be prompted to set it up. You can disable this in the settings if you work in non-Roblox codebases that trip them up.
+
 ## [1.1.1]
 - Fixed a bug that made new installations impossible.
 
