@@ -55,7 +55,7 @@ impl Rule for UnusedVariableLint {
             if !references.clone().any(|reference| reference.read) {
                 let mut notes = Vec::new();
 
-                if variable.name == "self" {
+                if variable.is_self {
                     if self.allow_unused_self {
                         continue;
                     }
@@ -123,6 +123,15 @@ mod tests {
     }
 
     #[test]
+    fn test_explicit_self() {
+        test_lint(
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
+            "unused_variable",
+            "explicit_self",
+        );
+    }
+
+    #[test]
     fn test_generic_for_shadowing() {
         test_lint(
             UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
@@ -147,6 +156,15 @@ mod tests {
             "unused_variable",
             "ignore",
         );
+    }
+
+    #[test]
+    fn test_invalid_regex() {
+        assert!(UnusedVariableLint::new(UnusedVariableConfig {
+            ignore_pattern: "(".to_owned(),
+            ..UnusedVariableConfig::default()
+        })
+        .is_err());
     }
 
     #[test]
@@ -214,14 +232,5 @@ mod tests {
             "unused_variable",
             "varargs",
         );
-    }
-
-    #[test]
-    fn test_invalid_regex() {
-        assert!(UnusedVariableLint::new(UnusedVariableConfig {
-            ignore_pattern: "(".to_owned(),
-            ..UnusedVariableConfig::default()
-        })
-        .is_err());
     }
 }

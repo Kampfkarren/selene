@@ -79,6 +79,7 @@ pub struct Variable {
     pub name: String,
     pub references: Vec<Id<Reference>>,
     pub shadowed: Option<Id<Variable>>,
+    pub is_self: bool,
 }
 
 #[derive(Default)]
@@ -312,18 +313,19 @@ impl ScopeVisitor {
         self.define_name_full(&token.token().to_string(), range(token), definition_range);
     }
 
-    fn define_name_full(
+    fn define_name_full_with_variable(
         &mut self,
         name: &str,
         range: Range,
         definition_range: Range,
+        variable: Variable,
     ) -> Id<Variable> {
         let shadowed = self.find_variable(name).map(|(var, _)| var);
 
         let id = self.scope_manager.variables.alloc(Variable {
             name: name.to_owned(),
             shadowed,
-            ..Variable::default()
+            ..variable
         });
 
         self.current_scope().variables.push(id);
@@ -334,6 +336,15 @@ impl ScopeVisitor {
         variable.identifiers.push(range);
 
         id
+    }
+
+    fn define_name_full(
+        &mut self,
+        name: &str,
+        range: Range,
+        definition_range: Range,
+    ) -> Id<Variable> {
+        self.define_name_full_with_variable(name, range, definition_range, Variable::default())
     }
 
     fn try_hoist(&mut self) {
@@ -570,7 +581,15 @@ impl Visitor<'_> for ScopeVisitor {
 
         if let Some(name) = name.method_name() {
             self.open_scope(declaration.body());
-            self.define_name_full("self", range(name), range(name));
+            self.define_name_full_with_variable(
+                "self",
+                range(name),
+                range(name),
+                Variable {
+                    is_self: true,
+                    ..Variable::default()
+                },
+            );
         }
     }
 
