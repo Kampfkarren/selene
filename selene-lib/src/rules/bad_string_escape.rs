@@ -125,8 +125,8 @@ impl Visitor<'_> for BadStringEscapeVisitor {
                         "a" | "b" | "f" | "n" | "r" | "t" | "v" | "\\" => {},
                         "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" => {
                             if captures[2].len() > 1 {
-                                let hundreds = u16::from_str_radix(&captures[1], 10).unwrap() * 100;
-                                let tens = u16::from_str_radix(&captures[2][1..2], 10).unwrap();
+                                let hundreds = u16::from_str_radix(&captures[1], 16).unwrap() * 100;
+                                let tens = u16::from_str_radix(&captures[2][1..2], 16).unwrap();
                                 if hundreds + tens > 0xff {
                                     self.sequences.push(
                                         StringEscapeSequence{
@@ -237,7 +237,7 @@ mod tests {
     use super::{super::test_util::test_lint, *};
 
     #[test]
-    fn test_bad_string_escape() {
+    fn test_lua51_string_escapes() {
         test_lint(
             BadStringEscapeLint::new(()).unwrap(),
             "bad_string_escape",
@@ -247,11 +247,20 @@ mod tests {
 
     #[test]
     #[cfg(feature = "roblox")]
-    fn test_bad_string_escape_roblox() {
+    fn test_roblox_string_escapes() {
         test_lint(
             BadStringEscapeLint::new(()).unwrap(),
             "bad_string_escape",
             "roblox_string_escapes",
+        );
+    }
+
+    #[test]
+    fn test_invalid_digit_panic() {
+        test_lint(
+            BadStringEscapeLint::new(()).unwrap(),
+            "bad_string_escape",
+            "invalid_digit_panic",
         );
     }
 }

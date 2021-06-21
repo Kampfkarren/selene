@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Fixed
 - Fixed internal selene panics exiting with a zero code. Panics will now exit with status code 1, allowing it to be picked up by CI.
 - Fixed variables named `self` not showing as unused if `allow_unused_self` was enabled. The implicit `self` variable being unused will still respect this configuration. [(#215)](https://github.com/Kampfkarren/selene/issues/215)
+- Fixed escape sequences with hex values panicing. [(#205)(https://github.com/Kampfkarren/selene/issues/205)]
 
 ## [0.12.1] - 2021-05-26
 ### Fixed

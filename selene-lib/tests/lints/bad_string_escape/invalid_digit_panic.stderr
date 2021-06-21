@@ -1,0 +1,8 @@
+error[bad_string_escape]: decimal escape is too high
+  ┌─ invalid_digit_panic.lua:1:9
+  │
+1 │ return "\97b"
+  │         ^^^^
+  │
+  = help: the maximum codepoint allowed in decimal escapes is `255`
+
