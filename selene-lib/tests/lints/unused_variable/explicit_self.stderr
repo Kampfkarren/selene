@@ -1,0 +1,6 @@
+error[unused_variable]: self is defined, but never used
+  ┌─ explicit_self.lua:1:20
+  │
+1 │ local function foo(self)
+  │                    ^^^^
+
