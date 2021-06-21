@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 - Updated internal parser.
+- Optimized linting process to run better with multiple threads.
 
 ### Fixed
 - Fixed internal selene panics exiting with a zero code. Panics will now exit with status code 1, allowing it to be picked up by CI.

@@ -124,6 +124,16 @@ fn emit_codespan(
     }
 }
 
+fn emit_codespan_locked(
+    files: &codespan::Files<&str>,
+    diagnostic: &CodespanDiagnostic<codespan::FileId>,
+) {
+    let stdout = termcolor::StandardStream::stdout(get_color());
+    let mut stdout = stdout.lock();
+
+    emit_codespan(&mut stdout, files, diagnostic);
+}
+
 fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut reader: R) {
     let mut buffer = Vec::new();
     if let Err(error) = reader.read_to_end(&mut buffer) {
@@ -145,9 +155,6 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
     let mut files = codespan::Files::new();
     let source_id = files.add(filename.as_os_str(), &*contents);
 
-    let stdout = termcolor::StandardStream::stdout(get_color());
-    let mut stdout = stdout.lock();
-
     let ast = match full_moon::parse(&contents) {
         Ok(ast) => ast,
         Err(error) => {
@@ -157,8 +164,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                 full_moon::Error::AstError(full_moon::ast::AstError::UnexpectedToken {
                     token,
                     additional,
-                }) => emit_codespan(
-                    &mut stdout,
+                }) => emit_codespan_locked(
                     &files,
                     &CodespanDiagnostic {
                         severity: CodespanSeverity::Error,
@@ -175,8 +181,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                         notes: Vec::new(),
                     },
                 ),
-                full_moon::Error::TokenizerError(error) => emit_codespan(
-                    &mut stdout,
+                full_moon::Error::TokenizerError(error) => emit_codespan_locked(
                     &files,
                     &CodespanDiagnostic {
                         severity: CodespanSeverity::Error,
@@ -231,6 +236,9 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
 
     LINT_ERRORS.fetch_add(errors, Ordering::SeqCst);
     LINT_WARNINGS.fetch_add(warnings, Ordering::SeqCst);
+
+    let stdout = termcolor::StandardStream::stdout(get_color());
+    let mut stdout = stdout.lock();
 
     for diagnostic in diagnostics {
         if opts.luacheck {
