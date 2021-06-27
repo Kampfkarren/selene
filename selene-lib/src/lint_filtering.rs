@@ -86,8 +86,8 @@ fn parse_comment(comment: &str) -> Option<Vec<FilterConfiguration>> {
     )
 }
 
-impl<'ast> NodeVisitor<'ast> for FilterVisitor {
-    fn visit_node<'a>(&mut self, node: &'a dyn Node<'ast>, visitor_type: VisitorType) {
+impl NodeVisitor for FilterVisitor {
+    fn visit_node<'a>(&mut self, node: &'a dyn Node, visitor_type: VisitorType) {
         if NODES_TO_IGNORE.contains(&visitor_type) {
             return;
         }
@@ -155,7 +155,7 @@ impl<'ast> NodeVisitor<'ast> for FilterVisitor {
     }
 }
 
-fn get_filter_ranges<'ast>(ast: &Ast<'ast>) -> Vec<Result<Filter, Diagnostic>> {
+fn get_filter_ranges(ast: &Ast) -> Vec<Result<Filter, Diagnostic>> {
     let mut filter_visitor = FilterVisitor::default();
     filter_visitor.visit_nodes(ast);
     filter_visitor.ranges
@@ -182,8 +182,8 @@ impl FilterInstruction {
     }
 }
 
-pub fn filter_diagnostics<'ast>(
-    ast: &Ast<'ast>,
+pub fn filter_diagnostics(
+    ast: &Ast,
     mut diagnostics: Vec<CheckerDiagnostic>,
     invalid_lint_filter_severity: Severity,
 ) -> Vec<CheckerDiagnostic> {

@@ -119,7 +119,7 @@ impl DuplicateKeysVisitor {
     }
 }
 
-impl Visitor<'_> for DuplicateKeysVisitor {
+impl Visitor for DuplicateKeysVisitor {
     fn visit_table_constructor(&mut self, node: &ast::TableConstructor) {
         let mut declared_fields = HashMap::new();
         let mut number_index: usize = 0;

@@ -108,7 +108,7 @@ struct StringEscapeSequence {
     issue: ReasonWhy,
 }
 
-impl Visitor<'_> for BadStringEscapeVisitor {
+impl Visitor for BadStringEscapeVisitor {
     fn visit_value(&mut self, node: &ast::Value) {
         if_chain::if_chain! {
             if let ast::Value::String(token) = node;

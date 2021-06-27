@@ -58,7 +58,7 @@ fn value_is_zero(value: &ast::Value) -> bool {
     }
 }
 
-impl Visitor<'_> for DivideByZeroVisitor {
+impl Visitor for DivideByZeroVisitor {
     fn visit_expression(&mut self, node: &ast::Expression) {
         if_chain::if_chain! {
             if let ast::Expression::BinaryOperator { lhs, binop, rhs, .. } = node;

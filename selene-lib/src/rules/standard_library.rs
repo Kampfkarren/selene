@@ -50,8 +50,8 @@ fn take_while_keep_going(suffix: &ast::Suffix, keep_going: &mut bool) -> bool {
     result
 }
 
-fn name_path_from_prefix_suffix<'a, 'ast, S: Iterator<Item = &'a ast::Suffix<'ast>>>(
-    prefix: &'a ast::Prefix<'ast>,
+fn name_path_from_prefix_suffix<'a, S: Iterator<Item = &'a ast::Suffix>>(
+    prefix: &'a ast::Prefix,
     suffixes: S,
 ) -> Option<Vec<String>> {
     if let ast::Prefix::Name(ref name) = prefix {
@@ -86,7 +86,7 @@ fn name_path_from_prefix_suffix<'a, 'ast, S: Iterator<Item = &'a ast::Suffix<'as
     }
 }
 
-fn name_path<'a, 'ast>(expression: &'a ast::Expression<'ast>) -> Option<Vec<String>> {
+fn name_path<'a>(expression: &'a ast::Expression) -> Option<Vec<String>> {
     if let ast::Expression::Value { value, .. } = expression {
         if let ast::Value::Var(var) = &**value {
             match var {
@@ -271,7 +271,7 @@ impl StandardLibraryVisitor<'_> {
     }
 }
 
-impl Visitor<'_> for StandardLibraryVisitor<'_> {
+impl Visitor for StandardLibraryVisitor<'_> {
     fn visit_assignment(&mut self, assignment: &ast::Assignment) {
         for var in assignment.variables() {
             if let Some(reference) = self
@@ -686,7 +686,7 @@ mod tests {
             paths: Vec<Vec<String>>,
         }
 
-        impl Visitor<'_> for NamePathTestVisitor {
+        impl Visitor for NamePathTestVisitor {
             fn visit_local_assignment(&mut self, node: &ast::LocalAssignment) {
                 self.paths.push(
                     name_path(node.expressions().into_iter().next().unwrap())

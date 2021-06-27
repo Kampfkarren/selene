@@ -3,10 +3,10 @@ use full_moon::{ast::*, node::Node, tokenizer::TokenReference, visitors::Visitor
 #[cfg(feature = "roblox")]
 use full_moon::ast::types::*;
 
-pub(crate) trait NodeVisitor<'ast> {
-    fn visit_node<'a>(&mut self, node: &'a dyn Node<'ast>, visitor_type: VisitorType);
+pub(crate) trait NodeVisitor {
+    fn visit_node<'a>(&mut self, node: &'a dyn Node, visitor_type: VisitorType);
 
-    fn visit_nodes<'a>(&mut self, ast: &'a Ast<'ast>)
+    fn visit_nodes<'a>(&mut self, ast: &'a Ast)
     where
         Self: Sized,
     {
@@ -16,8 +16,8 @@ pub(crate) trait NodeVisitor<'ast> {
     }
 }
 
-struct NodeVisitorLogic<'a, 'ast> {
-    callback: &'a mut dyn NodeVisitor<'ast>,
+struct NodeVisitorLogic<'a> {
+    callback: &'a mut dyn NodeVisitor,
 }
 
 macro_rules! make_node_visitor {
@@ -29,9 +29,9 @@ macro_rules! make_node_visitor {
         })+
     }) => {
         paste::paste! {
-            impl<'ast> Visitor<'ast> for NodeVisitorLogic<'_, 'ast> {
+            impl Visitor for NodeVisitorLogic<'_> {
                 $(
-                    fn $visitor(&mut self, node: &$struct<'ast>) {
+                    fn $visitor(&mut self, node: &$struct) {
                         self.callback.visit_node(node, VisitorType::[<$visitor:camel>]);
                     }
                 )+
@@ -39,7 +39,7 @@ macro_rules! make_node_visitor {
                 $(
                     $(
                         #[$meta]
-                        fn $meta_visitor(&mut self, node: &$meta_ast_type<'ast>) {
+                        fn $meta_visitor(&mut self, node: &$meta_ast_type) {
                             self.callback.visit_node(node, VisitorType::[<$meta_visitor:camel>]);
                         }
                     )+
@@ -130,8 +130,8 @@ mod tests {
             largest_range: usize,
         }
 
-        impl NodeVisitor<'_> for TestVisitor {
-            fn visit_node<'a>(&mut self, node: &'a dyn Node<'_>, _visitor_type: VisitorType) {
+        impl NodeVisitor for TestVisitor {
+            fn visit_node<'a>(&mut self, node: &'a dyn Node, _visitor_type: VisitorType) {
                 self.smallest_range =
                     min(self.smallest_range, node.start_position().unwrap().bytes());
                 self.largest_range = max(self.largest_range, node.end_position().unwrap().bytes());

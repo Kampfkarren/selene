@@ -54,7 +54,7 @@ struct TypeCheckInsideCallVisitor {
     roblox: bool,
 }
 
-impl Visitor<'_> for TypeCheckInsideCallVisitor {
+impl Visitor for TypeCheckInsideCallVisitor {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         if_chain::if_chain! {
             // Check that we're using type or typeof

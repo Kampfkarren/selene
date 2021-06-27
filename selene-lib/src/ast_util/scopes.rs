@@ -98,7 +98,7 @@ pub enum VariableInScope {
     Blocked,
 }
 
-fn create_scope<'a, N: Node<'a>>(node: N) -> Option<Scope> {
+fn create_scope<N: Node>(node: N) -> Option<Scope> {
     if let Some((start, end)) = node.range() {
         Some(Scope {
             block: (start.bytes(), end.bytes()),
@@ -111,7 +111,7 @@ fn create_scope<'a, N: Node<'a>>(node: N) -> Option<Scope> {
     }
 }
 
-fn range<'a, N: Node<'a>>(node: N) -> (usize, usize) {
+fn range<N: Node>(node: N) -> (usize, usize) {
     let (start, end) = node.range().unwrap();
     (start.bytes(), end.bytes())
 }
@@ -395,7 +395,7 @@ impl ScopeVisitor {
         self.current_scope().references.push(reference_id);
     }
 
-    fn open_scope<'a, N: Node<'a>>(&mut self, node: N) {
+    fn open_scope<N: Node>(&mut self, node: N) {
         let scope = create_scope(node).unwrap_or_else(Default::default);
         let scope_id = self.scope_manager.scopes.alloc(scope);
         self.scope_stack.push(scope_id);
@@ -410,7 +410,7 @@ impl ScopeVisitor {
     }
 }
 
-impl Visitor<'_> for ScopeVisitor {
+impl Visitor for ScopeVisitor {
     fn visit_assignment(&mut self, assignment: &ast::Assignment) {
         let mut expressions = assignment.expressions().iter();
 

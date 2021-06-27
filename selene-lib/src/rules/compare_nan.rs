@@ -85,7 +85,7 @@ fn expression_is_nan(node: &ast::Expression) -> bool {
     false
 }
 
-impl Visitor<'_> for CompareNanVisitor {
+impl Visitor for CompareNanVisitor {
     fn visit_expression(&mut self, node: &ast::Expression) {
         if_chain::if_chain! {
             if let ast::Expression::BinaryOperator { lhs, binop, rhs } = node;

@@ -114,13 +114,13 @@ fn expression_is_ellipsis(expression: &ast::Expression) -> bool {
     false
 }
 
-fn range<'a, N: Node<'a>>(node: N) -> (u32, u32) {
+fn range<N: Node>(node: N) -> (u32, u32) {
     let (start, end) = node.range().unwrap();
     (start.bytes() as u32, end.bytes() as u32)
 }
 
 impl UnbalancedAssignmentsVisitor {
-    fn lint_assignment<'a>(&mut self, lhs: usize, rhs: &Punctuated<'a, ast::Expression<'a>>) {
+    fn lint_assignment(&mut self, lhs: usize, rhs: &Punctuated<ast::Expression>) {
         if rhs.is_empty() {
             return;
         }
@@ -157,7 +157,7 @@ impl UnbalancedAssignmentsVisitor {
     }
 }
 
-impl Visitor<'_> for UnbalancedAssignmentsVisitor {
+impl Visitor for UnbalancedAssignmentsVisitor {
     fn visit_assignment(&mut self, assignment: &ast::Assignment) {
         self.lint_assignment(assignment.variables().len(), assignment.expressions());
     }

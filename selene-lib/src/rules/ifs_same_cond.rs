@@ -56,7 +56,7 @@ struct IfsSameCondVisitor {
     positions: Vec<((u32, u32), (u32, u32))>,
 }
 
-impl Visitor<'_> for IfsSameCondVisitor {
+impl Visitor for IfsSameCondVisitor {
     fn visit_if(&mut self, if_block: &ast::If) {
         if let Some(else_ifs) = if_block.else_if() {
             let mut conditions = Vec::with_capacity(else_ifs.len() + 1);

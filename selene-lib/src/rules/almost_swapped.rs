@@ -65,7 +65,7 @@ struct AlmostSwap {
     range: (usize, usize),
 }
 
-impl Visitor<'_> for AlmostSwappedVisitor {
+impl Visitor for AlmostSwappedVisitor {
     fn visit_block(&mut self, block: &ast::Block) {
         let mut last_swap: Option<AlmostSwap> = None;
 

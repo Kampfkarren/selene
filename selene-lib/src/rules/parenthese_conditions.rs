@@ -66,7 +66,7 @@ impl ParentheseConditionsVisitor {
     }
 }
 
-impl Visitor<'_> for ParentheseConditionsVisitor {
+impl Visitor for ParentheseConditionsVisitor {
     fn visit_if(&mut self, node: &ast::If) {
         self.lint_condition(node.condition());
 

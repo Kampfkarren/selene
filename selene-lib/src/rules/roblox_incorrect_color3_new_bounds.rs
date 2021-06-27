@@ -55,7 +55,7 @@ struct Color3BoundsVisitor {
     positions: Vec<(usize, usize)>,
 }
 
-impl Visitor<'_> for Color3BoundsVisitor {
+impl Visitor for Color3BoundsVisitor {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         if_chain::if_chain! {
             if let ast::Prefix::Name(token) = call.prefix();

@@ -272,8 +272,8 @@ impl MapFunctionDefinitionVisitor<'_> {
     }
 }
 
-impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
-    fn visit_local_function(&mut self, function: &ast::LocalFunction<'_>) {
+impl Visitor for MapFunctionDefinitionVisitor<'_> {
+    fn visit_local_function(&mut self, function: &ast::LocalFunction) {
         let identifier = range(function.name());
 
         if let Some(id) = self.find_variable(identifier) {
@@ -282,7 +282,7 @@ impl Visitor<'_> for MapFunctionDefinitionVisitor<'_> {
         }
     }
 
-    fn visit_function_declaration(&mut self, function: &ast::FunctionDeclaration<'_>) {
+    fn visit_function_declaration(&mut self, function: &ast::FunctionDeclaration) {
         let identifier = range(function.name());
 
         if let Some(reference) = self.find_reference(identifier) {
@@ -337,7 +337,7 @@ struct MismatchedArgCountVisitor {
     definitions: HashMap<Id<Variable>, ParameterCount>,
 }
 
-impl Visitor<'_> for MismatchedArgCountVisitor {
+impl Visitor for MismatchedArgCountVisitor {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         if_chain::if_chain! {
             // Check that we're using a named function call, with an anonymous call suffix

@@ -91,8 +91,8 @@ struct EmptyIfVisitor {
     positions: Vec<((u32, u32), EmptyIfKind)>,
 }
 
-impl Visitor<'_> for EmptyIfVisitor {
-    fn visit_if(&mut self, if_block: &ast::If<'_>) {
+impl Visitor for EmptyIfVisitor {
+    fn visit_if(&mut self, if_block: &ast::If) {
         if block_is_empty(if_block.block()) {
             self.positions.push((
                 if_block
@@ -143,7 +143,7 @@ impl Visitor<'_> for EmptyIfVisitor {
         }
     }
 
-    fn visit_token(&mut self, token: &Token<'_>) {
+    fn visit_token(&mut self, token: &Token) {
         match token.token_kind() {
             TokenKind::MultiLineComment | TokenKind::SingleLineComment => {
                 self.comment_positions
