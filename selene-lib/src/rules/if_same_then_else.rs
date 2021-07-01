@@ -56,7 +56,7 @@ struct IfSameThenElseVisitor {
     positions: Vec<((u32, u32), (u32, u32))>,
 }
 
-impl Visitor<'_> for IfSameThenElseVisitor {
+impl Visitor for IfSameThenElseVisitor {
     fn visit_if(&mut self, if_block: &ast::If) {
         let else_ifs = if_block
             .else_if()

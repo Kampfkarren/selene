@@ -18,7 +18,7 @@ pub fn is_type_function(name: &str, roblox: bool) -> bool {
     name == "type" || (name == "typeof" && roblox)
 }
 
-pub fn range<'a, N: Node<'a>, P: TryFrom<usize>>(node: N) -> (P, P)
+pub fn range<N: Node, P: TryFrom<usize>>(node: N) -> (P, P)
 where
     <P as TryFrom<usize>>::Error: std::fmt::Debug,
 {
@@ -34,7 +34,7 @@ where
     )
 }
 
-pub fn first_code<'ast>(ast: &Ast<'ast>) -> Option<(Position, Position)> {
+pub fn first_code(ast: &Ast) -> Option<(Position, Position)> {
     match ast.nodes().stmts().next() {
         Some(first_stmt) => first_stmt.range(),
         None => ast.nodes().last_stmt().and_then(Node::range),

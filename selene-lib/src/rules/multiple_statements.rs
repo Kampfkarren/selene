@@ -93,7 +93,7 @@ impl MultipleStatementsVisitor {
         }
     }
 
-    fn lint_stmt<'a, N: Node<'a>>(&mut self, stmt: N) {
+    fn lint_stmt<N: Node>(&mut self, stmt: N) {
         let line = stmt.end_position().unwrap().line();
 
         if self.lines_with_stmt.contains(&line) {
@@ -107,7 +107,7 @@ impl MultipleStatementsVisitor {
     }
 }
 
-impl Visitor<'_> for MultipleStatementsVisitor {
+impl Visitor for MultipleStatementsVisitor {
     fn visit_last_stmt(&mut self, stmt: &ast::LastStmt) {
         self.lint_stmt(stmt);
     }

@@ -6,7 +6,7 @@ pub trait HasSideEffects {
     fn has_side_effects(&self) -> bool;
 }
 
-impl HasSideEffects for ast::Expression<'_> {
+impl HasSideEffects for ast::Expression {
     fn has_side_effects(&self) -> bool {
         match self {
             ast::Expression::Parentheses { expression, .. }
@@ -17,7 +17,7 @@ impl HasSideEffects for ast::Expression<'_> {
     }
 }
 
-impl HasSideEffects for ast::Prefix<'_> {
+impl HasSideEffects for ast::Prefix {
     fn has_side_effects(&self) -> bool {
         match self {
             ast::Prefix::Expression(expression) => expression.has_side_effects(),
@@ -27,7 +27,7 @@ impl HasSideEffects for ast::Prefix<'_> {
     }
 }
 
-impl HasSideEffects for ast::Suffix<'_> {
+impl HasSideEffects for ast::Suffix {
     fn has_side_effects(&self) -> bool {
         match self {
             ast::Suffix::Call(_) => true,
@@ -37,7 +37,7 @@ impl HasSideEffects for ast::Suffix<'_> {
     }
 }
 
-impl HasSideEffects for ast::Value<'_> {
+impl HasSideEffects for ast::Value {
     fn has_side_effects(&self) -> bool {
         match self {
             ast::Value::Function(_)
@@ -66,7 +66,7 @@ impl HasSideEffects for ast::Value<'_> {
     }
 }
 
-impl HasSideEffects for ast::Var<'_> {
+impl HasSideEffects for ast::Var {
     fn has_side_effects(&self) -> bool {
         match self {
             ast::Var::Expression(var_expr) => var_expr.has_side_effects(),
@@ -76,7 +76,7 @@ impl HasSideEffects for ast::Var<'_> {
     }
 }
 
-impl HasSideEffects for ast::VarExpression<'_> {
+impl HasSideEffects for ast::VarExpression {
     fn has_side_effects(&self) -> bool {
         self.prefix().has_side_effects() || self.suffixes().any(HasSideEffects::has_side_effects)
     }

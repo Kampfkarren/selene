@@ -121,7 +121,7 @@ impl IncorrectRoactUsageVisitor {
     }
 }
 
-impl Visitor<'_> for IncorrectRoactUsageVisitor {
+impl Visitor for IncorrectRoactUsageVisitor {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         // Check if caller is Roact.createElement or a variable defined to it
         let mut suffixes = call.suffixes().collect::<Vec<_>>();

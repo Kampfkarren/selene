@@ -52,7 +52,7 @@ struct SuspiciousReverseLoopVisitor {
     positions: Vec<(usize, usize)>,
 }
 
-impl Visitor<'_> for SuspiciousReverseLoopVisitor {
+impl Visitor for SuspiciousReverseLoopVisitor {
     fn visit_numeric_for(&mut self, node: &ast::NumericFor) {
         if_chain::if_chain! {
             if node.step().is_none();
