@@ -1,7 +1,7 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.13.0] - 2021-07-01
 ### Added
 - Added `debug.info` to the Roblox standard library. [(#260)](https://github.com/Kampfkarren/selene/issues/260)
 - Tokenization errors now form rich diagnostics.
