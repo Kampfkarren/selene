@@ -7,7 +7,7 @@ use crate::{
     util::plural,
 };
 use std::{
-    collections::{HashMap, HashSet},
+    collections::HashMap,
     convert::Infallible,
     fmt::{self, Display},
 };
@@ -36,7 +36,6 @@ impl Rule for MismatchedArgCountLint {
         let mut definitions_visitor = MapFunctionDefinitionVisitor {
             scope_manager: &scope_manager,
             definitions: &mut definitions,
-            blacklisted_variables: HashSet::new(),
         };
         definitions_visitor.visit_ast(&ast);
 
@@ -62,10 +61,16 @@ impl Rule for MismatchedArgCountLint {
                         mismatched_arg.parameter_count.to_string(),
                     ),
                     Vec::new(),
-                    vec![Label::new_with_message(
-                        mismatched_arg.function_definition_range,
-                        "note: function defined here".to_owned(),
-                    )],
+                    mismatched_arg
+                        .function_definition_ranges
+                        .iter()
+                        .map(|range| {
+                            Label::new_with_message(
+                                *range,
+                                "note: function defined here".to_owned(),
+                            )
+                        })
+                        .collect(),
                 )
             })
             .collect()
@@ -84,7 +89,7 @@ struct MismatchedArgCount {
     parameter_count: ParameterCount,
     num_provided: PassedArgumentCount,
     call_range: (usize, usize),
-    function_definition_range: (usize, usize),
+    function_definition_ranges: Vec<(usize, usize)>,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -99,7 +104,7 @@ enum ParameterCount {
 
 impl ParameterCount {
     /// Calculates the number of required parameters that must be passed to a function
-    pub fn from_function_body(function_body: &ast::FunctionBody) -> Self {
+    fn from_function_body(function_body: &ast::FunctionBody) -> Self {
         let mut necessary_params = 0;
 
         for parameter in function_body.parameters() {
@@ -122,7 +127,7 @@ impl ParameterCount {
     /// Checks the provided number of arguments to see if it satisfies the number of arguments required
     /// We will only lint an upper bound. If we have a function(a, b, c) and we call foo(a, b), this will
     /// pass the lint, since the `nil` could be implicitly provided.
-    pub fn correct_num_args_provided(self, provided: PassedArgumentCount) -> bool {
+    fn correct_num_args_provided(self, provided: PassedArgumentCount) -> bool {
         match self {
             ParameterCount::Fixed(required) => match provided {
                 PassedArgumentCount::Fixed(provided) => provided <= required,
@@ -138,7 +143,7 @@ impl ParameterCount {
         }
     }
 
-    pub fn to_message(self, provided: PassedArgumentCount) -> String {
+    fn to_message(self, provided: PassedArgumentCount) -> String {
         match self {
             ParameterCount::Fixed(required) => {
                 format!(
@@ -155,6 +160,38 @@ impl ParameterCount {
                 provided
             ),
             ParameterCount::Variable => "a variable amount of arguments".to_owned(),
+        }
+    }
+
+    fn overlap_with_other_parameter_count(self, other: ParameterCount) -> ParameterCount {
+        match (self, other) {
+            // If something takes `...`, then it'll always be correct no matter what.
+            (ParameterCount::Variable, _) | (_, ParameterCount::Variable) => {
+                ParameterCount::Variable
+            }
+
+            // Minimum always wins, since it allows for infinite parameters, and fixed will always match.
+            // f(a, b, ...) vs. f(a) is Minimum(1), so that `f(1, 2, 3, 4)` passes.
+            // f(a, b, c) vs. f(a, ...) is Minimum(1) for the same reason.
+            (ParameterCount::Fixed(fixed), ParameterCount::Minimum(minimum))
+            | (ParameterCount::Minimum(minimum), ParameterCount::Fixed(fixed)) => {
+                ParameterCount::Minimum(minimum.min(fixed))
+            }
+
+            // Given `f(a, b)` and `f(c, d)`, just preserve the Fixed(2).
+            // The complication comes with `f(a)` and `f(b, c)`, where we change to Minimum(1).
+            (ParameterCount::Fixed(this_fixed), ParameterCount::Fixed(other_fixed)) => {
+                if this_fixed == other_fixed {
+                    ParameterCount::Fixed(this_fixed)
+                } else {
+                    ParameterCount::Fixed(this_fixed.max(other_fixed))
+                }
+            }
+
+            // `f(a, b, ...)` vs. `f(a, ...)`. Same rules apply, just preserve the smaller minimum.
+            (ParameterCount::Minimum(this_minimum), ParameterCount::Minimum(other_minimum)) => {
+                ParameterCount::Minimum(this_minimum.min(other_minimum))
+            }
         }
     }
 }
@@ -232,9 +269,6 @@ impl Display for PassedArgumentCount {
 struct MapFunctionDefinitionVisitor<'a> {
     scope_manager: &'a ScopeManager,
     definitions: &'a mut HashMap<Id<Variable>, ParameterCount>,
-    /// Blacklisted variables are ones we will ignore completely - this may be because its a reassigned global variable
-    /// so we cannot determine which function body/parameter count matches.
-    blacklisted_variables: HashSet<Id<Variable>>,
 }
 
 impl MapFunctionDefinitionVisitor<'_> {
@@ -260,15 +294,14 @@ impl MapFunctionDefinitionVisitor<'_> {
     /// as that is handled properly.
     /// If it is safe to use, the function body is stored.
     fn verify_assignment(&mut self, variable: Id<Variable>, function_body: &ast::FunctionBody) {
-        if self.blacklisted_variables.contains(&variable) {
-            return;
-        } else if self.definitions.contains_key(&variable) {
-            self.definitions.remove(&variable);
-            self.blacklisted_variables.insert(variable);
-        } else {
-            self.definitions
-                .insert(variable, ParameterCount::from_function_body(function_body));
-        }
+        let parameter_count = ParameterCount::from_function_body(function_body);
+
+        self.definitions
+            .entry(variable)
+            .and_modify(|older_count| {
+                *older_count = parameter_count.overlap_with_other_parameter_count(*older_count)
+            })
+            .or_insert(parameter_count);
     }
 }
 
@@ -337,6 +370,27 @@ struct MismatchedArgCountVisitor {
     definitions: HashMap<Id<Variable>, ParameterCount>,
 }
 
+impl MismatchedArgCountVisitor {
+    // Split off since the formatter doesn't work inside if_chain.
+    fn get_function_definiton_ranges(&self, defined_variable: Id<Variable>) -> Vec<(usize, usize)> {
+        let variable = self.scope_manager.variables.get(defined_variable).unwrap();
+
+        variable
+            .definitions
+            .iter()
+            .copied()
+            .chain(variable.references.iter().filter_map(|reference_id| {
+                let reference = self.scope_manager.references.get(*reference_id)?;
+                if reference.write {
+                    Some(reference.identifier)
+                } else {
+                    None
+                }
+            }))
+            .collect()
+    }
+}
+
 impl Visitor for MismatchedArgCountVisitor {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         if_chain::if_chain! {
@@ -359,7 +413,7 @@ impl Visitor for MismatchedArgCountVisitor {
                     num_provided: num_args_provided,
                     parameter_count: *parameter_count,
                     call_range: range(call),
-                    function_definition_range: self.scope_manager.variables.get(defined_variable).unwrap().identifiers[0],
+                    function_definition_ranges: self.get_function_definiton_ranges(defined_variable),
                 });
             }
         }
@@ -380,7 +434,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mismatched_vararg_function_def() {
+    fn test_vararg_function_def() {
         test_lint(
             MismatchedArgCountLint::new(()).unwrap(),
             "mismatched_arg_count",
@@ -389,7 +443,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mismatched_call_side_effects() {
+    fn test_call_side_effects() {
         test_lint(
             MismatchedArgCountLint::new(()).unwrap(),
             "mismatched_arg_count",
@@ -398,7 +452,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mismatched_args_alt_definition() {
+    fn test_args_alt_definition() {
         test_lint(
             MismatchedArgCountLint::new(()).unwrap(),
             "mismatched_arg_count",
@@ -407,7 +461,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mismatched_args_shadowing_definition() {
+    fn test_args_shadowing_variables() {
         test_lint(
             MismatchedArgCountLint::new(()).unwrap(),
             "mismatched_arg_count",
@@ -416,7 +470,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mismatched_args_reassigned_definition() {
+    fn test_args_reassigned_variables() {
         test_lint(
             MismatchedArgCountLint::new(()).unwrap(),
             "mismatched_arg_count",
@@ -425,11 +479,29 @@ mod tests {
     }
 
     #[test]
-    fn test_mismatched_args_reassigned_definition_2() {
+    fn test_args_reassigned_variables_2() {
         test_lint(
             MismatchedArgCountLint::new(()).unwrap(),
             "mismatched_arg_count",
             "reassigned_variables_2",
+        );
+    }
+
+    #[test]
+    fn test_definition_location() {
+        test_lint(
+            MismatchedArgCountLint::new(()).unwrap(),
+            "mismatched_arg_count",
+            "definition_location",
+        );
+    }
+
+    #[test]
+    fn test_multiple_definition_locations() {
+        test_lint(
+            MismatchedArgCountLint::new(()).unwrap(),
+            "mismatched_arg_count",
+            "multiple_definition_locations",
         );
     }
 }

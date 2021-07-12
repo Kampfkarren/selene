@@ -1,0 +1,15 @@
+error[mismatched_arg_count]: this function takes 1 argument but 2 arguments were supplied
+   ┌─ multiple_definition_locations.lua:1:1
+   │
+ 1 │ local dispatch
+   │ -------------- note: function defined here
+   ·
+ 4 │     dispatch = function() end
+   │     -------- note: function defined here
+ 5 │ else
+ 6 │     dispatch = function(a) end
+   │     -------- note: function defined here
+   ·
+11 │ dispatch(1, 2)
+   │ ^^^^^^^^^^^^^^ expected 1 argument
+
