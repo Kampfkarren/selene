@@ -157,8 +157,7 @@ foo(1, 2, 3) -- error, function takes 2 arguments, but 3 were supplied
 <h2 id="remarks"><a class="header" href="#remarks">Remarks</a></h2>
 <p>This lint does not handle too few arguments being passed, as this is commonly inferred as passing <code>nil</code>. For example,
 <code>foo(1)</code> could be used when meaning <code>foo(1, nil)</code>.</p>
-<p>If a defined function is reassigned anywhere in the program, it will not trigger the lint. This is because static analysis can no longer tell
-which definition is the right one in the given context. Take the example:</p>
+<p>If a defined function is reassigned anywhere in the program, it will try to match the best possible overlap. Take this example:</p>
 <pre><code class="language-lua">local function foo(a, b, c)
     print(&quot;a&quot;)
 end
@@ -174,6 +173,20 @@ updateFoo()
 foo(1, 2, 3, 4) --&gt; &quot;b&quot; [no more mismatched args]
 </code></pre>
 <p>selene can not tell that <code>foo</code> corresponds to a new definition because <code>updateFoo()</code> was called in the current context, without actually <em>running</em> the program.</p>
+<p>However, this would still lint properly:</p>
+<pre><code class="language-lua">local log
+
+if SOME_DEBUG_FLAG then
+    log = function() end
+else
+    log = function(message)
+        print(message)
+    end
+end
+
+-- No definition of `log` takes more than 1 argument, so this will lint.
+log(&quot;LOG MESSAGE&quot;, &quot;Something happened!&quot;)
+</code></pre>
 
                     </main>
 
