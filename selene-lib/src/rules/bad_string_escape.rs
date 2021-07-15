@@ -37,7 +37,7 @@ impl Rule for BadStringEscapeLint {
             roblox: context.is_roblox(),
         };
 
-        visitor.visit_ast(&ast);
+        visitor.visit_ast(ast);
 
         visitor
             .sequences
@@ -125,8 +125,8 @@ impl Visitor for BadStringEscapeVisitor {
                         "a" | "b" | "f" | "n" | "r" | "t" | "v" | "\\" => {},
                         "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" => {
                             if captures[2].len() > 1 {
-                                let hundreds = u16::from_str_radix(&captures[1], 10).unwrap() * 100;
-                                let tens = u16::from_str_radix(&captures[2][1..2], 10).unwrap();
+                                let hundreds = (&captures[1]).parse::<u16>().unwrap() * 100;
+                                let tens = (&captures[2][1..2]).parse::<u16>().unwrap();
                                 if hundreds + tens > 0xff {
                                     self.sequences.push(
                                         StringEscapeSequence{

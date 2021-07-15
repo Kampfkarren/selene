@@ -23,7 +23,7 @@ impl Rule for TypeCheckInsideCallLint {
             roblox: context.is_roblox(),
         };
 
-        visitor.visit_ast(&ast);
+        visitor.visit_ast(ast);
 
         visitor
             .positions
@@ -63,13 +63,11 @@ impl Visitor for TypeCheckInsideCallVisitor {
 
             // Check that we're calling it with an argument
             if let ast::Suffix::Call(call) = call.suffixes().next().unwrap();
-            if let ast::Call::AnonymousCall(args) = call;
-            if let ast::FunctionArgs::Parentheses { arguments, .. } = args;
-            if let Some(argument) = arguments.iter().next();
+            if let ast::Call::AnonymousCall(ast::FunctionArgs::Parentheses { arguments, .. }) = call;
 
-            // Check that the argument is in the form of x == y
-            if let ast::Expression::BinaryOperator { binop, rhs, .. } = &*argument;
-            if let ast::BinOp::TwoEqual(_) = binop;
+            // Check that the argument, if it's there, is in the form of x == y
+            if let Some(ast::Expression::BinaryOperator { binop: ast::BinOp::TwoEqual(_), rhs, .. })
+                = arguments.iter().next();
 
             // Check that rhs is a constant string
             if let ast::Expression::Value { value: rhs_value, .. } = &**rhs;

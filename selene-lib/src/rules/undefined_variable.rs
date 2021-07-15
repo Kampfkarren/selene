@@ -59,8 +59,8 @@ impl Rule for UndefinedVariableLint {
 
 // `...` is valid in the opening scope, but everywhere else must be explicitly defined.
 fn is_valid_vararg_reference(scope_manager: &ScopeManager, reference: &Reference) -> bool {
-    return Some(reference.scope_id) == scope_manager.initial_scope
-        && reference.name == *VARARG_STRING;
+    Some(reference.scope_id) == scope_manager.initial_scope
+        && reference.name == *VARARG_STRING
 }
 
 #[cfg(test)]

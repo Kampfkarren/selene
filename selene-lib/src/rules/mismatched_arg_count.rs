@@ -37,7 +37,7 @@ impl Rule for MismatchedArgCountLint {
             scope_manager: &scope_manager,
             definitions: &mut definitions,
         };
-        definitions_visitor.visit_ast(&ast);
+        definitions_visitor.visit_ast(ast);
 
         let mut visitor = MismatchedArgCountVisitor {
             mismatched_arg_counts: Vec::new(),
@@ -45,7 +45,7 @@ impl Rule for MismatchedArgCountLint {
             definitions,
         };
 
-        visitor.visit_ast(&ast);
+        visitor.visit_ast(ast);
 
         visitor
             .mismatched_arg_counts
@@ -338,7 +338,7 @@ impl Visitor for MapFunctionDefinitionVisitor<'_> {
 
                     if let Some(id) = self.find_variable(identifier) {
                         self.definitions
-                            .insert(id, ParameterCount::from_function_body(&function_body));
+                            .insert(id, ParameterCount::from_function_body(function_body));
                     }
                 }
             }

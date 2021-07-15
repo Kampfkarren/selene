@@ -41,7 +41,7 @@ impl Rule for EmptyIfLint {
             positions: Vec::new(),
         };
 
-        visitor.visit_ast(&ast);
+        visitor.visit_ast(ast);
 
         let comment_positions = visitor.comment_positions.clone();
 

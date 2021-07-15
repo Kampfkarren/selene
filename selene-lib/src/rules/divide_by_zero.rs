@@ -22,7 +22,7 @@ impl Rule for DivideByZeroLint {
             positions: Vec::new(),
         };
 
-        visitor.visit_ast(&ast);
+        visitor.visit_ast(ast);
 
         visitor
             .positions

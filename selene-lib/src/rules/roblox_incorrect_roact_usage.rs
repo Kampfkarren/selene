@@ -65,8 +65,7 @@ fn is_roact_create_element(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]) -> b
         if let ast::Prefix::Name(prefix_token) = prefix;
         if prefix_token.token().to_string() == "Roact";
         if suffixes.len() == 1;
-        if let ast::Suffix::Index(index) = suffixes[0];
-        if let ast::Index::Dot { name, .. } = index;
+        if let ast::Suffix::Index(ast::Index::Dot { name, .. }) = suffixes[0];
         then {
             name.token().to_string() == "createElement"
         } else {
@@ -151,9 +150,9 @@ impl Visitor for IncorrectRoactUsageVisitor {
         }
 
         let (mut class, arguments) = if_chain! {
-            if let Some(ast::Suffix::Call(call)) = call_suffix;
-            if let ast::Call::AnonymousCall(arguments) = call;
-            if let ast::FunctionArgs::Parentheses { arguments, .. } = arguments;
+            if let Some(ast::Suffix::Call(ast::Call::AnonymousCall(
+                ast::FunctionArgs::Parentheses { arguments, .. }
+            ))) = call_suffix;
             if arguments.len() >= 2;
             let mut iter = arguments.iter();
 
@@ -161,7 +160,7 @@ impl Visitor for IncorrectRoactUsageVisitor {
             let name_arg = iter.next().unwrap();
             if let ast::Expression::Value { value, .. } = name_arg;
             if let ast::Value::String(token) = &**value;
-            if let Some(class) = self.check_class_name(&token);
+            if let Some(class) = self.check_class_name(token);
 
             // Get second argument, check if it is a table
             let arg = iter.next().unwrap();
@@ -209,8 +208,7 @@ impl Visitor for IncorrectRoactUsageVisitor {
         for (name, expr) in node.names().iter().zip(node.expressions().iter()) {
             if_chain! {
                 if let ast::Expression::Value { value, .. } = expr;
-                if let ast::Value::Var(var) = &**value;
-                if let ast::Var::Expression(var_expr) = var;
+                if let ast::Value::Var(ast::Var::Expression(var_expr)) = &**value;
                 if is_roact_create_element(var_expr.prefix(), &var_expr.suffixes().collect::<Vec<_>>());
                 then {
                     self.definitions_of_create_element.insert(name.token().to_string());

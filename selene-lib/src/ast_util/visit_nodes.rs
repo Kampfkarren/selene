@@ -4,9 +4,9 @@ use full_moon::{ast::*, node::Node, tokenizer::TokenReference, visitors::Visitor
 use full_moon::ast::types::*;
 
 pub(crate) trait NodeVisitor {
-    fn visit_node<'a>(&mut self, node: &'a dyn Node, visitor_type: VisitorType);
+    fn visit_node(&mut self, node: &dyn Node, visitor_type: VisitorType);
 
-    fn visit_nodes<'a>(&mut self, ast: &'a Ast)
+    fn visit_nodes(&mut self, ast: &Ast)
     where
         Self: Sized,
     {

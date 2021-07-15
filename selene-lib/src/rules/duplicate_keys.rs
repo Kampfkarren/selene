@@ -24,7 +24,7 @@ impl Rule for DuplicateKeysLint {
             duplicates: Vec::new(),
         };
 
-        visitor.visit_ast(&ast);
+        visitor.visit_ast(ast);
 
         visitor
             .duplicates

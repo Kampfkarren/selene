@@ -23,7 +23,7 @@ impl Rule for UnbalancedAssignmentsLint {
             assignments: Vec::new(),
         };
 
-        visitor.visit_ast(&ast);
+        visitor.visit_ast(ast);
 
         visitor
             .assignments

@@ -87,7 +87,7 @@ fn parse_comment(comment: &str) -> Option<Vec<FilterConfiguration>> {
 }
 
 impl NodeVisitor for FilterVisitor {
-    fn visit_node<'a>(&mut self, node: &'a dyn Node, visitor_type: VisitorType) {
+    fn visit_node(&mut self, node: &dyn Node, visitor_type: VisitorType) {
         if NODES_TO_IGNORE.contains(&visitor_type) {
             return;
         }

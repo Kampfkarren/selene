@@ -22,7 +22,7 @@ impl Rule for SuspiciousReverseLoopLint {
             positions: Vec::new(),
         };
 
-        visitor.visit_ast(&ast);
+        visitor.visit_ast(ast);
 
         visitor
             .positions
@@ -56,8 +56,10 @@ impl Visitor for SuspiciousReverseLoopVisitor {
     fn visit_numeric_for(&mut self, node: &ast::NumericFor) {
         if_chain::if_chain! {
             if node.step().is_none();
-            if let ast::Expression::UnaryOperator { unop, .. } = node.start();
-            if let ast::UnOp::Hash(_) = unop;
+            if let ast::Expression::UnaryOperator {
+                unop: ast::UnOp::Hash(_),
+                ..
+            } = node.start();
             if let ast::Expression::Value { value, .. } = node.end();
             if let ast::Value::Number(number) = &**value;
             if str::parse::<f32>(&number.token().to_string()).ok() <= Some(1.0);

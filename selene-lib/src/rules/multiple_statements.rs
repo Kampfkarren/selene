@@ -45,7 +45,7 @@ impl Rule for MultipleStatementsLint {
             ..MultipleStatementsVisitor::default()
         };
 
-        visitor.visit_ast(&ast);
+        visitor.visit_ast(ast);
 
         visitor
             .positions

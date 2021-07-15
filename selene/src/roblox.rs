@@ -70,7 +70,7 @@ impl RobloxGenerator {
         .map_err(GenerateError::Io)?;
 
         self.std.extend(
-            StandardLibrary::from_name(&self.std.meta.as_ref().unwrap().base.as_ref().unwrap())
+            StandardLibrary::from_name(self.std.meta.as_ref().unwrap().base.as_ref().unwrap())
                 .unwrap(),
         );
 
@@ -219,7 +219,7 @@ impl RobloxGenerator {
 
                         match &value_type {
                             ApiValueType::Class { name } => {
-                                self.write_class_struct(api, &name);
+                                self.write_class_struct(api, name);
                                 Some(Field::Struct(name.to_owned()))
                             }
 

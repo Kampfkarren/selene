@@ -23,7 +23,7 @@ impl Rule for IfSameThenElseLint {
             positions: Vec::new(),
         };
 
-        visitor.visit_ast(&ast);
+        visitor.visit_ast(ast);
 
         visitor
             .positions
@@ -60,7 +60,7 @@ impl Visitor for IfSameThenElseVisitor {
     fn visit_if(&mut self, if_block: &ast::If) {
         let else_ifs = if_block
             .else_if()
-            .map(|else_ifs| else_ifs.iter().map(|x| x).collect())
+            .map(|else_ifs| else_ifs.iter().collect())
             .unwrap_or_else(Vec::new);
 
         let mut blocks = Vec::with_capacity(2 + else_ifs.len());

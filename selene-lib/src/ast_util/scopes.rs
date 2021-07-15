@@ -443,7 +443,7 @@ impl Visitor for ScopeVisitor {
                 _ => continue,
             };
 
-            self.write_name(&name, expression.map(range));
+            self.write_name(name, expression.map(range));
             if let ast::Var::Name(_) = var {
                 self.try_hoist();
             }
@@ -463,7 +463,7 @@ impl Visitor for ScopeVisitor {
             self.define_name(name_token, range(local_assignment));
 
             if let Some(expression) = expression {
-                self.write_name(&name_token, Some(range(expression)));
+                self.write_name(name_token, Some(range(expression)));
             }
         }
     }
@@ -503,12 +503,12 @@ impl Visitor for ScopeVisitor {
         match arguments {
             ast::FunctionArgs::Parentheses { arguments, .. } => {
                 for argument in arguments {
-                    self.read_expression(&argument);
+                    self.read_expression(argument);
                 }
             }
 
             ast::FunctionArgs::TableConstructor(table_constructor) => {
-                self.read_table_constructor(&table_constructor);
+                self.read_table_constructor(table_constructor);
             }
 
             _ => {}

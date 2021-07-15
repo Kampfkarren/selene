@@ -42,11 +42,7 @@ impl Rule for StandardLibraryLint {
 
 fn take_while_keep_going(suffix: &ast::Suffix, keep_going: &mut bool) -> bool {
     let result = *keep_going;
-    *keep_going = if let ast::Suffix::Call(_) = suffix {
-        false
-    } else {
-        true
-    };
+    *keep_going = !matches!(suffix, ast::Suffix::Call(_));
     result
 }
 
@@ -55,8 +51,7 @@ fn name_path_from_prefix_suffix<'a, S: Iterator<Item = &'a ast::Suffix>>(
     suffixes: S,
 ) -> Option<Vec<String>> {
     if let ast::Prefix::Name(ref name) = prefix {
-        let mut names = Vec::new();
-        names.push(name.token().to_string());
+        let mut names = vec![name.token().to_string()];
 
         let mut keep_going = true;
 
@@ -68,12 +63,8 @@ fn name_path_from_prefix_suffix<'a, S: Iterator<Item = &'a ast::Suffix>>(
                     }
                 }
 
-                ast::Suffix::Index(index) => {
-                    if let ast::Index::Dot { name, .. } = index {
-                        names.push(name.token().to_string());
-                    } else {
-                        return None;
-                    }
+                ast::Suffix::Index(ast::Index::Dot { name, .. }) => {
+                    names.push(name.token().to_string());
                 }
 
                 _ => return None,
@@ -86,7 +77,7 @@ fn name_path_from_prefix_suffix<'a, S: Iterator<Item = &'a ast::Suffix>>(
     }
 }
 
-fn name_path<'a>(expression: &'a ast::Expression) -> Option<Vec<String>> {
+fn name_path(expression: &ast::Expression) -> Option<Vec<String>> {
     if let ast::Expression::Value { value, .. } = expression {
         if let ast::Value::Var(var) = &**value {
             match var {
@@ -526,21 +517,21 @@ impl Visitor for StandardLibraryVisitor<'_> {
         let mut maybe_more_arguments = false;
 
         if let ast::FunctionArgs::Parentheses { arguments, .. } = function_args {
-            if let Some(ast::punctuated::Pair::End(last)) = arguments.last() {
-                if let ast::Expression::Value { value, .. } = last {
-                    match &**value {
-                        ast::Value::FunctionCall(_) => {
-                            maybe_more_arguments = true;
-                        }
-                        ast::Value::Symbol(token_ref) => {
-                            if let TokenType::Symbol { symbol } = token_ref.token().token_type() {
-                                if symbol == &full_moon::tokenizer::Symbol::Ellipse {
-                                    maybe_more_arguments = true;
-                                }
+            if let Some(ast::punctuated::Pair::End(ast::Expression::Value { value, .. })) =
+                arguments.last()
+            {
+                match &**value {
+                    ast::Value::FunctionCall(_) => {
+                        maybe_more_arguments = true;
+                    }
+                    ast::Value::Symbol(token_ref) => {
+                        if let TokenType::Symbol { symbol } = token_ref.token().token_type() {
+                            if symbol == &full_moon::tokenizer::Symbol::Ellipse {
+                                maybe_more_arguments = true;
                             }
                         }
-                        _ => {}
                     }
+                    _ => {}
                 }
             }
         };
@@ -647,10 +638,7 @@ impl PassedArgumentType {
                 us == &ArgumentType::Vararg
                     || us == argument_type
                     || (us == &ArgumentType::String
-                        && match argument_type {
-                            ArgumentType::Constant(_) => true,
-                            _ => false,
-                        })
+                        && matches!(argument_type, ArgumentType::Constant(_)))
             }
             PassedArgumentType::String(text) => match argument_type {
                 ArgumentType::Constant(constants) => constants.contains(text),

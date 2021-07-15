@@ -21,7 +21,7 @@ impl Rule for CompareNanLint {
             comparisons: Vec::new(),
         };
 
-        visitor.visit_ast(&ast);
+        visitor.visit_ast(ast);
 
         visitor
             .comparisons
@@ -71,8 +71,7 @@ fn value_is_zero(value: &ast::Value) -> bool {
 
 fn expression_is_nan(node: &ast::Expression) -> bool {
     if_chain::if_chain! {
-        if let ast::Expression::BinaryOperator { lhs, binop, rhs } = node;
-        if let ast::BinOp::Slash(_) = binop;
+        if let ast::Expression::BinaryOperator { lhs, binop: ast::BinOp::Slash(_), rhs } = node;
         if let ast::Expression::Value { value, .. } = &**lhs;
         if let ast::Expression::Value {
             value: rhs_value, ..

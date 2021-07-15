@@ -24,7 +24,7 @@ impl Rule for Color3BoundsLint {
 
         let mut visitor = Color3BoundsVisitor::default();
 
-        visitor.visit_ast(&ast);
+        visitor.visit_ast(ast);
 
         visitor
             .positions
@@ -66,13 +66,12 @@ impl Visitor for Color3BoundsVisitor {
             let call_suffix = suffixes.pop().unwrap();
             let index_suffix = suffixes.pop().unwrap();
 
-            if let ast::Suffix::Index(index) = index_suffix;
-            if let ast::Index::Dot { name, .. } = index;
+            if let ast::Suffix::Index(ast::Index::Dot { name, .. }) = index_suffix;
             if name.to_string() == "new";
 
-            if let ast::Suffix::Call(call) = call_suffix;
-            if let ast::Call::AnonymousCall(args) = call;
-            if let ast::FunctionArgs::Parentheses { arguments, .. } = args;
+            if let ast::Suffix::Call(ast::Call::AnonymousCall(
+                ast::FunctionArgs::Parentheses { arguments, .. }
+            )) = call_suffix;
 
             then {
                 for argument in arguments {

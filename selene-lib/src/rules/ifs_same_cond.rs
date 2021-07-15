@@ -23,7 +23,7 @@ impl Rule for IfsSameCondLint {
             positions: Vec::new(),
         };
 
-        visitor.visit_ast(&ast);
+        visitor.visit_ast(ast);
 
         visitor
             .positions

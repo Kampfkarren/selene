@@ -119,7 +119,7 @@ fn emit_codespan(
         )
         .unwrap();
     } else {
-        codespan_reporting::term::emit(writer, &config, files, diagnostic)
+        codespan_reporting::term::emit(writer, config, files, diagnostic)
             .expect("couldn't emit error to codespan");
     }
 }
