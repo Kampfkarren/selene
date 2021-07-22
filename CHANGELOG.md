@@ -2,6 +2,9 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- Added `duplicate_condition` lint to guard against conditions such as `x.y or x.y`.
+
 ### Changed
 - `mismatched_arg_count` now tries to find the best overlap between multiple definitions, rather than ignoring them entirely. This means that if you have `f(a)` and `f(b, c)` defined, then calling `f(1, 2, 3)` will now lint instead of silently passing, since no definition provided meets it.
 - `mismatched_arg_count` now shows all function definitions, rather than the local variable assignment. [(#259)](https://github.com/Kampfkarren/selene/issues/259)

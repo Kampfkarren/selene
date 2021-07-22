@@ -15,6 +15,7 @@
 - [Lints](./lints/index.md)
   - [almost_swapped](./lints/almost_swapped.md)
   - [divide_by_zero](./lints/divide_by_zero.md)
+  - [duplicate_condition](./lints/duplicate_condition.md)
   - [duplicate_keys](./lints/duplicate_keys.md)
   - [empty_if](./lints/empty_if.md)
   - [global_usage](./lints/global_usage.md)
