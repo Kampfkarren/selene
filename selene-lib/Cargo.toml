@@ -17,6 +17,7 @@ id-arena = "2.2"
 if_chain = "1.0"
 lazy_static = "1.4"
 paste = "1.0"
+quine-mc_cluskey = "0.2.4"
 rbx_reflection = { version = "3", optional = true }
 regex = "1"
 serde = "1.0"

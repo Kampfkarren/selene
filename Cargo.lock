@@ -1085,6 +1085,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "quine-mc_cluskey"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "07589615d719a60c8dd8a4622e7946465dfef20d1a428f969e3443e7386d5f45"
+
+[[package]]
 name = "quote"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1445,6 +1451,7 @@ dependencies = [
  "lazy_static",
  "paste 1.0.5",
  "pretty_assertions",
+ "quine-mc_cluskey",
  "rbx_reflection",
  "regex",
  "serde",
