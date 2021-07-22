@@ -648,6 +648,41 @@ required = false
 type = "number"
 required = false
 
+[[task.defer.args]]
+type = "function"
+
+[[task.defer.args]]
+required = false
+type = "..."
+
+[[task.delay.args]]
+required = false
+type = "number"
+
+[[task.delay.args]]
+type = "function"
+
+[[task.delay.args]]
+required = false
+type = "..."
+
+[task.desynchronize]
+args = []
+
+[[task.spawn.args]]
+type = "function"
+
+[[task.spawn.args]]
+required = false
+type = "..."
+
+[task.synchronize]
+args = []
+
+[[task.wait.args]]
+required = false
+type = "number"
+
 [tick]
 args = []
 
