@@ -121,8 +121,6 @@ impl<'a> QmcBoolTransformer<'a> {
             }
 
             ast::Expression::Value { value, .. } => match &**value {
-                ast::Value::Number(_) | ast::Value::String(_) => Some(qmc::Bool::True),
-
                 ast::Value::Symbol(symbol) => match symbol.token().token_type() {
                     tokenizer::TokenType::Symbol { symbol } => match symbol {
                         tokenizer::Symbol::False | tokenizer::Symbol::Nil => Some(qmc::Bool::False),
@@ -133,8 +131,7 @@ impl<'a> QmcBoolTransformer<'a> {
 
                     tokenizer::TokenType::Identifier { .. } => self.grab_literal(expression),
 
-                    // Any other value we can get here is truthy
-                    _ => Some(qmc::Bool::True),
+                    _ => self.grab_literal(expression),
                 },
 
                 ast::Value::ParenthesesExpression(expression) => {
@@ -167,9 +164,10 @@ impl<'a> QmcBoolTransformer<'a> {
                     Some(format!("not {}", self.format_bool(*other_bool)?))
                 }
 
-                // We provide `false` and `true` for any falsy or truthy values, but we don't have
-                // any recollection of what those *were*.
-                qmc::Bool::False | qmc::Bool::True => None,
+                qmc::Bool::True => Some("true".to_owned()),
+
+                // We can't remember if this is false or nil
+                qmc::Bool::False => None,
             }?
             .trim()
             .to_owned(),
@@ -219,6 +217,7 @@ impl DuplicateConditionVisitor {
                 "condition can be simplified".to_owned(),
                 Label::from_node(
                     expression,
+                    // Some(format!("{:?} /// {:?}", qmc_bool, simplified)),
                     transformer
                         .format_bool(simplified)
                         .map(|simplification| format!("can be simplified to `{}`", simplification)),

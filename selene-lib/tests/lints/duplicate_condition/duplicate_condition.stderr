@@ -29,32 +29,26 @@ error[duplicate_condition]: condition can be simplified
   │       ^^^^^^^^^^^^^^^ can be simplified to `not x`
 
 error[duplicate_condition]: condition can be simplified
-  ┌─ duplicate_condition.lua:9:7
-  │
-9 │ print(3 and 2) -- simplifies to 3, but lint doesn't support that right now
-  │       ^^^^^^^
-
-error[duplicate_condition]: condition can be simplified
-   ┌─ duplicate_condition.lua:60:7
+   ┌─ duplicate_condition.lua:61:7
    │
-60 │ while foo and foo or bar do end
+61 │ while foo and foo or bar do end
    │       ^^^^^^^^^^^^^^^^^^ can be simplified to `foo or bar`
 
 error[duplicate_condition]: condition can be simplified
-   ┌─ duplicate_condition.lua:61:7
+   ┌─ duplicate_condition.lua:62:7
    │
-61 │ while foo or foo and bar do end
+62 │ while foo or foo and bar do end
    │       ^^^^^^^^^^^^^^^^^^ can be simplified to `foo`
-
-error[duplicate_condition]: condition can be simplified
-   ┌─ duplicate_condition.lua:62:14
-   │
-62 │ repeat until not foo and not foo
-   │              ^^^^^^^^^^^^^^^^^^^ can be simplified to `not foo`
 
 error[duplicate_condition]: condition can be simplified
    ┌─ duplicate_condition.lua:63:14
    │
-63 │ repeat until x.y or x.y
+63 │ repeat until not foo and not foo
+   │              ^^^^^^^^^^^^^^^^^^^ can be simplified to `not foo`
+
+error[duplicate_condition]: condition can be simplified
+   ┌─ duplicate_condition.lua:64:14
+   │
+64 │ repeat until x.y or x.y
    │              ^^^^^^^^^^ can be simplified to `x.y`
 

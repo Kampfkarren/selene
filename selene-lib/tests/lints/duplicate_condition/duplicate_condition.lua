@@ -7,6 +7,7 @@ print(not x and not x) -- simplifies to not x
 print(x and y or z) -- doesn't simplify
 
 print(3 and 2) -- simplifies to 3, but lint doesn't support that right now
+print(x or 3) -- doesn't simplify
 
 -- The QMC implementation only allows 32 conditions.
 -- This is so unlikely that I don't really care what output it gives,
