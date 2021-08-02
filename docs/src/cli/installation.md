@@ -10,8 +10,6 @@ Once you have Rust installed, use either command:
 cargo install selene
 ```
 
-(Note: Currently, the above method will give you an outdated selene, as the selene crate on Cargo is not yet maintained.)
-
 **If you want the most up to date version of selene**
 ```
 cargo install --branch main --git https://github.com/Kampfkarren/selene selene
