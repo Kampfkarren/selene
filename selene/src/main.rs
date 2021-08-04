@@ -2,7 +2,7 @@ use std::{
     ffi::OsString,
     fmt, fs,
     io::{self, Read, Write},
-    path::Path,
+    path::{Path, PathBuf},
     sync::{
         atomic::{AtomicUsize, Ordering},
         Arc, RwLock,
@@ -405,12 +405,31 @@ fn start(matches: opts::Options) {
 
         Err(error) => {
             if cfg!(feature = "roblox") && config.std.split('+').any(|name| name == "roblox") {
-                eprint!("`std = \"roblox\"`, but there is no roblox.toml in this directory. ");
-                eprintln!("We are automatically generating one for you now!");
+                let missing_files: Vec<PathBuf> = config.std
+                    .split('+')
+                    .filter(|name| *name != "roblox")
+                    .map(|name| format!("{}.toml", name))
+                    .map(|name| PathBuf::from(&name))
+                    .filter(|path| !path.exists())
+                    .collect();
 
-                eprint!("By the way, you can do this manually in the future if you need ");
-                eprint!("to use new Roblox features with: ");
-                eprintln!("`selene generate-roblox-std`.");
+                if missing_files.is_empty() {
+                    eprint!("`std = \"roblox\"`, but there is no roblox.toml in this directory. ");
+                    eprintln!("We are automatically generating one for you now!");
+
+                    eprint!("By the way, you can do this manually in the future if you need ");
+                    eprint!("to use new Roblox features with: ");
+                    eprintln!("`selene generate-roblox-std`.");
+                } else {
+                    eprintln!("`std = \"{}\"`, but some files could not be found:", config.std);
+
+                    for path in missing_files {
+                        eprintln!("  {}", path.display())
+                    }
+
+                    error!("Could not find all standard library files");
+                    std::process::exit(1);
+                }
 
                 match generate_roblox_std(false) {
                     Ok(_) => {
