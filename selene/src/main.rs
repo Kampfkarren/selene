@@ -424,7 +424,7 @@ fn start(matches: opts::Options) {
                     eprintln!("`std = \"{}\"`, but some files could not be found:", config.std);
 
                     for path in missing_files {
-                        eprintln!("  {}", path.display())
+                        eprintln!("  {}", path.display());
                     }
 
                     error!("Could not find all standard library files");
