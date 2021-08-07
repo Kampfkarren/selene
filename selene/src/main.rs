@@ -405,9 +405,7 @@ fn start(matches: opts::Options) {
 
         Err(_) => {
             if cfg!(feature = "roblox") && config.std.split('+').any(|name| name == "roblox") {
-                let roblox_std = Path::new("roblox.toml");
-
-                if !roblox_std.exists() {
+                if !Path::new("roblox.toml").exists() {
                     eprint!("Roblox standard library could not be found in this directory. ");
                     eprintln!("We are automatically generating one for you now!");
 
