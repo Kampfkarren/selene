@@ -111,18 +111,13 @@ fn emit_codespan(
         ..Default::default()
     };
 
-    if let Some(display_style) = opts.display_style {
-        if let opts::DisplayStyle::Json = display_style {
-            writeln!(
-                writer,
-                "{}",
-                json_output::diagnostic_to_json(diagnostic).unwrap()
-            )
-            .unwrap();
-        } else {
-            codespan_reporting::term::emit(writer, config, files, diagnostic)
-                .expect("couldn't emit error to codespan");
-        }
+    if let Some(opts::DisplayStyle::Json) = opts.display_style {
+        writeln!(
+            writer,
+            "{}",
+            json_output::diagnostic_to_json(diagnostic).unwrap()
+        )
+        .unwrap();
     } else {
         codespan_reporting::term::emit(writer, config, files, diagnostic)
             .expect("couldn't emit error to codespan");
