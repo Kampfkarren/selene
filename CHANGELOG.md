@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Fixed
+- Fixed standard library error when missing files. [(#272)](https://github.com/Kampfkarren/selene/issues/272)
+
 ## [0.14.0] - 2021-07-07
 ### Added
 - Added `task` library to Roblox standard library.
