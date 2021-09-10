@@ -125,8 +125,8 @@ impl Visitor for BadStringEscapeVisitor {
                         "a" | "b" | "f" | "n" | "r" | "t" | "v" | "\\" => {},
                         "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" => {
                             if captures[2].len() > 1 {
-                                let hundreds = (&captures[1]).parse::<u16>().unwrap() * 100;
-                                let tens = (&captures[2][1..2]).parse::<u16>().unwrap();
+                                let hundreds = (&captures[1]).parse::<u16>().unwrap_or(0) * 100;
+                                let tens = (&captures[2][1..2]).parse::<u16>().unwrap_or(0);
                                 if hundreds + tens > 0xff {
                                     self.sequences.push(
                                         StringEscapeSequence{
