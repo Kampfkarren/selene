@@ -30,7 +30,7 @@ Checking fail.lua                                 2 warnings
 ```
 
 - selene uses [TOML](https://github.com/toml-lang/toml) files for configuration, while luacheck uses `.luacheckrc`, which runs Lua.
-- selene allows for [standard library configuration](./cli/std.md) such as argument types, argument counts, etc, while luacheck only allows knowing that fields exist and can be written to. In practice, this means that selene catches:
+- selene allows for [standard library configuration](./usage/std.md) such as argument types, argument counts, etc, while luacheck only allows knowing that fields exist and can be written to. In practice, this means that selene catches:
 
 ```lua
 for _, shop in pairs(GoldShop, ItemShop, MedicineShop) do
