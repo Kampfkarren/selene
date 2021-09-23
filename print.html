@@ -250,7 +250,7 @@ end
 </code></pre>
 <ul>
 <li>selene uses <a href="https://github.com/toml-lang/toml">TOML</a> files for configuration, while luacheck uses <code>.luacheckrc</code>, which runs Lua.</li>
-<li>selene allows for <a href="./cli/std.html">standard library configuration</a> such as argument types, argument counts, etc, while luacheck only allows knowing that fields exist and can be written to. In practice, this means that selene catches:</li>
+<li>selene allows for <a href="./usage/std.html">standard library configuration</a> such as argument types, argument counts, etc, while luacheck only allows knowing that fields exist and can be written to. In practice, this means that selene catches:</li>
 </ul>
 <pre><code class="language-lua">for _, shop in pairs(GoldShop, ItemShop, MedicineShop) do
 
