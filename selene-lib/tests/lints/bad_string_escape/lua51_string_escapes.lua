@@ -32,3 +32,8 @@ local bad6 = "\999"
 local bad7 = "\u{ffffffffff}"
 
 local good = [[\z\x1\u{1234\u{110000}\m\"\'\999]]
+
+-- See: Issue #292
+local decimal_decimal_hex = "\01B"
+local decimal_hex = "\1B"
+local all_hex = "\aaa"
