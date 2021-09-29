@@ -282,8 +282,8 @@ math.pi()
 <h2 id="migration"><a class="header" href="#migration">Migration</a></h2>
 <p>luacheck does not require much configuration to begin with, so migration should be easy.</p>
 <ul>
-<li>You can configure what lints are allowed in the <a href="./cli/configuration.html#changing-the-severity-of-lints">configuration</a>.</li>
-<li>Do you have a custom standard library (custom globals, functions, etc)? Read the <a href="./cli/std.html">standard library guide</a>.
+<li>You can configure what lints are allowed in the <a href="./usage/configuration.html#changing-the-severity-of-lints">configuration</a>.</li>
+<li>Do you have a custom standard library (custom globals, functions, etc)? Read the <a href="./usage/std.html">standard library guide</a>.
 <ul>
 <li>Are you a Roblox developer using something like <a href="https://github.com/Quenty/luacheck-roblox/">luacheck-roblox</a>? A featureful standard library for Roblox is generated with every commit on GitHub. TODO: Have a flag in the selene CLI to generate a Roblox standard library a la <code>generate-roblox-std</code>? Should <code>generate-roblox-std</code> be uploaded to crates.io?</li>
 </ul>
@@ -723,7 +723,7 @@ mod tests {
 <p>The <code>.unwrap()</code> is just because <code>CoolLint::new</code> returns a <code>Result</code>. If you want to test configuration errors, you can avoid <code>test_lint</code> altogether and just test <code>CoolLint::new(...).is_err()</code> directly.</p>
 <p>The first <code>&quot;cool_lint&quot;</code> is the name of the folder we created. The second <code>&quot;cool_lint&quot;</code> is the name of the <em>Lua file</em> we created.</p>
 <p>Now, just run <code>cargo test</code>, and a <code>.stderr</code> file will be automatically generated! You can manipulate it however you see fit as well as modifying your rule, and so long as the file is there, selene will make sure that its accurate.</p>
-<p>Optionally, you can add a <code>.std.toml</code> with the same name as the test next to the lua file, where you can specify a custom <a href="./cli/std.html">standard library</a> to use. If you do not, the Lua 5.1 standard library will be used.</p>
+<p>Optionally, you can add a <code>.std.toml</code> with the same name as the test next to the lua file, where you can specify a custom <a href="./usage/std.html">standard library</a> to use. If you do not, the Lua 5.1 standard library will be used.</p>
 <h3 id="documenting-it"><a class="header" href="#documenting-it">Documenting it</a></h3>
 <p>This step is only if you are contributing to the selene codebase, and not just writing personal lints (though I'm sure your other programmers would love if you did this).</p>
 <p>To document a new lint, edit <code>docs/src/SUMMARY.md</code>, and add your lint to the table of contents along the rest. As with everything else, make sure it's in alphabetical order.</p>
@@ -994,7 +994,7 @@ end
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="incorrect_standard_library_use"><a class="header" href="#incorrect_standard_library_use">incorrect_standard_library_use</a></h1>
 <h2 id="what-it-does-13"><a class="header" href="#what-it-does-13">What it does</a></h2>
-<p>Checks for correct use of <a href="lints/../cli/std.html">the standard library</a>.</p>
+<p>Checks for correct use of <a href="lints/../usage/std.html">the standard library</a>.</p>
 <h2 id="example-13"><a class="header" href="#example-13">Example</a></h2>
 <pre><code class="language-lua">for _, shop in pairs(GoldShop, ItemShop, MedicineShop) do
 </code></pre>
@@ -1065,7 +1065,7 @@ a = 1, 2
 prinnt(&quot;hello, world!&quot;)
 </code></pre>
 <h2 id="remarks-9"><a class="header" href="#remarks-9">Remarks</a></h2>
-<p>If you are using a different standard library where a global variable is defined that selene isn't picking up on, create a <a href="lints/../cli/std.html">standard library</a> that specifies it.</p>
+<p>If you are using a different standard library where a global variable is defined that selene isn't picking up on, create a <a href="lints/../usage/std.html">standard library</a> that specifies it.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="unscoped_variables"><a class="header" href="#unscoped_variables">unscoped_variables</a></h1>
 <h2 id="what-it-does-18"><a class="header" href="#what-it-does-18">What it does</a></h2>
 <p>Checks for variables that are unscoped (don't have a local variable attached).</p>

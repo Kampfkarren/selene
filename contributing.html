@@ -244,7 +244,7 @@ mod tests {
 <p>The <code>.unwrap()</code> is just because <code>CoolLint::new</code> returns a <code>Result</code>. If you want to test configuration errors, you can avoid <code>test_lint</code> altogether and just test <code>CoolLint::new(...).is_err()</code> directly.</p>
 <p>The first <code>&quot;cool_lint&quot;</code> is the name of the folder we created. The second <code>&quot;cool_lint&quot;</code> is the name of the <em>Lua file</em> we created.</p>
 <p>Now, just run <code>cargo test</code>, and a <code>.stderr</code> file will be automatically generated! You can manipulate it however you see fit as well as modifying your rule, and so long as the file is there, selene will make sure that its accurate.</p>
-<p>Optionally, you can add a <code>.std.toml</code> with the same name as the test next to the lua file, where you can specify a custom <a href="./cli/std.html">standard library</a> to use. If you do not, the Lua 5.1 standard library will be used.</p>
+<p>Optionally, you can add a <code>.std.toml</code> with the same name as the test next to the lua file, where you can specify a custom <a href="./usage/std.html">standard library</a> to use. If you do not, the Lua 5.1 standard library will be used.</p>
 <h3 id="documenting-it"><a class="header" href="#documenting-it">Documenting it</a></h3>
 <p>This step is only if you are contributing to the selene codebase, and not just writing personal lints (though I'm sure your other programmers would love if you did this).</p>
 <p>To document a new lint, edit <code>docs/src/SUMMARY.md</code>, and add your lint to the table of contents along the rest. As with everything else, make sure it's in alphabetical order.</p>
