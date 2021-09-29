@@ -12,4 +12,4 @@ prinnt("hello, world!")
 ```
 
 ## Remarks
-If you are using a different standard library where a global variable is defined that selene isn't picking up on, create a [standard library](../cli/std.md) that specifies it.
+If you are using a different standard library where a global variable is defined that selene isn't picking up on, create a [standard library](../usage/std.md) that specifies it.
