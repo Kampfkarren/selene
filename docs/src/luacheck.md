@@ -59,6 +59,6 @@ This is not to say selene is objectively better than luacheck, at least not yet.
 ## Migration
 luacheck does not require much configuration to begin with, so migration should be easy.
 
-- You can configure what lints are allowed in the [configuration](./cli/configuration.md#changing-the-severity-of-lints).
-- Do you have a custom standard library (custom globals, functions, etc)? Read the [standard library guide](./cli/std.md).
+- You can configure what lints are allowed in the [configuration](./usage/configuration.md#changing-the-severity-of-lints).
+- Do you have a custom standard library (custom globals, functions, etc)? Read the [standard library guide](./usage/std.md).
   - Are you a Roblox developer using something like [luacheck-roblox](https://github.com/Quenty/luacheck-roblox/)? A featureful standard library for Roblox is generated with every commit on GitHub. TODO: Have a flag in the selene CLI to generate a Roblox standard library a la `generate-roblox-std`? Should `generate-roblox-std` be uploaded to crates.io?
