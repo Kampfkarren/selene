@@ -27,6 +27,7 @@ type = [
     "step",
     "stop",
 ]
+required = false
 
 [[dofile.args]]
 type = "string"
