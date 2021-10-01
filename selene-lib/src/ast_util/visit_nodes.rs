@@ -46,6 +46,7 @@ macro_rules! make_node_visitor {
                 )+
             }
 
+            #[allow(clippy::enum_variant_names)]
             #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
             pub enum VisitorType {
                 $(
@@ -131,7 +132,7 @@ mod tests {
         }
 
         impl NodeVisitor for TestVisitor {
-            fn visit_node<'a>(&mut self, node: &'a dyn Node, _visitor_type: VisitorType) {
+            fn visit_node(&mut self, node: &dyn Node, _visitor_type: VisitorType) {
                 self.smallest_range =
                     min(self.smallest_range, node.start_position().unwrap().bytes());
                 self.largest_range = max(self.largest_range, node.end_position().unwrap().bytes());
