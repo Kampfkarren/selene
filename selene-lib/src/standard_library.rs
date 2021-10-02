@@ -164,8 +164,7 @@ impl StandardLibrary {
 
         if let Some(meta) = &library.meta {
             if let Some(base_name) = &meta.base {
-                if let Some(base) =
-                    StandardLibrary::from_config_name(base_name, filename.parent())?
+                if let Some(base) = StandardLibrary::from_config_name(base_name, filename.parent())?
                 {
                     library.extend(base);
                 }
