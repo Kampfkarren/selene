@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fixed display style option triggering `ArgumentConflict` when using quiet option. [(#288)](https://github.com/Kampfkarren/selene/issues/288)
 - `bad_string_escape` now correctly handles escapes of the shape `\1a` (one or two numbers followed by a hex digit). (#292)[https://github.com/Kampfkarren/selene/issues/292]
 
+### Changed
+- `duplicate_keys` now has a error severity. [(#262)](https://github.com/Kampfkarren/selene/issues/262)
+
 ## [0.14.0] - 2021-07-07
 ### Added
 - Added `task` library to Roblox standard library.
@@ -13,7 +16,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - `mismatched_arg_count` now tries to find the best overlap between multiple definitions, rather than ignoring them entirely. This means that if you have `f(a)` and `f(b, c)` defined, then calling `f(1, 2, 3)` will now lint instead of silently passing, since no definition provided meets it.
 - `mismatched_arg_count` now shows all function definitions, rather than the local variable assignment. [(#259)](https://github.com/Kampfkarren/selene/issues/259)
-- `duplicate_keys` now has a error severity. [(#262)](https://github.com/Kampfkarren/selene/issues/262)
 
 ### Fixed
 - Updated internal parser, fixing some bugs with Roblox parsing. [See the changelog here](https://github.com/Kampfkarren/full-moon/blob/main/CHANGELOG.md#0131---2021-07-07).
