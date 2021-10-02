@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fixed display style option triggering `ArgumentConflict` when using quiet option. [(#288)](https://github.com/Kampfkarren/selene/issues/288)
 - `bad_string_escape` now correctly handles escapes of the shape `\1a` (one or two numbers followed by a hex digit). (#292)[https://github.com/Kampfkarren/selene/issues/292]
 
+### Changed
+- Arguments of `collectgarbage` now considered to be optional. [(#287)](https://github.com/Kampfkarren/selene/issues/287)
+
 ## [0.14.0] - 2021-07-07
 ### Added
 - Added `task` library to Roblox standard library.
