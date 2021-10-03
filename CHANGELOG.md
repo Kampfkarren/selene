@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - `bad_string_escape` now correctly handles escapes of the shape `\1a` (one or two numbers followed by a hex digit). (#292)[https://github.com/Kampfkarren/selene/issues/292]
 
 ### Changed
+- `duplicate_keys` now has a error severity. [(#262)](https://github.com/Kampfkarren/selene/issues/262)
 - Arguments of `collectgarbage` now considered to be optional. [(#287)](https://github.com/Kampfkarren/selene/issues/287)
 
 ## [0.14.0] - 2021-07-07
