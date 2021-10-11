@@ -1,0 +1,6 @@
+error[unused_variable]: value is defined, but never used
+  ┌─ types.lua:3:7
+  │
+3 │ local value: types.something
+  │       ^^^^^
+
