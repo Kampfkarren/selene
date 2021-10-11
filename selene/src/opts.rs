@@ -25,14 +25,14 @@ pub struct Options {
     pub num_threads: usize,
 
     /// Sets the display method
+    // default_value is not used here since it triggers ArgumentConflict with quiet option
     #[structopt(
         long,
         possible_values = &DisplayStyle::variants(),
         case_insensitive = true,
         conflicts_with = "quiet",
-        default_value = "rich",
     )]
-    pub display_style: DisplayStyle,
+    pub display_style: Option<DisplayStyle>,
 
     /// Display only the necessary information.
     /// Equivalent to --display-style="quiet"
@@ -64,7 +64,10 @@ pub struct Options {
 
 impl Options {
     pub fn quiet(&self) -> bool {
-        self.quiet || self.display_style == DisplayStyle::Quiet
+        match self.display_style {
+            Some(display_style) => display_style == DisplayStyle::Quiet,
+            None => self.quiet,
+        }
     }
 }
 

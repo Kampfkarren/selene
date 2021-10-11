@@ -111,7 +111,7 @@ fn emit_codespan(
         ..Default::default()
     };
 
-    if opts.display_style == opts::DisplayStyle::Json {
+    if let Some(opts::DisplayStyle::Json) = opts.display_style {
         writeln!(
             writer,
             "{}",

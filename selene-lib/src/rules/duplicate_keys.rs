@@ -45,7 +45,7 @@ impl Rule for DuplicateKeysLint {
     }
 
     fn severity(&self) -> Severity {
-        Severity::Warning
+        Severity::Error
     }
 
     fn rule_type(&self) -> RuleType {

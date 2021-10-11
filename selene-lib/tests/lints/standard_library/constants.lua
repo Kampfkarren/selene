@@ -5,3 +5,5 @@ collectgarbage("doge")
 collectgarbage(1)
 
 collectgarbage("coun" .. "t")
+
+collectgarbage()
