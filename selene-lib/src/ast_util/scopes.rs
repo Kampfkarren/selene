@@ -711,4 +711,11 @@ impl Visitor for ScopeVisitor {
     fn visit_while_end(&mut self, _: &ast::While) {
         self.close_scope();
     }
+
+    #[cfg(feature = "roblox")]
+    fn visit_type_info(&mut self, type_info: &ast::types::TypeInfo) {
+        if let ast::types::TypeInfo::Module { module, .. } = type_info {
+            self.read_name(module);
+        }
+    }
 }

@@ -233,4 +233,14 @@ mod tests {
             "varargs",
         );
     }
+
+    #[cfg(feature = "roblox")]
+    #[test]
+    fn test_types() {
+        test_lint(
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
+            "unused_variable",
+            "types",
+        );
+    }
 }
