@@ -2,6 +2,9 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- Added `OverlapParams` to the Roblox standard library.
+
 ### Fixed
 - Fixed display style option triggering `ArgumentConflict` when using quiet option. [(#288)](https://github.com/Kampfkarren/selene/issues/288)
 - `bad_string_escape` now correctly handles escapes of the shape `\1a` (one or two numbers followed by a hex digit). (#292)[https://github.com/Kampfkarren/selene/issues/292]

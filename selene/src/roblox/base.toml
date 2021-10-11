@@ -491,6 +491,9 @@ type = "number"
 type = "number"
 required = false
 
+[OverlapParams.new]
+args = []
+
 [[PathWaypoint.new.args]]
 type = { display = "Vector3" }
 required = false
