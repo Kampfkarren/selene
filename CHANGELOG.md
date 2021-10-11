@@ -2,6 +2,9 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- Added `OverlapParams` to the Roblox standard library.
+
 ### Fixed
 - Fixed standard library error when missing files. [(#272)](https://github.com/Kampfkarren/selene/issues/272)
 - Fixed display style option triggering `ArgumentConflict` when using quiet option. [(#288)](https://github.com/Kampfkarren/selene/issues/288)
