@@ -2,7 +2,7 @@ use std::{
     ffi::OsString,
     fmt, fs,
     io::{self, Read, Write},
-    path::Path,
+    path::{Path, PathBuf},
     sync::{
         atomic::{AtomicUsize, Ordering},
         Arc, RwLock,
@@ -403,41 +403,54 @@ fn start(matches: opts::Options) {
             std::process::exit(1);
         }
 
-        Err(error) => {
+        Err(_) => {
             if cfg!(feature = "roblox") && config.std.split('+').any(|name| name == "roblox") {
-                eprint!("`std = \"roblox\"`, but there is no roblox.toml in this directory. ");
-                eprintln!("We are automatically generating one for you now!");
+                if !Path::new("roblox.toml").exists() {
+                    eprint!("Roblox standard library could not be found in this directory. ");
+                    eprintln!("We are automatically generating one for you now!");
 
-                eprint!("By the way, you can do this manually in the future if you need ");
-                eprint!("to use new Roblox features with: ");
-                eprintln!("`selene generate-roblox-std`.");
+                    eprint!("By the way, you can do this manually in the future if you need ");
+                    eprint!("to use new Roblox features with: ");
+                    eprintln!("`selene generate-roblox-std`.");
 
-                match generate_roblox_std(false) {
-                    Ok(_) => {
-                        match StandardLibrary::from_config_name(&config.std, Some(&current_dir)) {
-                            Ok(Some(library)) => library,
-
-                            // This is technically reachable if you edit your config while it is generating.
-                            Ok(None) => {
-                                error!("Standard library was empty after generating roblox standard library, did you edit your config while running selene?");
-                                std::process::exit(1);
-                            }
-
-                            Err(error) => {
-                                error!("Even after generating the `roblox` standard library, we couldn't retrieve the standard library: {}", error);
-                                std::process::exit(1);
-                            }
-                        }
-                    }
-
-                    Err(err) => {
-                        error!("Could not create roblox standard library: {}", err);
+                    if let Err(error) = generate_roblox_std(false) {
+                        error!("Could not create roblox standard library: {}", error);
                         std::process::exit(1);
                     }
                 }
-            } else {
-                error!("Could not retrieve standard library: {}", error);
+            }
+
+            let missing_files: Vec<PathBuf> = config.std
+                .split('+')
+                .map(|name| format!("{}.toml", name))
+                .map(|name| PathBuf::from(&name))
+                .filter(|path| !path.exists())
+                .collect();
+
+            if !missing_files.is_empty() {
+                eprintln!("`std = \"{}\"`, but some files could not be found:", config.std);
+
+                for path in missing_files {
+                    eprintln!("  `{}`", path.display());
+                }
+
+                error!("Could not find all standard library files");
                 std::process::exit(1);
+            }
+
+            match StandardLibrary::from_config_name(&config.std, Some(&current_dir)) {
+                Ok(Some(library)) => library,
+
+                // This is technically reachable if you edit your config while it is generating.
+                Ok(None) => {
+                    error!("Standard library was empty, did you edit your config while running selene?");
+                    std::process::exit(1);
+                }
+
+                Err(error) => {
+                    error!("Could not retrieve standard library: {}", error);
+                    std::process::exit(1);
+                }
             }
         }
     };
