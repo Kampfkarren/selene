@@ -4,13 +4,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## Unreleased
 ### Added
 - Added `OverlapParams` to the Roblox standard library.
+- Added `Enum:GetEnums()` to the Roblox standard library. [(#312)](https://github.com/Kampfkarren/selene/issues/312)
 
 ### Fixed
 - Fixed standard library error when missing files. [(#272)](https://github.com/Kampfkarren/selene/issues/272)
 - Fixed display style option triggering `ArgumentConflict` when using quiet option. [(#288)](https://github.com/Kampfkarren/selene/issues/288)
 - `bad_string_escape` now correctly handles escapes of the shape `\1a` (one or two numbers followed by a hex digit). [(#292)](https://github.com/Kampfkarren/selene/issues/292)
 - Fixed Roblox types not counting towards usage. [(#270)](https://github.com/Kampfkarren/selene/issues/270)
-- Fixed `Enum:GetEnums()` not being included in the Roblox std. [(#312)](https://github.com/Kampfkarren/selene/issues/312)
 
 ### Changed
 - `duplicate_keys` now has a error severity. [(#262)](https://github.com/Kampfkarren/selene/issues/262)
