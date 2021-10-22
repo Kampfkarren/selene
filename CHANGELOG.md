@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## Unreleased
 ### Added
 - Added `OverlapParams` to the Roblox standard library.
+- Added `Enum:GetEnums()` to the Roblox standard library. [(#312)](https://github.com/Kampfkarren/selene/issues/312)
 
 ### Fixed
 - Fixed standard library error when missing files. [(#272)](https://github.com/Kampfkarren/selene/issues/272)

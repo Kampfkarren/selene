@@ -420,6 +420,10 @@ required = false
 [elapsedTime]
 args=[]
 
+[Enum.GetEnums]
+method = true
+args = []
+
 [[error.args]]
 type = "any"
 required = "Erroring without an explanation is unhelpful to users."
