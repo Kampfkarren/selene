@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+    - name: Run clippy
+      run: cargo clippy
     - name: Run tests (selene, all features)
       run: cargo test
       working-directory: selene
