@@ -404,23 +404,25 @@ fn start(matches: opts::Options) {
         }
 
         Err(_) => {
-            if cfg!(feature = "roblox") && config.std.split('+').any(|name| name == "roblox") {
-                if !Path::new("roblox.toml").exists() {
-                    eprint!("Roblox standard library could not be found in this directory. ");
-                    eprintln!("We are automatically generating one for you now!");
+            if cfg!(feature = "roblox")
+                && config.std.split('+').any(|name| name == "roblox")
+                && !Path::new("roblox.toml").exists()
+            {
+                eprint!("Roblox standard library could not be found in this directory. ");
+                eprintln!("We are automatically generating one for you now!");
 
-                    eprint!("By the way, you can do this manually in the future if you need ");
-                    eprint!("to use new Roblox features with: ");
-                    eprintln!("`selene generate-roblox-std`.");
+                eprint!("By the way, you can do this manually in the future if you need ");
+                eprint!("to use new Roblox features with: ");
+                eprintln!("`selene generate-roblox-std`.");
 
-                    if let Err(error) = generate_roblox_std(false) {
-                        error!("Could not create roblox standard library: {}", error);
-                        std::process::exit(1);
-                    }
+                if let Err(error) = generate_roblox_std(false) {
+                    error!("Could not create roblox standard library: {}", error);
+                    std::process::exit(1);
                 }
             }
 
-            let missing_files: Vec<PathBuf> = config.std
+            let missing_files: Vec<PathBuf> = config
+                .std
                 .split('+')
                 .map(|name| format!("{}.toml", name))
                 .map(|name| PathBuf::from(&name))
@@ -428,7 +430,10 @@ fn start(matches: opts::Options) {
                 .collect();
 
             if !missing_files.is_empty() {
-                eprintln!("`std = \"{}\"`, but some files could not be found:", config.std);
+                eprintln!(
+                    "`std = \"{}\"`, but some files could not be found:",
+                    config.std
+                );
 
                 for path in missing_files {
                     eprintln!("  `{}`", path.display());
