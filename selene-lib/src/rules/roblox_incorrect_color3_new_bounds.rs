@@ -75,13 +75,8 @@ impl Visitor for Color3BoundsVisitor {
 
             then {
                 for argument in arguments {
-                    // Check if the argument is a constant number
-                    if_chain::if_chain! {
-                        if let ast::Expression::Value { value, .. } = argument;
-                        if let ast::Value::Number(value) = &**value;
-                        if let Ok(number) = value.to_string().parse::<f32>();
-                        if number > 1.0;
-                        then {
+                    if let Ok(number) = argument.to_string().parse::<f32>() {
+                        if !(0.0..=1.0).contains(&number) {
                             self.positions.push(range(argument));
                         }
                     }

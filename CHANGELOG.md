@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Added `OverlapParams` to the Roblox standard library.
 - Added `Enum:GetEnums()` to the Roblox standard library. [(#312)](https://github.com/Kampfkarren/selene/issues/312)
+- `roblox_incorrect_color3_new_bounds` now checks for if the given number is negative. [(#83)](https://github.com/Kampfkarren/selene/issues/83)
 
 ### Fixed
 - Fixed standard library error when missing files. [(#272)](https://github.com/Kampfkarren/selene/issues/272)

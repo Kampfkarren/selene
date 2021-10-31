@@ -6,3 +6,11 @@ error[roblox_incorrect_color3_new_bounds]: Color3.new only takes numbers from 0 
   │
   = help: did you mean to use Color3.fromRGB instead?
 
+error[roblox_incorrect_color3_new_bounds]: Color3.new only takes numbers from 0 to 1
+  ┌─ roblox_incorrect_color3_new_bounds.lua:5:12
+  │
+5 │ Color3.new(-1, 0, 0)
+  │            ^^
+  │
+  = help: did you mean to use Color3.fromRGB instead?
+
