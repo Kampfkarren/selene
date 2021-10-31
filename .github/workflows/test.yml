@@ -13,6 +13,8 @@ jobs:
     - uses: actions/checkout@v1
     - name: Run clippy
       run: cargo clippy
+    - name: Run Rustfmt
+      run: cargo fmt -- --check
     - name: Run tests (selene, all features)
       run: cargo test
       working-directory: selene

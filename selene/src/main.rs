@@ -421,8 +421,7 @@ fn start(matches: opts::Options) {
                 }
             }
 
-            let missing_files: Vec<PathBuf> = config
-                .std
+            let missing_files: Vec<PathBuf> = config.std
                 .split('+')
                 .map(|name| format!("{}.toml", name))
                 .map(|name| PathBuf::from(&name))
