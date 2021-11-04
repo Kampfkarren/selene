@@ -19,15 +19,15 @@ RUN apk add g++ && \
     cargo install --no-default-features --branch main --git https://github.com/Kampfkarren/selene selene
 
 FROM bash AS selene
-COPY --from=selene-builder /usr/local/carg/bin/selene /
+COPY --from=selene-builder /usr/local/cargo/bin/selene /
 CMD ["/selene"]
 
 FROM bash AS selene-light
-COPY --from=selene-light-builder /usr/local/carg/bin/selene /
+COPY --from=selene-light-builder /usr/local/cargo/bin/selene /
 CMD ["/selene"]
 
 FROM bash AS selene-musl
-COPY --from=selene-musl-builder /usr/local/carg/bin/selene /
+COPY --from=selene-musl-builder /usr/local/cargo/bin/selene /
 CMD ["/selene"]
 
 FROM bash AS selene-light-musl
