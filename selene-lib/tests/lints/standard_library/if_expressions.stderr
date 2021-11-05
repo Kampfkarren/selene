@@ -1,0 +1,6 @@
+error[incorrect_standard_library_use]: use of standard_library function `math.floor` is incorrect
+  ┌─ if_expressions.lua:2:12
+  │
+2 │ math.floor(if x then "a" else "b")
+  │            ^^^^^^^^^^^^^^^^^^^^^^ expected `number`, received `string`
+

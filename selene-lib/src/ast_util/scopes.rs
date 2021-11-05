@@ -215,6 +215,21 @@ impl ScopeVisitor {
 
                 ast::Value::Var(var) => self.read_var(var),
 
+                #[cfg(feature = "roblox")]
+                ast::Value::IfExpression(if_expression) => {
+                    self.read_expression(if_expression.condition());
+                    self.read_expression(if_expression.if_expression());
+
+                    if let Some(else_if_expressions) = if_expression.else_if_expressions() {
+                        for else_if_expression in else_if_expressions {
+                            self.read_expression(else_if_expression.condition());
+                            self.read_expression(else_if_expression.expression());
+                        }
+                    }
+
+                    self.read_expression(if_expression.else_expression());
+                }
+
                 ast::Value::Number(_) | ast::Value::String(_) => {}
 
                 _ => {}
@@ -442,6 +457,10 @@ impl Visitor for ScopeVisitor {
                 self.read_expression(expression);
             }
 
+            #[cfg_attr(
+                feature = "force_exhaustive_checks",
+                deny(non_exhaustive_omitted_patterns)
+            )]
             let name = match var {
                 ast::Var::Expression(var_expr) => match var_expr.prefix() {
                     ast::Prefix::Expression(expression) => {
@@ -516,6 +535,10 @@ impl Visitor for ScopeVisitor {
     }
 
     fn visit_call(&mut self, call: &ast::Call) {
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         let arguments = match call {
             ast::Call::AnonymousCall(args) => args,
             ast::Call::MethodCall(method_call) => method_call.args(),

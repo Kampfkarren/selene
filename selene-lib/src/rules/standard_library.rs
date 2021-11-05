@@ -149,6 +149,29 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
             },
             ast::Value::TableConstructor(_) => Some(ArgumentType::Table.into()),
             ast::Value::Var(_) => None,
+
+            #[cfg(feature = "roblox")]
+            ast::Value::IfExpression(if_expression) => {
+                // This could be a union type
+                let expected_type = get_argument_type(if_expression.if_expression())?;
+
+                if let Some(else_if_expressions) = if_expression.else_if_expressions() {
+                    for else_if_expression in else_if_expressions {
+                        if !get_argument_type(else_if_expression.expression())?
+                            .same_type(&expected_type)
+                        {
+                            return None;
+                        }
+                    }
+                }
+
+                if get_argument_type(if_expression.else_expression())?.same_type(&expected_type) {
+                    Some(expected_type)
+                } else {
+                    None
+                }
+            }
+
             _ => None,
         },
 
@@ -666,6 +689,14 @@ impl PassedArgumentType {
         }
     }
 
+    fn same_type(&self, other: &PassedArgumentType) -> bool {
+        match (self, other) {
+            (PassedArgumentType::Primitive(a), PassedArgumentType::Primitive(b)) => a == b,
+            (PassedArgumentType::String(_), PassedArgumentType::String(_)) => true,
+            _ => false,
+        }
+    }
+
     fn type_name(&self) -> String {
         match self {
             PassedArgumentType::Primitive(argument_type) => argument_type.to_string(),
@@ -877,6 +908,16 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "writing",
+        );
+    }
+
+    #[cfg(feature = "roblox")]
+    #[test]
+    fn test_if_expressions() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "if_expressions",
         );
     }
 }

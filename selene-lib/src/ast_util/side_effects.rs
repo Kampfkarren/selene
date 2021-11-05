@@ -8,7 +8,14 @@ pub trait HasSideEffects {
 
 impl HasSideEffects for ast::Expression {
     fn has_side_effects(&self) -> bool {
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         match self {
+            ast::Expression::BinaryOperator { lhs, rhs, .. } => {
+                lhs.has_side_effects() || rhs.has_side_effects()
+            }
             ast::Expression::Parentheses { expression, .. }
             | ast::Expression::UnaryOperator { expression, .. } => expression.has_side_effects(),
             ast::Expression::Value { value, .. } => value.has_side_effects(),
@@ -19,6 +26,10 @@ impl HasSideEffects for ast::Expression {
 
 impl HasSideEffects for ast::Prefix {
     fn has_side_effects(&self) -> bool {
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         match self {
             ast::Prefix::Expression(expression) => expression.has_side_effects(),
             ast::Prefix::Name(_) => false,
@@ -29,6 +40,10 @@ impl HasSideEffects for ast::Prefix {
 
 impl HasSideEffects for ast::Suffix {
     fn has_side_effects(&self) -> bool {
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         match self {
             ast::Suffix::Call(_) => true,
             ast::Suffix::Index(_) => false,
@@ -39,6 +54,10 @@ impl HasSideEffects for ast::Suffix {
 
 impl HasSideEffects for ast::Value {
     fn has_side_effects(&self) -> bool {
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         match self {
             ast::Value::Function(_)
             | ast::Value::Number(_)
@@ -61,6 +80,29 @@ impl HasSideEffects for ast::Value {
                     _ => true,
                 }),
             ast::Value::Var(var) => var.has_side_effects(),
+
+            #[cfg(feature = "roblox")]
+            ast::Value::IfExpression(if_expression) => {
+                if if_expression.if_expression().has_side_effects()
+                    || if_expression.condition().has_side_effects()
+                    || if_expression.else_expression().has_side_effects()
+                {
+                    return true;
+                }
+
+                if let Some(else_if_expressions) = if_expression.else_if_expressions() {
+                    for else_if_expression in else_if_expressions {
+                        if else_if_expression.condition().has_side_effects()
+                            || else_if_expression.expression().has_side_effects()
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                false
+            }
+
             _ => true,
         }
     }
@@ -68,6 +110,10 @@ impl HasSideEffects for ast::Value {
 
 impl HasSideEffects for ast::Var {
     fn has_side_effects(&self) -> bool {
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         match self {
             ast::Var::Expression(var_expr) => var_expr.has_side_effects(),
             ast::Var::Name(_) => false,
