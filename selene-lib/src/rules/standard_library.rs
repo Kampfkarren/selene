@@ -149,6 +149,27 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
             },
             ast::Value::TableConstructor(_) => Some(ArgumentType::Table.into()),
             ast::Value::Var(_) => None,
+
+            #[cfg(feature = "roblox")]
+            ast::Value::IfExpression(if_expression) => {
+                // This could be a union type
+                let expected_type = get_argument_type(if_expression.if_expression())?;
+
+                if let Some(else_if_expressions) = if_expression.else_if_expressions() {
+                    for else_if_expression in else_if_expressions {
+                        if get_argument_type(else_if_expression.expression())? != expected_type {
+                            return None;
+                        }
+                    }
+                }
+
+                if get_argument_type(if_expression.else_expression())? == expected_type {
+                    Some(expected_type)
+                } else {
+                    None
+                }
+            }
+
             _ => None,
         },
 
