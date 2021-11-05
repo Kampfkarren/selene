@@ -12,12 +12,9 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Run clippy
-      run: cargo clippy
+      run: cargo clippy -D warnings
     - name: Run Rustfmt
       run: cargo fmt -- --check
-    - name: Run exhaustive check tests
-      run: cargo check --features force_exhaustive_checks
-      working-directory: selene-lib
     - name: Run tests (selene, all features)
       run: cargo test
       working-directory: selene
@@ -30,5 +27,11 @@ jobs:
     - name: Run tests (selene-lib, no features)
       run: cargo test --no-default-features
       working-directory: selene-lib
+  # Remove this when non_exhaustive_omitted_patterns_lint is made stable in the next Rust version
+  test_exhaustive_checks:
+    - uses: actions/checkout@v1
     - name: Install nightly for exhaustive check tests
       uses: dtolnay/rust-toolchain@nightly
+    - name: Run exhaustive check tests
+      run: cargo check --features force_exhaustive_checks
+      working-directory: selene-lib
