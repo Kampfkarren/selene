@@ -15,6 +15,9 @@ jobs:
       run: cargo clippy
     - name: Run Rustfmt
       run: cargo fmt -- --check
+    - name: Run exhaustive check tests
+      run: cargo check --features force_exhaustive_checks
+      working-directory: selene-lib
     - name: Run tests (selene, all features)
       run: cargo test
       working-directory: selene
@@ -29,6 +32,3 @@ jobs:
       working-directory: selene-lib
     - name: Install nightly for exhaustive check tests
       uses: dtolnay/rust-toolchain@nightly
-    - name: Run exhaustive check tests
-      run: cargo test --features force_exhaustive_checks
-      working-directory: selene-lib
