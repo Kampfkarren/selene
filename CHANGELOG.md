@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - `duplicate_keys` now has a error severity. [(#262)](https://github.com/Kampfkarren/selene/issues/262)
 - Arguments of `collectgarbage` now considered to be optional. [(#287)](https://github.com/Kampfkarren/selene/issues/287)
+- Updated internal parser, adding new Luau syntax.
 
 ## [0.14.0] - 2021-07-07
 ### Added
