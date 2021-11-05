@@ -28,7 +28,7 @@ jobs:
       run: cargo test --no-default-features
       working-directory: selene-lib
     - name: Install nightly for exhaustive check tests
-    - uses: dtolnay/rust-toolchain@nightly
+      uses: dtolnay/rust-toolchain@nightly
     - name: Run exhaustive check tests
       run: cargo test --features force_exhaustive_checks
       working-directory: selene-lib
