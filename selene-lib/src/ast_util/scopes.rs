@@ -418,7 +418,7 @@ impl ScopeVisitor {
     }
 
     fn open_scope<N: Node>(&mut self, node: N) {
-        let scope = create_scope(node).unwrap_or_else(Default::default);
+        let scope = create_scope(node).unwrap_or_default();
         let scope_id = self.scope_manager.scopes.alloc(scope);
         self.scope_stack.push(scope_id);
     }
