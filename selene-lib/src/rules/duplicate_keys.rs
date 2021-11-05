@@ -127,6 +127,10 @@ impl Visitor for DuplicateKeysVisitor {
         for field in node.fields() {
             let field_range = range(field);
 
+            #[cfg_attr(
+                feature = "force_exhaustive_checks",
+                deny(non_exhaustive_omitted_patterns)
+            )]
             match field {
                 ast::Field::NameKey { key, .. } => {
                     let key = Key {

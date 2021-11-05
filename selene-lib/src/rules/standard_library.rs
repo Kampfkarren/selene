@@ -101,6 +101,10 @@ fn name_path(expression: &ast::Expression) -> Option<Vec<String>> {
 // Otherwise, returns None
 // Only attempts to resolve constants
 fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType> {
+    #[cfg_attr(
+        feature = "force_exhaustive_checks",
+        deny(non_exhaustive_omitted_patterns)
+    )]
     match expression {
         ast::Expression::Parentheses { expression, .. } => get_argument_type(expression),
 
@@ -123,6 +127,10 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
             ast::Value::String(token) => {
                 Some(PassedArgumentType::from_string(token.token().to_string()))
             }
+            #[cfg_attr(
+                feature = "force_exhaustive_checks",
+                allow(non_exhaustive_omitted_patterns)
+            )]
             ast::Value::Symbol(symbol) => match *symbol.token_type() {
                 TokenType::Symbol { symbol } => match symbol {
                     Symbol::False => Some(ArgumentType::Bool.into()),
@@ -152,6 +160,10 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
             match binop {
                 ast::BinOp::Caret(_) => Some(ArgumentType::Number.into()),
 
+                #[cfg_attr(
+                    feature = "force_exhaustive_checks",
+                    allow(non_exhaustive_omitted_patterns)
+                )]
                 ast::BinOp::GreaterThan(_)
                 | ast::BinOp::GreaterThanEqual(_)
                 | ast::BinOp::LessThan(_)
@@ -485,6 +497,10 @@ impl Visitor for StandardLibraryVisitor<'_> {
 
         let mut argument_types = Vec::new();
 
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         match function_args {
             ast::FunctionArgs::Parentheses { arguments, .. } => {
                 for argument in arguments {
@@ -524,6 +540,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                     ast::Value::FunctionCall(_) => {
                         maybe_more_arguments = true;
                     }
+
                     ast::Value::Symbol(token_ref) => {
                         if let TokenType::Symbol { symbol } = token_ref.token().token_type() {
                             if symbol == &full_moon::tokenizer::Symbol::Ellipse {
@@ -531,6 +548,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                             }
                         }
                     }
+
                     _ => {}
                 }
             }

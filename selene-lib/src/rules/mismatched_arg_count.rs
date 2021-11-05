@@ -108,6 +108,10 @@ impl ParameterCount {
         let mut necessary_params = 0;
 
         for parameter in function_body.parameters() {
+            #[cfg_attr(
+                feature = "force_exhaustive_checks",
+                deny(non_exhaustive_omitted_patterns)
+            )]
             match parameter {
                 ast::Parameter::Name(_) => necessary_params += 1,
                 ast::Parameter::Ellipse(_) => {

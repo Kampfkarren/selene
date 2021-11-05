@@ -27,11 +27,11 @@ mod roblox;
 
 macro_rules! error {
     ($fmt:expr) => {
-        error(fmt::format(format_args!($fmt))).unwrap();
+        error(fmt::format(format_args!($fmt))).unwrap()
     };
 
     ($fmt:expr, $($args:tt)*) => {
-        error(fmt::format(format_args!($fmt, $($args)*))).unwrap();
+        error(fmt::format(format_args!($fmt, $($args)*))).unwrap()
     };
 }
 
