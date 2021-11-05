@@ -1,4 +1,8 @@
 #![recursion_limit = "1000"]
+#![cfg_attr(
+    feature = "force_exhaustive_checks",
+    feature(non_exhaustive_omitted_patterns_lint)
+)]
 use std::{collections::HashMap, error::Error, fmt};
 
 use full_moon::ast::Ast;

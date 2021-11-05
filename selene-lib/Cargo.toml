@@ -29,4 +29,5 @@ termcolor = "1.0"
 
 [features]
 default = ["roblox"]
+force_exhaustive_checks = []
 roblox = ["rbx_reflection", "full_moon/roblox"]

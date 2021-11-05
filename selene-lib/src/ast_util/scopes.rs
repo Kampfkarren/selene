@@ -170,6 +170,10 @@ impl ScopeVisitor {
     }
 
     fn read_expression(&mut self, expression: &ast::Expression) {
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         match expression {
             ast::Expression::Parentheses { expression, .. }
             | ast::Expression::UnaryOperator { expression, .. } => {
@@ -211,6 +215,8 @@ impl ScopeVisitor {
 
                 ast::Value::Var(var) => self.read_var(var),
 
+                ast::Value::Number(_) | ast::Value::String(_) => {}
+
                 _ => {}
             },
 
@@ -219,6 +225,10 @@ impl ScopeVisitor {
     }
 
     fn read_prefix(&mut self, prefix: &ast::Prefix) {
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         match prefix {
             ast::Prefix::Expression(expression) => self.read_expression(expression),
             ast::Prefix::Name(name) => self.read_name(name),
@@ -227,6 +237,10 @@ impl ScopeVisitor {
     }
 
     fn read_suffix(&mut self, suffix: &ast::Suffix) {
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         match suffix {
             ast::Suffix::Call(call) => self.visit_call(call),
             ast::Suffix::Index(index) => self.visit_index(index),
@@ -258,6 +272,10 @@ impl ScopeVisitor {
 
     fn read_table_constructor(&mut self, table: &ast::TableConstructor) {
         for field in table.fields() {
+            #[cfg_attr(
+                feature = "force_exhaustive_checks",
+                deny(non_exhaustive_omitted_patterns)
+            )]
             match field {
                 ast::Field::ExpressionKey { key, value, .. } => {
                     self.read_expression(key);
@@ -278,6 +296,10 @@ impl ScopeVisitor {
     }
 
     fn read_var(&mut self, var: &ast::Var) {
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         match var {
             ast::Var::Expression(var_expr) => {
                 self.read_prefix(var_expr.prefix());
@@ -396,7 +418,7 @@ impl ScopeVisitor {
     }
 
     fn open_scope<N: Node>(&mut self, node: N) {
-        let scope = create_scope(node).unwrap_or_else(Default::default);
+        let scope = create_scope(node).unwrap_or_default();
         let scope_id = self.scope_manager.scopes.alloc(scope);
         self.scope_stack.push(scope_id);
     }
@@ -500,6 +522,10 @@ impl Visitor for ScopeVisitor {
             _ => return,
         };
 
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         match arguments {
             ast::FunctionArgs::Parentheses { arguments, .. } => {
                 for argument in arguments {
@@ -510,6 +536,8 @@ impl Visitor for ScopeVisitor {
             ast::FunctionArgs::TableConstructor(table_constructor) => {
                 self.read_table_constructor(table_constructor);
             }
+
+            ast::FunctionArgs::String(_) => {}
 
             _ => {}
         }
