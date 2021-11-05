@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Run clippy
-      run: cargo clippy -D warnings
+      run: cargo clippy -- -D warnings
     - name: Run Rustfmt
       run: cargo fmt -- --check
     - name: Run tests (selene, all features)
