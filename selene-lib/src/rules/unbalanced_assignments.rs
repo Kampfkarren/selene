@@ -125,8 +125,7 @@ impl UnbalancedAssignmentsVisitor {
             return;
         }
 
-        // TODO: Implement last() on Punctuated
-        let last_rhs = rhs.iter().last().unwrap();
+        let last_rhs = rhs.last().unwrap().value();
 
         if rhs.len() > lhs {
             self.assignments.push(UnbalancedAssignment {
