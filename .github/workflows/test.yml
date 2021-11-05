@@ -22,7 +22,7 @@ jobs:
       run: cargo test --no-default-features
       working-directory: selene
     - name: Run tests (selene-lib, all features)
-      run: cargo test
+      run: cargo test --features force_exhaustive_checks
       working-directory: selene-lib
     - name: Run tests (selene-lib, no features)
       run: cargo test --no-default-features
