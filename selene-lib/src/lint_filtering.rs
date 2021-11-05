@@ -127,7 +127,6 @@ impl NodeVisitor for FilterVisitor {
                     )
                 });
 
-                // TODO: Check if lint is real here
                 self.ranges
                     .extend(configurations.into_iter().map(|configuration| {
                         if rule_exists(&configuration.lint) {
