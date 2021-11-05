@@ -29,6 +29,8 @@ jobs:
       working-directory: selene-lib
   # Remove this when non_exhaustive_omitted_patterns_lint is made stable in the next Rust version
   test_exhaustive_checks:
+    runs-on: ubuntu-latest
+    steps:
     - uses: actions/checkout@v1
     - name: Install nightly for exhaustive check tests
       uses: dtolnay/rust-toolchain@nightly
