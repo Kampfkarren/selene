@@ -22,8 +22,11 @@ jobs:
       run: cargo test --no-default-features
       working-directory: selene
     - name: Run tests (selene-lib, all features)
-      run: cargo test --features force_exhaustive_checks
+      run: cargo test
       working-directory: selene-lib
     - name: Run tests (selene-lib, no features)
       run: cargo test --no-default-features
+      working-directory: selene-lib
+    - name: Run exhaustive check tests
+      run: rustup run nightly cargo test --features force_exhaustive_checks
       working-directory: selene-lib
