@@ -628,6 +628,9 @@ required = false
 [[table.freeze.args]]
 type = "table"
 
+[[table.isfrozen.args]]
+type = "table"
+
 [[table.move.args]]
 type = "table"
 
