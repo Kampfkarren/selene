@@ -3,7 +3,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Unreleased
 ### Added
-- Added `table.freeze`, `table.isfrozen`, `bit32.countlz`, `bit32.countrz` to the Roblox standard library
+- Added `table.freeze`, `table.isfrozen`, `bit32.countlz`, `bit32.countrz` to the Roblox standard library.
 
 ## [0.15.0] - 2021-11-05
 ### Added
