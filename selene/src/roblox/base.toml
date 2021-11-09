@@ -45,6 +45,12 @@ type = "..."
 [[bit32.bxor.args]]
 type = "..."
 
+[[bit32.countlz.args]]
+type = "number"
+
+[[bit32.countrz.args]]
+type = "number"
+
 [[bit32.extract.args]]
 type = "number"
 
@@ -624,6 +630,12 @@ type = "any"
 [[table.find.args]]
 type = "number"
 required = false
+
+[[table.freeze.args]]
+type = "table"
+
+[[table.isfrozen.args]]
+type = "table"
 
 [[table.move.args]]
 type = "table"
