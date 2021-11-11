@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Added `table.freeze`, `table.isfrozen`, `bit32.countlz`, `bit32.countrz` to the Roblox standard library.
 
+### Fixed
+- Fixed a bug where empty else blocks were not properly closing their scope, meaning that they could confuse the shadowing lint. [(#116)](https://github.com/Kampfkarren/selene/issues/116)
+
 ## [0.15.0] - 2021-11-05
 ### Added
 - Added `OverlapParams` to the Roblox standard library.
