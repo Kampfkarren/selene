@@ -134,9 +134,9 @@ impl ScopeVisitor {
                 else_blocks: HashSet::new(),
             };
 
+            output.visit_ast(ast);
             assert!(output.scope_stack.len() == 1, "scopes not all popped");
 
-            output.visit_ast(ast);
             output
         } else {
             ScopeVisitor::default()
@@ -686,9 +686,13 @@ impl Visitor for ScopeVisitor {
 
     fn visit_if_end(&mut self, if_block: &ast::If) {
         // else clean themselves up
-        if if_block.else_block().is_none() {
-            self.close_scope();
+        if let Some(else_block) = if_block.else_block() {
+            if else_block.range().is_some() {
+                return;
+            }
         }
+
+        self.close_scope();
     }
 
     fn visit_local_function(&mut self, local_function: &ast::LocalFunction) {
