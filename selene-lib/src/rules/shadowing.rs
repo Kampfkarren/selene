@@ -100,4 +100,13 @@ mod tests {
             "shadowing",
         );
     }
+
+    #[test]
+    fn test_empty_else() {
+        test_lint(
+            ShadowingLint::new(ShadowingConfig::default()).unwrap(),
+            "shadowing",
+            "empty_else",
+        );
+    }
 }
