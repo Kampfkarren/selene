@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## Unreleased
 ### Added
 - Added `table.freeze`, `table.isfrozen`, `bit32.countlz`, `bit32.countrz` to the Roblox standard library.
+- Added `Vector2.zero`, `Vector2.one`, `Vector2.xAxis`, `Vector2.yAxis` to the Roblox standard library.
+- Added `Vector3.zero`, `Vector3.one`, `Vector3.xAxis`, `Vector3.yAxis`, `Vector3.zAxis` to the Roblox standard library.
+- Added `CFrame.identity` to the Roblox standard library.
 
 ### Fixed
 - Fixed a bug where empty else blocks were not properly closing their scope, meaning that they could confuse the shadowing lint. [(#116)](https://github.com/Kampfkarren/selene/issues/116)
