@@ -137,6 +137,9 @@ args = []
 [BrickColor.Yellow]
 args = []
 
+[CFrame.identity]
+property = true
+
 [[CFrame.Angles.args]]
 type = "number"
 required = false
@@ -842,6 +845,18 @@ required = false
 type = "number"
 required = false
 
+[Vector2.zero]
+property = true
+
+[Vector2.one]
+property = true
+
+[Vector2.xAxis]
+property = true
+
+[Vector2.yAxis]
+property = true
+
 [[Vector2.new.args]]
 type = "number"
 required = false
@@ -857,6 +872,22 @@ required = false
 [[Vector2int16.new.args]]
 type = "number"
 required = false
+
+[Vector3.zero]
+property = true
+
+[Vector3.one]
+property = true
+
+[Vector3.xAxis]
+property = true
+
+[Vector3.yAxis]
+property = true
+
+[Vector3.zAxis]
+property = true
+
 
 [[Vector3.FromAxis.args]]
 type = { display = "Axis" }
