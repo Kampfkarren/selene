@@ -149,6 +149,9 @@ required = false
 type = "number"
 required = false
 
+[CFrame.identity]
+property = true
+
 [[CFrame.new.args]]
 type = "any"
 required = false
@@ -850,6 +853,18 @@ required = false
 type = "number"
 required = false
 
+[Vector2.one]
+property = true
+
+[Vector2.xAxis]
+property = true
+
+[Vector2.yAxis]
+property = true
+
+[Vector2.zero]
+property = true
+
 [[Vector2int16.new.args]]
 type = "number"
 required = false
@@ -875,6 +890,21 @@ required = false
 [[Vector3.new.args]]
 type = "number"
 required = false
+
+[Vector3.one]
+property = true
+
+[Vector3.xAxis]
+property = true
+
+[Vector3.yAxis]
+property = true
+
+[Vector3.zAxis]
+property = true
+
+[Vector3.zero]
+property = true
 
 [[Vector3int16.new.args]]
 type = "number"
