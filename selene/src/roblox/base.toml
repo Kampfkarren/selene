@@ -444,6 +444,9 @@ required = false
 [[Faces.new.args]]
 type = "..."
 
+[gcinfo]
+args = []
+
 [[Instance.new.args]]
 type = "string" # This is changed at generate time
 
