@@ -41,7 +41,8 @@
                         null
                     ],
                     "default": null,
-                    "description": "Specifies the path of selene. If not specified, selene will automatically download from the GitHub releases."
+                    "description": "Specifies the path of selene. If not specified, selene will automatically download from the GitHub releases.",
+                    "scope": "machine-overridable"
                 },
                 "selene.run": {
                     "title": "Run",
