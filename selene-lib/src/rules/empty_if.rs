@@ -9,18 +9,10 @@ use full_moon::{
 };
 use serde::Deserialize;
 
-#[derive(Clone, Copy, Deserialize)]
+#[derive(Clone, Copy, Default, Deserialize)]
 #[serde(default)]
 pub struct EmptyIfLintConfig {
     comments_count: bool,
-}
-
-impl Default for EmptyIfLintConfig {
-    fn default() -> Self {
-        Self {
-            comments_count: false,
-        }
-    }
 }
 
 pub struct EmptyIfLint {

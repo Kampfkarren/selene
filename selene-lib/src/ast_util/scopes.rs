@@ -54,7 +54,6 @@ impl ScopeManager {
 
 #[derive(Debug, Default)]
 pub struct Scope {
-    block: Range,
     references: Vec<Id<Reference>>,
     variables: Vec<Id<Variable>>,
     blocked: Vec<Cow<'static, str>>,
@@ -99,9 +98,8 @@ pub enum VariableInScope {
 }
 
 fn create_scope<N: Node>(node: N) -> Option<Scope> {
-    if let Some((start, end)) = node.range() {
+    if node.range().is_some() {
         Some(Scope {
-            block: (start.bytes(), end.bytes()),
             blocked: Vec::new(),
             references: Vec::new(),
             variables: Vec::new(),
