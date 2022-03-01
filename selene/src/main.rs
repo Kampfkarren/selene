@@ -115,7 +115,7 @@ fn emit_codespan(
         writeln!(
             writer,
             "{}",
-            json_output::diagnostic_to_json(diagnostic).unwrap()
+            json_output::diagnostic_to_json(diagnostic, files).unwrap()
         )
         .unwrap();
     } else {

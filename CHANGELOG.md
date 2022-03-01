@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+Unreleased
+### Added
+- Added `start_line`, `start_column`, `end_line`, and `end_column` to JSON diagnostic output.
+
 ## [0.16.0] - 2022-01-30
 ### Added
 - Added support for parsing generic type packs, variadic type packs, and explicit type packs in generic arguments for a type under the `roblox` feature flag (`type X<S...> = Y<(string, number), ...string, S...>`)
