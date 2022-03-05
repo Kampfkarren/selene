@@ -1,7 +1,7 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Unreleased
+## Unreleased
 ### Added
 - Added `start_line`, `start_column`, `end_line`, and `end_column` to JSON diagnostic output.
 
