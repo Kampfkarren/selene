@@ -308,6 +308,9 @@ type = { display = "Color3" }
 [coroutine.isyieldable]
 args = []
 
+[[coroutine.running.args]]
+type = "coroutine"
+
 [DateTime.now]
 args = []
 
