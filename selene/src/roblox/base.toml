@@ -277,6 +277,9 @@ type = "number"
 [[Color3.fromHSV.args]]
 type = "number"
 
+[[Color3.fromHex.args]]
+type = "string"
+
 [[Color3.new.args]]
 type = "number"
 required = false

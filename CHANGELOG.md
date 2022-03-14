@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## Unreleased
 ### Added
 - Added `start_line`, `start_column`, `end_line`, and `end_column` to JSON diagnostic output.
+- Added `Color3.fromHex` to the Roblox standard library.
 
 ## [0.16.0] - 2022-01-30
 ### Added
