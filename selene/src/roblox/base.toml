@@ -308,6 +308,9 @@ type = "number"
 [[ColorSequenceKeypoint.new.args]]
 type = { display = "Color3" }
 
+[[coroutine.close.args]]
+type = "thread"
+
 [coroutine.isyieldable]
 args = []
 
@@ -624,6 +627,9 @@ type = "number"
 required = false
 
 [[table.clear.args]]
+type = "table"
+
+[[table.clone.args]]
 type = "table"
 
 [[table.create.args]]
