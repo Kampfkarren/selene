@@ -308,11 +308,11 @@ type = "number"
 [[ColorSequenceKeypoint.new.args]]
 type = { display = "Color3" }
 
+[[coroutine.close.args]]
+type = "thread"
+
 [coroutine.isyieldable]
 args = []
-
-[[coroutine.close]]
-type = "thread"
 
 [DateTime.now]
 args = []
