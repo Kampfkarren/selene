@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `Color3.fromHex` to the Roblox standard library.
 - Added `table.clone` to the Roblox standard library.
 - Added `coroutine.close` to the Roblox standard library.
+- Added `task.cancel` to the Roblox standard library.
 
 ## [0.16.0] - 2022-01-30
 ### Added
