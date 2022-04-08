@@ -685,6 +685,9 @@ required = false
 type = "number"
 required = false
 
+[[task.cancel.args]]
+type = "thread"
+
 [[task.defer.args]]
 type = "function"
 
