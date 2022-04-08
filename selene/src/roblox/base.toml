@@ -309,7 +309,7 @@ type = "number"
 type = { display = "Color3" }
 
 [[coroutine.close.args]]
-type = "thread"
+type = { display = "thread" }
 
 [coroutine.isyieldable]
 args = []
