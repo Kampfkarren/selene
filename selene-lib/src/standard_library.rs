@@ -359,7 +359,7 @@ impl<'de> Deserialize<'de> for Field {
 
         let function_behavior = if is_function {
             Some(FunctionBehavior {
-                arguments: field_raw.args.unwrap_or_else(Vec::new),
+                arguments: field_raw.args.unwrap_or_default(),
                 method: field_raw.method,
             })
         } else {
