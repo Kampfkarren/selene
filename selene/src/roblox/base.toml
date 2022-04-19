@@ -382,6 +382,9 @@ type = "number"
 [[DateTime.fromUnixTimestampMillis.args]]
 type = "number"
 
+[[debug.setmemorycategory]]
+type = "string"
+
 [[debug.info.args]]
 type = "any"
 
