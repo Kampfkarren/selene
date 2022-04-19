@@ -401,7 +401,7 @@ args = []
 [[debug.resetmemorycategory]]
 args = []
 
-[[debug.setmemorycategory]]
+[[debug.setmemorycategory.args]]
 type = "string"
 
 [[delay.args]]
