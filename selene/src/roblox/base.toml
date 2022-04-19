@@ -382,9 +382,6 @@ type = "number"
 [[DateTime.fromUnixTimestampMillis.args]]
 type = "number"
 
-[[debug.setmemorycategory]]
-type = "string"
-
 [[debug.info.args]]
 type = "any"
 
@@ -400,6 +397,12 @@ type = "string"
 
 [debug.profileend]
 args = []
+
+[[debug.resetmemorycategory]]
+args = []
+
+[[debug.setmemorycategory]]
+type = "string"
 
 [[delay.args]]
 type = "number"
