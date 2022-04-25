@@ -398,7 +398,7 @@ type = "string"
 [debug.profileend]
 args = []
 
-[[debug.resetmemorycategory]]
+[debug.resetmemorycategory]
 args = []
 
 [[debug.setmemorycategory.args]]
