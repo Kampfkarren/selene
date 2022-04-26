@@ -3,10 +3,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Unreleased
 
-## [0.18.0] - 2022-04-19
 ## Added
 - Added `debug.resetmemorycategory` to the Roblox standard library.
 - Added `debug.setmemorycategory` to the Roblox standard library.
+
+## [0.18.0] - 2022-04-19
 ## [0.17.0] - 2022-04-10
 ### Added
 - Added `start_line`, `start_column`, `end_line`, and `end_column` to JSON diagnostic output.
