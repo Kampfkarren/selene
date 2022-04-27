@@ -2,8 +2,6 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
-
-## [0.18.0] - 2022-04-19
 ## Added
 - Added `debug.resetmemorycategory` to the Roblox standard library.
 - Added `debug.setmemorycategory` to the Roblox standard library.
