@@ -398,6 +398,12 @@ type = "string"
 [debug.profileend]
 args = []
 
+[debug.resetmemorycategory]
+args = []
+
+[[debug.setmemorycategory.args]]
+type = "string"
+
 [[delay.args]]
 type = "number"
 
