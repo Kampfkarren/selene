@@ -47,6 +47,10 @@ pub struct Options {
     )]
     pub color: Color,
 
+    /// Suppress summary information.
+    #[structopt(long, short)]
+    pub no_summary: bool,
+
     /// Whether to pretend to be luacheck for existing consumers
     #[structopt(long, hidden(true))]
     pub luacheck: bool,

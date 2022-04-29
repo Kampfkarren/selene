@@ -539,7 +539,7 @@ fn start(matches: opts::Options) {
         LINT_WARNINGS.load(Ordering::SeqCst),
     );
 
-    if !matches.luacheck {
+    if !matches.luacheck && !matches.no_summary {
         log_total(parse_errors, lint_errors, lint_warnings).ok();
     }
 

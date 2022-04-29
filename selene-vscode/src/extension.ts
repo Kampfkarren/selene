@@ -102,7 +102,7 @@ export async function activate(
 
         const output = await selene.seleneCommand(
             context.globalStorageUri,
-            "--display-style=json -",
+            "--display-style=json --no-summary -",
             selene.Expectation.Stderr,
             vscode.workspace.getWorkspaceFolder(document.uri),
             document.getText(),
@@ -118,10 +118,6 @@ export async function activate(
         const byteOffsets = new Set<number>()
 
         for (const line of output.split("\n")) {
-            if (line === "Results:") {
-                break
-            }
-
             const data: Diagnostic = JSON.parse(line)
             dataToAdd.push(data)
             byteOffsets.add(data.primary_label.span.start)
