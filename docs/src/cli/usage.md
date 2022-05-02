@@ -17,7 +17,7 @@ OPTIONS:
         --config <config>                  A toml file to configure the behavior of selene [default: selene.toml]
         --display-style <display-style>    Sets the display method [possible values: Json, Rich, Quiet]
         --num-threads <num-threads>        Number of threads to run on, default to the numbers of logical cores on your
-                                           system [default: 6]
+                                           system [default: your system's cores]
         --pattern <pattern>                A glob to match files with to check [default: **/*.lua]
 
 ARGS:
