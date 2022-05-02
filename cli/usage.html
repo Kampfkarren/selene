@@ -138,20 +138,28 @@
 <p>If you want to get a quick understanding of the interface, simply type <code>selene --help</code>.</p>
 <pre><code>USAGE:
     selene [FLAGS] [OPTIONS] &lt;files&gt;...
+    selene &lt;SUBCOMMAND&gt;
 
 FLAGS:
-    -h, --help       Prints help information
-    -q               Display only the necessary information
-    -V, --version    Prints version information
+    -h, --help          Prints help information
+    -n, --no-summary    Suppress summary information
+    -q, --quiet         Display only the necessary information. Equivalent to --display-style=&quot;quiet&quot;
+    -V, --version       Prints version information
 
 OPTIONS:
-        --config &lt;config&gt;              A toml file to configure the behavior of selene [default: selene.toml]
-        --num-threads &lt;num-threads&gt;    Number of threads to run on, default to the numbers of logical cores on your
-                                       system [default: 8]
-        --pattern &lt;pattern&gt;            A glob to match files with to check [default: **/*.lua]
+        --color &lt;color&gt;                     [default: auto]  [possible values: Always, Auto, Never]
+        --config &lt;config&gt;                  A toml file to configure the behavior of selene [default: selene.toml]
+        --display-style &lt;display-style&gt;    Sets the display method [possible values: Json, Rich, Quiet]
+        --num-threads &lt;num-threads&gt;        Number of threads to run on, default to the numbers of logical cores on your
+                                           system [default: your system's cores]
+        --pattern &lt;pattern&gt;                A glob to match files with to check [default: **/*.lua]
 
 ARGS:
     &lt;files&gt;...
+
+SUBCOMMANDS:
+    generate-roblox-std
+    help                   Prints this message or the help of the given subcommand(s)
 </code></pre>
 <h2 id="basic-usage"><a class="header" href="#basic-usage">Basic usage</a></h2>
 <p>All unnamed inputs you give to selene will be treated as files to check for.</p>
