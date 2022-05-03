@@ -38,6 +38,8 @@ If you just want to check one file: `selene code.lua`
 
 If you want to check multiple files/folders: `selene file1 file2 file3 ...`
 
+If you want to pipe code to selene using stdin: `cat code.lua | selene -`
+
 ## Advanced options
 
 **-q**
