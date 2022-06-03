@@ -1,4 +1,5 @@
-mod v1;
+pub mod v1;
+mod v1_upgrade;
 
 use std::{
     collections::{BTreeMap, HashMap},
@@ -25,14 +26,19 @@ lazy_static::lazy_static! {
 #[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
 pub struct StandardLibrary {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub base: Option<String>,
 
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
 
+    #[serde(default)]
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub globals: BTreeMap<String, Field>,
 
     #[serde(default)]
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub structs: BTreeMap<String, BTreeMap<String, Field>>,
 }
 
@@ -77,7 +83,7 @@ impl StandardLibrary {
                 match name {
                     $(
                         $name => {
-                            let mut std = toml::from_str::<StandardLibrary>(
+                            let mut std = serde_yaml::from_str::<StandardLibrary>(
                                 include_str!($path)
                             ).unwrap_or_else(|error| {
                                 panic!(
@@ -87,14 +93,12 @@ impl StandardLibrary {
                                 )
                             });
 
-                            if let Some(meta) = &std.meta {
-                                if let Some(base_name) = &meta.base {
-                                    let base = StandardLibrary::from_name(base_name);
+                            if let Some(base_name) = &std.base {
+                                let base = StandardLibrary::from_name(base_name);
 
-                                    std.extend(
-                                        base.expect("built-in library based off of non-existent built-in"),
-                                    );
-                                }
+                                std.extend(
+                                    base.expect("built-in library based off of non-existent built-in"),
+                                );
                             }
 
                             std.inflate();
@@ -108,11 +112,11 @@ impl StandardLibrary {
             };
         }
 
-        // names! {
-        //     "lua51" => "../../default_std/lua51.toml",
-        //     "lua52" => "../../default_std/lua52.toml",
-        // }
-        todo!("convert the tomls to yml")
+        names! {
+            "lua51" => "../../default_std/lua51.yml",
+            "lua52" => "../../default_std/lua52.yml",
+            "lua53" => "../../default_std/lua53.yml",
+        }
     }
 
     pub fn from_config_name(
@@ -192,7 +196,12 @@ impl StandardLibrary {
 pub struct FunctionBehavior {
     #[serde(rename = "args")]
     pub arguments: Vec<Argument>,
+    #[serde(skip_serializing_if = "is_false")]
     pub method: bool,
+}
+
+fn is_false(value: &bool) -> bool {
+    !value
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]

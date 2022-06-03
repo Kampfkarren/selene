@@ -19,11 +19,13 @@ use selene_lib::{rules::Severity, standard_library::StandardLibrary, *};
 use structopt::{clap, StructOpt};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
+use upgrade_std::upgrade_std;
 
 mod json_output;
 mod opts;
 #[cfg(feature = "roblox")]
 mod roblox;
+mod upgrade_std;
 
 macro_rules! error {
     ($fmt:expr) => {
@@ -344,9 +346,9 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
 }
 
 fn start(matches: opts::Options) {
-    #[cfg(feature = "roblox")]
-    {
-        if let Some(opts::Command::GenerateRobloxStd { deprecated }) = matches.command {
+    match matches.command {
+        #[cfg(feature = "roblox")]
+        Some(opts::Command::GenerateRobloxStd { deprecated }) => {
             println!("Generating Roblox standard library...");
 
             if let Err(error) = generate_roblox_std(deprecated) {
@@ -356,6 +358,17 @@ fn start(matches: opts::Options) {
 
             return;
         }
+
+        Some(opts::Command::UpgradeStd { filename }) => {
+            if let Err(error) = upgrade_std(filename) {
+                error!("Couldn't upgrade standard library: {}", error);
+                std::process::exit(1);
+            }
+
+            return;
+        }
+
+        None => {}
     }
 
     *OPTIONS.write().unwrap() = Some(matches.clone());

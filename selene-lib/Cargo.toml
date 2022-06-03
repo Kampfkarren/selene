@@ -20,6 +20,7 @@ paste = "1.0"
 rbx_reflection = { version = "3", optional = true }
 regex = "1"
 serde = "1.0"
+serde_yaml = "0.8.24"
 toml = "0.5"
 
 [dev-dependencies]

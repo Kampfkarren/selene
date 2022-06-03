@@ -1,4 +1,4 @@
-use std::ffi::OsString;
+use std::{ffi::OsString, path::PathBuf};
 
 use structopt::{
     clap::{arg_enum, AppSettings},
@@ -84,8 +84,10 @@ pub enum Command {
         deprecated: bool,
     },
 
-    #[structopt(setting(AppSettings::Hidden))]
-    NonExhaustive,
+    UpgradeStd {
+        #[structopt(parse(from_os_str))]
+        filename: PathBuf,
+    },
 }
 
 arg_enum! {

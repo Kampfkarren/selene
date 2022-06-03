@@ -1,3 +1,6 @@
+// An intentionally separate implementation of the standard library as it existed
+// before version 2.
+// This is so that any changes to the v2 standard library don't affect the old one.
 use std::{
     collections::{BTreeMap, HashMap},
     fmt,
@@ -29,6 +32,7 @@ pub struct StandardLibrary {
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
 pub struct StandardLibraryMeta {
+    // TODO: Skip serializing if these are None
     #[serde(default)]
     pub base: Option<String>,
     #[serde(default)]
