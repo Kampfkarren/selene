@@ -1,9 +1,11 @@
 use std::{
+    borrow::Cow,
     collections::{BTreeMap, HashMap},
     fmt, fs, io,
     path::Path,
 };
 
+use regex::{Captures, Regex};
 use serde::{
     de::{self, Deserializer, Visitor},
     ser::{SerializeMap, SerializeSeq, Serializer},
@@ -285,6 +287,7 @@ impl StandardLibrary {
 pub struct FunctionBehavior {
     pub arguments: Vec<Argument>,
     pub method: bool,
+    pub deprecated: Option<Deprecated>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -361,6 +364,7 @@ impl<'de> Deserialize<'de> for Field {
             Some(FunctionBehavior {
                 arguments: field_raw.args.unwrap_or_default(),
                 method: field_raw.method,
+                deprecated: field_raw.deprecated,
             })
         } else {
             None
@@ -434,6 +438,68 @@ pub enum Writable {
     Full,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct Deprecated {
+    pub message: String,
+
+    // TODO: Validate proper %s
+    // TODO: Validate that a pattern is possible to reach (uses different # of parameters)
+    // TODO: Validate that parmeters match the number of arguments
+    // TODO: %...
+    // TODO: Validate that all numbers parse as u32
+    #[serde(default)]
+    pub(self) replace: Vec<String>,
+}
+
+impl Deprecated {
+    fn regex_pattern() -> Regex {
+        Regex::new(r"%(%|(?P<number>[0-9]+)|(\.\.\.))").unwrap()
+    }
+
+    pub fn try_instead(&self, parameters: &Vec<String>) -> Option<String> {
+        let regex_pattern = Deprecated::regex_pattern();
+
+        for replace_format in &self.replace {
+            let mut success = true;
+
+            let new_message = regex_pattern.replace_all(replace_format, |captures: &Captures| {
+                if let Some(number) = captures.name("number") {
+                    let number = match number.as_str().parse::<u32>() {
+                        Ok(number) => number,
+                        Err(_) => {
+                            success = false;
+                            return Cow::Borrowed("");
+                        }
+                    };
+
+                    if number > parameters.len() as u32 || number == 0 {
+                        success = false;
+                        return Cow::Borrowed("");
+                    }
+
+                    return Cow::Borrowed(&parameters[number as usize - 1]);
+                }
+
+                let capture = captures.get(1).unwrap();
+                match capture.as_str() {
+                    "%" => Cow::Borrowed("%"),
+                    "..." => Cow::Owned(parameters.join(", ")),
+                    other => unreachable!("Unexpected capture in deprecated formatting: {}", other),
+                }
+            });
+
+            if !success {
+                continue;
+            }
+
+            return Some(new_message.into_owned());
+        }
+
+        None
+    }
+}
+
 #[derive(Debug, Deserialize)]
 struct FieldSerde {
     #[serde(default)]
@@ -444,6 +510,8 @@ struct FieldSerde {
     removed: bool,
     #[serde(default)]
     writable: Option<Writable>,
+    #[serde(default)]
+    deprecated: Option<Deprecated>,
     #[serde(default)]
     args: Option<Vec<Argument>>,
     #[serde(default)]
@@ -652,6 +720,61 @@ impl<'de> Visitor<'de> for RequiredVisitor {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn string_vec(vec: Vec<&str>) -> Vec<String> {
+        vec.into_iter().map(|s| s.to_owned()).collect()
+    }
+
+    #[test]
+    fn deprecated_try_instead() {
+        let deprecated = Deprecated {
+            message: "You shouldn't see this".to_owned(),
+            replace: vec![
+                "eleven(%11)".to_owned(),
+                "four(%1, %2, %3, %4)".to_owned(),
+                "three(%1, %2, %3 %%3)".to_owned(),
+                "two(%1, %2)".to_owned(),
+                "one(%1)".to_owned(),
+            ],
+        };
+
+        assert_eq!(
+            deprecated.try_instead(&string_vec(vec!["a", "b", "c"])),
+            Some("three(a, b, c %3)".to_owned())
+        );
+
+        assert_eq!(
+            deprecated.try_instead(&string_vec(vec!["a", "b"])),
+            Some("two(a, b)".to_owned())
+        );
+
+        assert_eq!(
+            deprecated.try_instead(&string_vec(vec!["a"])),
+            Some("one(a)".to_owned())
+        );
+
+        assert_eq!(
+            deprecated.try_instead(&string_vec(vec![
+                "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11",
+            ])),
+            Some("eleven(11)".to_owned())
+        );
+
+        assert_eq!(deprecated.try_instead(&string_vec(vec![])), None);
+    }
+
+    #[test]
+    fn deprecated_varargs() {
+        let deprecated = Deprecated {
+            message: "You shouldn't see this".to_owned(),
+            replace: vec!["print(%...)".to_owned()],
+        };
+
+        assert_eq!(
+            deprecated.try_instead(&string_vec(vec!["a", "b", "c"])),
+            Some("print(a, b, c)".to_owned())
+        );
+    }
 
     #[test]
     fn valid_serde() {
