@@ -205,11 +205,7 @@ pub struct Context {
 impl Context {
     #[cfg(feature = "roblox")]
     pub fn is_roblox(&self) -> bool {
-        if let Some(ref meta) = self.standard_library.meta {
-            meta.name == Some("roblox".to_owned())
-        } else {
-            false
-        }
+        self.standard_library.name.as_deref() == Some("roblox")
     }
 
     #[cfg(not(feature = "roblox"))]

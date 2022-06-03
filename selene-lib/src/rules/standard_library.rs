@@ -265,11 +265,11 @@ impl StandardLibraryVisitor<'_> {
                 let path = &name_path[0..bound];
                 match self.standard_library.find_global(path) {
                     Some(field) => {
-                        match field {
-                            Field::Any => return,
+                        match field.field_kind {
+                            FieldKind::Any => return,
 
-                            Field::Property { writable } => {
-                                if writable.is_some() && *writable != Some(Writable::Overridden) {
+                            FieldKind::Property(writability) => {
+                                if writability != PropertyWritability::OverrideFields {
                                     return;
                                 }
                             }
@@ -327,15 +327,13 @@ impl Visitor for StandardLibraryVisitor<'_> {
                     {
                         match self.standard_library.find_global(&name_path) {
                             Some(field) => {
-                                match field {
-                                    Field::Property { writable } => {
-                                        if writable.is_some()
-                                            && *writable != Some(Writable::NewFields)
-                                        {
+                                match field.field_kind {
+                                    FieldKind::Property(writability) => {
+                                        if writability != PropertyWritability::NewFields {
                                             continue;
                                         }
                                     }
-                                    Field::Any => continue,
+                                    FieldKind::Any => continue,
                                     _ => {}
                                 };
 
@@ -367,13 +365,13 @@ impl Visitor for StandardLibraryVisitor<'_> {
                     let name = name_token.token().to_string();
 
                     if let Some(global) = self.standard_library.find_global(&[name.to_owned()]) {
-                        match global {
-                            Field::Property { writable } => {
-                                if writable.is_some() && *writable != Some(Writable::NewFields) {
+                        match global.field_kind {
+                            FieldKind::Property(writability) => {
+                                if writability != PropertyWritability::NewFields {
                                     continue;
                                 }
                             }
-                            Field::Any => continue,
+                            FieldKind::Any => continue,
                             _ => {}
                         };
 
@@ -454,12 +452,10 @@ impl Visitor for StandardLibraryVisitor<'_> {
             }
         };
 
-        let (arguments, expecting_method) = match &field {
-            standard_library::Field::Any => return,
-            standard_library::Field::Complex {
-                function: Some(function),
-                ..
-            } => (&function.arguments, &function.method),
+        // TODO: Change this to just be FunctionBehavior directly
+        let (arguments, expecting_method) = match &field.field_kind {
+            FieldKind::Any => return,
+            FieldKind::Function(function) => (&function.arguments, &function.method),
             _ => {
                 self.diagnostics.push(Diagnostic::new(
                     "incorrect_standard_library_use",
