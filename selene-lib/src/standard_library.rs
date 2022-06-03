@@ -298,6 +298,7 @@ pub enum Field {
         table: BTreeMap<String, Field>,
     },
     Property {
+        deprecated: Option<Deprecated>,
         writable: Option<Writable>,
     },
     Struct(String),
@@ -353,6 +354,7 @@ impl<'de> Deserialize<'de> for Field {
         if field_raw.property {
             return Ok(Field::Property {
                 writable: field_raw.writable,
+                deprecated: field_raw.deprecated,
             });
         }
 
@@ -393,7 +395,12 @@ impl Serialize for Field {
                     if function.method {
                         map.serialize_entry("method", &true)?;
                     }
+
                     map.serialize_entry("args", &function.arguments)?;
+
+                    if let Some(deprecated) = &function.deprecated {
+                        map.serialize_entry("deprecated", &deprecated)?;
+                    }
                 }
 
                 for (key, value) in table.iter() {
@@ -403,12 +410,21 @@ impl Serialize for Field {
                 map.end()
             }
 
-            Field::Property { writable } => {
+            Field::Property {
+                writable,
+                deprecated,
+            } => {
                 let mut map = serializer.serialize_map(None)?;
                 map.serialize_entry("property", &true)?;
+
                 if let Some(writable) = writable {
                     map.serialize_entry("writable", writable)?;
                 }
+
+                if let Some(deprecated) = deprecated {
+                    map.serialize_entry("deprecated", deprecated)?;
+                }
+
                 map.end()
             }
 
@@ -457,7 +473,7 @@ impl Deprecated {
         Regex::new(r"%(%|(?P<number>[0-9]+)|(\.\.\.))").unwrap()
     }
 
-    pub fn try_instead(&self, parameters: &Vec<String>) -> Option<String> {
+    pub fn try_instead(&self, parameters: &[String]) -> Option<String> {
         let regex_pattern = Deprecated::regex_pattern();
 
         for replace_format in &self.replace {

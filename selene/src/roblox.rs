@@ -120,6 +120,7 @@ impl RobloxGenerator {
                     tags,
                     Some(Field::Property {
                         writable: Some(Writable::Overridden),
+                        deprecated: None,
                     }),
                 ),
 
@@ -191,6 +192,7 @@ impl RobloxGenerator {
                                 })
                                 .collect(),
                             method: true,
+                            deprecated: None,
                         }
                         .into(),
                     ),
@@ -215,6 +217,8 @@ impl RobloxGenerator {
                             } else {
                                 Some(Writable::Overridden)
                             },
+
+                            deprecated: None,
                         });
 
                         match &value_type {
@@ -271,6 +275,7 @@ impl RobloxGenerator {
                 FunctionBehavior {
                     arguments: vec![],
                     method: true,
+                    deprecated: None,
                 }
                 .into(),
             );
@@ -307,6 +312,7 @@ impl RobloxGenerator {
                     required: Required::Required(None),
                 }],
                 method: false,
+                deprecated: None,
             }
             .into();
         } else {
@@ -337,6 +343,7 @@ impl RobloxGenerator {
                 required: Required::Required(None),
             }],
             method: true,
+            deprecated: None,
         }
         .into();
     }

@@ -1,0 +1,3 @@
+[this.is_deprecated]
+property = true
+deprecated = { message = "This field is deprecated :(" }

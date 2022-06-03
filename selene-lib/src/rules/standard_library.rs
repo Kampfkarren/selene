@@ -214,7 +214,7 @@ impl StandardLibraryVisitor<'_> {
                         match field {
                             Field::Any => return,
 
-                            Field::Property { writable } => {
+                            Field::Property { writable, .. } => {
                                 if writable.is_some() && *writable != Some(Writable::Overridden) {
                                     return;
                                 }
@@ -274,7 +274,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                         match self.standard_library.find_global(&name_path) {
                             Some(field) => {
                                 match field {
-                                    Field::Property { writable } => {
+                                    Field::Property { writable, .. } => {
                                         if writable.is_some()
                                             && *writable != Some(Writable::NewFields)
                                         {
@@ -314,7 +314,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
 
                     if let Some(global) = self.standard_library.find_global(&[name.to_owned()]) {
                         match global {
-                            Field::Property { writable } => {
+                            Field::Property { writable, .. } => {
                                 if writable.is_some() && *writable != Some(Writable::NewFields) {
                                     continue;
                                 }

@@ -1,7 +1,7 @@
 use super::{super::standard_library::*, *};
 use crate::{
     ast_util::{
-        name_paths::{name_path_from_prefix_suffix, take_while_keep_going},
+        name_paths::{name_path, name_path_from_prefix_suffix, take_while_keep_going},
         scopes::ScopeManager,
     },
     standard_library,
@@ -52,6 +52,47 @@ struct DeprecatedVisitor<'a> {
 }
 
 impl Visitor for DeprecatedVisitor<'_> {
+    fn visit_expression(&mut self, expression: &ast::Expression) {
+        if let Some(reference) = self
+            .scope_manager
+            .reference_at_byte(expression.start_position().unwrap().bytes())
+        {
+            if reference.resolved.is_some() {
+                return;
+            }
+        }
+
+        let name_path = match name_path(expression) {
+            Some(name_path) => name_path,
+            None => return,
+        };
+
+        let deprecated = match self.standard_library.find_global(&name_path) {
+            Some(Field::Property {
+                deprecated: Some(deprecated),
+                ..
+            }) => deprecated,
+            _ => return,
+        };
+
+        let mut notes = vec![deprecated.message.to_owned()];
+
+        if let Some(replace_with) = deprecated.try_instead(&[]) {
+            notes.push(format!("try: {replace_with}"));
+        }
+
+        self.diagnostics.push(Diagnostic::new_complete(
+            "deprecated",
+            format!(
+                "standard library property `{}` is deprecated",
+                name_path.join(".")
+            ),
+            Label::from_node(expression, None),
+            notes,
+            Vec::new(),
+        ));
+    }
+
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         if let Some(reference) = self
             .scope_manager
@@ -149,6 +190,15 @@ impl Visitor for DeprecatedVisitor<'_> {
 #[cfg(test)]
 mod tests {
     use super::{super::test_util::*, *};
+
+    #[test]
+    fn test_deprecated_fields() {
+        test_lint(
+            DeprecatedLint::new(()).unwrap(),
+            "deprecated",
+            "deprecated_fields",
+        );
+    }
 
     #[test]
     fn test_deprecated_functions() {

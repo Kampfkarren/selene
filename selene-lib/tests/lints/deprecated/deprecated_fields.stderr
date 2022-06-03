@@ -1,0 +1,8 @@
+error[deprecated]: standard library property `this.is_deprecated` is deprecated
+  ┌─ deprecated_fields.lua:1:11
+  │
+1 │ local _ = this.is_deprecated
+  │           ^^^^^^^^^^^^^^^^^^
+  │
+  = This field is deprecated :(
+
