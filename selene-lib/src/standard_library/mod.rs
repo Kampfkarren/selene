@@ -202,9 +202,12 @@ impl StandardLibrary {
     /// 4. "x.y.z" where `x.*.z` or `x.*.*` is defined
     /// 5. "x.y.z" where `x.y` or `x.*` is defined as "any"
     /// 6. "x.y" resolving to a read only property if only "x.y.z" (or x.y.*) is explicitly defined
-    // TODO: Optimize by doing get(names.join('.')) directly
     pub fn find_global(&self, names: &[String]) -> Option<&Field> {
         assert!(!names.is_empty());
+
+        if let Some(explicit_global) = self.globals.get(&names.join(".")) {
+            return Some(explicit_global);
+        }
 
         static READ_ONLY_FIELD: Field = Field {
             field_kind: FieldKind::Property(PropertyWritability::ReadOnly),
