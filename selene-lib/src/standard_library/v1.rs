@@ -32,7 +32,6 @@ pub struct StandardLibrary {
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
 pub struct StandardLibraryMeta {
-    // TODO: Skip serializing if these are None
     #[serde(default)]
     pub base: Option<String>,
     #[serde(default)]
