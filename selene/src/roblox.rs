@@ -72,8 +72,6 @@ impl RobloxGenerator {
         self.std
             .extend(StandardLibrary::from_name(self.std.base.as_ref().unwrap()).unwrap());
 
-        self.std.inflate();
-
         Ok((bytes, self.std))
     }
 

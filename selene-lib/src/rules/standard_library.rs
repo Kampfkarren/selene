@@ -250,12 +250,12 @@ impl StandardLibraryVisitor<'_> {
         mut name_path: Vec<String>,
         range: (Position, Position),
     ) {
+        // Make sure it's not just `bad()`, and that it's not a field access from a global outside of standard library
         if self.standard_library.find_global(&name_path).is_none()
-            && self
+            && !self
                 .standard_library
-                .find_global(&[name_path[0].to_owned()])
-                .is_some()
-        // Make sure it's not just `bad()`
+                .get_globals_under(&name_path[0])
+                .is_empty()
         {
             let field = name_path.pop().unwrap();
             assert!(!name_path.is_empty(), "name_path is empty");
@@ -269,7 +269,9 @@ impl StandardLibraryVisitor<'_> {
                             FieldKind::Any => return,
 
                             FieldKind::Property(writability) => {
-                                if writability != PropertyWritability::OverrideFields {
+                                if writability != PropertyWritability::ReadOnly
+                                    && writability != PropertyWritability::OverrideFields
+                                {
                                     return;
                                 }
                             }
@@ -329,7 +331,9 @@ impl Visitor for StandardLibraryVisitor<'_> {
                             Some(field) => {
                                 match field.field_kind {
                                     FieldKind::Property(writability) => {
-                                        if writability != PropertyWritability::NewFields {
+                                        if writability != PropertyWritability::ReadOnly
+                                            && writability != PropertyWritability::NewFields
+                                        {
                                             continue;
                                         }
                                     }
@@ -367,7 +371,9 @@ impl Visitor for StandardLibraryVisitor<'_> {
                     if let Some(global) = self.standard_library.find_global(&[name.to_owned()]) {
                         match global.field_kind {
                             FieldKind::Property(writability) => {
-                                if writability != PropertyWritability::NewFields {
+                                if writability != PropertyWritability::ReadOnly
+                                    && writability != PropertyWritability::NewFields
+                                {
                                     continue;
                                 }
                             }

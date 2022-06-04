@@ -101,8 +101,6 @@ impl StandardLibrary {
                                 );
                             }
 
-                            std.inflate();
-
                             Some(std)
                         },
                     )+
@@ -153,10 +151,6 @@ impl StandardLibrary {
             };
         }
 
-        if let Some(ref mut library) = library {
-            library.inflate();
-        }
-
         Ok(library)
     }
 
@@ -174,21 +168,61 @@ impl StandardLibrary {
         Ok(Some(library))
     }
 
-    // TODO: This can be significantly slimmed down to just joining "."
+    /// Find a global in the standard library through its name path.
+    /// Handles all of the following cases:
+    /// 1. "x.y" where `x.y` is explicitly defined
+    /// 2. "x.y" where `x.*` is defined
+    /// 3. "x.y" where `x` is a struct with a `y` or `*` field
+    /// 4. "x.y.z" where `x.*.z` or `x.*.*` is defined
     pub fn find_global(&self, names: &[String]) -> Option<&Field> {
-        todo!("StandardLibrary::find_global")
+        assert!(!names.is_empty());
+
+        todo!()
     }
 
-    pub fn unstruct<'a>(&'a self, field: &'a Field) -> &'a Field {
-        todo!("StandardLibrary::unstruct")
+    pub fn get_globals_under<'a>(&'a self, name: &str) -> HashMap<&'a String, &'a Field> {
+        let mut globals = HashMap::new();
+
+        for (key, value) in self.globals.iter() {
+            if key.split_once('.').map_or(&**key, |x| x.0) == name {
+                globals.insert(key, value);
+            }
+        }
+
+        globals
     }
 
-    pub fn extend(&mut self, mut other: StandardLibrary) {
-        todo!("StandardLibrary::extend")
-    }
+    pub fn extend(&mut self, other: StandardLibrary) {
+        self.structs.extend(other.structs);
 
-    pub fn inflate(&mut self) {
-        todo!("StandardLibrary::inflate")
+        // let mut globals = other.globals.to_owned();
+        let mut globals: BTreeMap<String, Field> = other
+            .globals
+            .into_iter()
+            .filter(|(other_field_name, other_field)| {
+                other_field.field_kind != FieldKind::Removed
+                    && !matches!(
+                        self.globals.get(other_field_name),
+                        Some(Field {
+                            field_kind: FieldKind::Removed,
+                        })
+                    )
+            })
+            .collect();
+
+        globals.extend(
+            std::mem::take(&mut self.globals)
+                .into_iter()
+                .filter_map(|(key, value)| {
+                    if value.field_kind == FieldKind::Removed {
+                        None
+                    } else {
+                        Some((key, value))
+                    }
+                }),
+        );
+
+        self.globals = globals;
     }
 }
 
@@ -196,6 +230,7 @@ impl StandardLibrary {
 pub struct FunctionBehavior {
     #[serde(rename = "args")]
     pub arguments: Vec<Argument>,
+    #[serde(default)]
     #[serde(skip_serializing_if = "is_false")]
     pub method: bool,
 }
@@ -297,6 +332,7 @@ impl Serialize for FieldKind {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum PropertyWritability {
+    // New fields can't be added, and entire variable can't be overridden
     ReadOnly,
     // New fields can be added and set, but variable itself cannot be redefined
     NewFields,

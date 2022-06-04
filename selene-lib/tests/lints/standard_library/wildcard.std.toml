@@ -11,3 +11,6 @@ writable = "overridden"
 [script."*"."*"]
 property = true
 writable = "full"
+
+[x."*".z]
+property = true

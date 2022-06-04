@@ -6,77 +6,27 @@ impl From<v1::StandardLibrary> for StandardLibrary {
     fn from(mut v1: v1::StandardLibrary) -> Self {
         let mut standard_library = StandardLibrary::default();
 
-        // TODO: structs
-
         if let Some(meta) = v1.meta.take() {
             standard_library.base = meta.base;
             standard_library.name = meta.name;
+
+            if let Some(v1_structs) = meta.structs {
+                for (name, children) in v1_structs {
+                    let mut struct_fields = BTreeMap::new();
+
+                    for (name, v1_struct_field) in children {
+                        struct_fields.extend(unpack_v1_field(name, v1_struct_field));
+                    }
+
+                    standard_library.structs.insert(name, struct_fields);
+                }
+            }
         }
 
         let mut globals = BTreeMap::new();
 
-        let mut v1_globals = v1.globals.into_iter().collect::<Vec<_>>();
-
-        while let Some((name, field)) = v1_globals.pop() {
-            match field {
-                v1::Field::Any => {
-                    globals.insert(
-                        name,
-                        Field {
-                            field_kind: FieldKind::Any,
-                        },
-                    );
-                }
-
-                v1::Field::Complex { function, table } => {
-                    for (child_name, child_field) in table {
-                        v1_globals.push((format!("{name}.{child_name}").to_owned(), child_field));
-                    }
-
-                    if let Some(function) = function {
-                        globals.insert(
-                            name,
-                            Field {
-                                field_kind: FieldKind::Function(FunctionBehavior {
-                                    arguments: function
-                                        .arguments
-                                        .into_iter()
-                                        .map(Into::into)
-                                        .collect(),
-                                    method: function.method,
-                                }),
-                            },
-                        );
-                    }
-                }
-
-                v1::Field::Property { writable } => {
-                    globals.insert(
-                        name,
-                        Field {
-                            field_kind: FieldKind::Property(writable.into()),
-                        },
-                    );
-                }
-
-                v1::Field::Struct(struct_name) => {
-                    globals.insert(
-                        name,
-                        Field {
-                            field_kind: FieldKind::Struct(struct_name),
-                        },
-                    );
-                }
-
-                v1::Field::Removed => {
-                    globals.insert(
-                        name,
-                        Field {
-                            field_kind: FieldKind::Removed,
-                        },
-                    );
-                }
-            }
+        for (name, v1_global) in v1.globals {
+            globals.extend(unpack_v1_field(name, v1_global));
         }
 
         standard_library.globals = globals;
@@ -109,6 +59,71 @@ impl From<v1::ArgumentType> for ArgumentType {
             v1::ArgumentType::Vararg => ArgumentType::Vararg,
         }
     }
+}
+
+fn unpack_v1_field(name: String, v1_field: v1::Field) -> BTreeMap<String, Field> {
+    let mut upgraded_fields = BTreeMap::new();
+    let mut v1_fields = vec![(name, v1_field)];
+
+    while let Some((name, field)) = v1_fields.pop() {
+        match field {
+            v1::Field::Any => {
+                upgraded_fields.insert(
+                    name,
+                    Field {
+                        field_kind: FieldKind::Any,
+                    },
+                );
+            }
+
+            v1::Field::Complex { function, table } => {
+                for (child_name, child_field) in table {
+                    v1_fields.push((format!("{name}.{child_name}").to_owned(), child_field));
+                }
+
+                if let Some(function) = function {
+                    upgraded_fields.insert(
+                        name,
+                        Field {
+                            field_kind: FieldKind::Function(FunctionBehavior {
+                                arguments: function.arguments.into_iter().map(Into::into).collect(),
+                                method: function.method,
+                            }),
+                        },
+                    );
+                }
+            }
+
+            v1::Field::Property { writable } => {
+                upgraded_fields.insert(
+                    name,
+                    Field {
+                        field_kind: FieldKind::Property(writable.into()),
+                    },
+                );
+            }
+
+            v1::Field::Struct(struct_name) => {
+                upgraded_fields.insert(
+                    name,
+                    Field {
+                        field_kind: FieldKind::Struct(struct_name),
+                    },
+                );
+            }
+
+            v1::Field::Removed => {
+                upgraded_fields.insert(
+                    name,
+                    Field {
+                        field_kind: FieldKind::Removed,
+                    },
+                );
+            }
+        }
+    }
+
+    upgraded_fields
 }
 
 impl From<Option<v1::Writable>> for PropertyWritability {
