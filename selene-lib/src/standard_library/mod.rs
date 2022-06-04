@@ -186,7 +186,7 @@ impl StandardLibrary {
 
         #[derive(Clone, Debug)]
         struct TreeNode<'a> {
-            field: Option<&'a Field>,
+            field: &'a Field,
             children: BTreeMap<String, TreeNode<'a>>,
         }
 
@@ -205,19 +205,19 @@ impl StandardLibrary {
                     current = &mut current
                         .entry(segment.to_string())
                         .or_insert_with(|| TreeNode {
-                            field: Some(&READ_ONLY_FIELD),
+                            field: &READ_ONLY_FIELD,
                             children: BTreeMap::new(),
                         })
                         .children;
                 }
 
                 if let Some(existing_segment) = current.get_mut(final_name) {
-                    existing_segment.field = Some(field);
+                    existing_segment.field = field;
                 } else {
                     current.insert(
                         final_name.to_string(),
                         TreeNode {
-                            field: Some(field),
+                            field,
                             children: BTreeMap::new(),
                         },
                     );
@@ -237,15 +237,15 @@ impl StandardLibrary {
             let found_segment = current.get(name).or_else(|| current.get("*"))?;
 
             match found_segment.field {
-                Some(Field {
+                Field {
                     field_kind: FieldKind::Any,
-                }) => {
-                    return found_segment.field;
+                } => {
+                    return Some(found_segment.field);
                 }
 
-                Some(Field {
+                Field {
                     field_kind: FieldKind::Struct(struct_name),
-                }) => {
+                } => {
                     let strukt = self
                         .structs
                         .get(struct_name)
@@ -264,7 +264,7 @@ impl StandardLibrary {
         current
             .get(names.last().unwrap())
             .or_else(|| current.get("*"))
-            .and_then(|node| node.field)
+            .map(|node| node.field)
     }
 
     pub fn get_globals_under<'a>(&'a self, name: &str) -> HashMap<&'a String, &'a Field> {
