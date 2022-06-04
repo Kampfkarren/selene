@@ -4,13 +4,11 @@ pub fn upgrade_std(filename: PathBuf) -> Result<(), Box<dyn std::error::Error>> 
     let output_filename = filename.with_extension("yml");
 
     if output_filename.exists() {
-        // TODO: This should be an Err
-        eprintln!(
-            "{} already exists, delete it to prevent overriding",
+        return Err(format!(
+            "{} already exists, delete it before re-running",
             output_filename.display()
-        );
-
-        return Ok(());
+        )
+        .into());
     }
 
     let v1_std: selene_lib::standard_library::v1::StandardLibrary =
