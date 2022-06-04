@@ -1,6 +1,5 @@
 use std::path::PathBuf;
 
-// TODO: Change to eyre, then carry useful information like "while deserializing toml"
 pub fn upgrade_std(filename: PathBuf) -> Result<(), Box<dyn std::error::Error>> {
     let output_filename = filename.with_extension("yml");
 

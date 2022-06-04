@@ -625,16 +625,16 @@ fn get_opts_safe(mut args: Vec<OsString>, luacheck: bool) -> Result<opts::Option
 }
 
 #[cfg(feature = "roblox")]
-fn generate_roblox_std(show_deprecated: bool) -> Result<StandardLibrary, roblox::GenerateError> {
+fn generate_roblox_std(
+    show_deprecated: bool,
+) -> Result<StandardLibrary, Box<dyn std::error::Error>> {
     let (contents, std) = roblox::RobloxGenerator {
         std: roblox::RobloxGenerator::base_std()?,
         show_deprecated,
     }
     .generate()?;
 
-    fs::File::create("roblox.yml")
-        .and_then(|mut file| file.write_all(&contents))
-        .map_err(roblox::GenerateError::Io)?;
+    fs::File::create("roblox.yml").and_then(|mut file| file.write_all(&contents))?;
 
     Ok(std)
 }
