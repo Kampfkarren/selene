@@ -11,4 +11,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: roblox
-        path: roblox.toml
+        path: roblox.yml
