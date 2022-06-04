@@ -16,3 +16,9 @@ error[incorrect_standard_library_use]: standard library global `script.Child` is
 6 │ script.Child = "Oops"
   │ ^^^^^^^^^^^^
 
+error[incorrect_standard_library_use]: standard library global `x.y` does not contain the field `fail`
+   ┌─ wildcard.lua:12:7
+   │
+12 │ print(x.y.fail)
+   │       ^^^^^^^^
+

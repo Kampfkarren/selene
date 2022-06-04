@@ -174,10 +174,97 @@ impl StandardLibrary {
     /// 2. "x.y" where `x.*` is defined
     /// 3. "x.y" where `x` is a struct with a `y` or `*` field
     /// 4. "x.y.z" where `x.*.z` or `x.*.*` is defined
+    /// 5. "x.y.z" where `x.y` or `x.*` is defined as "any"
+    /// 6. "x.y" resolving to a read only property if only "x.y.z" (or x.y.*) is explicitly defined
+    // TODO: Optimize by doing get(names.join('.')) directly
     pub fn find_global(&self, names: &[String]) -> Option<&Field> {
         assert!(!names.is_empty());
 
-        todo!()
+        static READ_ONLY_FIELD: Field = Field {
+            field_kind: FieldKind::Property(PropertyWritability::ReadOnly),
+        };
+
+        #[derive(Clone, Debug)]
+        struct TreeNode<'a> {
+            field: Option<&'a Field>,
+            children: BTreeMap<String, TreeNode<'a>>,
+        }
+
+        fn extract_into_tree<'a>(
+            names_to_fields: &'a BTreeMap<String, Field>,
+        ) -> BTreeMap<String, TreeNode<'a>> {
+            let mut fields: BTreeMap<String, TreeNode<'_>> = BTreeMap::new();
+
+            for (name, field) in names_to_fields {
+                let mut current = &mut fields;
+
+                let mut split = name.split('.').collect::<Vec<_>>();
+                let final_name = split.pop().unwrap();
+
+                for segment in split {
+                    current = &mut current
+                        .entry(segment.to_string())
+                        .or_insert_with(|| TreeNode {
+                            field: Some(&READ_ONLY_FIELD),
+                            children: BTreeMap::new(),
+                        })
+                        .children;
+                }
+
+                if let Some(existing_segment) = current.get_mut(final_name) {
+                    existing_segment.field = Some(field);
+                } else {
+                    current.insert(
+                        final_name.to_string(),
+                        TreeNode {
+                            field: Some(field),
+                            children: BTreeMap::new(),
+                        },
+                    );
+                }
+            }
+
+            fields
+        }
+
+        let global_fields = extract_into_tree(&self.globals);
+        let mut current = &global_fields;
+
+        // TODO: This is really stupid lol
+        let mut last_extracted_struct;
+
+        for name in names.iter().take(names.len() - 1) {
+            let found_segment = current.get(name).or_else(|| current.get("*"))?;
+
+            match found_segment.field {
+                Some(Field {
+                    field_kind: FieldKind::Any,
+                }) => {
+                    return found_segment.field;
+                }
+
+                Some(Field {
+                    field_kind: FieldKind::Struct(struct_name),
+                }) => {
+                    let strukt = self
+                        .structs
+                        .get(struct_name)
+                        .unwrap_or_else(|| panic!("struct `{struct_name}` not found"));
+
+                    last_extracted_struct = extract_into_tree(strukt);
+                    current = &last_extracted_struct;
+                }
+
+                _ => {
+                    current = &found_segment.children;
+                }
+            }
+        }
+
+        current
+            .get(names.last().unwrap())
+            .or_else(|| current.get("*"))
+            .and_then(|node| node.field)
     }
 
     pub fn get_globals_under<'a>(&'a self, name: &str) -> HashMap<&'a String, &'a Field> {
