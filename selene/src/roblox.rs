@@ -38,8 +38,8 @@ impl fmt::Display for GenerateError {
 
 impl RobloxGenerator {
     pub fn generate(mut self) -> Result<(Vec<u8>, StandardLibrary), GenerateError> {
-        let api: ApiDump = reqwest::get(API_DUMP)
-            .and_then(|mut response| response.json())
+        let api: ApiDump = reqwest::blocking::get(API_DUMP)
+            .and_then(|response| response.json())
             .map_err(GenerateError::Http)?;
 
         self.write_class(&api, "game", "DataModel");
