@@ -1,9 +1,6 @@
 use std::{ffi::OsString, path::PathBuf};
 
-use structopt::{
-    clap::{arg_enum, AppSettings},
-    StructOpt,
-};
+use structopt::{clap::arg_enum, StructOpt};
 
 #[derive(Clone, Debug, StructOpt)]
 #[structopt(rename_all = "kebab-case")]

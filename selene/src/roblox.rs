@@ -277,27 +277,21 @@ impl RobloxGenerator {
 
     fn write_enums(&mut self, api: &api::ApiDump) {
         for enuhm in &api.enums {
-            let mut enum_table = BTreeMap::new();
-            enum_table.insert(
-                "GetEnumItems".to_owned(),
+            self.std.globals.insert(
+                format!("Enum.{}", enuhm.name),
                 Field {
-                    field_kind: FieldKind::Function(FunctionBehavior {
-                        arguments: vec![],
-                        method: true,
-                    }),
+                    field_kind: FieldKind::Struct("Enum".to_owned()),
                 },
             );
 
             for item in &enuhm.items {
-                enum_table.insert(
-                    item.name.to_owned(),
+                self.std.globals.insert(
+                    format!("Enum.{}.{}", enuhm.name, item.name),
                     Field {
                         field_kind: FieldKind::Struct("EnumItem".to_owned()),
                     },
                 );
             }
-
-            todo!("write enums");
         }
     }
 

@@ -718,6 +718,10 @@ globals:
       - required: false
         type: "..."
 structs:
+  Enum:
+    GetEnumItems:
+      method: true
+      args: []
   EnumItem:
     Name:
       property: read-only
