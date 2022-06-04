@@ -15,7 +15,7 @@ pub struct RobloxGenerator {
 }
 
 pub enum GenerateError {
-    Http(reqwest::Error),
+    Http(ureq::Error),
     Io(std::io::Error),
     YamlDe(serde_yaml::Error),
     YamlSer(serde_yaml::Error),
@@ -38,9 +38,11 @@ impl fmt::Display for GenerateError {
 
 impl RobloxGenerator {
     pub fn generate(mut self) -> Result<(Vec<u8>, StandardLibrary), GenerateError> {
-        let api: ApiDump = reqwest::blocking::get(API_DUMP)
-            .and_then(|response| response.json())
-            .map_err(GenerateError::Http)?;
+        let api: ApiDump = ureq::get(API_DUMP)
+            .call()
+            .map_err(GenerateError::Http)?
+            .into_json()
+            .map_err(GenerateError::Io)?;
 
         self.write_class(&api, "game", "DataModel");
         self.write_class(&api, "plugin", "Plugin");
