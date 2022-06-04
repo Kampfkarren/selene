@@ -30,10 +30,10 @@ impl Rule for UndefinedVariableLint {
                 && reference.read
                 && !read.contains(&reference.identifier)
                 && !is_valid_vararg_reference(&scope_manager, reference)
-                && !context
+                && context
                     .standard_library
-                    .globals
-                    .contains_key(&reference.name)
+                    .get_globals_under(&reference.name)
+                    .is_empty()
             {
                 read.insert(reference.identifier);
 

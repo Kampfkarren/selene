@@ -44,16 +44,22 @@ pub struct StandardLibrary {
 
 #[derive(Debug)]
 pub enum StandardLibraryError {
-    DeserializeError(toml::de::Error),
+    DeserializeTomlError(toml::de::Error),
+    DeserializeYamlError(serde_yaml::Error),
     IoError(io::Error),
 }
 
 impl fmt::Display for StandardLibraryError {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            StandardLibraryError::DeserializeError(error) => {
-                write!(formatter, "deserialize error: {}", error)
+            StandardLibraryError::DeserializeTomlError(error) => {
+                write!(formatter, "deserialize toml error: {}", error)
             }
+
+            StandardLibraryError::DeserializeYamlError(error) => {
+                write!(formatter, "deserialize yaml error: {}", error)
+            }
+
             StandardLibraryError::IoError(error) => write!(formatter, "io error: {}", error),
         }
     }
@@ -64,7 +70,8 @@ impl std::error::Error for StandardLibraryError {
         use StandardLibraryError::*;
 
         match self {
-            DeserializeError(error) => Some(error),
+            DeserializeTomlError(error) => Some(error),
+            DeserializeYamlError(error) => Some(error),
             IoError(error) => Some(error),
         }
     }
@@ -128,7 +135,7 @@ impl StandardLibrary {
                 Some(default) => default,
 
                 None => {
-                    let mut path = directory
+                    let path = directory
                         .map(Path::to_path_buf)
                         .unwrap_or_else(||
                             panic!(
@@ -137,8 +144,7 @@ impl StandardLibrary {
                             )
                         );
 
-                    path.push(format!("{}.toml", segment));
-                    match StandardLibrary::from_file(&path)? {
+                    match StandardLibrary::from_file_segment(&path.join(segment))? {
                         Some(library) => library,
                         None => return Ok(None),
                     }
@@ -154,13 +160,33 @@ impl StandardLibrary {
         Ok(library)
     }
 
-    pub fn from_file(filename: &Path) -> Result<Option<StandardLibrary>, StandardLibraryError> {
-        let content = fs::read_to_string(filename)?;
-        let mut library: StandardLibrary =
-            toml::from_str(&content).map_err(StandardLibraryError::DeserializeError)?;
+    pub fn from_file_segment(
+        file_segment: &Path,
+    ) -> Result<Option<StandardLibrary>, StandardLibraryError> {
+        let mut library: StandardLibrary;
+
+        let toml_file = file_segment.with_extension("toml");
+        if toml_file.exists() {
+            let content = fs::read_to_string(toml_file)?;
+
+            let v1_library: v1::StandardLibrary =
+                toml::from_str(&content).map_err(StandardLibraryError::DeserializeTomlError)?;
+
+            library = v1_library.into();
+        } else {
+            let yaml_file = file_segment.with_extension("yml");
+            if yaml_file.exists() {
+                let content = fs::read_to_string(yaml_file)?;
+                library = serde_yaml::from_str(&content)
+                    .map_err(StandardLibraryError::DeserializeYamlError)?;
+            } else {
+                return Ok(None);
+            }
+        }
 
         if let Some(base_name) = &library.base {
-            if let Some(base) = StandardLibrary::from_config_name(base_name, filename.parent())? {
+            if let Some(base) = StandardLibrary::from_config_name(base_name, file_segment.parent())?
+            {
                 library.extend(base);
             }
         }

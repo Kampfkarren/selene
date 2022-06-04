@@ -17,8 +17,8 @@ pub struct RobloxGenerator {
 pub enum GenerateError {
     Http(reqwest::Error),
     Io(std::io::Error),
-    TomlDe(toml::de::Error),
-    TomlSer(toml::ser::Error),
+    YamlDe(serde_yaml::Error),
+    YamlSer(serde_yaml::Error),
 }
 
 impl fmt::Display for GenerateError {
@@ -26,11 +26,11 @@ impl fmt::Display for GenerateError {
         match self {
             GenerateError::Http(error) => write!(formatter, "HTTP error: {}", error),
             GenerateError::Io(error) => write!(formatter, "IO error: {}", error),
-            GenerateError::TomlDe(error) => {
-                write!(formatter, "TOML deserialization error: {}", error)
+            GenerateError::YamlDe(error) => {
+                write!(formatter, "YAML deserialization error: {}", error)
             }
-            GenerateError::TomlSer(error) => {
-                write!(formatter, "TOML serialization error: {}", error)
+            GenerateError::YamlSer(error) => {
+                write!(formatter, "YAML serialization error: {}", error)
             }
         }
     }
@@ -65,7 +65,7 @@ impl RobloxGenerator {
         write!(
             bytes,
             "{}",
-            toml::to_string(&self.std).map_err(GenerateError::TomlSer)?
+            serde_yaml::to_string(&self.std).map_err(GenerateError::YamlSer)?
         )
         .map_err(GenerateError::Io)?;
 
@@ -76,7 +76,7 @@ impl RobloxGenerator {
     }
 
     pub fn base_std() -> Result<StandardLibrary, GenerateError> {
-        toml::from_str(include_str!("./roblox/base.toml")).map_err(GenerateError::TomlDe)
+        serde_yaml::from_str(include_str!("./roblox/base.yml")).map_err(GenerateError::YamlDe)
     }
 
     fn write_class(&mut self, api: &api::ApiDump, global_name: &str, class_name: &str) {

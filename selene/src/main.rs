@@ -632,7 +632,7 @@ fn generate_roblox_std(show_deprecated: bool) -> Result<StandardLibrary, roblox:
     }
     .generate()?;
 
-    fs::File::create("roblox.toml")
+    fs::File::create("roblox.yml")
         .and_then(|mut file| file.write_all(&contents))
         .map_err(roblox::GenerateError::Io)?;
 
