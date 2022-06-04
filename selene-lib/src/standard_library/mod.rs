@@ -35,7 +35,7 @@ pub struct StandardLibrary {
 
     #[serde(default)]
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
-    globals: BTreeMap<String, Field>,
+    pub globals: BTreeMap<String, Field>,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
