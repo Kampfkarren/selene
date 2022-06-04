@@ -458,10 +458,9 @@ impl Visitor for StandardLibraryVisitor<'_> {
             }
         };
 
-        // TODO: Change this to just be FunctionBehavior directly
-        let (arguments, expecting_method) = match &field.field_kind {
+        let function = match &field.field_kind {
             FieldKind::Any => return,
-            FieldKind::Function(function) => (&function.arguments, &function.method),
+            FieldKind::Function(function) => function,
             _ => {
                 self.diagnostics.push(Diagnostic::new(
                     "incorrect_standard_library_use",
@@ -486,7 +485,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
             _ => unreachable!("function_call.call_suffix != ast::Suffix::Call"),
         };
 
-        if *expecting_method != call_is_method {
+        if function.method != call_is_method {
             let problem = if call_is_method {
                 "is not a method"
             } else {
@@ -547,13 +546,14 @@ impl Visitor for StandardLibraryVisitor<'_> {
             _ => {}
         }
 
-        let mut expected_args = arguments
+        let mut expected_args = function
+            .arguments
             .iter()
             .filter(|arg| arg.required != Required::NotRequired)
             .count();
 
         let mut vararg = false;
-        let mut max_args = arguments.len();
+        let mut max_args = function.arguments.len();
 
         let mut maybe_more_arguments = false;
 
@@ -579,11 +579,11 @@ impl Visitor for StandardLibraryVisitor<'_> {
             }
         };
 
-        if let Some(last) = arguments.last() {
+        if let Some(last) = function.arguments.last() {
             if last.argument_type == ArgumentType::Vararg {
                 if let Required::Required(message) = &last.required {
                     // Functions like math.ceil where not using the vararg is wrong
-                    if arguments.len() > argument_types.len() && !maybe_more_arguments {
+                    if function.arguments.len() > argument_types.len() && !maybe_more_arguments {
                         self.diagnostics.push(Diagnostic::new_complete(
                             "incorrect_standard_library_use",
                             format!(
@@ -622,7 +622,8 @@ impl Visitor for StandardLibraryVisitor<'_> {
             ));
         }
 
-        for ((range, passed_type), expected) in argument_types.iter().zip(arguments.iter()) {
+        for ((range, passed_type), expected) in argument_types.iter().zip(function.arguments.iter())
+        {
             if expected.argument_type == ArgumentType::Vararg {
                 continue;
             }
