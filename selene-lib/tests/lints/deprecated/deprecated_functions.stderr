@@ -1,0 +1,25 @@
+error[deprecated]: standard library function `table.foreach` is deprecated
+  ┌─ deprecated_functions.lua:1:1
+  │
+1 │ table.foreach({}, function(k, v) end)
+  │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │
+  = use a for loop instead.
+
+error[deprecated]: standard library function `table.getn` is deprecated
+  ┌─ deprecated_functions.lua:2:7
+  │
+2 │ print(table.getn(x))
+  │       ^^^^^^^^^^^^^
+  │
+  = `table.getn` has been superceded by #.
+  = try: #x
+
+error[deprecated]: standard library function `table.foreach` is deprecated
+  ┌─ deprecated_functions.lua:4:1
+  │
+4 │ table.foreach({}, 3)
+  │ ^^^^^^^^^^^^^^^^^^^^
+  │
+  = use a for loop instead.
+

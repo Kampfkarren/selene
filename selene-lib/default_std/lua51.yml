@@ -511,6 +511,20 @@ globals:
         type: number
       - required: false
         type: number
+  table.foreach:
+    args:
+      - type: table
+      - type: function
+    deprecated:
+      message: use a for loop instead.
+  table.getn:
+    args:
+      - type: table
+      - type: number
+    deprecated:
+      message: "`table.getn` has been superceded by #."
+      replace:
+        - "#%1"
   table.insert:
     args:
       - type: table
