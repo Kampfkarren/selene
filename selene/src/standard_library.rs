@@ -48,7 +48,7 @@ fn collect_roblox_standard_library<V>(
 }
 
 #[cfg(not(feature = "roblox"))]
-fn collect_roblox_standard_library(
+fn collect_roblox_standard_library<V>(
     _config: &CheckerConfig<V>,
     _directory: &Path,
 ) -> color_eyre::Result<StandardLibrary> {
