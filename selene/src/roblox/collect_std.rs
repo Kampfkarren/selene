@@ -1,5 +1,6 @@
 use std::{
     fs,
+    io::BufReader,
     path::{Path, PathBuf},
 };
 
@@ -22,10 +23,10 @@ pub fn collect_roblox_standard_library<V>(
             let floating_file = floating_file_directory.join("roblox.yml");
 
             if floating_file.exists() {
-                let mut library: StandardLibrary = serde_yaml::from_reader(
+                let mut library: StandardLibrary = serde_yaml::from_reader(BufReader::new(
                     fs::File::open(&floating_file)
-                        .context("Could not open the floating roblox standard library.")?,
-                )?;
+                        .context("Culd not open the floating roblox standard library.")?,
+                ))?;
 
                 if (chrono::Local::now()
                     - chrono::Local.timestamp(library.last_updated.unwrap_or(0), 0))
