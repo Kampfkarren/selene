@@ -3,9 +3,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Unreleased
 ### Added
+- Added [new YAML based standard library format](https://kampfkarren.github.io/selene/usage/std.html). The old TOML format is now deprecated and will not have any new functionality added to it, but will be preserved for the forseeable future.
+  - You can upgrade old TOML standard libraries by running `selene upgrade-std library.toml`, which will create a new .yml file of the same name in the new format.
 - Added `debug.resetmemorycategory` to the Roblox standard library.
 - Added `debug.setmemorycategory` to the Roblox standard library.
 - Added `--no-summary` option to suppress summary information.
+
+### Changed
+- Roblox standard library files are now no longer generated in the project directory, and will be updated automatically every 6 hours. You can update it manually with `selene update-roblox-std`.
+  - As per the deprecation of TOML standard libraries, you should delete your `roblox.toml` if you have one.
+  - It is possible to pin a standard library in the same way `roblox.toml` was if you are in an environment where you do not want automatic updates, such as one where you want to limit selene's internet usage. Learn more [on the Roblox Guide documentation page](https://kampfkarren.github.io/selene/roblox.html).
 
 ## [0.17.0] - 2022-04-10
 ### Added
