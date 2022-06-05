@@ -2,10 +2,12 @@ pub mod v1;
 mod v1_upgrade;
 
 use std::{
+    borrow::Cow,
     collections::{BTreeMap, HashMap},
     fmt, io,
 };
 
+use regex::{Captures, Regex};
 use serde::{
     de::{self, Deserializer, Visitor},
     ser::{SerializeMap, SerializeSeq, Serializer},
@@ -15,9 +17,7 @@ use serde::{
 lazy_static::lazy_static! {
     static ref ANY_TABLE: BTreeMap<String, Field> = {
         let mut map = BTreeMap::new();
-        map.insert("*".to_owned(), Field {
-            field_kind: FieldKind::Any,
-        });
+        map.insert("*".to_owned(), Field::from_field_kind(FieldKind::Any));
         map
     };
 }
@@ -143,9 +143,8 @@ impl StandardLibrary {
             return Some(explicit_global);
         }
 
-        static READ_ONLY_FIELD: Field = Field {
-            field_kind: FieldKind::Property(PropertyWritability::ReadOnly),
-        };
+        static READ_ONLY_FIELD: Field =
+            Field::from_field_kind(FieldKind::Property(PropertyWritability::ReadOnly));
 
         #[derive(Clone, Debug)]
         struct TreeNode<'a> {
@@ -199,16 +198,12 @@ impl StandardLibrary {
         for name in names.iter().take(names.len() - 1) {
             let found_segment = current.get(name).or_else(|| current.get("*"))?;
 
-            match found_segment.field {
-                Field {
-                    field_kind: FieldKind::Any,
-                } => {
+            match &found_segment.field.field_kind {
+                FieldKind::Any => {
                     return Some(found_segment.field);
                 }
 
-                Field {
-                    field_kind: FieldKind::Struct(struct_name),
-                } => {
+                FieldKind::Struct(struct_name) => {
                     let strukt = self
                         .structs
                         .get(struct_name)
@@ -255,6 +250,7 @@ impl StandardLibrary {
                         self.globals.get(other_field_name),
                         Some(Field {
                             field_kind: FieldKind::Removed,
+                            ..
                         })
                     )
             })
@@ -293,6 +289,81 @@ fn is_false(value: &bool) -> bool {
 pub struct Field {
     #[serde(flatten)]
     pub field_kind: FieldKind,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deprecated: Option<Deprecated>,
+}
+
+impl Field {
+    pub const fn from_field_kind(field_kind: FieldKind) -> Self {
+        Self {
+            field_kind,
+            deprecated: None,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct Deprecated {
+    pub message: String,
+
+    // TODO: Validate proper %s
+    // TODO: Validate that a pattern is possible to reach (uses different # of parameters)
+    // TODO: Validate that parmeters match the number of arguments
+    // TODO: %...
+    // TODO: Validate that all numbers parse as u32
+    #[serde(default)]
+    pub(self) replace: Vec<String>,
+}
+
+impl Deprecated {
+    fn regex_pattern() -> Regex {
+        Regex::new(r"%(%|(?P<number>[0-9]+)|(\.\.\.))").unwrap()
+    }
+
+    pub fn try_instead(&self, parameters: &[String]) -> Option<String> {
+        let regex_pattern = Deprecated::regex_pattern();
+
+        for replace_format in &self.replace {
+            let mut success = true;
+
+            let new_message = regex_pattern.replace_all(replace_format, |captures: &Captures| {
+                if let Some(number) = captures.name("number") {
+                    let number = match number.as_str().parse::<u32>() {
+                        Ok(number) => number,
+                        Err(_) => {
+                            success = false;
+                            return Cow::Borrowed("");
+                        }
+                    };
+
+                    if number > parameters.len() as u32 || number == 0 {
+                        success = false;
+                        return Cow::Borrowed("");
+                    }
+
+                    return Cow::Borrowed(&parameters[number as usize - 1]);
+                }
+
+                let capture = captures.get(1).unwrap();
+                match capture.as_str() {
+                    "%" => Cow::Borrowed("%"),
+                    "..." => Cow::Owned(parameters.join(", ")),
+                    other => unreachable!("Unexpected capture in deprecated formatting: {}", other),
+                }
+            });
+
+            if !success {
+                continue;
+            }
+
+            return Some(new_message.into_owned());
+        }
+
+        None
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -590,9 +661,64 @@ impl<'de> Visitor<'de> for RequiredVisitor {
 mod tests {
     use super::*;
 
+    fn string_vec(strings: Vec<&str>) -> Vec<String> {
+        strings.into_iter().map(ToOwned::to_owned).collect()
+    }
+
     #[test]
     fn valid_serde() {
         StandardLibrary::from_name("lua51").expect("lua51.toml wasn't found");
         StandardLibrary::from_name("lua52").expect("lua52.toml wasn't found");
+    }
+
+    #[test]
+    fn deprecated_try_instead() {
+        let deprecated = Deprecated {
+            message: "You shouldn't see this".to_owned(),
+            replace: vec![
+                "eleven(%11)".to_owned(),
+                "four(%1, %2, %3, %4)".to_owned(),
+                "three(%1, %2, %3 %%3)".to_owned(),
+                "two(%1, %2)".to_owned(),
+                "one(%1)".to_owned(),
+            ],
+        };
+
+        assert_eq!(
+            deprecated.try_instead(&string_vec(vec!["a", "b", "c"])),
+            Some("three(a, b, c %3)".to_owned())
+        );
+
+        assert_eq!(
+            deprecated.try_instead(&string_vec(vec!["a", "b"])),
+            Some("two(a, b)".to_owned())
+        );
+
+        assert_eq!(
+            deprecated.try_instead(&string_vec(vec!["a"])),
+            Some("one(a)".to_owned())
+        );
+
+        assert_eq!(
+            deprecated.try_instead(&string_vec(vec![
+                "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11",
+            ])),
+            Some("eleven(11)".to_owned())
+        );
+
+        assert_eq!(deprecated.try_instead(&string_vec(vec![])), None);
+    }
+
+    #[test]
+    fn deprecated_varargs() {
+        let deprecated = Deprecated {
+            message: "You shouldn't see this".to_owned(),
+            replace: vec!["print(%...)".to_owned()],
+        };
+
+        assert_eq!(
+            deprecated.try_instead(&string_vec(vec!["a", "b", "c"])),
+            Some("print(a, b, c)".to_owned())
+        );
     }
 }
