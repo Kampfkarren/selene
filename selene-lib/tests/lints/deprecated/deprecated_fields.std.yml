@@ -1,0 +1,10 @@
+---
+globals:
+  all_of_this:
+    deprecated:
+      message: "This entire field is deprecated"
+    property: full-write
+  this.is_deprecated:
+    deprecated:
+      message: "This field is deprecated :("
+    property: read-only

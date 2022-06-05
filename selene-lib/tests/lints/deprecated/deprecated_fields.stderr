@@ -1,0 +1,24 @@
+error[deprecated]: standard library expression `this.is_deprecated` is deprecated
+  ┌─ deprecated_fields.lua:1:11
+  │
+1 │ local _ = this.is_deprecated
+  │           ^^^^^^^^^^^^^^^^^^
+  │
+  = This field is deprecated :(
+
+error[deprecated]: standard library expression `all_of_this.is_deprecated` is deprecated
+  ┌─ deprecated_fields.lua:2:11
+  │
+2 │ local _ = all_of_this.is_deprecated
+  │           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  │
+  = This entire field is deprecated
+
+error[deprecated]: standard library expression `all_of_this.even.deeper.is_deprecated` is deprecated
+  ┌─ deprecated_fields.lua:3:11
+  │
+3 │ local _ = all_of_this.even.deeper.is_deprecated
+  │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │
+  = This entire field is deprecated
+

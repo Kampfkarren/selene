@@ -78,10 +78,7 @@ impl Options {
 #[allow(clippy::enum_variant_names)]
 pub enum Command {
     #[cfg(feature = "roblox")]
-    GenerateRobloxStd {
-        #[structopt(long)]
-        deprecated: bool,
-    },
+    GenerateRobloxStd,
 
     #[cfg(feature = "roblox")]
     UpdateRobloxStd,

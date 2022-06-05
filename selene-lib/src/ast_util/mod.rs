@@ -6,6 +6,7 @@ use full_moon::{
     tokenizer::{self, Position},
 };
 
+pub mod name_paths;
 mod purge_trivia;
 pub mod scopes;
 mod side_effects;

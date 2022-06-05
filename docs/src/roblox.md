@@ -41,5 +41,3 @@ roblox-std-source = "pinned"
 This will generate the standard library file into `roblox.yml` where it is run.
 
 You can also create a `roblox.yml` file manually with `selene generate-roblox-std`.
-
-Deprecated event members are not added by default. This means code such as `workspace.ChildAdded:connect(...)` will error. If you don't want to lint these, use `selene generate-roblox-std --deprecated`.

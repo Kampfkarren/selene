@@ -10,7 +10,6 @@ const API_DUMP: &str =
 
 pub struct RobloxGenerator {
     pub std: StandardLibrary,
-    pub show_deprecated: bool,
 }
 
 impl RobloxGenerator {
@@ -29,8 +28,6 @@ impl RobloxGenerator {
         self.write_enums(&api);
         self.write_instance_new(&api);
         self.write_get_service(&api);
-
-        self.deprecated_event_methods();
 
         let mut bytes = Vec::new();
 
@@ -59,9 +56,7 @@ impl RobloxGenerator {
         self.write_class_struct(api, class_name);
         self.std.globals.insert(
             global_name.to_owned(),
-            Field {
-                field_kind: FieldKind::Struct(class_name.to_owned()),
-            },
+            Field::from_field_kind(FieldKind::Struct(class_name.to_owned())),
         );
     }
 
@@ -76,9 +71,7 @@ impl RobloxGenerator {
         let mut table = BTreeMap::new();
         table.insert(
             "*".to_owned(),
-            Field {
-                field_kind: FieldKind::Struct("Instance".to_owned()),
-            },
+            Field::from_field_kind(FieldKind::Struct("Instance".to_owned())),
         );
 
         self.write_class_members(api, &mut table, class_name);
@@ -99,17 +92,17 @@ impl RobloxGenerator {
                 ApiMember::Callback { name, tags } => (
                     name,
                     tags,
-                    Some(Field {
-                        field_kind: FieldKind::Property(PropertyWritability::OverrideFields),
-                    }),
+                    Some(Field::from_field_kind(FieldKind::Property(
+                        PropertyWritability::OverrideFields,
+                    ))),
                 ),
 
                 ApiMember::Event { name, tags } => (
                     name,
                     tags,
-                    Some(Field {
-                        field_kind: FieldKind::Struct("Event".to_owned()),
-                    }),
+                    Some(Field::from_field_kind(FieldKind::Struct(
+                        "Event".to_owned(),
+                    ))),
                 ),
 
                 ApiMember::Function {
@@ -119,8 +112,8 @@ impl RobloxGenerator {
                 } => (
                     name,
                     tags,
-                    Some(Field {
-                        field_kind: FieldKind::Function(FunctionBehavior {
+                    Some(Field::from_field_kind(FieldKind::Function(
+                        FunctionBehavior {
                             // TODO: Roblox doesn't tell us which parameters are nillable or not
                             // So results from these are regularly wrong
                             // The best solution is a manual patch for every method we *know* is nillable
@@ -176,8 +169,8 @@ impl RobloxGenerator {
                                 })
                                 .collect(),
                             method: true,
-                        }),
-                    }),
+                        },
+                    ))),
                 ),
 
                 ApiMember::Property {
@@ -193,31 +186,25 @@ impl RobloxGenerator {
                             None => &empty,
                         };
 
-                        let default_field = Some(Field {
-                            field_kind: FieldKind::Property(
-                                if tags.contains(&"ReadOnly".to_string()) {
-                                    PropertyWritability::ReadOnly
-                                } else {
-                                    PropertyWritability::OverrideFields
-                                },
-                            ),
-                        });
+                        let default_field = Some(Field::from_field_kind(FieldKind::Property(
+                            if tags.contains(&"ReadOnly".to_string()) {
+                                PropertyWritability::ReadOnly
+                            } else {
+                                PropertyWritability::OverrideFields
+                            },
+                        )));
 
                         match &value_type {
                             ApiValueType::Class { name } => {
                                 self.write_class_struct(api, name);
-                                Some(Field {
-                                    field_kind: FieldKind::Struct(name.to_owned()),
-                                })
+                                Some(Field::from_field_kind(FieldKind::Struct(name.to_owned())))
                             }
 
                             ApiValueType::DataType { value } => {
                                 // See comment on `has_custom_methods` for why we're taking
                                 // such a lax approach here.
                                 if value.has_custom_methods() {
-                                    Some(Field {
-                                        field_kind: FieldKind::Any,
-                                    })
+                                    Some(Field::from_field_kind(FieldKind::Any))
                                 } else {
                                     default_field
                                 }
@@ -237,11 +224,14 @@ impl RobloxGenerator {
                 None => &empty,
             };
 
-            if !self.show_deprecated && tags.contains(&"Deprecated".to_owned()) {
-                continue;
-            }
+            if let Some(mut field) = field {
+                if tags.contains(&"Deprecated".to_owned()) {
+                    field.deprecated = Some(Deprecated {
+                        message: "this property is deprecated.".to_owned(),
+                        replace: Vec::new(),
+                    });
+                }
 
-            if let Some(field) = field {
                 table.insert(name.to_owned(), field);
             }
         }
@@ -255,17 +245,13 @@ impl RobloxGenerator {
         for enuhm in &api.enums {
             self.std.globals.insert(
                 format!("Enum.{}", enuhm.name),
-                Field {
-                    field_kind: FieldKind::Struct("Enum".to_owned()),
-                },
+                Field::from_field_kind(FieldKind::Struct("Enum".to_owned())),
             );
 
             for item in &enuhm.items {
                 self.std.globals.insert(
                     format!("Enum.{}.{}", enuhm.name, item.name),
-                    Field {
-                        field_kind: FieldKind::Struct("EnumItem".to_owned()),
-                    },
+                    Field::from_field_kind(FieldKind::Struct("EnumItem".to_owned())),
                 );
             }
         }
@@ -286,15 +272,13 @@ impl RobloxGenerator {
 
         self.std.globals.insert(
             "Instance.new".to_owned(),
-            Field {
-                field_kind: FieldKind::Function(FunctionBehavior {
-                    arguments: vec![Argument {
-                        argument_type: ArgumentType::Constant(instance_names),
-                        required: Required::Required(None),
-                    }],
-                    method: false,
-                }),
-            },
+            Field::from_field_kind(FieldKind::Function(FunctionBehavior {
+                arguments: vec![Argument {
+                    argument_type: ArgumentType::Constant(instance_names),
+                    required: Required::Required(None),
+                }],
+                method: false,
+            })),
         );
     }
 
@@ -313,30 +297,13 @@ impl RobloxGenerator {
 
         let data_model = self.std.structs.get_mut("DataModel").unwrap();
 
-        *data_model.get_mut("GetService").unwrap() = Field {
-            field_kind: FieldKind::Function(FunctionBehavior {
+        *data_model.get_mut("GetService").unwrap() =
+            Field::from_field_kind(FieldKind::Function(FunctionBehavior {
                 arguments: vec![Argument {
                     argument_type: ArgumentType::Constant(service_names),
                     required: Required::Required(None),
                 }],
                 method: true,
-            }),
-        };
-    }
-
-    fn deprecated_event_methods(&mut self) {
-        if !self.show_deprecated {
-            return;
-        }
-
-        let structs = &mut self.std.structs;
-        let event_struct = structs.get_mut("Event").unwrap();
-        let (connect, wait) = (
-            event_struct["Connect"].clone(),
-            event_struct["Wait"].clone(),
-        );
-
-        event_struct.insert("connect".to_owned(), connect);
-        event_struct.insert("wait".to_owned(), wait);
+            }));
     }
 }

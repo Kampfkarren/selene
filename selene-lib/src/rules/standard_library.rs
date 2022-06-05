@@ -1,5 +1,5 @@
 use super::{super::standard_library::*, *};
-use crate::ast_util::scopes::ScopeManager;
+use crate::ast_util::{name_paths::*, scopes::ScopeManager};
 use std::convert::Infallible;
 
 use full_moon::{
@@ -37,63 +37,6 @@ impl Rule for StandardLibraryLint {
 
     fn rule_type(&self) -> RuleType {
         RuleType::Correctness
-    }
-}
-
-fn take_while_keep_going(suffix: &ast::Suffix, keep_going: &mut bool) -> bool {
-    let result = *keep_going;
-    *keep_going = !matches!(suffix, ast::Suffix::Call(_));
-    result
-}
-
-fn name_path_from_prefix_suffix<'a, S: Iterator<Item = &'a ast::Suffix>>(
-    prefix: &'a ast::Prefix,
-    suffixes: S,
-) -> Option<Vec<String>> {
-    if let ast::Prefix::Name(ref name) = prefix {
-        let mut names = vec![name.token().to_string()];
-
-        let mut keep_going = true;
-
-        for suffix in suffixes.take_while(|suffix| take_while_keep_going(suffix, &mut keep_going)) {
-            match suffix {
-                ast::Suffix::Call(call) => {
-                    if let ast::Call::MethodCall(method_call) = call {
-                        names.push(method_call.name().token().to_string());
-                    }
-                }
-
-                ast::Suffix::Index(ast::Index::Dot { name, .. }) => {
-                    names.push(name.token().to_string());
-                }
-
-                _ => return None,
-            }
-        }
-
-        Some(names)
-    } else {
-        None
-    }
-}
-
-fn name_path(expression: &ast::Expression) -> Option<Vec<String>> {
-    if let ast::Expression::Value { value, .. } = expression {
-        if let ast::Value::Var(var) = &**value {
-            match var {
-                ast::Var::Expression(expression) => {
-                    name_path_from_prefix_suffix(expression.prefix(), expression.suffixes())
-                }
-
-                ast::Var::Name(name) => Some(vec![name.to_string()]),
-
-                _ => None,
-            }
-        } else {
-            None
-        }
-    } else {
-        None
     }
 }
 

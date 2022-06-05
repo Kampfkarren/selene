@@ -14,6 +14,7 @@
 - [Contributing](./contributing.md)
 - [Lints](./lints/index.md)
   - [almost_swapped](./lints/almost_swapped.md)
+  - [deprecated](./lints/deprecated.md)
   - [divide_by_zero](./lints/divide_by_zero.md)
   - [duplicate_keys](./lints/duplicate_keys.md)
   - [empty_if](./lints/empty_if.md)

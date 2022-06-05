@@ -68,12 +68,7 @@ fn unpack_v1_field(name: String, v1_field: v1::Field) -> BTreeMap<String, Field>
     while let Some((name, field)) = v1_fields.pop() {
         match field {
             v1::Field::Any => {
-                upgraded_fields.insert(
-                    name,
-                    Field {
-                        field_kind: FieldKind::Any,
-                    },
-                );
+                upgraded_fields.insert(name, Field::from_field_kind(FieldKind::Any));
             }
 
             v1::Field::Complex { function, table } => {
@@ -84,12 +79,10 @@ fn unpack_v1_field(name: String, v1_field: v1::Field) -> BTreeMap<String, Field>
                 if let Some(function) = function {
                     upgraded_fields.insert(
                         name,
-                        Field {
-                            field_kind: FieldKind::Function(FunctionBehavior {
-                                arguments: function.arguments.into_iter().map(Into::into).collect(),
-                                method: function.method,
-                            }),
-                        },
+                        Field::from_field_kind(FieldKind::Function(FunctionBehavior {
+                            arguments: function.arguments.into_iter().map(Into::into).collect(),
+                            method: function.method,
+                        })),
                     );
                 }
             }
@@ -97,28 +90,17 @@ fn unpack_v1_field(name: String, v1_field: v1::Field) -> BTreeMap<String, Field>
             v1::Field::Property { writable } => {
                 upgraded_fields.insert(
                     name,
-                    Field {
-                        field_kind: FieldKind::Property(writable.into()),
-                    },
+                    Field::from_field_kind(FieldKind::Property(writable.into())),
                 );
             }
 
             v1::Field::Struct(struct_name) => {
-                upgraded_fields.insert(
-                    name,
-                    Field {
-                        field_kind: FieldKind::Struct(struct_name),
-                    },
-                );
+                upgraded_fields
+                    .insert(name, Field::from_field_kind(FieldKind::Struct(struct_name)));
             }
 
             v1::Field::Removed => {
-                upgraded_fields.insert(
-                    name,
-                    Field {
-                        field_kind: FieldKind::Removed,
-                    },
-                );
+                upgraded_fields.insert(name, Field::from_field_kind(FieldKind::Removed));
             }
         }
     }

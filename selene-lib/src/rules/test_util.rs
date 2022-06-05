@@ -43,11 +43,14 @@ pub fn test_lint_config<
 ) {
     let path_base = TEST_PROJECTS_ROOT.join(lint_name).join(test_name);
 
-    if let Ok(test_std_contents) = fs::read_to_string(path_base.with_extension("std.toml")) {
-        // config.standard_library = toml::from_str(&test_std_contents).unwrap();
-        config.standard_library = toml::from_str::<v1::StandardLibrary>(&test_std_contents)
+    if let Ok(test_std_toml_contents) = fs::read_to_string(path_base.with_extension("std.toml")) {
+        config.standard_library = toml::from_str::<v1::StandardLibrary>(&test_std_toml_contents)
             .unwrap()
             .into();
+    } else if let Ok(test_std_yml_contents) =
+        fs::read_to_string(path_base.with_extension("std.yml"))
+    {
+        config.standard_library = serde_yaml::from_str(&test_std_yml_contents).unwrap();
     }
 
     let lua_source =
