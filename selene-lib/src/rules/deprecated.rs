@@ -183,4 +183,13 @@ mod tests {
             "deprecated_functions",
         );
     }
+
+    #[test]
+    fn test_toml_forwards_compatibility() {
+        test_lint(
+            DeprecatedLint::new(()).unwrap(),
+            "deprecated",
+            "toml_forwards_compatibility",
+        );
+    }
 }
