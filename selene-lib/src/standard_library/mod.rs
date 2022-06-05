@@ -312,7 +312,6 @@ pub struct Deprecated {
     // TODO: Validate proper %s
     // TODO: Validate that a pattern is possible to reach (uses different # of parameters)
     // TODO: Validate that parmeters match the number of arguments
-    // TODO: %...
     // TODO: Validate that all numbers parse as u32
     #[serde(default)]
     pub replace: Vec<String>,
