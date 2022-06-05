@@ -161,9 +161,9 @@ Fields can specify requirements if a field is referenced that is not explicitly 
 
 We can specify this behavior by using the special `"*"` field.
 
-```toml
-[workspace."*"]
-struct = "Instance"
+```yaml
+workspace.*:
+  struct: Instance
 ```
 
 This will tell selene "any field accessed from `workspace` that doesn't exist must be an Instance [struct](#structs)".
