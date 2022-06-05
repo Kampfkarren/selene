@@ -1,0 +1,555 @@
+---
+globals:
+  _G:
+    property: new-fields
+  _VERSION:
+    property: read-only
+  arg:
+    property: new-fields
+  assert:
+    args:
+      - type: any
+      - required: A failed assertion without a message is unhelpful to users.
+        type: string
+  collectgarbage:
+    args:
+      - required: false
+        type:
+          - collect
+          - count
+          - restart
+          - setpause
+          - setstepmul
+          - step
+          - stop
+  coroutine.create:
+    args:
+      - type: function
+  coroutine.resume:
+    args:
+      - type:
+          display: coroutine
+      - required: false
+        type: "..."
+  coroutine.running:
+    args: []
+  coroutine.status:
+    args:
+      - type:
+          display: coroutine
+  coroutine.wrap:
+    args:
+      - type: function
+  coroutine.yield:
+    args:
+      - required: false
+        type: "..."
+  debug.debug:
+    args: []
+  debug.getfenv:
+    args:
+      - type: function
+  debug.gethook:
+    args:
+      - required: false
+        type: any
+  debug.getinfo:
+    args:
+      - type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+  debug.getlocal:
+    args:
+      - type: any
+      - type: any
+      - required: false
+        type: any
+  debug.getmetatable:
+    args:
+      - type: any
+  debug.getregistry:
+    args: []
+  debug.getupvalue:
+    args:
+      - type: function
+      - type: number
+  debug.setfenv:
+    args:
+      - type: any
+      - type: table
+  debug.sethook:
+    args:
+      - type: any
+      - type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+  debug.setlocal:
+    args:
+      - type: any
+      - type: any
+      - type: any
+      - required: false
+        type: any
+  debug.setmetatable:
+    args:
+      - type: any
+      - type: table
+  debug.setupvalue:
+    args:
+      - type: function
+      - type: number
+      - type: string
+  debug.traceback:
+    args:
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+  dofile:
+    args:
+      - required: false
+        type: string
+  error:
+    args:
+      - required: Erroring without a message is unhelpful to users.
+        type: string
+      - required: false
+        type: number
+  getfenv:
+    args:
+      - required: false
+        type: any
+  getmetatable:
+    args:
+      - type: table
+  io.close:
+    args:
+      - required: false
+        type:
+          display: file
+  io.flush:
+    args: []
+  io.input:
+    args:
+      - required: false
+        type:
+          display: file
+  io.lines:
+    args:
+      - type: string
+  io.open:
+    args:
+      - type: string
+      - required: false
+        type:
+          - r
+          - rb
+          - w
+          - wb
+          - a
+          - ab
+          - r+
+          - rb+
+          - w+
+          - wb+
+          - a+
+          - ab+
+  io.output:
+    args:
+      - required: false
+        type:
+          display: file
+  io.popen:
+    args:
+      - type: string
+      - required: false
+        type:
+          - r
+          - rb
+          - w
+          - wb
+          - a
+          - ab
+          - r+
+          - rb+
+          - w+
+          - wb+
+          - a+
+          - ab+
+  io.read:
+    args:
+      - type: "..."
+  io.stderr:
+    property: read-only
+  io.stdin:
+    property: read-only
+  io.stdout:
+    property: read-only
+  io.tmpfile:
+    args: []
+  io.type:
+    args:
+      - type:
+          display: potentially file-like object
+  io.write:
+    args:
+      - type: "..."
+  ipairs:
+    args:
+      - type: table
+  load:
+    args:
+      - type: function
+      - required: false
+        type: string
+  loadfile:
+    args:
+      - required: false
+        type: string
+  loadstring:
+    args:
+      - type: string
+      - required: false
+        type: string
+  math.abs:
+    args:
+      - type: number
+  math.acos:
+    args:
+      - type: number
+  math.asin:
+    args:
+      - type: number
+  math.atan:
+    args:
+      - type: number
+  math.atan2:
+    args:
+      - type: number
+      - type: number
+  math.ceil:
+    args:
+      - type: number
+  math.cos:
+    args:
+      - type: number
+  math.cosh:
+    args:
+      - type: number
+  math.deg:
+    args:
+      - type: number
+  math.exp:
+    args:
+      - type: number
+  math.floor:
+    args:
+      - type: number
+  math.fmod:
+    args:
+      - type: number
+      - type: number
+  math.frexp:
+    args:
+      - type: number
+  math.huge:
+    property: read-only
+  math.ldexp:
+    args:
+      - type: number
+      - type: number
+  math.log:
+    args:
+      - type: number
+  math.log10:
+    args:
+      - type: number
+  math.max:
+    args:
+      - type: number
+      - required: use of max only makes sense with more than 1 parameter
+        type: "..."
+  math.min:
+    args:
+      - type: number
+      - required: use of min only makes sense with more than 1 parameter
+        type: "..."
+  math.modf:
+    args:
+      - type: number
+  math.pi:
+    property: read-only
+  math.pow:
+    args:
+      - type: number
+      - type: number
+  math.rad:
+    args:
+      - type: number
+  math.random:
+    args:
+      - required: false
+        type: number
+      - required: false
+        type: number
+  math.randomseed:
+    args:
+      - type: number
+  math.sin:
+    args:
+      - type: number
+  math.sinh:
+    args:
+      - type: number
+  math.sqrt:
+    args:
+      - type: number
+  math.tan:
+    args:
+      - type: number
+  math.tanh:
+    args:
+      - type: number
+  module:
+    args:
+      - type: string
+      - type: "..."
+  newproxy:
+    args:
+      - required: false
+        type: bool
+  next:
+    args:
+      - type: table
+      - required: false
+        type: number
+  os.clock:
+    args: []
+  os.date:
+    args:
+      - required: false
+        type: string
+      - required: false
+        type: number
+  os.difftime:
+    args:
+      - type: number
+      - type: number
+  os.execute:
+    args:
+      - required: false
+        type: string
+  os.exit:
+    args:
+      - required: false
+        type: number
+  os.getenv:
+    args:
+      - type: string
+  os.remove:
+    args:
+      - type: string
+  os.rename:
+    args:
+      - type: string
+      - type: string
+  os.setlocale:
+    args:
+      - type: string
+      - required: false
+        type:
+          - all
+          - collate
+          - ctype
+          - monetary
+          - numeric
+          - time
+  os.time:
+    args:
+      - required: false
+        type: table
+  os.tmpname:
+    args: []
+  package.cpath:
+    property: full-write
+  package.loaded:
+    property: new-fields
+  package.loaders:
+    property: new-fields
+  package.loadlib:
+    args:
+      - type: string
+      - type: string
+  package.path:
+    property: full-write
+  package.preload:
+    property: new-fields
+  package.seeall:
+    args:
+      - type: table
+  pairs:
+    args:
+      - type: table
+  pcall:
+    args:
+      - type: function
+      - required: false
+        type: "..."
+  print:
+    args:
+      - required: false
+        type: "..."
+  rawequal:
+    args:
+      - type: any
+      - type: any
+  rawget:
+    args:
+      - type: any
+      - type: any
+  rawset:
+    args:
+      - type: any
+      - type: any
+      - type: any
+  require:
+    args:
+      - type: string
+  select:
+    args:
+      - type: any
+      - type: "..."
+  setfenv:
+    args:
+      - type: any
+      - type: table
+  setmetatable:
+    args:
+      - type: table
+      - required: false
+        type: table
+  string.byte:
+    args:
+      - type: string
+      - required: false
+        type: number
+      - required: false
+        type: number
+  string.char:
+    args:
+      - required: string.char should be used with an argument despite it not throwing
+        type: number
+      - required: false
+        type: "..."
+  string.dump:
+    args:
+      - type: function
+  string.find:
+    args:
+      - type: string
+      - type: string
+      - required: false
+        type: number
+      - required: false
+        type: bool
+  string.format:
+    args:
+      - type: string
+      - required: string.format should only be used for strings that need formatting
+        type: "..."
+  string.gmatch:
+    args:
+      - type: string
+      - type: string
+  string.gsub:
+    args:
+      - type: string
+      - type: string
+      - type: any
+      - required: false
+        type: number
+  string.len:
+    args:
+      - type: string
+  string.lower:
+    args:
+      - type: string
+  string.match:
+    args:
+      - type: string
+      - type: string
+      - required: false
+        type: number
+  string.rep:
+    args:
+      - type: string
+      - type: number
+  string.reverse:
+    args:
+      - type: string
+  string.sub:
+    args:
+      - type: string
+      - type: number
+      - required: false
+        type: number
+  string.upper:
+    args:
+      - type: string
+  table.concat:
+    args:
+      - type: table
+      - required: false
+        type: string
+      - required: false
+        type: number
+      - required: false
+        type: number
+  table.insert:
+    args:
+      - type: table
+      - type: any
+      - required: false
+        type: any
+  table.maxn:
+    args:
+      - type: table
+  table.remove:
+    args:
+      - type: table
+      - required: false
+        type: number
+  table.sort:
+    args:
+      - type: table
+      - required: false
+        type: function
+  tonumber:
+    args:
+      - type: any
+      - required: false
+        type: number
+  tostring:
+    args:
+      - type: any
+  type:
+    args:
+      - type: any
+  unpack:
+    args:
+      - type: table
+      - required: false
+        type: number
+      - required: false
+        type: number
+  xpcall:
+    args:
+      - type: function
+      - required: false
+        type: "..."

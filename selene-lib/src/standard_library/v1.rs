@@ -1,7 +1,9 @@
+// An intentionally separate implementation of the standard library as it existed
+// before version 2.
+// This is so that any changes to the v2 standard library don't affect the old one.
 use std::{
     collections::{BTreeMap, HashMap},
-    fmt, fs, io,
-    path::Path,
+    fmt,
 };
 
 use serde::{
@@ -36,249 +38,6 @@ pub struct StandardLibraryMeta {
     pub name: Option<String>,
     #[serde(default)]
     pub structs: Option<BTreeMap<String, BTreeMap<String, Field>>>,
-}
-
-#[derive(Debug)]
-pub enum StandardLibraryError {
-    DeserializeError(toml::de::Error),
-    IoError(io::Error),
-}
-
-impl fmt::Display for StandardLibraryError {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            StandardLibraryError::DeserializeError(error) => {
-                write!(formatter, "deserialize error: {}", error)
-            }
-            StandardLibraryError::IoError(error) => write!(formatter, "io error: {}", error),
-        }
-    }
-}
-
-impl std::error::Error for StandardLibraryError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        use StandardLibraryError::*;
-
-        match self {
-            DeserializeError(error) => Some(error),
-            IoError(error) => Some(error),
-        }
-    }
-}
-
-impl From<io::Error> for StandardLibraryError {
-    fn from(error: io::Error) -> Self {
-        StandardLibraryError::IoError(error)
-    }
-}
-
-impl StandardLibrary {
-    pub fn from_name(name: &str) -> Option<StandardLibrary> {
-        macro_rules! names {
-            {$($name:expr => $path:expr,)+} => {
-                match name {
-                    $(
-                        $name => {
-                            let mut std = toml::from_str::<StandardLibrary>(
-                                include_str!($path)
-                            ).unwrap_or_else(|error| {
-                                panic!(
-                                    "default standard library '{}' failed deserialization: {}",
-                                    name,
-                                    error,
-                                )
-                            });
-
-                            if let Some(meta) = &std.meta {
-                                if let Some(base_name) = &meta.base {
-                                    let base = StandardLibrary::from_name(base_name);
-
-                                    std.extend(
-                                        base.expect("built-in library based off of non-existent built-in"),
-                                    );
-                                }
-                            }
-
-                            std.inflate();
-
-                            Some(std)
-                        },
-                    )+
-
-                    _ => None
-                }
-            };
-        }
-
-        names! {
-            "lua51" => "../default_std/lua51.toml",
-            "lua52" => "../default_std/lua52.toml",
-        }
-    }
-
-    pub fn from_config_name(
-        name: &str,
-        directory: Option<&Path>,
-    ) -> Result<Option<StandardLibrary>, StandardLibraryError> {
-        let mut library: Option<StandardLibrary> = None;
-
-        for segment in name.split('+') {
-            let segment_library = match StandardLibrary::from_name(segment) {
-                Some(default) => default,
-
-                None => {
-                    let mut path = directory
-                        .map(Path::to_path_buf)
-                        .unwrap_or_else(||
-                            panic!(
-                                "from_config_name used with no directory, but segment `{}` is not a built-in library",
-                                segment
-                            )
-                        );
-
-                    path.push(format!("{}.toml", segment));
-                    match StandardLibrary::from_file(&path)? {
-                        Some(library) => library,
-                        None => return Ok(None),
-                    }
-                }
-            };
-
-            match library {
-                Some(ref mut base) => base.extend(segment_library),
-                None => library = Some(segment_library),
-            };
-        }
-
-        if let Some(ref mut library) = library {
-            library.inflate();
-        }
-
-        Ok(library)
-    }
-
-    pub fn from_file(filename: &Path) -> Result<Option<StandardLibrary>, StandardLibraryError> {
-        let content = fs::read_to_string(filename)?;
-        let mut library: StandardLibrary =
-            toml::from_str(&content).map_err(StandardLibraryError::DeserializeError)?;
-
-        if let Some(meta) = &library.meta {
-            if let Some(base_name) = &meta.base {
-                if let Some(base) = StandardLibrary::from_config_name(base_name, filename.parent())?
-                {
-                    library.extend(base);
-                }
-            }
-        }
-
-        Ok(Some(library))
-    }
-
-    pub fn find_global(&self, names: &[String]) -> Option<&Field> {
-        assert!(!names.is_empty());
-        let mut current = &self.globals;
-
-        // Traverse through `foo.bar` in `foo.bar.baz`
-        for name in names.iter().take(names.len() - 1) {
-            if let Some(child) = current
-                .get(name)
-                .or_else(|| current.get("*"))
-                .map(|field| self.unstruct(field))
-            {
-                match child {
-                    Field::Any => {
-                        current = &ANY_TABLE;
-                    }
-
-                    Field::Complex { table, .. } if !table.is_empty() => {
-                        current = table;
-                    }
-
-                    _ => return None,
-                };
-            } else {
-                return None;
-            }
-        }
-
-        current
-            .get(names.last().unwrap())
-            .or_else(|| current.get("*"))
-            .map(|field| self.unstruct(field))
-    }
-
-    pub fn unstruct<'a>(&'a self, field: &'a Field) -> &'a Field {
-        if let Field::Struct(name) = field {
-            self.structs
-                .get(name)
-                .unwrap_or_else(|| panic!("no struct named `{}` exists", name))
-        } else {
-            field
-        }
-    }
-
-    pub fn extend(&mut self, mut other: StandardLibrary) {
-        fn merge(into: &mut BTreeMap<String, Field>, other: &mut BTreeMap<String, Field>) {
-            for (k, v) in other {
-                let (k, mut v) = (k.to_owned(), v.to_owned());
-
-                if let Field::Removed = v {
-                    into.remove(&k);
-                    continue;
-                }
-
-                if_chain::if_chain! {
-                    if let Some(conflict) = into.get_mut(&k);
-                    if let Field::Complex {
-                        table: ref mut from_children,
-                        ..
-                    } = v;
-                    if !from_children.is_empty();
-                    if let Field::Complex { table: into_children, .. } = conflict;
-                    then {
-                        merge(into_children, from_children);
-                        continue;
-                    }
-                }
-
-                into.insert(k, v);
-            }
-        }
-
-        if let Some(other_meta) = &mut other.meta {
-            if let Some(other_structs) = &mut other_meta.structs {
-                if self.meta.is_none() {
-                    self.meta = Some(StandardLibraryMeta::default());
-                }
-
-                let meta = self.meta.as_mut().unwrap();
-
-                if let Some(structs) = meta.structs.as_mut() {
-                    structs.extend(other_structs.iter().map(|(k, v)| (k.clone(), v.clone())));
-                } else {
-                    meta.structs = Some(other_structs.clone());
-                }
-            }
-        }
-
-        let mut globals = BTreeMap::new();
-        merge(&mut globals, &mut other.globals);
-        merge(&mut globals, &mut self.globals);
-        self.globals = globals;
-    }
-
-    pub fn inflate(&mut self) {
-        let structs = self
-            .meta
-            .as_ref()
-            .and_then(|meta| meta.structs.as_ref())
-            .cloned();
-
-        for (name, children) in structs.unwrap_or_default() {
-            self.structs
-                .insert(name.to_owned(), children.clone().into());
-        }
-    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -465,20 +224,16 @@ pub struct Argument {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-// TODO: Nilable types
 pub enum ArgumentType {
     Any,
     Bool,
     Constant(Vec<String>),
     Display(String),
-    // TODO: Optionally specify parameters
     Function,
     Nil,
     Number,
     String,
-    // TODO: Types for tables
     Table,
-    // TODO: Support repeating types (like for string.char)
     Vararg,
 }
 
@@ -646,16 +401,5 @@ impl<'de> Visitor<'de> for RequiredVisitor {
 
     fn visit_str<E: de::Error>(self, value: &str) -> Result<Self::Value, E> {
         Ok(Required::Required(Some(value.to_owned())))
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn valid_serde() {
-        StandardLibrary::from_name("lua51").expect("lua51.toml wasn't found");
-        StandardLibrary::from_name("lua52").expect("lua52.toml wasn't found");
     }
 }

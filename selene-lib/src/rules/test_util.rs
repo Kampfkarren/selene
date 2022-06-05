@@ -1,5 +1,5 @@
 use super::{Context, Rule};
-use crate::{test_util::PrettyString, StandardLibrary};
+use crate::{standard_library::v1, test_util::PrettyString, StandardLibrary};
 use std::{
     fs,
     io::Write,
@@ -44,9 +44,10 @@ pub fn test_lint_config<
     let path_base = TEST_PROJECTS_ROOT.join(lint_name).join(test_name);
 
     if let Ok(test_std_contents) = fs::read_to_string(path_base.with_extension("std.toml")) {
-        let mut std: StandardLibrary = toml::from_str(&test_std_contents).unwrap();
-        std.inflate();
-        config.standard_library = std;
+        // config.standard_library = toml::from_str(&test_std_contents).unwrap();
+        config.standard_library = toml::from_str::<v1::StandardLibrary>(&test_std_contents)
+            .unwrap()
+            .into();
     }
 
     let lua_source =

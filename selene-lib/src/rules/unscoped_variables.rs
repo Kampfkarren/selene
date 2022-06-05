@@ -46,10 +46,10 @@ impl Rule for UnscopedVariablesLint {
                 && reference.write
                 && !read.contains(&reference.identifier)
                 && !self.ignore_pattern.is_match(&reference.name)
-                && !context
+                && context
                     .standard_library
-                    .globals
-                    .contains_key(&reference.name)
+                    .get_globals_under(&reference.name)
+                    .is_empty()
             {
                 read.insert(reference.identifier);
 

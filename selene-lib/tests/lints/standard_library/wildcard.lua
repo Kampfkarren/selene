@@ -7,3 +7,6 @@ script.Child = "Oops"
 script.Child.Name = "Okay"
 
 script.Child.Grandchild.Name = "Okay"
+
+print(x.y.z)
+print(x.y.fail)

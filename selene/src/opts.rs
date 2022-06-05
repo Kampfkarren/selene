@@ -1,9 +1,6 @@
-use std::ffi::OsString;
+use std::{ffi::OsString, path::PathBuf};
 
-use structopt::{
-    clap::{arg_enum, AppSettings},
-    StructOpt,
-};
+use structopt::{clap::arg_enum, StructOpt};
 
 #[derive(Clone, Debug, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
@@ -77,6 +74,8 @@ impl Options {
 
 #[derive(Clone, Debug, PartialEq, Eq, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
+// I'm gonna add more than standard library stuff I swear
+#[allow(clippy::enum_variant_names)]
 pub enum Command {
     #[cfg(feature = "roblox")]
     GenerateRobloxStd {
@@ -84,8 +83,13 @@ pub enum Command {
         deprecated: bool,
     },
 
-    #[structopt(setting(AppSettings::Hidden))]
-    NonExhaustive,
+    #[cfg(feature = "roblox")]
+    UpdateRobloxStd,
+
+    UpgradeStd {
+        #[structopt(parse(from_os_str))]
+        filename: PathBuf,
+    },
 }
 
 arg_enum! {

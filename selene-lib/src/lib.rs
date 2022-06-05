@@ -56,10 +56,15 @@ impl Error for CheckerError {}
 
 #[derive(Deserialize)]
 #[serde(default)]
+#[serde(rename_all = "kebab-case")]
 pub struct CheckerConfig<V> {
     pub config: HashMap<String, V>,
     pub rules: HashMap<String, RuleVariation>,
     pub std: String,
+
+    // Not locked behind Roblox feature so that selene.toml for Roblox will
+    // run even without it.
+    pub roblox_std_source: RobloxStdSource,
 }
 
 // #[derive(Default)] cannot be used since it binds V to Default
@@ -69,6 +74,7 @@ impl<V> Default for CheckerConfig<V> {
             config: HashMap::new(),
             rules: HashMap::new(),
             std: "lua51".to_owned(),
+            roblox_std_source: RobloxStdSource::default(),
         }
     }
 }
@@ -88,6 +94,19 @@ impl RuleVariation {
             RuleVariation::Deny => Severity::Error,
             RuleVariation::Warn => Severity::Warning,
         }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum RobloxStdSource {
+    Floating,
+    Pinned,
+}
+
+impl Default for RobloxStdSource {
+    fn default() -> Self {
+        Self::Floating
     }
 }
 

@@ -250,12 +250,12 @@ impl StandardLibraryVisitor<'_> {
         mut name_path: Vec<String>,
         range: (Position, Position),
     ) {
+        // Make sure it's not just `bad()`, and that it's not a field access from a global outside of standard library
         if self.standard_library.find_global(&name_path).is_none()
-            && self
+            && !self
                 .standard_library
-                .find_global(&[name_path[0].to_owned()])
-                .is_some()
-        // Make sure it's not just `bad()`
+                .get_globals_under(&name_path[0])
+                .is_empty()
         {
             let field = name_path.pop().unwrap();
             assert!(!name_path.is_empty(), "name_path is empty");
@@ -265,11 +265,13 @@ impl StandardLibraryVisitor<'_> {
                 let path = &name_path[0..bound];
                 match self.standard_library.find_global(path) {
                     Some(field) => {
-                        match field {
-                            Field::Any => return,
+                        match field.field_kind {
+                            FieldKind::Any => return,
 
-                            Field::Property { writable } => {
-                                if writable.is_some() && *writable != Some(Writable::Overridden) {
+                            FieldKind::Property(writability) => {
+                                if writability != PropertyWritability::ReadOnly
+                                    && writability != PropertyWritability::OverrideFields
+                                {
                                     return;
                                 }
                             }
@@ -327,15 +329,15 @@ impl Visitor for StandardLibraryVisitor<'_> {
                     {
                         match self.standard_library.find_global(&name_path) {
                             Some(field) => {
-                                match field {
-                                    Field::Property { writable } => {
-                                        if writable.is_some()
-                                            && *writable != Some(Writable::NewFields)
+                                match field.field_kind {
+                                    FieldKind::Property(writability) => {
+                                        if writability != PropertyWritability::ReadOnly
+                                            && writability != PropertyWritability::NewFields
                                         {
                                             continue;
                                         }
                                     }
-                                    Field::Any => continue,
+                                    FieldKind::Any => continue,
                                     _ => {}
                                 };
 
@@ -367,13 +369,15 @@ impl Visitor for StandardLibraryVisitor<'_> {
                     let name = name_token.token().to_string();
 
                     if let Some(global) = self.standard_library.find_global(&[name.to_owned()]) {
-                        match global {
-                            Field::Property { writable } => {
-                                if writable.is_some() && *writable != Some(Writable::NewFields) {
+                        match global.field_kind {
+                            FieldKind::Property(writability) => {
+                                if writability != PropertyWritability::ReadOnly
+                                    && writability != PropertyWritability::NewFields
+                                {
                                     continue;
                                 }
                             }
-                            Field::Any => continue,
+                            FieldKind::Any => continue,
                             _ => {}
                         };
 
@@ -454,12 +458,9 @@ impl Visitor for StandardLibraryVisitor<'_> {
             }
         };
 
-        let (arguments, expecting_method) = match &field {
-            standard_library::Field::Any => return,
-            standard_library::Field::Complex {
-                function: Some(function),
-                ..
-            } => (&function.arguments, &function.method),
+        let function = match &field.field_kind {
+            FieldKind::Any => return,
+            FieldKind::Function(function) => function,
             _ => {
                 self.diagnostics.push(Diagnostic::new(
                     "incorrect_standard_library_use",
@@ -484,7 +485,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
             _ => unreachable!("function_call.call_suffix != ast::Suffix::Call"),
         };
 
-        if *expecting_method != call_is_method {
+        if function.method != call_is_method {
             let problem = if call_is_method {
                 "is not a method"
             } else {
@@ -545,13 +546,14 @@ impl Visitor for StandardLibraryVisitor<'_> {
             _ => {}
         }
 
-        let mut expected_args = arguments
+        let mut expected_args = function
+            .arguments
             .iter()
             .filter(|arg| arg.required != Required::NotRequired)
             .count();
 
         let mut vararg = false;
-        let mut max_args = arguments.len();
+        let mut max_args = function.arguments.len();
 
         let mut maybe_more_arguments = false;
 
@@ -577,11 +579,11 @@ impl Visitor for StandardLibraryVisitor<'_> {
             }
         };
 
-        if let Some(last) = arguments.last() {
+        if let Some(last) = function.arguments.last() {
             if last.argument_type == ArgumentType::Vararg {
                 if let Required::Required(message) = &last.required {
                     // Functions like math.ceil where not using the vararg is wrong
-                    if arguments.len() > argument_types.len() && !maybe_more_arguments {
+                    if function.arguments.len() > argument_types.len() && !maybe_more_arguments {
                         self.diagnostics.push(Diagnostic::new_complete(
                             "incorrect_standard_library_use",
                             format!(
@@ -620,7 +622,8 @@ impl Visitor for StandardLibraryVisitor<'_> {
             ));
         }
 
-        for ((range, passed_type), expected) in argument_types.iter().zip(arguments.iter()) {
+        for ((range, passed_type), expected) in argument_types.iter().zip(function.arguments.iter())
+        {
             if expected.argument_type == ArgumentType::Vararg {
                 continue;
             }
