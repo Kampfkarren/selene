@@ -94,9 +94,36 @@ pub fn collect_roblox_standard_library<V>(
     }
 }
 
-pub fn floating_file_directory() -> color_eyre::Result<PathBuf> {
+fn floating_file_directory() -> color_eyre::Result<PathBuf> {
     match dirs::cache_dir() {
         Some(cache_dir) => Ok(cache_dir.join("selene")),
         None => color_eyre::eyre::bail!("your platform is not supported"),
     }
+}
+
+pub fn update_roblox_std() -> color_eyre::Result<()> {
+    let (contents, _) = RobloxGenerator {
+        std: RobloxGenerator::base_std(),
+        show_deprecated: false,
+    }
+    .generate()?;
+
+    let output_directory = floating_file_directory()?;
+    let output_location = output_directory.join("roblox.yml");
+
+    fs::create_dir_all(&output_directory).with_context(|| {
+        format!(
+            "Could not create the directory for the floating roblox standard library at {}",
+            output_directory.display()
+        )
+    })?;
+
+    fs::write(&output_location, contents).with_context(|| {
+        format!(
+            "Could not write the Roblox standard library to {}",
+            output_location.display()
+        )
+    })?;
+
+    Ok(())
 }

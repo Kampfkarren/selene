@@ -74,12 +74,17 @@ impl Options {
 
 #[derive(Clone, Debug, PartialEq, Eq, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
+// I'm gonna add more than standard library stuff I swear
+#[allow(clippy::enum_variant_names)]
 pub enum Command {
     #[cfg(feature = "roblox")]
     GenerateRobloxStd {
         #[structopt(long)]
         deprecated: bool,
     },
+
+    #[cfg(feature = "roblox")]
+    UpdateRobloxStd,
 
     UpgradeStd {
         #[structopt(parse(from_os_str))]

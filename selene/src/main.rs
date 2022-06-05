@@ -361,9 +361,21 @@ fn start(matches: opts::Options) {
             return;
         }
 
+        #[cfg(feature = "roblox")]
+        Some(opts::Command::UpdateRobloxStd) => {
+            println!("Updating Roblox standard library...");
+
+            if let Err(error) = roblox::update_roblox_std() {
+                error!("Couldn't update Roblox standard library: {error}");
+                std::process::exit(1);
+            }
+
+            return;
+        }
+
         Some(opts::Command::UpgradeStd { filename }) => {
             if let Err(error) = upgrade_std(filename) {
-                error!("Couldn't upgrade standard library: {}", error);
+                error!("Couldn't upgrade standard library: {error}");
                 std::process::exit(1);
             }
 
