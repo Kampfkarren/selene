@@ -207,6 +207,12 @@ globals:
         type: number
       - required: false
         type: number
+  Enum.Font.GothamSemibold:
+    deprecated:
+      message: "Enum.Font.GothamSemibold was replaced with Enum.Font.GothamMedium"
+      replace:
+        - "Enum.Font.GothamMedium"
+    property: read-only
   Enum.GetEnums:
     args: []
     method: true
@@ -732,8 +738,24 @@ structs:
       args:
         - type: function
       method: true
+    connect:
+      deprecated:
+        message: "lowercase methods have been superceded by uppercase ones"
+        replace:
+          - "Connect(%1)"
+      args:
+        - type: function
+      method: true
     Wait:
       args: []
+      method: true
+    wait:
+      deprecated:
+        message: "lowercase methods have been superceded by uppercase ones"
+        replace:
+          - "Wait(%1)"
+      args:
+        - type: function
       method: true
   Instance:
     "*":

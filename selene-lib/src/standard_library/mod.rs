@@ -315,7 +315,7 @@ pub struct Deprecated {
     // TODO: %...
     // TODO: Validate that all numbers parse as u32
     #[serde(default)]
-    pub(self) replace: Vec<String>,
+    pub replace: Vec<String>,
 }
 
 impl Deprecated {

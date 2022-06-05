@@ -10,7 +10,6 @@ const API_DUMP: &str =
 
 pub struct RobloxGenerator {
     pub std: StandardLibrary,
-    pub show_deprecated: bool,
 }
 
 impl RobloxGenerator {
@@ -29,8 +28,6 @@ impl RobloxGenerator {
         self.write_enums(&api);
         self.write_instance_new(&api);
         self.write_get_service(&api);
-
-        self.deprecated_event_methods();
 
         let mut bytes = Vec::new();
 
@@ -227,11 +224,14 @@ impl RobloxGenerator {
                 None => &empty,
             };
 
-            if !self.show_deprecated && tags.contains(&"Deprecated".to_owned()) {
-                continue;
-            }
+            if let Some(mut field) = field {
+                if tags.contains(&"Deprecated".to_owned()) {
+                    field.deprecated = Some(Deprecated {
+                        message: "this property is deprecated.".to_owned(),
+                        replace: Vec::new(),
+                    });
+                }
 
-            if let Some(field) = field {
                 table.insert(name.to_owned(), field);
             }
         }
@@ -305,21 +305,5 @@ impl RobloxGenerator {
                 }],
                 method: true,
             }));
-    }
-
-    fn deprecated_event_methods(&mut self) {
-        if !self.show_deprecated {
-            return;
-        }
-
-        let structs = &mut self.std.structs;
-        let event_struct = structs.get_mut("Event").unwrap();
-        let (connect, wait) = (
-            event_struct["Connect"].clone(),
-            event_struct["Wait"].clone(),
-        );
-
-        event_struct.insert("connect".to_owned(), connect);
-        event_struct.insert("wait".to_owned(), wait);
     }
 }

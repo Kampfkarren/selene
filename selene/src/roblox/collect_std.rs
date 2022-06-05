@@ -60,7 +60,6 @@ pub fn collect_roblox_standard_library<V>(
 
     let generated_std = RobloxGenerator {
         std: RobloxGenerator::base_std(),
-        show_deprecated: false,
     }
     .generate();
 
@@ -105,7 +104,6 @@ fn floating_file_directory() -> color_eyre::Result<PathBuf> {
 pub fn update_roblox_std() -> color_eyre::Result<()> {
     let (contents, _) = RobloxGenerator {
         std: RobloxGenerator::base_std(),
-        show_deprecated: false,
     }
     .generate()?;
 

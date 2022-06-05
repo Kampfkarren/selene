@@ -350,10 +350,10 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
 fn start(matches: opts::Options) {
     match matches.command {
         #[cfg(feature = "roblox")]
-        Some(opts::Command::GenerateRobloxStd { deprecated }) => {
+        Some(opts::Command::GenerateRobloxStd) => {
             println!("Generating Roblox standard library...");
 
-            if let Err(error) = generate_roblox_std(deprecated) {
+            if let Err(error) = generate_roblox_std() {
                 error!("Couldn't create roblox standard library: {}", error);
                 std::process::exit(1);
             }
@@ -616,12 +616,9 @@ fn get_opts_safe(mut args: Vec<OsString>, luacheck: bool) -> Result<opts::Option
 }
 
 #[cfg(feature = "roblox")]
-fn generate_roblox_std(
-    show_deprecated: bool,
-) -> Result<StandardLibrary, Box<dyn std::error::Error>> {
+fn generate_roblox_std() -> Result<StandardLibrary, Box<dyn std::error::Error>> {
     let (contents, std) = roblox::RobloxGenerator {
         std: roblox::RobloxGenerator::base_std(),
-        show_deprecated,
     }
     .generate()?;
 
@@ -631,7 +628,7 @@ fn generate_roblox_std(
 }
 
 #[cfg(not(feature = "roblox"))]
-fn generate_roblox_std(_: bool) -> Result<StandardLibrary, std::convert::Infallible> {
+fn generate_roblox_std() -> Result<StandardLibrary, std::convert::Infallible> {
     unreachable!("generate_roblox_std called when Roblox feature was not installed!");
 }
 
