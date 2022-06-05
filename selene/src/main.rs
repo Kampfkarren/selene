@@ -25,15 +25,16 @@ mod json_output;
 mod opts;
 #[cfg(feature = "roblox")]
 mod roblox;
+mod standard_library;
 mod upgrade_std;
 
 macro_rules! error {
     ($fmt:expr) => {
-        error(fmt::format(format_args!($fmt))).unwrap()
+        error(&fmt::format(format_args!($fmt)))
     };
 
     ($fmt:expr, $($args:tt)*) => {
-        error(fmt::format(format_args!($fmt, $($args)*))).unwrap()
+        error(&fmt::format(format_args!($fmt, $($args)*)))
     };
 }
 
@@ -62,13 +63,14 @@ fn get_color() -> ColorChoice {
     }
 }
 
-fn error(text: String) -> io::Result<()> {
+pub fn error(text: &str) {
     let mut stderr = StandardStream::stderr(get_color());
-    stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
-    write!(&mut stderr, "ERROR: ")?;
-    stderr.reset()?;
-    writeln!(&mut stderr, "{}", text)?;
-    Ok(())
+    stderr
+        .set_color(ColorSpec::new().set_fg(Some(Color::Red)))
+        .unwrap();
+    write!(&mut stderr, "ERROR: ").unwrap();
+    stderr.reset().unwrap();
+    writeln!(&mut stderr, "{}", text).unwrap();
 }
 
 fn log_total(parse_errors: usize, lint_errors: usize, lint_warnings: usize) -> io::Result<()> {
@@ -407,76 +409,49 @@ fn start(matches: opts::Options) {
 
     let current_dir = std::env::current_dir().unwrap();
 
-    let standard_library = match StandardLibrary::from_config_name(&config.std, Some(&current_dir))
-    {
-        Ok(Some(library)) => library,
+    let standard_library =
+        match standard_library::collect_standard_library(&config, &config.std, &current_dir) {
+            Ok(Some(library)) => library,
 
-        Ok(None) => {
-            error!("Standard library was empty.");
-            std::process::exit(1);
-        }
-
-        Err(_) => {
-            if cfg!(feature = "roblox")
-                && config.std.split('+').any(|name| name == "roblox")
-                && !Path::new("roblox.yml").exists()
-            {
-                eprint!("Roblox standard library could not be found in this directory. ");
-                eprintln!("We are automatically generating one for you now!");
-
-                eprint!("By the way, you can do this manually in the future if you need ");
-                eprint!("to use new Roblox features with: ");
-                eprintln!("`selene generate-roblox-std`.");
-
-                if let Err(error) = generate_roblox_std(false) {
-                    error!("Could not create roblox standard library: {}", error);
-                    std::process::exit(1);
-                }
-            }
-
-            let missing_files: Vec<PathBuf> = config
-                .std
-                .split('+')
-                .map(|name| format!("{}.toml", name))
-                .map(|name| PathBuf::from(&name))
-                .filter(|path| !path.exists())
-                .collect();
-
-            if !missing_files.is_empty() {
-                eprintln!(
-                    "`std = \"{}\"`, but some files could not be found:",
-                    config.std
-                );
-
-                for path in missing_files {
-                    eprintln!("  `{}`", path.display());
-                }
-
-                error!("Could not find all standard library files");
+            Ok(None) => {
+                error!("Standard library was empty.");
                 std::process::exit(1);
             }
 
-            match StandardLibrary::from_config_name(&config.std, Some(&current_dir)) {
-                Ok(Some(library)) => library,
+            Err(error) => {
+                let missing_files: Vec<_> = config
+                    .std
+                    .split('+')
+                    .filter(|name| {
+                        !PathBuf::from(format!("{name}.yml")).exists()
+                            && !PathBuf::from(format!("{name}.toml")).exists()
+                    })
+                    .filter(|name| !cfg!(feature = "roblox") || *name != "roblox")
+                    .collect();
 
-                // This is technically reachable if you edit your config while it is generating.
-                Ok(None) => {
-                    error!("Standard library was empty, did you edit your config while running selene?");
+                if !missing_files.is_empty() {
+                    eprintln!(
+                        "`std = \"{}\"`, but some libraries could not be found:",
+                        config.std
+                    );
+
+                    for library_name in missing_files {
+                        eprintln!("  `{library_name}`");
+                    }
+
+                    error!("Could not find all standard library files");
                     std::process::exit(1);
                 }
 
-                Err(error) => {
-                    error!("Could not retrieve standard library: {}", error);
-                    std::process::exit(1);
-                }
+                error!("Could not collect standard library: {error}");
+                std::process::exit(1);
             }
-        }
-    };
+        };
 
     let checker = Arc::new(match Checker::new(config, standard_library) {
         Ok(checker) => checker,
         Err(error) => {
-            error!("{}", error);
+            error!("{error}");
             std::process::exit(1);
         }
     });
@@ -561,7 +536,9 @@ fn start(matches: opts::Options) {
     }
 }
 
-fn main() {
+fn main() -> color_eyre::Result<()> {
+    color_eyre::install()?;
+
     let mut luacheck = false;
 
     if let Ok(path) = std::env::current_exe() {
@@ -573,6 +550,8 @@ fn main() {
     }
 
     start(get_opts(luacheck));
+
+    Ok(())
 }
 
 // Will attempt to get the options.
@@ -629,7 +608,7 @@ fn generate_roblox_std(
     show_deprecated: bool,
 ) -> Result<StandardLibrary, Box<dyn std::error::Error>> {
     let (contents, std) = roblox::RobloxGenerator {
-        std: roblox::RobloxGenerator::base_std()?,
+        std: roblox::RobloxGenerator::base_std(),
         show_deprecated,
     }
     .generate()?;

@@ -3,8 +3,7 @@ mod v1_upgrade;
 
 use std::{
     collections::{BTreeMap, HashMap},
-    fmt, fs, io,
-    path::Path,
+    fmt, io,
 };
 
 use serde::{
@@ -40,6 +39,11 @@ pub struct StandardLibrary {
     #[serde(default)]
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub structs: BTreeMap<String, BTreeMap<String, Field>>,
+
+    /// Internal, used for the Roblox standard library
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_updated: Option<i64>,
 }
 
 #[derive(Debug)]
@@ -122,76 +126,6 @@ impl StandardLibrary {
             "lua52" => "../../default_std/lua52.yml",
             "lua53" => "../../default_std/lua53.yml",
         }
-    }
-
-    pub fn from_config_name(
-        name: &str,
-        directory: Option<&Path>,
-    ) -> Result<Option<StandardLibrary>, StandardLibraryError> {
-        let mut library: Option<StandardLibrary> = None;
-
-        for segment in name.split('+') {
-            let segment_library = match StandardLibrary::from_name(segment) {
-                Some(default) => default,
-
-                None => {
-                    let path = directory
-                        .map(Path::to_path_buf)
-                        .unwrap_or_else(||
-                            panic!(
-                                "from_config_name used with no directory, but segment `{}` is not a built-in library",
-                                segment
-                            )
-                        );
-
-                    match StandardLibrary::from_file_segment(&path.join(segment))? {
-                        Some(library) => library,
-                        None => return Ok(None),
-                    }
-                }
-            };
-
-            match library {
-                Some(ref mut base) => base.extend(segment_library),
-                None => library = Some(segment_library),
-            };
-        }
-
-        Ok(library)
-    }
-
-    pub fn from_file_segment(
-        file_segment: &Path,
-    ) -> Result<Option<StandardLibrary>, StandardLibraryError> {
-        let mut library: StandardLibrary;
-
-        let toml_file = file_segment.with_extension("toml");
-        if toml_file.exists() {
-            let content = fs::read_to_string(toml_file)?;
-
-            let v1_library: v1::StandardLibrary =
-                toml::from_str(&content).map_err(StandardLibraryError::DeserializeTomlError)?;
-
-            library = v1_library.into();
-        } else {
-            let yaml_file = file_segment.with_extension("yml");
-            if yaml_file.exists() {
-                let content = fs::read_to_string(yaml_file)?;
-                library = serde_yaml::from_str(&content)
-                    .map_err(StandardLibraryError::DeserializeYamlError)?;
-            } else {
-                return Ok(None);
-            }
-        }
-
-        if let Some(base_name) = &library.base {
-            if let Some(base) = StandardLibrary::from_config_name(base_name, file_segment.parent())?
-            {
-                library.extend(base);
-            }
-        }
-
-        Ok(Some(library))
     }
 
     /// Find a global in the standard library through its name path.
