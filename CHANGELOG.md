@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Added [new YAML based standard library format](https://kampfkarren.github.io/selene/usage/std.html). The old TOML format is now deprecated and will not have any new functionality added to it, but will be preserved for the forseeable future.
   - You can upgrade old TOML standard libraries by running `selene upgrade-std library.toml`, which will create a new .yml file of the same name in the new format.
+  - This only affects **standard library files**. `selene.toml` has not changed.
 - Added `debug.resetmemorycategory` to the Roblox standard library.
 - Added `debug.setmemorycategory` to the Roblox standard library.
 - Added `--no-summary` option to suppress summary information.
