@@ -11,3 +11,8 @@ insert_final_newline = false
 [*.yml]
 indent_style = space
 indent_size = 2
+
+# This makes it a lot less painful to write YAMLs in docs
+[*.md]
+indent_style = space
+indent_size = 2
