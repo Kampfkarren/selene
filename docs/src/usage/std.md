@@ -121,6 +121,52 @@ globals:
 
 A field is understood as a table if it has fields of its own. Notice that `math` is not defined anywhere, but its fields are. This will create an implicit `math` with the property writability of `read-only`.
 
+### Deprecated
+Any field can have a deprecation notice added to it, which will then be read by [the deprecated lint](../lints/deprecated.md).
+
+```yaml
+---
+globals:
+  table.getn:
+    args:
+      - type: table
+      - type: number
+    deprecated:
+      message: "`table.getn` has been superceded by #."
+      replace:
+        - "#%1"
+```
+
+The deprecated field consists of two subfields.
+
+`message` is required, and is a human readable explanation of what the deprecation is, and potentially why.
+
+`replace` is an optional array of replacements. The most relevant replacement is suggested to the user. If used with a function, then every parameter of the function will be provided.
+
+For instance, since `table.getn`'s top replacement is `#%1`:
+- `table.getn(x)` will suggest `#x`
+- `table.getn()` will not suggest anything, as there is no relevant suggestion
+
+You can also use `%...` to list every argument, separated by commas.
+
+The following:
+```yaml
+---
+globals:
+  call:
+    deprecated:
+      message: "call will be removed in the next version"
+      replace:
+        - "newcall(%...)"
+    args:
+      - type: "..."
+        required: false
+```
+
+...will suggest `newcall(1, 2, 3)` for `call(1, 2, 3)`, and `newcall()` for `call()`.
+
+You can also use `%%` to write a raw `%`.
+
 ### Removed
 ```yaml
 ---
