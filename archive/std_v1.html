@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Standard Library Format - selene Documentation</title>
+        <title>TOML Standard Library Format - selene Documentation</title>
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../selene.html"><strong aria-hidden="true">1.</strong> selene</a></li><li class="chapter-item expanded "><a href="../motivation.html"><strong aria-hidden="true">2.</strong> Motivation</a></li><li class="chapter-item expanded "><a href="../luacheck.html"><strong aria-hidden="true">3.</strong> Luacheck Comparison</a></li><li class="chapter-item expanded "><a href="../cli/index.html"><strong aria-hidden="true">4.</strong> Command Line Interface</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../cli/installation.html"><strong aria-hidden="true">4.1.</strong> Installation</a></li><li class="chapter-item expanded "><a href="../cli/usage.html"><strong aria-hidden="true">4.2.</strong> CLI Usage</a></li></ol></li><li class="chapter-item expanded "><a href="../usage/index.html"><strong aria-hidden="true">5.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../usage/configuration.html"><strong aria-hidden="true">5.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../usage/filtering.html"><strong aria-hidden="true">5.2.</strong> Filtering</a></li><li class="chapter-item expanded "><a href="../usage/std.html" class="active"><strong aria-hidden="true">5.3.</strong> Standard Library Format</a></li></ol></li><li class="chapter-item expanded "><a href="../roblox.html"><strong aria-hidden="true">6.</strong> Roblox Guide</a></li><li class="chapter-item expanded "><a href="../contributing.html"><strong aria-hidden="true">7.</strong> Contributing</a></li><li class="chapter-item expanded "><a href="../lints/index.html"><strong aria-hidden="true">8.</strong> Lints</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../lints/almost_swapped.html"><strong aria-hidden="true">8.1.</strong> almost_swapped</a></li><li class="chapter-item expanded "><a href="../lints/divide_by_zero.html"><strong aria-hidden="true">8.2.</strong> divide_by_zero</a></li><li class="chapter-item expanded "><a href="../lints/duplicate_keys.html"><strong aria-hidden="true">8.3.</strong> duplicate_keys</a></li><li class="chapter-item expanded "><a href="../lints/empty_if.html"><strong aria-hidden="true">8.4.</strong> empty_if</a></li><li class="chapter-item expanded "><a href="../lints/global_usage.html"><strong aria-hidden="true">8.5.</strong> global_usage</a></li><li class="chapter-item expanded "><a href="../lints/if_same_then_else.html"><strong aria-hidden="true">8.6.</strong> if_same_then_else</a></li><li class="chapter-item expanded "><a href="../lints/ifs_same_cond.html"><strong aria-hidden="true">8.7.</strong> ifs_same_cond</a></li><li class="chapter-item expanded "><a href="../lints/multiple_statements.html"><strong aria-hidden="true">8.8.</strong> multiple_statements</a></li><li class="chapter-item expanded "><a href="../lints/mismatched_arg_count.html"><strong aria-hidden="true">8.9.</strong> mismatched_arg_count</a></li><li class="chapter-item expanded "><a href="../lints/parenthese_conditions.html"><strong aria-hidden="true">8.10.</strong> parenthese_conditions</a></li><li class="chapter-item expanded "><a href="../lints/roblox_incorrect_color3_new_bounds.html"><strong aria-hidden="true">8.11.</strong> roblox_incorrect_color3_new_bounds</a></li><li class="chapter-item expanded "><a href="../lints/roblox_incorrect_roact_usage.html"><strong aria-hidden="true">8.12.</strong> roblox_incorrect_roact_usage</a></li><li class="chapter-item expanded "><a href="../lints/shadowing.html"><strong aria-hidden="true">8.13.</strong> shadowing</a></li><li class="chapter-item expanded "><a href="../lints/incorrect_standard_library_use.html"><strong aria-hidden="true">8.14.</strong> incorrect_standard_library_use</a></li><li class="chapter-item expanded "><a href="../lints/suspicious_reverse_loop.html"><strong aria-hidden="true">8.15.</strong> suspicious_reverse_loop</a></li><li class="chapter-item expanded "><a href="../lints/type_check_inside_call.html"><strong aria-hidden="true">8.16.</strong> type_check_inside_call</a></li><li class="chapter-item expanded "><a href="../lints/unbalanced_assignments.html"><strong aria-hidden="true">8.17.</strong> unbalanced_assignments</a></li><li class="chapter-item expanded "><a href="../lints/undefined_variable.html"><strong aria-hidden="true">8.18.</strong> undefined_variable</a></li><li class="chapter-item expanded "><a href="../lints/unscoped_variables.html"><strong aria-hidden="true">8.19.</strong> unscoped_variables</a></li><li class="chapter-item expanded "><a href="../lints/unused_variable.html"><strong aria-hidden="true">8.20.</strong> unused_variable</a></li></ol></li><li class="chapter-item expanded "><a href="../archive/index.html"><strong aria-hidden="true">9.</strong> Archive</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../archive/std_v1.html"><strong aria-hidden="true">9.1.</strong> TOML Standard Library Format</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../selene.html"><strong aria-hidden="true">1.</strong> selene</a></li><li class="chapter-item expanded "><a href="../motivation.html"><strong aria-hidden="true">2.</strong> Motivation</a></li><li class="chapter-item expanded "><a href="../luacheck.html"><strong aria-hidden="true">3.</strong> Luacheck Comparison</a></li><li class="chapter-item expanded "><a href="../cli/index.html"><strong aria-hidden="true">4.</strong> Command Line Interface</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../cli/installation.html"><strong aria-hidden="true">4.1.</strong> Installation</a></li><li class="chapter-item expanded "><a href="../cli/usage.html"><strong aria-hidden="true">4.2.</strong> CLI Usage</a></li></ol></li><li class="chapter-item expanded "><a href="../usage/index.html"><strong aria-hidden="true">5.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../usage/configuration.html"><strong aria-hidden="true">5.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../usage/filtering.html"><strong aria-hidden="true">5.2.</strong> Filtering</a></li><li class="chapter-item expanded "><a href="../usage/std.html"><strong aria-hidden="true">5.3.</strong> Standard Library Format</a></li></ol></li><li class="chapter-item expanded "><a href="../roblox.html"><strong aria-hidden="true">6.</strong> Roblox Guide</a></li><li class="chapter-item expanded "><a href="../contributing.html"><strong aria-hidden="true">7.</strong> Contributing</a></li><li class="chapter-item expanded "><a href="../lints/index.html"><strong aria-hidden="true">8.</strong> Lints</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../lints/almost_swapped.html"><strong aria-hidden="true">8.1.</strong> almost_swapped</a></li><li class="chapter-item expanded "><a href="../lints/divide_by_zero.html"><strong aria-hidden="true">8.2.</strong> divide_by_zero</a></li><li class="chapter-item expanded "><a href="../lints/duplicate_keys.html"><strong aria-hidden="true">8.3.</strong> duplicate_keys</a></li><li class="chapter-item expanded "><a href="../lints/empty_if.html"><strong aria-hidden="true">8.4.</strong> empty_if</a></li><li class="chapter-item expanded "><a href="../lints/global_usage.html"><strong aria-hidden="true">8.5.</strong> global_usage</a></li><li class="chapter-item expanded "><a href="../lints/if_same_then_else.html"><strong aria-hidden="true">8.6.</strong> if_same_then_else</a></li><li class="chapter-item expanded "><a href="../lints/ifs_same_cond.html"><strong aria-hidden="true">8.7.</strong> ifs_same_cond</a></li><li class="chapter-item expanded "><a href="../lints/multiple_statements.html"><strong aria-hidden="true">8.8.</strong> multiple_statements</a></li><li class="chapter-item expanded "><a href="../lints/mismatched_arg_count.html"><strong aria-hidden="true">8.9.</strong> mismatched_arg_count</a></li><li class="chapter-item expanded "><a href="../lints/parenthese_conditions.html"><strong aria-hidden="true">8.10.</strong> parenthese_conditions</a></li><li class="chapter-item expanded "><a href="../lints/roblox_incorrect_color3_new_bounds.html"><strong aria-hidden="true">8.11.</strong> roblox_incorrect_color3_new_bounds</a></li><li class="chapter-item expanded "><a href="../lints/roblox_incorrect_roact_usage.html"><strong aria-hidden="true">8.12.</strong> roblox_incorrect_roact_usage</a></li><li class="chapter-item expanded "><a href="../lints/shadowing.html"><strong aria-hidden="true">8.13.</strong> shadowing</a></li><li class="chapter-item expanded "><a href="../lints/incorrect_standard_library_use.html"><strong aria-hidden="true">8.14.</strong> incorrect_standard_library_use</a></li><li class="chapter-item expanded "><a href="../lints/suspicious_reverse_loop.html"><strong aria-hidden="true">8.15.</strong> suspicious_reverse_loop</a></li><li class="chapter-item expanded "><a href="../lints/type_check_inside_call.html"><strong aria-hidden="true">8.16.</strong> type_check_inside_call</a></li><li class="chapter-item expanded "><a href="../lints/unbalanced_assignments.html"><strong aria-hidden="true">8.17.</strong> unbalanced_assignments</a></li><li class="chapter-item expanded "><a href="../lints/undefined_variable.html"><strong aria-hidden="true">8.18.</strong> undefined_variable</a></li><li class="chapter-item expanded "><a href="../lints/unscoped_variables.html"><strong aria-hidden="true">8.19.</strong> unscoped_variables</a></li><li class="chapter-item expanded "><a href="../lints/unused_variable.html"><strong aria-hidden="true">8.20.</strong> unused_variable</a></li></ol></li><li class="chapter-item expanded "><a href="../archive/index.html"><strong aria-hidden="true">9.</strong> Archive</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../archive/std_v1.html" class="active"><strong aria-hidden="true">9.1.</strong> TOML Standard Library Format</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -134,38 +134,41 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="standard-library-format"><a class="header" href="#standard-library-format">Standard Library Format</a></h1>
-<p>selene provides a robust standard library format to allow for use with environments other than vanilla Lua. Standard libraries are defined in the form of <a href="https://en.wikipedia.org/wiki/YAML">YAML</a> files.</p>
+                        <h1 id="standard-library-format-v1"><a class="header" href="#standard-library-format-v1">Standard Library Format (v1)</a></h1>
+<blockquote>
+<p>The TOML standard library format is <strong>DEPRECATED</strong> and will not have any new functionality added onto it. Check out the <a href="../usage/std.html">updated standard library format here</a>.</p>
+<p>In order to convert an existing TOML standard library over to the new format, simply run <code>selene upgrade-std library.toml</code>, which will create an upgraded <code>library.yml</code> file.</p>
+</blockquote>
+<p>selene provides a robust standard library format to allow for use with environments other than vanilla Lua. Standard libraries are defined in the form of <a href="https://github.com/toml-lang/toml">TOML</a> files.</p>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <p>For examples of the standard library format, see:</p>
 <ul>
-<li><a href="https://github.com/Kampfkarren/selene/blob/main/selene-lib/default_std/lua51.yml"><code>lua51.yml</code></a> - The default standard library for Lua 5.1</li>
-<li><a href="https://github.com/Kampfkarren/selene/blob/main/selene-lib/default_std/lua52.yml"><code>lua52.yml</code></a> - A standard library for Lua 5.2's additions and removals. Reference this if your standard library is based off another (it most likely is).</li>
-<li><a href="https://gist.github.com/Kampfkarren/dff2dc17cc30d68a48510da58fff2381"><code>roblox.yml</code></a> - A standard library for Roblox that incorporates all the advanced features of the format. If you are a Roblox developer, don't use this as anything other than reference--an up to date version of this library is automatically generated.</li>
+<li><a href="https://github.com/Kampfkarren/selene/blob/416be350d7004bf300a83f402712f8df6a3f67da/selene-lib/default_std/lua51.toml"><code>lua51.toml</code></a> - The default standard library for Lua 5.1</li>
+<li><a href="https://github.com/Kampfkarren/selene/blob/416be350d7004bf300a83f402712f8df6a3f67da/selene-lib/default_std/lua52.toml"><code>lua52.toml</code></a> - A standard library for Lua 5.2's additions and removals. Reference this if your standard library is based off another (it most likely is).</li>
+<li><a href="https://gist.github.com/evaera/13c96302d308c7a9ffb2a3fc5d28ac96"><code>roblox.toml</code></a> - A standard library for Roblox that incorporates all the advanced features of the format. If you are a Roblox developer, don't use this as anything other than reference--an up to date version of this library is available with every commit.</li>
 </ul>
-<h2 id="base"><a class="header" href="#base">base</a></h2>
-<p>Used for specifying what standard library to be based off of. This supports both builtin libraries (lua51, lua52, lua53, roblox), as well as any standard libraries that can be found in the current directory.</p>
-<pre><code class="language-yaml">--- # This begins a YAML file
-base: lua51 # We will be extending off of Lua 5.1.
-</code></pre>
-<h2 id="globals"><a class="header" href="#globals">globals</a></h2>
+<h2 id="selene"><a class="header" href="#selene">[selene]</a></h2>
+<p>Anything under the key <code>[selene]</code> is used for meta information. The following paths are accepted:</p>
+<p><code>[selene.base]</code> - Used for specifying what standard library to be based off of. Currently only accepts built in standard libraries, meaning <code>lua51</code> or <code>lua52</code>.</p>
+<p><code>[selene.name]</code> - Used for specifying the name of the standard library. Used internally for cases such as only giving Roblox lints if the standard library is named <code>&quot;roblox&quot;</code>.</p>
+<p><code>[selene.structs]</code> - Used for declaring <a href="#structs">structs</a>.</p>
+<h2 id="globals"><a class="header" href="#globals">[globals]</a></h2>
 <p>This is where the magic happens. The <code>globals</code> field is a dictionary where the keys are the globals you want to define. The value you give tells selene what the value can be, do, and provide.</p>
 <p>If your standard library is based off another, overriding something defined there will use your implementation over the original.</p>
-<h3 id="any"><a class="header" href="#any">Any</a></h3>
-<pre><code class="language-yaml">---
-globals:
-  foo:
-    any: true
+<h2 id="any"><a class="header" href="#any">Any</a></h2>
+<p>Example:</p>
+<pre><code class="language-toml">[foo]
+any = true
 </code></pre>
-<p>This specifies that the field can be used in any possible way, meaning that <code>foo.x</code>, <code>foo:y()</code>, etc will all validate.</p>
-<h3 id="functions"><a class="header" href="#functions">Functions</a></h3>
-<pre><code class="language-yaml">---
-globals:
-  tonumber:
-    args:
-      - type: any
-      - type: number
-        required: false
+<p>Specifies that the field can be used in any possible way, meaning that <code>foo.x</code>, <code>foo:y()</code>, etc will all validate.</p>
+<h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
+<p>Example:</p>
+<pre><code class="language-toml">[[tonumber.args]]
+type = &quot;any&quot;
+
+[[tonumber.args]]
+type = &quot;number&quot;
+required = false
 </code></pre>
 <p>A field is a function if it contains an <code>args</code> and/or <code>method</code> field.</p>
 <p>If <code>method</code> is specified as <code>true</code> and the function is inside a table, then it will require the function be called in the form of <code>Table:FunctionName()</code>, instead of <code>Table.FunctionName()</code>.</p>
@@ -175,13 +178,13 @@ type: &quot;any&quot; | &quot;bool&quot; | &quot;function&quot; | &quot;nil&quot
     | &quot;number&quot; | &quot;string&quot; | &quot;table&quot; | &quot;...&quot;
     | string[] | { &quot;display&quot;: string }
 </code></pre>
-<h4 id="required"><a class="header" href="#required">&quot;required&quot;</a></h4>
+<h2 id="required"><a class="header" href="#required">&quot;required&quot;</a></h2>
 <ul>
 <li><code>true</code> - The default, this argument is required.</li>
 <li><code>false</code> - This argument is optional.</li>
 <li>A string - This argument is required, and not using it will give this as the reason why.</li>
 </ul>
-<h4 id="argument-types"><a class="header" href="#argument-types">Argument types</a></h4>
+<h2 id="argument-types"><a class="header" href="#argument-types">Argument types</a></h2>
 <ul>
 <li><code>&quot;any&quot;</code> - Allows any value.</li>
 <li><code>&quot;bool&quot;</code>, <code>&quot;function&quot;</code>, <code>&quot;nil&quot;</code>, <code>&quot;number&quot;</code>, <code>&quot;string&quot;</code>, <code>&quot;table&quot;</code> - Expects a value of the respective type.</li>
@@ -189,69 +192,60 @@ type: &quot;any&quot; | &quot;bool&quot; | &quot;function&quot; | &quot;nil&quot
 <li>Constant list of strings - Will check if the value provided is one of the strings in the list. For example, <code>collectgarbage</code> only takes one of a few exact string arguments--doing <code>collectgarbage(&quot;count&quot;)</code> will work, but <code>collectgarbage(&quot;whoops&quot;)</code> won't.</li>
 <li><code>{ &quot;display&quot;: string }</code> - Used when no constant could possibly be correct. If a constant is used, selene will tell the user that an argument of the type (display) is required. For an example, the Roblox method <code>Color3.toHSV</code> expects a <code>Color3</code> object--no constant inside it could be correct, so this is defined as:</li>
 </ul>
-<pre><code class="language-yaml">---
-globals:
-  Color3.toHSV:
-    args:
-      - type:
-          display: Color3
+<pre><code class="language-toml">[[Color3.toHSV.args]]
+type = { display = &quot;Color3&quot; }
 </code></pre>
-<h3 id="properties"><a class="header" href="#properties">Properties</a></h3>
-<pre><code class="language-yaml">---
-globals:
-  _VERSION:
-    property: read-only
+<h2 id="properties"><a class="header" href="#properties">Properties</a></h2>
+<p>Example:</p>
+<pre><code class="language-toml">[_VERSION]
+property = true
 </code></pre>
 <p>Specifies that a property exists. For example, <code>_VERSION</code> is available as a global and doesn't have any fields of its own, so it is just defined as a property.</p>
 <p>The same goes for <code>_G</code>, which is defined as:</p>
-<pre><code class="language-yaml">_G:
-  property: new-fields
+<pre><code class="language-toml">[_G]
+property = true
+writable = &quot;new-fields&quot;
 </code></pre>
-<p>The value of property tells selene how it can be mutated and used:</p>
+<p><code>writable</code> is an optional field that tells selene how the property can be mutated and used:</p>
 <ul>
-<li><code>&quot;read-only&quot;</code> - New fields cannot be added or set, and the variable itself cannot be redefined.</li>
 <li><code>&quot;new-fields&quot;</code> - New fields can be added and set, but variable itself cannot be redefined. In the case of _G, it means that <code>_G = &quot;foo&quot;</code> is linted against.</li>
-<li><code>&quot;override-fields&quot;</code> - New fields can't be added, but entire variable can be overridden. In the case of Roblox's <code>Instance.Name</code>, it means we can do <code>Instance.Name = &quot;Hello&quot;</code>, but not <code>Instance.Name.Call()</code>.</li>
-<li><code>&quot;full-write&quot;</code> - New fields can be added and entire variable can be overridden.</li>
+<li><code>&quot;overridden&quot;</code> - New fields can't be added, but entire variable can be overridden. In the case of Roblox's <code>Instance.Name</code>, it means we can do <code>Instance.Name = &quot;Hello&quot;</code>, but not <code>Instance.Name.Call()</code>.</li>
+<li><code>&quot;full&quot;</code> - New fields can be added and entire variable can be overridden.</li>
 </ul>
-<h3 id="struct"><a class="header" href="#struct">Struct</a></h3>
-<pre><code class="language-yaml">---
-globals:
-  game:
-    struct: DataModel
+<p>If <code>writable</code> is not specified, selene will assume it can neither have new fields associated with it nor can be overridden.</p>
+<h2 id="struct"><a class="header" href="#struct">Struct</a></h2>
+<p>Example:</p>
+<pre><code class="language-toml">[game]
+struct = &quot;DataModel&quot;
 </code></pre>
 <p>Specifies that the field is an instance of a <a href="#structs">struct</a>. The value is the name of the struct.</p>
-<h3 id="tables"><a class="header" href="#tables">Tables</a></h3>
-<pre><code class="language-yaml">---
-globals:
-  math.huge:
-    property: read-only
-  math.pi:
-    property: read-only
+<h2 id="table"><a class="header" href="#table">Table</a></h2>
+<p>Example:</p>
+<pre><code class="language-toml">[math.huge]
+property = true
+
+[math.pi]
+property = true
 </code></pre>
-<p>A field is understood as a table if it has fields of its own. Notice that <code>math</code> is not defined anywhere, but its fields are. This will create an implicit <code>math</code> with the property writability of <code>read-only</code>.</p>
-<h3 id="removed"><a class="header" href="#removed">Removed</a></h3>
-<pre><code class="language-yaml">---
-globals:
-  getfenv:
-    removed: true
+<p>A field is understood as a table if it has fields of its own. Notice that <code>[math]</code> is not defined anywhere, but its fields are. Fields are of the same type as globals.</p>
+<h2 id="removed"><a class="header" href="#removed">Removed</a></h2>
+<p>Example:</p>
+<pre><code class="language-toml">[getfenv]
+removed = true
 </code></pre>
-<p>Used when your standard library is <a href="#base">based off</a> another, and your library removes something from the original.</p>
+<p>Used when your standard library is based off another, and your library removes something from the original.</p>
 <h2 id="structs"><a class="header" href="#structs">Structs</a></h2>
 <p>Structs are used in places such as Roblox Instances. Every Instance in Roblox, for example, declares a <code>:GetChildren()</code> method. We don't want to have to define this everywhere an Instance is declared globally, so instead we just define it once in a struct.</p>
-<p>Structs are defined as fields of <code>structs</code>. Any fields they have will be used for instances of that struct. For example, the Roblox standard library has the struct:</p>
-<pre><code class="language-yaml">---
-structs:
-  Event:
-    Connect:
-      method: true
-      args:
-        - type: function
+<p>Structs are defined as fields of <code>[selene.structs]</code>. Any fields they have will be used for instances of that struct. For example, the Roblox standard library has the struct:</p>
+<pre><code class="language-toml">[selene.structs.Event.Connect]
+method = true
+
+[[selene.structs.Event.Connect.args]]
+type = &quot;function&quot;
 </code></pre>
 <p>From there, it can define:</p>
-<pre><code class="language-yaml">globals:
-  workspace.Changed:
-    struct: Event
+<pre><code class="language-toml">[workspace.Changed]
+struct = &quot;Event&quot;
 </code></pre>
 <p>...and selene will know that <code>workspace.Changed:Connect(callback)</code> is valid, but <code>workspace.Changed:RandomNameHere()</code> is not.</p>
 <h2 id="wildcards"><a class="header" href="#wildcards">Wildcards</a></h2>
@@ -262,11 +256,13 @@ struct = &quot;Instance&quot;
 </code></pre>
 <p>This will tell selene &quot;any field accessed from <code>workspace</code> that doesn't exist must be an Instance <a href="#structs">struct</a>&quot;.</p>
 <p>Wildcards can even be used in succession. For example, consider the following:</p>
-<pre><code class="language-yaml">script.Name:
-  property: override-fields
+<pre><code class="language-toml">[script.Name]
+property = true
+writable = &quot;overridden&quot;
 
-script.*.*:
-  property: full-write
+[script.&quot;*&quot;.&quot;*&quot;]
+property = true
+writable = &quot;full&quot;
 </code></pre>
 <p>Ignoring the wildcard, so far this means:</p>
 <ul>
@@ -280,22 +276,13 @@ script.*.*:
 <li><code>script.Foo.Bar = 3</code> <em>will</em> work, because <code>script.*.*</code> has full writability.</li>
 <li><code>script.Foo.Bar.Baz = 3</code> <em>will</em> work for the same reason as above.</li>
 </ul>
-<h2 id="internal-properties"><a class="header" href="#internal-properties">Internal properties</a></h2>
-<p>There are some properties that exist in standard library YAMLs that exist specifically for internal purposes. This is merely a reference, but these are not guaranteed to be stable.</p>
-<h3 id="name"><a class="header" href="#name">name</a></h3>
-<p>This specifies the name of the standard library. This is used internally for cases such as only giving Roblox lints if the standard library is named <code>&quot;roblox&quot;</code>.</p>
-<h3 id="last_updated"><a class="header" href="#last_updated">last_updated</a></h3>
-<p>A timestamp of when the standard library was last updated. This is used by the Roblox standard library generator to update when it gets too old.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../usage/filtering.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../archive/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
-                            </a>
-                            <a rel="next" href="../roblox.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
                     </nav>
@@ -303,11 +290,8 @@ script.*.*:
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../usage/filtering.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../archive/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
-                    </a>
-                    <a rel="next" href="../roblox.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
 
