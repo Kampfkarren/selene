@@ -25,7 +25,7 @@ pub fn collect_roblox_standard_library<V>(
             if floating_file.exists() {
                 let mut library: StandardLibrary = serde_yaml::from_reader(BufReader::new(
                     fs::File::open(&floating_file)
-                        .context("Culd not open the floating roblox standard library.")?,
+                        .context("Could not open the floating roblox standard library.")?,
                 ))?;
 
                 if (chrono::Local::now()
