@@ -54,22 +54,11 @@ struct SuspiciousReverseLoopVisitor {
 
 impl Visitor for SuspiciousReverseLoopVisitor {
     fn visit_numeric_for(&mut self, node: &ast::NumericFor) {
-        if_chain::if_chain! {
-            if node.step().is_none();
-            if let ast::Expression::UnaryOperator {
-                unop: ast::UnOp::Hash(_),
-                ..
-            } = node.start();
-            if let ast::Expression::Value { value, .. } = node.end();
-            if let ast::Value::Number(number) = &**value;
-            if str::parse::<f32>(&number.token().to_string()).ok() <= Some(1.0);
-            then {
-                self.positions.push((
-                    node.start().start_position().unwrap().bytes(),
-                    node.end().end_position().unwrap().bytes(),
-                ));
-            }
-        };
+        // NO more numeric for loops...........
+        self.positions.push((
+            node.start().start_position().unwrap().bytes(),
+            node.end().end_position().unwrap().bytes(),
+        ));
     }
 }
 
