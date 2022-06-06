@@ -32,7 +32,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Run selenology
       id: selenology
-      uses: Kampfkarren/selenology@js-rewrite
+      uses: Kampfkarren/selenology@main
       with:
         new_selene_checkout: ${{ fromJSON(steps.get_pr_info.outputs.data).repository.pullRequest.headRefOid }}
         new_selene_repository: ${{ fromJSON(steps.get_pr_info.outputs.data).repository.pullRequest.headRepository.url }}
