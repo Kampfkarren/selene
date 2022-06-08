@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.1] - 2022-06-07
+### Changed
+- [Updated internal parser](https://github.com/Kampfkarren/full-moon/blob/main/CHANGELOG.md#0151---2022-02-17), bringing bug fixes to type information with generic packs.
+
 ## [0.18.0] - 2022-06-07
 ### Added
 - Added [new YAML based standard library format](https://kampfkarren.github.io/selene/usage/std.html). The old TOML format is now deprecated and will not have any new functionality added to it, but will be preserved for the forseeable future.
