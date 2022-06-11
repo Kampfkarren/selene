@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Fixed
+- Fixed `Enum.NAME.Value` failing in newly generated standard libraries.
+
 ## [0.18.1] - 2022-06-07
 ### Changed
 - [Updated internal parser](https://github.com/Kampfkarren/full-moon/blob/main/CHANGELOG.md#0151---2022-02-17), bringing bug fixes to type information with generic packs.
