@@ -244,8 +244,11 @@ impl RobloxGenerator {
     fn write_enums(&mut self, api: &ApiDump) {
         for enuhm in &api.enums {
             self.std.globals.insert(
-                format!("Enum.{}", enuhm.name),
-                Field::from_field_kind(FieldKind::Struct("Enum".to_owned())),
+                format!("Enum.{}.GetEnumItems", enuhm.name),
+                Field::from_field_kind(FieldKind::Function(FunctionBehavior {
+                    arguments: vec![],
+                    method: true,
+                })),
             );
 
             for item in &enuhm.items {
