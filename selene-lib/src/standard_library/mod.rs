@@ -309,13 +309,8 @@ impl StandardLibrary {
     }
 
     pub fn global_has_fields(&self, name: &str) -> bool {
-        for key in self.globals.keys() {
-            if key.split_once('.').map_or(&**key, |x| x.0) == name {
-                return true;
-            }
-        }
-
-        false
+        profiling::scope!("global_has_fields", name);
+        self.global_tree_cache().contains_key(name)
     }
 
     pub fn extend(&mut self, other: StandardLibrary) {

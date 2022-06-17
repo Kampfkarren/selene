@@ -20,6 +20,7 @@ pub struct ScopeManager {
 
 impl ScopeManager {
     pub fn new(ast: &ast::Ast) -> Self {
+        profiling::scope!("ScopeManager::new");
         let scope_visitor = ScopeVisitor::from_ast(ast);
         scope_visitor.scope_manager
     }
