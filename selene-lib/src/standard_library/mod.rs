@@ -136,6 +136,7 @@ impl StandardLibrary {
     /// 4. "x.y.z" where `x.*.z` or `x.*.*` is defined
     /// 5. "x.y.z" where `x.y` or `x.*` is defined as "any"
     /// 6. "x.y" resolving to a read only property if only "x.y.z" (or x.y.*) is explicitly defined
+    #[profiling::function]
     pub fn find_global(&self, names: &[String]) -> Option<&Field> {
         assert!(!names.is_empty());
 
@@ -146,24 +147,35 @@ impl StandardLibrary {
         static READ_ONLY_FIELD: Field =
             Field::from_field_kind(FieldKind::Property(PropertyWritability::ReadOnly));
 
+        profiling::scope!("find_global (can't find directly)");
+
         #[derive(Clone, Debug)]
         struct TreeNode<'a> {
             field: &'a Field,
             children: BTreeMap<String, TreeNode<'a>>,
         }
 
+        #[profiling::function]
         fn extract_into_tree<'a>(
             names_to_fields: &'a BTreeMap<String, Field>,
+            names: &[String],
         ) -> BTreeMap<String, TreeNode<'a>> {
             let mut fields: BTreeMap<String, TreeNode<'_>> = BTreeMap::new();
 
-            for (name, field) in names_to_fields {
+            'search_name_to_fields: for (name, field) in names_to_fields {
                 let mut current = &mut fields;
 
                 let mut split = name.split('.').collect::<Vec<_>>();
                 let final_name = split.pop().unwrap();
 
+                let mut names_iter = names.iter();
+
                 for segment in split {
+                    if !matches!(names_iter.next(), Some(name_to_find) if segment == "*" || name_to_find == segment)
+                    {
+                        continue 'search_name_to_fields;
+                    }
+
                     current = &mut current
                         .entry(segment.to_string())
                         .or_insert_with(|| TreeNode {
@@ -189,13 +201,13 @@ impl StandardLibrary {
             fields
         }
 
-        let global_fields = extract_into_tree(&self.globals);
+        let global_fields = extract_into_tree(&self.globals, names);
         let mut current = &global_fields;
 
         // TODO: This is really stupid lol
         let mut last_extracted_struct;
 
-        for name in names.iter().take(names.len() - 1) {
+        for (index, name) in names.iter().take(names.len() - 1).enumerate() {
             let found_segment = current.get(name).or_else(|| current.get("*"))?;
 
             match &found_segment.field.field_kind {
@@ -209,7 +221,7 @@ impl StandardLibrary {
                         .get(struct_name)
                         .unwrap_or_else(|| panic!("struct `{struct_name}` not found"));
 
-                    last_extracted_struct = extract_into_tree(strukt);
+                    last_extracted_struct = extract_into_tree(strukt, &names[index + 1..]);
                     current = &last_extracted_struct;
                 }
 

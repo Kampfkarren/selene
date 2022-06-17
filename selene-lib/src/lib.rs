@@ -217,7 +217,13 @@ macro_rules! use_rules {
                 macro_rules! check_rule {
                     ($name:ident) => {
                         let rule = &self.$name;
-                        diagnostics.extend(&mut rule.pass(ast, &self.context).into_iter().map(|diagnostic| {
+
+                        let rule_pass = {
+                            profiling::scope!(&format!("lint: {}", stringify!($name)));
+                            rule.pass(ast, &self.context)
+                        };
+
+                        diagnostics.extend(&mut rule_pass.into_iter().map(|diagnostic| {
                             CheckerDiagnostic {
                                 diagnostic,
                                 severity: self.get_lint_severity(rule, stringify!($name)),
