@@ -892,6 +892,7 @@ dependencies = [
  "id-arena",
  "if_chain",
  "lazy_static",
+ "once_cell",
  "paste 1.0.5",
  "pretty_assertions",
  "profiling",

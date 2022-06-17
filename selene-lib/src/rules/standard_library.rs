@@ -197,7 +197,7 @@ impl StandardLibraryVisitor<'_> {
         if self.standard_library.find_global(&name_path).is_none()
             && self.standard_library.global_has_fields(&name_path[0])
         {
-            let field = dbg!(&mut name_path).pop().unwrap();
+            let field = name_path.pop().unwrap();
             assert!(!name_path.is_empty(), "name_path is empty");
 
             // check if it's writable
