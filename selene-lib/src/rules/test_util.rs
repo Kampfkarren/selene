@@ -1,4 +1,4 @@
-use super::{Context, Rule};
+use super::{AstContext, Context, Rule};
 use crate::{standard_library::v1, test_util::PrettyString, StandardLibrary};
 use std::{
     fs,
@@ -62,6 +62,7 @@ pub fn test_lint_config<
         &Context {
             standard_library: config.standard_library,
         },
+        &AstContext::from_ast(&ast),
     );
 
     let mut files = codespan::Files::new();

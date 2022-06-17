@@ -1,10 +1,10 @@
-use crate::standard_library::StandardLibrary;
+use crate::{ast_util::scopes::ScopeManager, standard_library::StandardLibrary};
 use std::convert::TryInto;
 
 use codespan_reporting::diagnostic::{
     Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
 };
-use full_moon::node::Node;
+use full_moon::{ast::Ast, node::Node};
 use serde::de::DeserializeOwned;
 
 pub mod almost_swapped;
@@ -46,7 +46,13 @@ pub trait Rule {
     fn new(config: Self::Config) -> Result<Self, Self::Error>
     where
         Self: Sized;
-    fn pass(&self, ast: &full_moon::ast::Ast, context: &Context) -> Vec<Diagnostic>;
+
+    fn pass(
+        &self,
+        ast: &full_moon::ast::Ast,
+        context: &Context,
+        ast_context: &AstContext,
+    ) -> Vec<Diagnostic>;
 
     fn severity(&self) -> Severity;
     fn rule_type(&self) -> RuleType;
@@ -212,5 +218,18 @@ impl Context {
     #[cfg(not(feature = "roblox"))]
     pub fn is_roblox(&self) -> bool {
         false
+    }
+}
+
+#[derive(Debug)]
+pub struct AstContext {
+    pub scope_manager: ScopeManager,
+}
+
+impl AstContext {
+    pub fn from_ast(ast: &Ast) -> Self {
+        Self {
+            scope_manager: ScopeManager::new(ast),
+        }
     }
 }

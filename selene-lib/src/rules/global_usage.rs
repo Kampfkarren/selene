@@ -1,5 +1,4 @@
 use super::*;
-use crate::ast_util::scopes::ScopeManager;
 use std::{collections::HashSet, convert::Infallible};
 
 use full_moon::ast::Ast;
@@ -18,11 +17,11 @@ impl Rule for GlobalLint {
         Ok(GlobalLint)
     }
 
-    fn pass(&self, ast: &Ast, context: &Context) -> Vec<Diagnostic> {
-        let scope_manager = ScopeManager::new(ast);
+    fn pass(&self, _: &Ast, context: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
         let mut checked = HashSet::new(); // TODO: Fix ScopeManager having duplicate references
 
-        scope_manager
+        ast_context
+            .scope_manager
             .references
             .iter()
             .filter(|(_, reference)| {

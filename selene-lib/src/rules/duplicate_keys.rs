@@ -19,7 +19,7 @@ impl Rule for DuplicateKeysLint {
         Ok(DuplicateKeysLint)
     }
 
-    fn pass(&self, ast: &Ast, _: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, _: &Context, _: &AstContext) -> Vec<Diagnostic> {
         let mut visitor = DuplicateKeysVisitor {
             duplicates: Vec::new(),
         };

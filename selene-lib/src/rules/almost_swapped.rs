@@ -17,7 +17,7 @@ impl Rule for AlmostSwappedLint {
         Ok(AlmostSwappedLint)
     }
 
-    fn pass(&self, ast: &Ast, _: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, _: &Context, _: &AstContext) -> Vec<Diagnostic> {
         let mut visitor = AlmostSwappedVisitor {
             almost_swaps: Vec::new(),
         };

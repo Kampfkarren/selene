@@ -19,10 +19,10 @@ impl Rule for StandardLibraryLint {
         Ok(StandardLibraryLint)
     }
 
-    fn pass(&self, ast: &Ast, context: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, context: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
         let mut visitor = StandardLibraryVisitor {
             diagnostics: Vec::new(),
-            scope_manager: ScopeManager::new(ast),
+            scope_manager: &ast_context.scope_manager,
             standard_library: &context.standard_library,
         };
 
@@ -183,7 +183,7 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
 
 pub struct StandardLibraryVisitor<'std> {
     diagnostics: Vec<Diagnostic>,
-    scope_manager: ScopeManager,
+    scope_manager: &'std ScopeManager,
     standard_library: &'std StandardLibrary,
 }
 

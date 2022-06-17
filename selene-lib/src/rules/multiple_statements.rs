@@ -39,7 +39,7 @@ impl Rule for MultipleStatementsLint {
         Ok(MultipleStatementsLint { config })
     }
 
-    fn pass(&self, ast: &Ast, _: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, _: &Context, _: &AstContext) -> Vec<Diagnostic> {
         let mut visitor = MultipleStatementsVisitor {
             config: self.config,
             ..MultipleStatementsVisitor::default()

@@ -19,7 +19,7 @@ impl Rule for IncorrectRoactUsageLint {
         Ok(IncorrectRoactUsageLint)
     }
 
-    fn pass(&self, ast: &Ast, context: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, context: &Context, _: &AstContext) -> Vec<Diagnostic> {
         if !context.is_roblox() {
             return Vec::new();
         }

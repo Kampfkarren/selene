@@ -17,7 +17,7 @@ impl Rule for DivideByZeroLint {
         Ok(DivideByZeroLint)
     }
 
-    fn pass(&self, ast: &Ast, _: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, _: &Context, _: &AstContext) -> Vec<Diagnostic> {
         let mut visitor = DivideByZeroVisitor {
             positions: Vec::new(),
         };

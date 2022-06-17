@@ -1,5 +1,4 @@
 use super::*;
-use crate::ast_util::scopes::ScopeManager;
 use std::collections::HashSet;
 
 use full_moon::ast::Ast;
@@ -34,14 +33,13 @@ impl Rule for UnscopedVariablesLint {
         })
     }
 
-    fn pass(&self, ast: &Ast, context: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, _: &Ast, context: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
         // ScopeManager repeats references, and I just don't want to fix it right now
         let mut read = HashSet::new();
 
         let mut diagnostics = Vec::new();
-        let scope_manager = ScopeManager::new(ast);
 
-        for (_, reference) in &scope_manager.references {
+        for (_, reference) in &ast_context.scope_manager.references {
             if reference.resolved.is_none()
                 && reference.write
                 && !read.contains(&reference.identifier)

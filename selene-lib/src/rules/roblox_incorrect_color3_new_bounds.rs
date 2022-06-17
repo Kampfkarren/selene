@@ -17,7 +17,7 @@ impl Rule for Color3BoundsLint {
         Ok(Color3BoundsLint)
     }
 
-    fn pass(&self, ast: &Ast, context: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, context: &Context, _: &AstContext) -> Vec<Diagnostic> {
         if !context.is_roblox() {
             return Vec::new();
         }

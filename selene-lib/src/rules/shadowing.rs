@@ -1,5 +1,4 @@
 use super::*;
-use crate::ast_util::scopes::ScopeManager;
 
 use full_moon::ast::Ast;
 use regex::Regex;
@@ -33,13 +32,12 @@ impl Rule for ShadowingLint {
         })
     }
 
-    fn pass(&self, ast: &Ast, _: &Context) -> Vec<Diagnostic> {
-        let scope_manager = ScopeManager::new(ast);
+    fn pass(&self, _: &Ast, _: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
         let mut shadows = Vec::new();
 
-        for (_, variable) in &scope_manager.variables {
+        for (_, variable) in &ast_context.scope_manager.variables {
             if let Some(shadow_id) = variable.shadowed {
-                let shadow = &scope_manager.variables[shadow_id];
+                let shadow = &ast_context.scope_manager.variables[shadow_id];
                 let definition = shadow.identifiers[0];
 
                 let name = variable.name.to_owned();

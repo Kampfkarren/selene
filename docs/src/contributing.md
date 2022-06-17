@@ -1,7 +1,7 @@
 # Contributing
 selene is written in Rust, so knowledge of the ecosystem is expected.
 
-selene uses [Full Moon](https://github.com/Kampfkarren/full-moon) to parse the Lua code losslessly, meaning whitespace and comments are preserved. You can read the full documentation for Full Moon on its [docs.rs](https://docs.rs/full_moon/latest/full_moon/) page.
+selene uses [Full Moon](https://github.com/Kampfkarren/full-moon) to parse the Lua code losslessly, meaning whitespace and comments are preserved. You can read the full documentation for full-moon on its [docs.rs](https://docs.rs/full_moon/latest/full_moon/) page.
 
 TODO: Upload selene-lib on crates.io and link the docs.rs page for that as well as throughout the rest of this article.
 
@@ -13,7 +13,7 @@ Let's now understand what a lint consists of. selene takes lints in the form of 
 - A `Config` associated type that defines what the configuration format is expected to be. Whatever you pass must be [deserializable](https://serde.rs/).
 - An `Error` associated type that implements [`std::error::Error`](https://doc.rust-lang.org/std/error/trait.Error.html). This is used if configurations can be invalid (such as a parameter only being a number within a range). Most of the time, configurations cannot be invalid (other than deserializing errors, which are handled by selene), and so you can set this to [`std::convert::Infallible`](https://doc.rust-lang.org/std/convert/enum.Infallible.html).
 - A `new` function with the signature `fn new(config: Self::Config) -> Result<Self, Self::Error>`. With the selene CLI, this is called once.
-- A `pass` function with the signature `fn pass(&self, ast: &full_moon::ast::Ast, context: &Context) -> Vec<Diagnostic>`. The `ast` argument is the Full Moon representation of the code, and the context provides optional additional information, such as the standard library being used. Any `Diagnostic` structs returned here are displayed to the user.
+- A `pass` function with the signature `fn pass(&self, ast: &full_moon::ast::Ast, context: &Context, ast_context: &AstContext) -> Vec<Diagnostic>`. The `ast` argument is the full-moon representation of the code. The `context` argument provides optional additional information, such as the standard library being used. The `ast_context` argument provides context specific to that AST, such as its scopes. Any `Diagnostic` structs returned here are displayed to the user.
 - A `severity` function with the signature `fn severity(&self) -> Severity`. Returns either `Severity::Error` or `Severity::Warning`. Use `Error` if the code is positively impossible to be correct. The `&self` is only provided due to limitations of Rust--the function should be completely constant and pure.
 - A `rule_type` function with the signature `fn rule_type(&self) -> RuleType`. Returns either `Complexity`, `Correctness`, `Performance`, or `Style`. So far not used for anything. Has the same gotcha as `severity` in relation to `&self`.
 
@@ -33,7 +33,7 @@ impl Rule for CoolLint {
         Ok(CoolLint)
     }
 
-    fn pass(&self, ast: &Ast, _: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, _: &Context, _: &AstContext) -> Vec<Diagnostic> {
         unimplemented!()
     }
 

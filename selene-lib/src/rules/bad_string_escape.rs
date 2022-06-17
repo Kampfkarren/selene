@@ -31,7 +31,7 @@ impl Rule for BadStringEscapeLint {
         Ok(BadStringEscapeLint)
     }
 
-    fn pass(&self, ast: &Ast, context: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, context: &Context, _: &AstContext) -> Vec<Diagnostic> {
         let mut visitor = BadStringEscapeVisitor {
             sequences: Vec::new(),
             roblox: context.is_roblox(),
