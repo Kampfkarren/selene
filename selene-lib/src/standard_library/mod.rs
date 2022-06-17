@@ -227,16 +227,16 @@ impl StandardLibrary {
             .map(|node| node.field)
     }
 
-    pub fn get_globals_under<'a>(&'a self, name: &str) -> HashMap<&'a String, &'a Field> {
+    pub fn global_has_fields<'a>(&'a self, name: &str) -> bool {
         let mut globals = HashMap::new();
 
         for (key, value) in self.globals.iter() {
             if key.split_once('.').map_or(&**key, |x| x.0) == name {
-                globals.insert(key, value);
+                return true;
             }
         }
 
-        globals
+        false
     }
 
     pub fn extend(&mut self, other: StandardLibrary) {
