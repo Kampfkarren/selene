@@ -46,7 +46,7 @@ impl Rule for UnscopedVariablesLint {
                 && reference.write
                 && !read.contains(&reference.identifier)
                 && !self.ignore_pattern.is_match(&reference.name)
-                && !context.standard_library.global_exists(&reference.name)
+                && !context.standard_library.global_has_fields(&reference.name)
             {
                 read.insert(reference.identifier);
 

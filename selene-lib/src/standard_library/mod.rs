@@ -238,7 +238,7 @@ impl StandardLibrary {
     }
 
     #[profiling::function]
-    pub fn global_exists<'a>(&'a self, name: &str) -> bool {
+    pub fn global_has_fields<'a>(&'a self, name: &str) -> bool {
         for key in self.globals.keys() {
             if key.split_once('.').map_or(&**key, |x| x.0) == name {
                 return true;
