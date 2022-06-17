@@ -54,7 +54,7 @@ impl GlobalTreeNode {
 struct GlobalTreeCache {
     cache: BTreeMap<String, GlobalTreeNode>,
 
-    #[cfg(feature = "debug_assertions")]
+    #[cfg(debug_assertions)]
     last_globals_hash: u64,
 }
 
@@ -210,7 +210,7 @@ impl StandardLibrary {
     // This assumes globals has not changed, which it shouldn't by the time this is being used.
     fn global_tree_cache(&self) -> &BTreeMap<String, GlobalTreeNode> {
         // O(n) debug check to make sure globals doesn't change
-        #[cfg(feature = "debug_assertions")]
+        #[cfg(debug_assertions)]
         let hash = {
             use std::{
                 collections::hash_map::DefaultHasher,
@@ -227,7 +227,7 @@ impl StandardLibrary {
         if let Some(cache) = self.global_tree_cache.get() {
             profiling::scope!("global_tree_cache: cache hit");
 
-            #[cfg(feature = "debug_assertions")]
+            #[cfg(debug_assertions)]
             assert_eq!(
                 cache.last_globals_hash, hash,
                 "globals changed after global_tree_cache has already been created"
@@ -245,7 +245,7 @@ impl StandardLibrary {
                 GlobalTreeCache {
                     cache: extract_into_tree(&self.globals),
 
-                    #[cfg(feature = "debug_assertions")]
+                    #[cfg(debug_assertions)]
                     last_globals_hash: hash,
                 }
             })
@@ -348,7 +348,7 @@ impl StandardLibrary {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub struct FunctionBehavior {
     #[serde(rename = "args")]
     pub arguments: Vec<Argument>,
@@ -361,7 +361,7 @@ fn is_false(value: &bool) -> bool {
     !value
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Field {
     #[serde(flatten)]
     pub field_kind: FieldKind,
@@ -380,7 +380,7 @@ impl Field {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct Deprecated {
     pub message: String,
@@ -441,7 +441,7 @@ impl Deprecated {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
 pub enum FieldKind {
     Any,
     Function(FunctionBehavior),
@@ -525,7 +525,7 @@ impl Serialize for FieldKind {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum PropertyWritability {
     // New fields can't be added, and entire variable can't be overridden
@@ -538,7 +538,7 @@ pub enum PropertyWritability {
     FullWrite,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Argument {
     #[serde(default)]
     #[serde(skip_serializing_if = "Required::required_no_message")]
@@ -547,7 +547,7 @@ pub struct Argument {
     pub argument_type: ArgumentType,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
 // TODO: Nilable types
 pub enum ArgumentType {
     Any,
@@ -676,7 +676,7 @@ impl fmt::Display for ArgumentType {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
 pub enum Required {
     NotRequired,
     Required(Option<String>),
