@@ -22,7 +22,7 @@ impl Rule for AlmostSwappedLint {
             almost_swaps: Vec::new(),
         };
 
-        visitor.visit_ast(&purge_trivia(ast.to_owned()));
+        visitor.visit_ast(ast);
 
         visitor
             .almost_swaps
@@ -81,8 +81,8 @@ impl Visitor for AlmostSwappedVisitor {
                     if !var.has_side_effects() {
                         let expr_end = range(expr).1;
 
-                        let expr_text = expr.to_string().trim().to_owned();
-                        let var_text = var.to_string().trim().to_owned();
+                        let expr_text = purge_trivia(expr).to_string().trim().to_owned();
+                        let var_text = purge_trivia(var).to_string().trim().to_owned();
 
                         if let Some(last_swap) = last_swap.take() {
                             if last_swap.names.0 == expr_text && last_swap.names.1 == var_text {
