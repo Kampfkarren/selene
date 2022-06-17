@@ -260,6 +260,7 @@ impl StandardLibrary {
     /// 4. "x.y.z" where `x.*.z` or `x.*.*` is defined
     /// 5. "x.y.z" where `x.y` or `x.*` is defined as "any"
     /// 6. "x.y" resolving to a read only property if only "x.y.z" (or x.y.*) is explicitly defined
+    #[profiling::function]
     pub fn find_global(&self, names: &[String]) -> Option<&Field> {
         assert!(!names.is_empty());
 
@@ -399,6 +400,8 @@ impl Deprecated {
     }
 
     pub fn try_instead(&self, parameters: &[String]) -> Option<String> {
+        profiling::scope!("Deprecated::try_instead");
+
         let regex_pattern = Deprecated::regex_pattern();
 
         for replace_format in &self.replace {

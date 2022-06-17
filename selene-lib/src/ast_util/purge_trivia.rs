@@ -12,6 +12,7 @@ impl VisitorMut for TriviaPurger {
 }
 
 /// Returns a new Ast without any trivia
+#[profiling::function]
 pub fn purge_trivia<V: Clone + VisitMut>(node: &V) -> V {
     node.clone().visit_mut(&mut TriviaPurger)
 }

@@ -54,6 +54,7 @@ impl DeprecatedVisitor<'_> {
         assert!(!name_path.is_empty());
 
         for bound in 1..=name_path.len() {
+            profiling::scope!("DeprecatedVisitor::check_name_path check in bound");
             let deprecated = match self.standard_library.find_global(&name_path[0..bound]) {
                 Some(Field {
                     deprecated: Some(deprecated),
