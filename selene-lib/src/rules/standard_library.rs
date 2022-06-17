@@ -195,10 +195,7 @@ impl StandardLibraryVisitor<'_> {
     ) {
         // Make sure it's not just `bad()`, and that it's not a field access from a global outside of standard library
         if self.standard_library.find_global(&name_path).is_none()
-            && !self
-                .standard_library
-                .get_globals_under(&name_path[0])
-                .is_empty()
+            && !self.standard_library.global_exists(&name_path[0])
         {
             let field = name_path.pop().unwrap();
             assert!(!name_path.is_empty(), "name_path is empty");
