@@ -228,9 +228,7 @@ impl StandardLibrary {
     }
 
     pub fn global_has_fields<'a>(&'a self, name: &str) -> bool {
-        let mut globals = HashMap::new();
-
-        for (key, value) in self.globals.iter() {
+        for key in self.globals.keys() {
             if key.split_once('.').map_or(&**key, |x| x.0) == name {
                 return true;
             }
