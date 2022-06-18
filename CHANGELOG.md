@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Fixed
+- Fixed a bunch of performance failures, lowering some benchmarks from 3 seconds to 200ms.
+
 ## [0.18.2] - 2022-06-10
 ### Fixed
 - Fixed `Enum.NAME.Value` failing in newly generated standard libraries.
