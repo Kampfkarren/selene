@@ -14,7 +14,7 @@ impl Rule for InvalidLintFilterLint {
         Ok(InvalidLintFilterLint)
     }
 
-    fn pass(&self, _: &full_moon::ast::Ast, _: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, _: &full_moon::ast::Ast, _: &Context, _: &AstContext) -> Vec<Diagnostic> {
         Vec::new()
     }
 

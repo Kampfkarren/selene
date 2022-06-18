@@ -1,4 +1,7 @@
-use full_moon::{ast, tokenizer::TokenReference, visitors::VisitorMut};
+use full_moon::{
+    tokenizer::TokenReference,
+    visitors::{VisitMut, VisitorMut},
+};
 
 struct TriviaPurger;
 
@@ -9,6 +12,7 @@ impl VisitorMut for TriviaPurger {
 }
 
 /// Returns a new Ast without any trivia
-pub fn purge_trivia(ast: ast::Ast) -> ast::Ast {
-    TriviaPurger.visit_ast(ast)
+#[profiling::function]
+pub fn purge_trivia<V: Clone + VisitMut>(node: &V) -> V {
+    node.clone().visit_mut(&mut TriviaPurger)
 }

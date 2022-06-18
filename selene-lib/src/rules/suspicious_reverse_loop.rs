@@ -17,7 +17,7 @@ impl Rule for SuspiciousReverseLoopLint {
         Ok(SuspiciousReverseLoopLint)
     }
 
-    fn pass(&self, ast: &Ast, _: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, _: &Context, _: &AstContext) -> Vec<Diagnostic> {
         let mut visitor = SuspiciousReverseLoopVisitor {
             positions: Vec::new(),
         };

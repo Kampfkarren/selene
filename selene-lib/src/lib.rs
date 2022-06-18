@@ -20,7 +20,7 @@ mod util;
 #[cfg(test)]
 mod test_util;
 
-use rules::{Context, Diagnostic, Rule, Severity};
+use rules::{AstContext, Context, Diagnostic, Rule, Severity};
 use standard_library::StandardLibrary;
 
 #[derive(Debug)]
@@ -214,10 +214,18 @@ macro_rules! use_rules {
             pub fn test_on(&self, ast: &Ast) -> Vec<CheckerDiagnostic> {
                 let mut diagnostics = Vec::new();
 
+                let ast_context = AstContext::from_ast(ast);
+
                 macro_rules! check_rule {
                     ($name:ident) => {
                         let rule = &self.$name;
-                        diagnostics.extend(&mut rule.pass(ast, &self.context).into_iter().map(|diagnostic| {
+
+                        let rule_pass = {
+                            profiling::scope!(&format!("lint: {}", stringify!($name)));
+                            rule.pass(ast, &self.context, &ast_context)
+                        };
+
+                        diagnostics.extend(&mut rule_pass.into_iter().map(|diagnostic| {
                             CheckerDiagnostic {
                                 diagnostic,
                                 severity: self.get_lint_severity(rule, stringify!($name)),

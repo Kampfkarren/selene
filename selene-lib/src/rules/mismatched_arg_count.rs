@@ -28,20 +28,18 @@ impl Rule for MismatchedArgCountLint {
         Ok(MismatchedArgCountLint)
     }
 
-    fn pass(&self, ast: &Ast, _context: &Context) -> Vec<Diagnostic> {
-        let scope_manager = ScopeManager::new(ast);
-
+    fn pass(&self, ast: &Ast, _: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
         // Firstly visit the AST so we can map the variables to their required parameter counts
         let mut definitions = HashMap::new();
         let mut definitions_visitor = MapFunctionDefinitionVisitor {
-            scope_manager: &scope_manager,
+            scope_manager: &ast_context.scope_manager,
             definitions: &mut definitions,
         };
         definitions_visitor.visit_ast(ast);
 
         let mut visitor = MismatchedArgCountVisitor {
             mismatched_arg_counts: Vec::new(),
-            scope_manager,
+            scope_manager: &ast_context.scope_manager,
             definitions,
         };
 
@@ -368,13 +366,13 @@ impl Visitor for MapFunctionDefinitionVisitor<'_> {
     }
 }
 
-struct MismatchedArgCountVisitor {
+struct MismatchedArgCountVisitor<'a> {
     mismatched_arg_counts: Vec<MismatchedArgCount>,
-    scope_manager: ScopeManager,
+    scope_manager: &'a ScopeManager,
     definitions: HashMap<Id<Variable>, ParameterCount>,
 }
 
-impl MismatchedArgCountVisitor {
+impl MismatchedArgCountVisitor<'_> {
     // Split off since the formatter doesn't work inside if_chain.
     fn get_function_definiton_ranges(&self, defined_variable: Id<Variable>) -> Vec<(usize, usize)> {
         let variable = self.scope_manager.variables.get(defined_variable).unwrap();
@@ -395,7 +393,7 @@ impl MismatchedArgCountVisitor {
     }
 }
 
-impl Visitor for MismatchedArgCountVisitor {
+impl Visitor for MismatchedArgCountVisitor<'_> {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         if_chain::if_chain! {
             // Check that we're using a named function call, with an anonymous call suffix

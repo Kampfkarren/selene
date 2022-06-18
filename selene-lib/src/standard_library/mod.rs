@@ -7,6 +7,7 @@ use std::{
     fmt, io,
 };
 
+use once_cell::sync::OnceCell;
 use regex::{Captures, Regex};
 use serde::{
     de::{self, Deserializer, Visitor},
@@ -20,6 +21,81 @@ lazy_static::lazy_static! {
         map.insert("*".to_owned(), Field::from_field_kind(FieldKind::Any));
         map
     };
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum GlobalTreeField {
+    Key(String),
+    ReadOnlyField,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct GlobalTreeNode {
+    children: BTreeMap<String, GlobalTreeNode>,
+    field: GlobalTreeField,
+}
+
+impl GlobalTreeNode {
+    fn field<'a>(&self, names_to_fields: &'a BTreeMap<String, Field>) -> &'a Field {
+        static READ_ONLY_FIELD: Field =
+            Field::from_field_kind(FieldKind::Property(PropertyWritability::ReadOnly));
+
+        match &self.field {
+            GlobalTreeField::Key(key) => names_to_fields
+                .get(key)
+                .unwrap_or_else(|| panic!("couldn't find {key} inside names_to_fields")),
+
+            GlobalTreeField::ReadOnlyField => &READ_ONLY_FIELD,
+        }
+    }
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+struct GlobalTreeCache {
+    cache: BTreeMap<String, GlobalTreeNode>,
+
+    #[cfg(debug_assertions)]
+    last_globals_hash: u64,
+}
+
+#[profiling::function]
+fn extract_into_tree(
+    names_to_fields: &BTreeMap<String, Field>,
+) -> BTreeMap<String, GlobalTreeNode> {
+    let mut fields: BTreeMap<String, GlobalTreeNode> = BTreeMap::new();
+
+    for name in names_to_fields.keys() {
+        let mut current = &mut fields;
+
+        let mut split = name.split('.').collect::<Vec<_>>();
+        let final_name = split.pop().unwrap();
+
+        for segment in split {
+            current = &mut current
+                .entry(segment.to_string())
+                .or_insert_with(|| GlobalTreeNode {
+                    field: GlobalTreeField::ReadOnlyField,
+                    children: BTreeMap::new(),
+                })
+                .children;
+        }
+
+        let tree_field_key = GlobalTreeField::Key(name.to_owned());
+
+        if let Some(existing_segment) = current.get_mut(final_name) {
+            existing_segment.field = tree_field_key;
+        } else {
+            current.insert(
+                final_name.to_string(),
+                GlobalTreeNode {
+                    field: tree_field_key,
+                    children: BTreeMap::new(),
+                },
+            );
+        }
+    }
+
+    fields
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
@@ -44,6 +120,9 @@ pub struct StandardLibrary {
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_updated: Option<i64>,
+
+    #[serde(skip)]
+    global_tree_cache: OnceCell<GlobalTreeCache>,
 }
 
 #[derive(Debug)]
@@ -128,6 +207,51 @@ impl StandardLibrary {
         }
     }
 
+    // This assumes globals has not changed, which it shouldn't by the time this is being used.
+    fn global_tree_cache(&self) -> &BTreeMap<String, GlobalTreeNode> {
+        // O(n) debug check to make sure globals doesn't change
+        #[cfg(debug_assertions)]
+        let hash = {
+            use std::{
+                collections::hash_map::DefaultHasher,
+                hash::{Hash, Hasher},
+            };
+
+            profiling::scope!("global_tree_cache: hash");
+
+            let mut hasher = DefaultHasher::new();
+            self.globals.hash(&mut hasher);
+            hasher.finish()
+        };
+
+        if let Some(cache) = self.global_tree_cache.get() {
+            profiling::scope!("global_tree_cache: cache hit");
+
+            #[cfg(debug_assertions)]
+            assert_eq!(
+                cache.last_globals_hash, hash,
+                "globals changed after global_tree_cache has already been created"
+            );
+
+            return &cache.cache;
+        }
+
+        profiling::scope!("global_tree_cache: cache not set");
+
+        &self
+            .global_tree_cache
+            .get_or_init(|| {
+                profiling::scope!("global_tree_cache: create cache");
+                GlobalTreeCache {
+                    cache: extract_into_tree(&self.globals),
+
+                    #[cfg(debug_assertions)]
+                    last_globals_hash: hash,
+                }
+            })
+            .cache
+    }
+
     /// Find a global in the standard library through its name path.
     /// Handles all of the following cases:
     /// 1. "x.y" where `x.y` is explicitly defined
@@ -136,71 +260,30 @@ impl StandardLibrary {
     /// 4. "x.y.z" where `x.*.z` or `x.*.*` is defined
     /// 5. "x.y.z" where `x.y` or `x.*` is defined as "any"
     /// 6. "x.y" resolving to a read only property if only "x.y.z" (or x.y.*) is explicitly defined
+    #[profiling::function]
     pub fn find_global(&self, names: &[String]) -> Option<&Field> {
         assert!(!names.is_empty());
 
         if let Some(explicit_global) = self.globals.get(&names.join(".")) {
+            profiling::scope!("find_global: explicit global");
             return Some(explicit_global);
         }
-
-        static READ_ONLY_FIELD: Field =
-            Field::from_field_kind(FieldKind::Property(PropertyWritability::ReadOnly));
-
-        #[derive(Clone, Debug)]
-        struct TreeNode<'a> {
-            field: &'a Field,
-            children: BTreeMap<String, TreeNode<'a>>,
-        }
-
-        fn extract_into_tree<'a>(
-            names_to_fields: &'a BTreeMap<String, Field>,
-        ) -> BTreeMap<String, TreeNode<'a>> {
-            let mut fields: BTreeMap<String, TreeNode<'_>> = BTreeMap::new();
-
-            for (name, field) in names_to_fields {
-                let mut current = &mut fields;
-
-                let mut split = name.split('.').collect::<Vec<_>>();
-                let final_name = split.pop().unwrap();
-
-                for segment in split {
-                    current = &mut current
-                        .entry(segment.to_string())
-                        .or_insert_with(|| TreeNode {
-                            field: &READ_ONLY_FIELD,
-                            children: BTreeMap::new(),
-                        })
-                        .children;
-                }
-
-                if let Some(existing_segment) = current.get_mut(final_name) {
-                    existing_segment.field = field;
-                } else {
-                    current.insert(
-                        final_name.to_string(),
-                        TreeNode {
-                            field,
-                            children: BTreeMap::new(),
-                        },
-                    );
-                }
-            }
-
-            fields
-        }
-
-        let global_fields = extract_into_tree(&self.globals);
-        let mut current = &global_fields;
 
         // TODO: This is really stupid lol
         let mut last_extracted_struct;
 
+        let mut current = self.global_tree_cache();
+        let mut current_names_to_fields = &self.globals;
+
+        profiling::scope!("find_global: look through global tree cache");
+
         for name in names.iter().take(names.len() - 1) {
             let found_segment = current.get(name).or_else(|| current.get("*"))?;
+            let field = found_segment.field(current_names_to_fields);
 
-            match &found_segment.field.field_kind {
+            match &field.field_kind {
                 FieldKind::Any => {
-                    return Some(found_segment.field);
+                    return Some(field);
                 }
 
                 FieldKind::Struct(struct_name) => {
@@ -210,6 +293,7 @@ impl StandardLibrary {
                         .unwrap_or_else(|| panic!("struct `{struct_name}` not found"));
 
                     last_extracted_struct = extract_into_tree(strukt);
+                    current_names_to_fields = strukt;
                     current = &last_extracted_struct;
                 }
 
@@ -222,19 +306,12 @@ impl StandardLibrary {
         current
             .get(names.last().unwrap())
             .or_else(|| current.get("*"))
-            .map(|node| node.field)
+            .map(|node| node.field(current_names_to_fields))
     }
 
-    pub fn get_globals_under<'a>(&'a self, name: &str) -> HashMap<&'a String, &'a Field> {
-        let mut globals = HashMap::new();
-
-        for (key, value) in self.globals.iter() {
-            if key.split_once('.').map_or(&**key, |x| x.0) == name {
-                globals.insert(key, value);
-            }
-        }
-
-        globals
+    pub fn global_has_fields(&self, name: &str) -> bool {
+        profiling::scope!("global_has_fields", name);
+        self.global_tree_cache().contains_key(name)
     }
 
     pub fn extend(&mut self, other: StandardLibrary) {
@@ -272,7 +349,7 @@ impl StandardLibrary {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub struct FunctionBehavior {
     #[serde(rename = "args")]
     pub arguments: Vec<Argument>,
@@ -285,7 +362,7 @@ fn is_false(value: &bool) -> bool {
     !value
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Field {
     #[serde(flatten)]
     pub field_kind: FieldKind,
@@ -304,7 +381,7 @@ impl Field {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct Deprecated {
     pub message: String,
@@ -323,6 +400,8 @@ impl Deprecated {
     }
 
     pub fn try_instead(&self, parameters: &[String]) -> Option<String> {
+        profiling::scope!("Deprecated::try_instead");
+
         let regex_pattern = Deprecated::regex_pattern();
 
         for replace_format in &self.replace {
@@ -365,7 +444,7 @@ impl Deprecated {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
 pub enum FieldKind {
     Any,
     Function(FunctionBehavior),
@@ -449,7 +528,7 @@ impl Serialize for FieldKind {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum PropertyWritability {
     // New fields can't be added, and entire variable can't be overridden
@@ -462,7 +541,7 @@ pub enum PropertyWritability {
     FullWrite,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Argument {
     #[serde(default)]
     #[serde(skip_serializing_if = "Required::required_no_message")]
@@ -471,7 +550,7 @@ pub struct Argument {
     pub argument_type: ArgumentType,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
 // TODO: Nilable types
 pub enum ArgumentType {
     Any,
@@ -600,7 +679,7 @@ impl fmt::Display for ArgumentType {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
 pub enum Required {
     NotRequired,
     Required(Option<String>),

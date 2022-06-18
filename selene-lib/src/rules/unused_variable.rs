@@ -1,5 +1,4 @@
 use super::*;
-use crate::ast_util::scopes;
 
 use full_moon::ast::Ast;
 use regex::Regex;
@@ -37,11 +36,11 @@ impl Rule for UnusedVariableLint {
         })
     }
 
-    fn pass(&self, ast: &Ast, _: &Context) -> Vec<Diagnostic> {
-        let scope_manager = scopes::ScopeManager::new(ast);
+    fn pass(&self, _: &Ast, _: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
         let mut diagnostics = Vec::new();
 
-        for (_, variable) in scope_manager
+        for (_, variable) in ast_context
+            .scope_manager
             .variables
             .iter()
             .filter(|(_, variable)| !self.ignore_pattern.is_match(&variable.name))
@@ -50,7 +49,7 @@ impl Rule for UnusedVariableLint {
                 .references
                 .iter()
                 .copied()
-                .map(|id| &scope_manager.references[id]);
+                .map(|id| &ast_context.scope_manager.references[id]);
 
             if !references.clone().any(|reference| reference.read) {
                 let mut notes = Vec::new();

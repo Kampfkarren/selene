@@ -17,7 +17,7 @@ impl Rule for TypeCheckInsideCallLint {
         Ok(TypeCheckInsideCallLint)
     }
 
-    fn pass(&self, ast: &Ast, context: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, context: &Context, _: &AstContext) -> Vec<Diagnostic> {
         let mut visitor = TypeCheckInsideCallVisitor {
             positions: Vec::new(),
             roblox: context.is_roblox(),

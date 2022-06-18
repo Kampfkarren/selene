@@ -19,10 +19,10 @@ impl Rule for StandardLibraryLint {
         Ok(StandardLibraryLint)
     }
 
-    fn pass(&self, ast: &Ast, context: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, context: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
         let mut visitor = StandardLibraryVisitor {
             diagnostics: Vec::new(),
-            scope_manager: ScopeManager::new(ast),
+            scope_manager: &ast_context.scope_manager,
             standard_library: &context.standard_library,
         };
 
@@ -183,7 +183,7 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
 
 pub struct StandardLibraryVisitor<'std> {
     diagnostics: Vec<Diagnostic>,
-    scope_manager: ScopeManager,
+    scope_manager: &'std ScopeManager,
     standard_library: &'std StandardLibrary,
 }
 
@@ -195,10 +195,7 @@ impl StandardLibraryVisitor<'_> {
     ) {
         // Make sure it's not just `bad()`, and that it's not a field access from a global outside of standard library
         if self.standard_library.find_global(&name_path).is_none()
-            && !self
-                .standard_library
-                .get_globals_under(&name_path[0])
-                .is_empty()
+            && self.standard_library.global_has_fields(&name_path[0])
         {
             let field = name_path.pop().unwrap();
             assert!(!name_path.is_empty(), "name_path is empty");

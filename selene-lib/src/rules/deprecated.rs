@@ -16,10 +16,10 @@ impl Rule for DeprecatedLint {
         Ok(DeprecatedLint)
     }
 
-    fn pass(&self, ast: &full_moon::ast::Ast, context: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, context: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
         let mut visitor = DeprecatedVisitor {
             diagnostics: Vec::new(),
-            scope_manager: ScopeManager::new(ast),
+            scope_manager: &ast_context.scope_manager,
             standard_library: &context.standard_library,
         };
 
@@ -39,7 +39,7 @@ impl Rule for DeprecatedLint {
 
 struct DeprecatedVisitor<'a> {
     diagnostics: Vec<Diagnostic>,
-    scope_manager: ScopeManager,
+    scope_manager: &'a ScopeManager,
     standard_library: &'a StandardLibrary,
 }
 
@@ -54,6 +54,7 @@ impl DeprecatedVisitor<'_> {
         assert!(!name_path.is_empty());
 
         for bound in 1..=name_path.len() {
+            profiling::scope!("DeprecatedVisitor::check_name_path check in bound");
             let deprecated = match self.standard_library.find_global(&name_path[0..bound]) {
                 Some(Field {
                     deprecated: Some(deprecated),

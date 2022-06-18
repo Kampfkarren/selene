@@ -551,6 +551,11 @@ fn start(matches: opts::Options) {
 fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
 
+    #[cfg(feature = "tracy-profiling")]
+    {
+        tracy_client::Client::start();
+    }
+
     let mut luacheck = false;
 
     if let Ok(path) = std::env::current_exe() {

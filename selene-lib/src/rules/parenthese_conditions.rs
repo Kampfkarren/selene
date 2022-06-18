@@ -17,7 +17,7 @@ impl Rule for ParentheseConditionsLint {
         Ok(ParentheseConditionsLint)
     }
 
-    fn pass(&self, ast: &Ast, _: &Context) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, _: &Context, _: &AstContext) -> Vec<Diagnostic> {
         let mut visitor = ParentheseConditionsVisitor {
             positions: Vec::new(),
         };
