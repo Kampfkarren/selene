@@ -682,7 +682,7 @@ roblox-std-source = &quot;pinned&quot;
 <p>You can also create a <code>roblox.yml</code> file manually with <code>selene generate-roblox-std</code>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="contributing"><a class="header" href="#contributing">Contributing</a></h1>
 <p>selene is written in Rust, so knowledge of the ecosystem is expected.</p>
-<p>selene uses <a href="https://github.com/Kampfkarren/full-moon">Full Moon</a> to parse the Lua code losslessly, meaning whitespace and comments are preserved. You can read the full documentation for Full Moon on its <a href="https://docs.rs/full_moon/latest/full_moon/">docs.rs</a> page.</p>
+<p>selene uses <a href="https://github.com/Kampfkarren/full-moon">Full Moon</a> to parse the Lua code losslessly, meaning whitespace and comments are preserved. You can read the full documentation for full-moon on its <a href="https://docs.rs/full_moon/latest/full_moon/">docs.rs</a> page.</p>
 <p>TODO: Upload selene-lib on crates.io and link the docs.rs page for that as well as throughout the rest of this article.</p>
 <h2 id="writing-a-lint"><a class="header" href="#writing-a-lint">Writing a lint</a></h2>
 <p>In selene, lints are created in isolated modules. To start, create a file in <code>selene-lib/src/rules</code> with the name of your lint. In this example, we're going to call the lint <code>cool_lint.rs</code>.</p>
@@ -691,7 +691,7 @@ roblox-std-source = &quot;pinned&quot;
 <li>A <code>Config</code> associated type that defines what the configuration format is expected to be. Whatever you pass must be <a href="https://serde.rs/">deserializable</a>.</li>
 <li>An <code>Error</code> associated type that implements <a href="https://doc.rust-lang.org/std/error/trait.Error.html"><code>std::error::Error</code></a>. This is used if configurations can be invalid (such as a parameter only being a number within a range). Most of the time, configurations cannot be invalid (other than deserializing errors, which are handled by selene), and so you can set this to <a href="https://doc.rust-lang.org/std/convert/enum.Infallible.html"><code>std::convert::Infallible</code></a>.</li>
 <li>A <code>new</code> function with the signature <code>fn new(config: Self::Config) -&gt; Result&lt;Self, Self::Error&gt;</code>. With the selene CLI, this is called once.</li>
-<li>A <code>pass</code> function with the signature <code>fn pass(&amp;self, ast: &amp;full_moon::ast::Ast, context: &amp;Context) -&gt; Vec&lt;Diagnostic&gt;</code>. The <code>ast</code> argument is the Full Moon representation of the code, and the context provides optional additional information, such as the standard library being used. Any <code>Diagnostic</code> structs returned here are displayed to the user.</li>
+<li>A <code>pass</code> function with the signature <code>fn pass(&amp;self, ast: &amp;full_moon::ast::Ast, context: &amp;Context, ast_context: &amp;AstContext) -&gt; Vec&lt;Diagnostic&gt;</code>. The <code>ast</code> argument is the full-moon representation of the code. The <code>context</code> argument provides optional additional information, such as the standard library being used. The <code>ast_context</code> argument provides context specific to that AST, such as its scopes. Any <code>Diagnostic</code> structs returned here are displayed to the user.</li>
 <li>A <code>severity</code> function with the signature <code>fn severity(&amp;self) -&gt; Severity</code>. Returns either <code>Severity::Error</code> or <code>Severity::Warning</code>. Use <code>Error</code> if the code is positively impossible to be correct. The <code>&amp;self</code> is only provided due to limitations of Rust--the function should be completely constant and pure.</li>
 <li>A <code>rule_type</code> function with the signature <code>fn rule_type(&amp;self) -&gt; RuleType</code>. Returns either <code>Complexity</code>, <code>Correctness</code>, <code>Performance</code>, or <code>Style</code>. So far not used for anything. Has the same gotcha as <code>severity</code> in relation to <code>&amp;self</code>.</li>
 </ul>
@@ -709,7 +709,7 @@ impl Rule for CoolLint {
         Ok(CoolLint)
     }
 
-    fn pass(&amp;self, ast: &amp;Ast, _: &amp;Context) -&gt; Vec&lt;Diagnostic&gt; {
+    fn pass(&amp;self, ast: &amp;Ast, _: &amp;Context, _: &amp;AstContext) -&gt; Vec&lt;Diagnostic&gt; {
         unimplemented!()
     }
 
