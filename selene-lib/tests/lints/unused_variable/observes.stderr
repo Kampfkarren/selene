@@ -1,0 +1,24 @@
+error[unused_variable]: writtenOnlyA is assigned a value, but never used
+  ┌─ observes.lua:1:7
+  │
+1 │ local writtenOnlyA = {}
+  │       ^^^^^^^^^^^^
+2 │ table.insert(writtenOnlyA, 3)
+  │              ------------ `table.insert` only writes to `writtenOnlyA`
+
+error[unused_variable]: writtenOnlyB is assigned a value, but never used
+   ┌─ observes.lua:9:8
+   │
+ 9 │     local writtenOnlyB = {}
+   │           ^^^^^^^^^^^^
+10 │     table.insert(writtenOnlyB, 1)
+   │                  ------------ `table.insert` only writes to `writtenOnlyB`
+
+error[unused_variable]: writtenOnlyC is assigned a value, but never used
+   ┌─ observes.lua:17:8
+   │
+17 │     local writtenOnlyC = {}
+   │           ^^^^^^^^^^^^
+18 │     table.insert(writtenOnlyC, 1)
+   │                  ------------ `table.insert` only writes to `writtenOnlyC`
+

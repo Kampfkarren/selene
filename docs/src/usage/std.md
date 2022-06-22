@@ -60,6 +60,24 @@ type: "any" | "bool" | "function" | "nil"
 - `false` - This argument is optional.
 - A string - This argument is required, and not using it will give this as the reason why.
 
+#### "observes"
+This field is used for allowing smarter introspection of how the argument given is used.
+
+- "read-write" - The default. This argument is potentially both written to and read from.
+- "read" - This argument is only read from. Currently unused.
+- "write" - This argument is only written to. Used by `unused_variable` to assist in detecting a variable only being written to, even if passed into a function.
+
+Example:
+```yml
+ table.insert:
+  args:
+    - type: table
+      observes: write # This way, `table.insert(x, 1)` doesn't count as a read to `x`
+    - type: any
+    - required: false
+      type: any
+```
+
 #### Argument types
 - `"any"` - Allows any value.
 - `"bool"`, `"function"`, `"nil"`, `"number"`, `"string"`, `"table"` - Expects a value of the respective type.

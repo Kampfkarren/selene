@@ -8,6 +8,8 @@ use full_moon::{
 };
 use id_arena::{Arena, Id};
 
+use super::expression_to_ident;
+
 type Range = (usize, usize);
 
 #[derive(Debug, Default)]
@@ -15,6 +17,7 @@ pub struct ScopeManager {
     pub scopes: Arena<Scope>,
     pub references: Arena<Reference>,
     pub variables: Arena<Variable>,
+    pub function_calls: Arena<FunctionCallStmt>,
     pub initial_scope: Option<Id<Scope>>,
 }
 
@@ -26,9 +29,24 @@ impl ScopeManager {
     }
 
     pub fn reference_at_byte(&self, byte: usize) -> Option<&Reference> {
-        for (_, reference) in &self.references {
+        self.reference_at_byte_with_id(byte)
+            .map(|(_, reference)| reference)
+    }
+
+    fn reference_at_byte_mut(&mut self, byte: usize) -> Option<&mut Reference> {
+        for (_, reference) in self.references.iter_mut() {
             if byte >= reference.identifier.0 && byte <= reference.identifier.1 {
                 return Some(reference);
+            }
+        }
+
+        None
+    }
+
+    pub fn reference_at_byte_with_id(&self, byte: usize) -> Option<(Id<Reference>, &Reference)> {
+        for (id, reference) in &self.references {
+            if byte >= reference.identifier.0 && byte <= reference.identifier.1 {
+                return Some((id, reference));
             }
         }
 
@@ -70,6 +88,13 @@ pub struct Reference {
     pub scope_id: Id<Scope>,
     pub read: bool,
     pub write: bool,
+    pub within_function_stmt: Option<WithinFunctionStmt>,
+}
+
+#[derive(Debug)]
+pub struct WithinFunctionStmt {
+    pub function_call_stmt_id: Id<FunctionCallStmt>,
+    pub argument_index: usize,
 }
 
 #[derive(Debug, Default)]
@@ -80,12 +105,26 @@ pub struct Variable {
     pub references: Vec<Id<Reference>>,
     pub shadowed: Option<Id<Variable>>,
     pub is_self: bool,
+    pub value: Option<AssignedValue>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum AssignedValue {
+    StaticTable,
+}
+
+#[derive(Debug)]
+pub struct FunctionCallStmt {
+    pub call_name_path: Vec<String>,
+    pub initial_reference: Id<Reference>,
 }
 
 #[derive(Default)]
 struct ScopeVisitor {
     scope_manager: ScopeManager,
     scope_stack: Vec<Id<Scope>>,
+
+    captured_references: HashSet<Range>,
 
     // sigh
     else_blocks: HashSet<Range>,
@@ -115,6 +154,77 @@ fn range<N: Node>(node: N) -> (usize, usize) {
     (start.bytes(), end.bytes())
 }
 
+fn get_name_path_from_call(call: &ast::FunctionCall) -> Option<Vec<String>> {
+    let mut all_suffixes = Vec::new();
+
+    let mut path = match call.prefix() {
+        ast::Prefix::Expression(ast::Expression::Value { value, .. }) => match &**value {
+            ast::Value::Var(ast::Var::Name(name)) => vec![name.token().to_string()],
+            ast::Value::Var(ast::Var::Expression(var_expression)) => {
+                let mut path = Vec::new();
+
+                let name = if let ast::Prefix::Name(name) = var_expression.prefix() {
+                    name
+                } else {
+                    return None;
+                };
+
+                path.push(name.token().to_string());
+
+                all_suffixes.extend(var_expression.suffixes());
+
+                path
+            }
+            _ => return None,
+        },
+        ast::Prefix::Expression(_) => return None,
+        ast::Prefix::Name(name) => vec![name.token().to_string()],
+        _ => return None,
+    };
+
+    all_suffixes.extend(call.suffixes());
+
+    let length = all_suffixes.len();
+
+    for (index, suffix) in all_suffixes.into_iter().enumerate() {
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
+        match suffix {
+            ast::Suffix::Index(ast::Index::Dot { name, .. }) => {
+                path.push(name.token().to_string());
+            }
+
+            ast::Suffix::Index(ast::Index::Brackets { .. }) => {
+                return None;
+            }
+
+            ast::Suffix::Call(_) => {
+                if index + 1 == length {
+                    return Some(path);
+                } else {
+                    return None;
+                }
+            }
+
+            _ => {}
+        }
+    }
+
+    Some(path)
+}
+
+fn get_assigned_value(expression: &ast::Expression) -> Option<AssignedValue> {
+    if let ast::Expression::Value { value, .. } = expression {
+        if let ast::Value::TableConstructor(_) = **value {
+            return Some(AssignedValue::StaticTable);
+        }
+    }
+
+    None
+}
+
 impl ScopeVisitor {
     fn from_ast(ast: &ast::Ast) -> Self {
         if let Some(scope) = create_scope(ast.nodes()) {
@@ -126,10 +236,13 @@ impl ScopeVisitor {
                     scopes,
                     references: Arena::new(),
                     variables: Arena::new(),
+                    function_calls: Arena::new(),
                     initial_scope: Some(id),
                 },
 
+                captured_references: HashSet::new(),
                 scope_stack: vec![id],
+
                 else_blocks: HashSet::new(),
             };
 
@@ -263,22 +376,31 @@ impl ScopeVisitor {
     }
 
     fn read_name(&mut self, token: &TokenReference) {
+        let identifier = range(token);
+
+        if self.captured_references.contains(&identifier) {
+            return;
+        }
+
         if token.token_kind() == TokenKind::Identifier
             || *token.token_type()
                 == (TokenType::Symbol {
                     symbol: Symbol::Ellipse,
                 })
         {
+            self.captured_references.insert(identifier);
+
             self.reference_variable(
                 &token.token().to_string(),
                 Reference {
-                    identifier: range(token),
+                    identifier,
                     name: token.token().to_string(),
                     read: true,
                     resolved: None,
                     scope_id: self.current_scope_id(),
                     write: false,
                     write_expr: None,
+                    within_function_stmt: None,
                 },
             );
         }
@@ -340,6 +462,7 @@ impl ScopeVisitor {
                     scope_id: self.current_scope_id(),
                     write: true,
                     write_expr,
+                    within_function_stmt: None,
                 },
             );
         }
@@ -431,6 +554,59 @@ impl ScopeVisitor {
         self.current_scope().references.push(reference_id);
     }
 
+    fn process_function_call_finish(&mut self, call: &ast::FunctionCall) {
+        let name_path = match get_name_path_from_call(call) {
+            Some(name_path) => name_path,
+            None => return,
+        };
+
+        let initial_reference = self
+            .scope_manager
+            .reference_at_byte_with_id(range(call).0)
+            // .map(|(id, _)| id);
+            .expect("function call stmt has no reference")
+            .0;
+
+        let function_call_stmt_id = self.scope_manager.function_calls.alloc(FunctionCallStmt {
+            call_name_path: name_path,
+            initial_reference,
+        });
+
+        let last_call = match call.suffixes().last() {
+            Some(ast::Suffix::Call(call)) => call,
+            _ => unreachable!("last suffix inside a FunctionCall stmt was not a Call"),
+        };
+
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
+        let function_args = match last_call {
+            ast::Call::AnonymousCall(args) => args,
+            ast::Call::MethodCall(method_call) => method_call.args(),
+            _ => return,
+        };
+
+        let args = if let ast::FunctionArgs::Parentheses { arguments, .. } = function_args {
+            arguments
+        } else {
+            return;
+        };
+
+        for (argument_index, arg) in args.iter().enumerate() {
+            if expression_to_ident(arg).is_none() {
+                continue;
+            }
+
+            if let Some(reference) = self.scope_manager.reference_at_byte_mut(range(arg).0) {
+                reference.within_function_stmt = Some(WithinFunctionStmt {
+                    function_call_stmt_id,
+                    argument_index,
+                });
+            }
+        }
+    }
+
     fn open_scope<N: Node>(&mut self, node: N) {
         let scope = create_scope(node).unwrap_or_default();
         let scope_id = self.scope_manager.scopes.alloc(scope);
@@ -500,7 +676,15 @@ impl Visitor for ScopeVisitor {
                 self.read_expression(expression);
             }
 
-            self.define_name(name_token, range(local_assignment));
+            self.define_name_full_with_variable(
+                &name_token.token().to_string(),
+                range(name_token),
+                range(local_assignment),
+                Variable {
+                    value: expression.and_then(get_assigned_value),
+                    ..Default::default()
+                },
+            );
 
             if let Some(expression) = expression {
                 self.write_name(name_token, Some(range(expression)));
@@ -754,6 +938,13 @@ impl Visitor for ScopeVisitor {
     fn visit_return(&mut self, return_stmt: &ast::Return) {
         for value in return_stmt.returns() {
             self.read_expression(value);
+        }
+    }
+
+    // Wait until after the entire statement is read to then look for references to function calls
+    fn visit_stmt_end(&mut self, stmt: &ast::Stmt) {
+        if let ast::Stmt::FunctionCall(call) = stmt {
+            self.process_function_call_finish(call);
         }
     }
 

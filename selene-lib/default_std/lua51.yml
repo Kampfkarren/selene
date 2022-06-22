@@ -528,6 +528,7 @@ globals:
   table.insert:
     args:
       - type: table
+        observes: write
       - type: any
       - required: false
         type: any

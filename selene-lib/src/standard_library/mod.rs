@@ -349,6 +349,13 @@ impl StandardLibrary {
     }
 }
 
+fn is_default<T>(value: &T) -> bool
+where
+    T: Default + PartialEq<T>,
+{
+    value == &T::default()
+}
+
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub struct FunctionBehavior {
     #[serde(rename = "args")]
@@ -544,10 +551,15 @@ pub enum PropertyWritability {
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Argument {
     #[serde(default)]
-    #[serde(skip_serializing_if = "Required::required_no_message")]
+    #[serde(skip_serializing_if = "is_default")]
     pub required: Required,
+
     #[serde(rename = "type")]
     pub argument_type: ArgumentType,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "is_default")]
+    pub observes: Observes,
 }
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq)]
@@ -685,12 +697,6 @@ pub enum Required {
     Required(Option<String>),
 }
 
-impl Required {
-    fn required_no_message(&self) -> bool {
-        self == &Required::Required(None)
-    }
-}
-
 impl Default for Required {
     fn default() -> Self {
         Required::Required(None)
@@ -732,6 +738,20 @@ impl<'de> Visitor<'de> for RequiredVisitor {
 
     fn visit_str<E: de::Error>(self, value: &str) -> Result<Self::Value, E> {
         Ok(Required::Required(Some(value.to_owned())))
+    }
+}
+
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum Observes {
+    ReadWrite,
+    Read,
+    Write,
+}
+
+impl Default for Observes {
+    fn default() -> Self {
+        Self::ReadWrite
     }
 }
 

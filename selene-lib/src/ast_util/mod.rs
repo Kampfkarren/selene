@@ -3,7 +3,7 @@ use std::convert::{TryFrom, TryInto};
 use full_moon::{
     ast::{self, Ast},
     node::Node,
-    tokenizer::{self, Position},
+    tokenizer::{self, Position, TokenReference},
 };
 
 pub mod name_paths;
@@ -66,6 +66,16 @@ pub fn is_function_call(expression: &ast::Expression) -> bool {
     }
 
     false
+}
+
+pub fn expression_to_ident(expression: &ast::Expression) -> Option<&TokenReference> {
+    if let ast::Expression::Value { value, .. } = expression {
+        if let ast::Value::Var(ast::Var::Name(name)) = &**value {
+            return Some(name);
+        }
+    }
+
+    None
 }
 
 #[cfg(test)]
