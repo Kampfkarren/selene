@@ -83,6 +83,7 @@ fn unpack_v1_field(name: String, v1_field: v1::Field) -> BTreeMap<String, Field>
                         Field::from_field_kind(FieldKind::Function(FunctionBehavior {
                             arguments: function.arguments.into_iter().map(Into::into).collect(),
                             method: function.method,
+                            must_use: false,
                         })),
                     );
                 }

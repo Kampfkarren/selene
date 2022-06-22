@@ -25,6 +25,7 @@ globals:
   coroutine.create:
     args:
       - type: function
+    must_use: true
   coroutine.resume:
     args:
       - type:
@@ -33,10 +34,12 @@ globals:
         type: "..."
   coroutine.running:
     args: []
+    must_use: true
   coroutine.status:
     args:
       - type:
           display: coroutine
+    must_use: true
   coroutine.wrap:
     args:
       - type: function
@@ -49,10 +52,12 @@ globals:
   debug.getfenv:
     args:
       - type: function
+    must_use: true
   debug.gethook:
     args:
       - required: false
         type: any
+    must_use: true
   debug.getinfo:
     args:
       - type: any
@@ -60,21 +65,26 @@ globals:
         type: any
       - required: false
         type: any
+    must_use: true
   debug.getlocal:
     args:
       - type: any
       - type: any
       - required: false
         type: any
+    must_use: true
   debug.getmetatable:
     args:
       - type: any
+    must_use: true
   debug.getregistry:
     args: []
+    must_use: true
   debug.getupvalue:
     args:
       - type: function
       - type: number
+    must_use: true
   debug.setfenv:
     args:
       - type: any
@@ -111,6 +121,7 @@ globals:
         type: any
       - required: false
         type: any
+    must_use: true
   dofile:
     args:
       - required: false
@@ -125,9 +136,11 @@ globals:
     args:
       - required: false
         type: any
+    must_use: true
   getmetatable:
     args:
       - type: table
+    must_use: true
   io.close:
     args:
       - required: false
@@ -203,6 +216,7 @@ globals:
   ipairs:
     args:
       - type: table
+    must_use: true
   load:
     args:
       - type: function
@@ -220,102 +234,129 @@ globals:
   math.abs:
     args:
       - type: number
+    must_use: true
   math.acos:
     args:
       - type: number
+    must_use: true
   math.asin:
     args:
       - type: number
+    must_use: true
   math.atan:
     args:
       - type: number
+    must_use: true
   math.atan2:
     args:
       - type: number
       - type: number
+    must_use: true
   math.ceil:
     args:
       - type: number
+    must_use: true
   math.cos:
     args:
       - type: number
+    must_use: true
   math.cosh:
     args:
       - type: number
+    must_use: true
   math.deg:
     args:
       - type: number
+    must_use: true
   math.exp:
     args:
       - type: number
+    must_use: true
   math.floor:
     args:
       - type: number
+    must_use: true
   math.fmod:
     args:
       - type: number
       - type: number
+    must_use: true
   math.frexp:
     args:
       - type: number
+    must_use: true
   math.huge:
     property: read-only
   math.ldexp:
     args:
       - type: number
       - type: number
+    must_use: true
   math.log:
     args:
       - type: number
+    must_use: true
   math.log10:
     args:
       - type: number
+    must_use: true
   math.max:
     args:
       - type: number
       - required: use of max only makes sense with more than 1 parameter
         type: "..."
+    must_use: true
   math.min:
     args:
       - type: number
       - required: use of min only makes sense with more than 1 parameter
         type: "..."
+    must_use: true
   math.modf:
     args:
       - type: number
+    must_use: true
   math.pi:
     property: read-only
   math.pow:
     args:
       - type: number
       - type: number
+    must_use: true
   math.rad:
     args:
       - type: number
+    must_use: true
   math.random:
     args:
       - required: false
         type: number
       - required: false
         type: number
+    must_use: true
   math.randomseed:
     args:
       - type: number
   math.sin:
     args:
       - type: number
+    must_use: true
   math.sinh:
     args:
       - type: number
+    must_use: true
   math.sqrt:
     args:
       - type: number
+    must_use: true
   math.tan:
     args:
       - type: number
+    must_use: true
   math.tanh:
     args:
       - type: number
+    must_use: true
   module:
     args:
       - type: string
@@ -324,6 +365,7 @@ globals:
     args:
       - required: false
         type: bool
+    must_use: true
   next:
     args:
       - type: table
@@ -331,16 +373,19 @@ globals:
         type: number
   os.clock:
     args: []
+    must_use: true
   os.date:
     args:
       - required: false
         type: string
       - required: false
         type: number
+    must_use: true
   os.difftime:
     args:
       - type: number
       - type: number
+    must_use: true
   os.execute:
     args:
       - required: false
@@ -374,8 +419,10 @@ globals:
     args:
       - required: false
         type: table
+    must_use: true
   os.tmpname:
     args: []
+    must_use: true
   package.cpath:
     property: full-write
   package.loaded:
@@ -396,6 +443,7 @@ globals:
   pairs:
     args:
       - type: table
+    must_use: true
   pcall:
     args:
       - type: function
@@ -409,15 +457,18 @@ globals:
     args:
       - type: any
       - type: any
+    must_use: true
   rawget:
     args:
       - type: any
       - type: any
+    must_use: true
   rawset:
     args:
       - type: any
       - type: any
       - type: any
+    must_use: true
   require:
     args:
       - type: string
@@ -425,6 +476,7 @@ globals:
     args:
       - type: any
       - type: "..."
+    must_use: true
   setfenv:
     args:
       - type: any
@@ -447,9 +499,11 @@ globals:
         type: number
       - required: false
         type: "..."
+    must_use: true
   string.dump:
     args:
       - type: function
+    must_use: true
   string.find:
     args:
       - type: string
@@ -458,15 +512,18 @@ globals:
         type: number
       - required: false
         type: bool
+    must_use: true
   string.format:
     args:
       - type: string
       - required: string.format should only be used for strings that need formatting
         type: "..."
+    must_use: true
   string.gmatch:
     args:
       - type: string
       - type: string
+    must_use: true
   string.gsub:
     args:
       - type: string
@@ -474,34 +531,42 @@ globals:
       - type: any
       - required: false
         type: number
+    must_use: true
   string.len:
     args:
       - type: string
+    must_use: true
   string.lower:
     args:
       - type: string
+    must_use: true
   string.match:
     args:
       - type: string
       - type: string
       - required: false
         type: number
+    must_use: true
   string.rep:
     args:
       - type: string
       - type: number
+    must_use: true
   string.reverse:
     args:
       - type: string
+    must_use: true
   string.sub:
     args:
       - type: string
       - type: number
       - required: false
         type: number
+    must_use: true
   string.upper:
     args:
       - type: string
+    must_use: true
   table.concat:
     args:
       - type: table
@@ -511,6 +576,7 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   table.foreach:
     args:
       - type: table
@@ -525,6 +591,7 @@ globals:
       message: "`table.getn` has been superceded by #."
       replace:
         - "#%1"
+    must_use: true
   table.insert:
     args:
       - type: table
@@ -535,6 +602,7 @@ globals:
   table.maxn:
     args:
       - type: table
+    must_use: true
   table.remove:
     args:
       - type: table
@@ -550,9 +618,11 @@ globals:
       - type: any
       - required: false
         type: number
+    must_use: true
   tostring:
     args:
       - type: any
+    must_use: true
   type:
     args:
       - type: any
@@ -563,6 +633,7 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   xpcall:
     args:
       - type: function

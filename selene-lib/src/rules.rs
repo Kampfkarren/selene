@@ -20,6 +20,7 @@ pub mod ifs_same_cond;
 pub mod invalid_lint_filter;
 pub mod mismatched_arg_count;
 pub mod multiple_statements;
+pub mod must_use;
 pub mod parenthese_conditions;
 pub mod shadowing;
 pub mod standard_library;
