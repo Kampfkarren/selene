@@ -59,3 +59,13 @@ local index = table.insert(list, 1)
 ```
 
 ...would lint `list` as mutated only, which while technically true, is unimportant considering `index` is affected by the mutation.
+
+This also requires that the variable be a static table. This:
+
+```lua
+return function(value)
+    table.insert(value, 1)
+end
+```
+
+...will not lint, as we cannot be sure `value` is unused outside of this.
