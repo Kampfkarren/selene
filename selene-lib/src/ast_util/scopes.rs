@@ -8,6 +8,8 @@ use full_moon::{
 };
 use id_arena::{Arena, Id};
 
+use super::expression_to_ident;
+
 type Range = (usize, usize);
 
 #[derive(Debug, Default)]
@@ -103,6 +105,12 @@ pub struct Variable {
     pub references: Vec<Id<Reference>>,
     pub shadowed: Option<Id<Variable>>,
     pub is_self: bool,
+    pub value: Option<AssignedValue>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum AssignedValue {
+    StaticTable,
 }
 
 #[derive(Debug)]
@@ -205,6 +213,16 @@ fn get_name_path_from_call(call: &ast::FunctionCall) -> Option<Vec<String>> {
     }
 
     Some(path)
+}
+
+fn get_assigned_value(expression: &ast::Expression) -> Option<AssignedValue> {
+    if let ast::Expression::Value { value, .. } = expression {
+        if let ast::Value::TableConstructor(_) = **value {
+            return Some(AssignedValue::StaticTable);
+        }
+    }
+
+    None
 }
 
 impl ScopeVisitor {
@@ -576,6 +594,10 @@ impl ScopeVisitor {
         };
 
         for (argument_index, arg) in args.iter().enumerate() {
+            if expression_to_ident(arg).is_none() {
+                continue;
+            }
+
             if let Some(reference) = self.scope_manager.reference_at_byte_mut(range(arg).0) {
                 reference.within_function_stmt = Some(WithinFunctionStmt {
                     function_call_stmt_id,
@@ -654,7 +676,15 @@ impl Visitor for ScopeVisitor {
                 self.read_expression(expression);
             }
 
-            self.define_name(name_token, range(local_assignment));
+            self.define_name_full_with_variable(
+                &name_token.token().to_string(),
+                range(name_token),
+                range(local_assignment),
+                Variable {
+                    value: expression.and_then(get_assigned_value),
+                    ..Default::default()
+                },
+            );
 
             if let Some(expression) = expression {
                 self.write_name(name_token, Some(range(expression)));

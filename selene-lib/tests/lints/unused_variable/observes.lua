@@ -24,3 +24,23 @@ end
 local insertButReadLater = {}
 table.insert(insertButReadLater, 1)
 print(insertButReadLater)
+
+local ambiguous = external()
+table.insert(ambiguous, 1)
+
+local rooms = {
+	boss = {},
+}
+
+for index, room in pairs(rooms) do
+	table.insert(room, 1)
+
+	local roomByIndex = rooms[index]
+	table.insert(roomByIndex, 2)
+end
+
+local nested = {
+	key = external(),
+}
+
+table.insert(nested.key, 1)

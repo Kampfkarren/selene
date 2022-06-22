@@ -1,4 +1,7 @@
-use crate::standard_library::{Field, FieldKind, Observes};
+use crate::{
+    ast_util::scopes::AssignedValue,
+    standard_library::{Field, FieldKind, Observes},
+};
 
 use super::*;
 
@@ -65,6 +68,10 @@ impl Rule for UnusedVariableLint {
                 .map(|reference| {
                     if reference.write {
                         return AnalyzedReference::PlainWrite;
+                    }
+
+                    if variable.value != Some(AssignedValue::StaticTable) {
+                        return AnalyzedReference::Read;
                     }
 
                     let within_function_stmt = match &reference.within_function_stmt {
