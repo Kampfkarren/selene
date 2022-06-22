@@ -149,10 +149,6 @@ fn range<N: Node>(node: N) -> (usize, usize) {
 fn get_name_path_from_call(call: &ast::FunctionCall) -> Option<Vec<String>> {
     let mut all_suffixes = Vec::new();
 
-    #[cfg_attr(
-        feature = "force_exhaustive_checks",
-        deny(non_exhaustive_omitted_patterns)
-    )]
     let mut path = match call.prefix() {
         ast::Prefix::Expression(ast::Expression::Value { value, .. }) => match &**value {
             ast::Value::Var(ast::Var::Name(name)) => vec![name.token().to_string()],
@@ -173,10 +169,6 @@ fn get_name_path_from_call(call: &ast::FunctionCall) -> Option<Vec<String>> {
             }
             _ => return None,
         },
-        #[cfg_attr(
-            feature = "force_exhaustive_checks",
-            allow(non_exhaustive_omitted_patterns)
-        )]
         ast::Prefix::Expression(_) => return None,
         ast::Prefix::Name(name) => vec![name.token().to_string()],
         _ => return None,
