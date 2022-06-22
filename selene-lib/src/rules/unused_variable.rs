@@ -60,7 +60,7 @@ impl Rule for UnusedVariableLint {
                 .copied()
                 .map(|id| &ast_context.scope_manager.references[id]);
 
-            // We need to make sure that references that are marked as "read" aren't only being read in an "observes: write-only" context.
+            // We need to make sure that references that are marked as "read" aren't only being read in an "observes: write" context.
             let analyzed_references = references
                 .map(|reference| {
                     if reference.write {
