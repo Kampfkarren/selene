@@ -40,6 +40,7 @@ impl From<v1::Argument> for Argument {
         Argument {
             required: v1_argument.required.into(),
             argument_type: v1_argument.argument_type.into(),
+            observes: Observes::ReadWrite,
         }
     }
 }

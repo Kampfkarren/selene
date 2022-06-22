@@ -143,7 +143,7 @@ impl Diagnostic {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Label {
     pub message: Option<String>,
     pub range: (u32, u32),

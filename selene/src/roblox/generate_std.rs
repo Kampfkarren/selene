@@ -166,6 +166,7 @@ impl RobloxGenerator {
                                 .map(|_| Argument {
                                     argument_type: ArgumentType::Any,
                                     required: Required::NotRequired,
+                                    observes: Observes::ReadWrite,
                                 })
                                 .collect(),
                             method: true,
@@ -279,6 +280,7 @@ impl RobloxGenerator {
                 arguments: vec![Argument {
                     argument_type: ArgumentType::Constant(instance_names),
                     required: Required::Required(None),
+                    observes: Observes::ReadWrite,
                 }],
                 method: false,
             })),
@@ -305,6 +307,7 @@ impl RobloxGenerator {
                 arguments: vec![Argument {
                     argument_type: ArgumentType::Constant(service_names),
                     required: Required::Required(None),
+                    observes: Observes::ReadWrite,
                 }],
                 method: true,
             }));
