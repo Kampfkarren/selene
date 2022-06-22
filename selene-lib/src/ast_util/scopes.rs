@@ -173,6 +173,10 @@ fn get_name_path_from_call(call: &ast::FunctionCall) -> Option<Vec<String>> {
             }
             _ => return None,
         },
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            allow(non_exhaustive_omitted_patterns)
+        )]
         ast::Prefix::Expression(_) => return None,
         ast::Prefix::Name(name) => vec![name.token().to_string()],
         _ => return None,
