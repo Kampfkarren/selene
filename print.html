@@ -516,6 +516,22 @@ type: &quot;any&quot; | &quot;bool&quot; | &quot;function&quot; | &quot;nil&quot
 <li><code>false</code> - This argument is optional.</li>
 <li>A string - This argument is required, and not using it will give this as the reason why.</li>
 </ul>
+<h4 id="observes"><a class="header" href="#observes">&quot;observes&quot;</a></h4>
+<p>This field is used for allowing smarter introspection of how the argument given is used.</p>
+<ul>
+<li>&quot;read-write&quot; - The default. This argument is potentially both written to and read from.</li>
+<li>&quot;read&quot; - This argument is only read from. Currently unused.</li>
+<li>&quot;write&quot; - This argument is only written to. Used by <code>unused_variable</code> to assist in detecting a variable only being written to, even if passed into a function.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-yml"> table.insert:
+  args:
+    - type: table
+      observes: write # This way, `table.insert(x, 1)` doesn't count as a read to `x`
+    - type: any
+    - required: false
+      type: any
+</code></pre>
 <h4 id="argument-types"><a class="header" href="#argument-types">Argument types</a></h4>
 <ul>
 <li><code>&quot;any&quot;</code> - Allows any value.</li>
@@ -1157,9 +1173,39 @@ prinnt(&quot;hello, world!&quot;)
 <pre><code class="language-lua">local foo = 1
 </code></pre>
 <h2 id="remarks-10"><a class="header" href="#remarks-10">Remarks</a></h2>
+<h3 id="_-prefixing"><a class="header" href="#_-prefixing"><code>_</code> prefixing</a></h3>
 <p>If you intend to create a variable without using it, replace it with <code>_</code> or something that starts with <code>_</code>. You'll see this most in generic for loops.</p>
 <pre><code class="language-lua">for _, value in ipairs(list) do
 </code></pre>
+<h3 id="observes-1"><a class="header" href="#observes-1"><code>observes</code></a></h3>
+<p>Standard libraries can apply <a href="lints/../usage/std.html#observes">an <code>observes</code> field</a> to distinguish an argument from being only written to.</p>
+<p>This is so that we can get lints like the following:</p>
+<pre><code class="language-lua">local writtenOnly = {}
+table.insert(writtenOnly, 1)
+</code></pre>
+<pre><code>warning[unused_variable]: writtenOnly is assigned a value, but never used
+  ┌─ example.lua:1:7
+  │
+1 │ local writtenOnly = {}
+  │       ^^^^^^^^^^^
+2 │ table.insert(writtenOnly, 1)
+  │              ----------- `table.insert` only writes to `writtenOnly`
+</code></pre>
+<p>This only applies when the function call is its own statement. So for instance, this:</p>
+<pre><code class="language-lua">local list = {}
+print(table.insert(list, 1))
+</code></pre>
+<p>...will <em>not</em> lint. To understand this, consider if <code>table.insert</code> returned the index. Without this check, this code:</p>
+<pre><code class="language-lua">local list = {}
+local index = table.insert(list, 1)
+</code></pre>
+<p>...would lint <code>list</code> as mutated only, which while technically true, is unimportant considering <code>index</code> is affected by the mutation.</p>
+<p>This also requires that the variable be a static table. This:</p>
+<pre><code class="language-lua">return function(value)
+    table.insert(value, 1)
+end
+</code></pre>
+<p>...will not lint, as we cannot be sure <code>value</code> is unused outside of this.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="archive"><a class="header" href="#archive">Archive</a></h1>
 <p>The following is pages that refer to deprecated or removed features in selene.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="standard-library-format-v1"><a class="header" href="#standard-library-format-v1">Standard Library Format (v1)</a></h1>

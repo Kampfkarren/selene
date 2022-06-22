@@ -181,6 +181,22 @@ type: &quot;any&quot; | &quot;bool&quot; | &quot;function&quot; | &quot;nil&quot
 <li><code>false</code> - This argument is optional.</li>
 <li>A string - This argument is required, and not using it will give this as the reason why.</li>
 </ul>
+<h4 id="observes"><a class="header" href="#observes">&quot;observes&quot;</a></h4>
+<p>This field is used for allowing smarter introspection of how the argument given is used.</p>
+<ul>
+<li>&quot;read-write&quot; - The default. This argument is potentially both written to and read from.</li>
+<li>&quot;read&quot; - This argument is only read from. Currently unused.</li>
+<li>&quot;write&quot; - This argument is only written to. Used by <code>unused_variable</code> to assist in detecting a variable only being written to, even if passed into a function.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-yml"> table.insert:
+  args:
+    - type: table
+      observes: write # This way, `table.insert(x, 1)` doesn't count as a read to `x`
+    - type: any
+    - required: false
+      type: any
+</code></pre>
 <h4 id="argument-types"><a class="header" href="#argument-types">Argument types</a></h4>
 <ul>
 <li><code>&quot;any&quot;</code> - Allows any value.</li>

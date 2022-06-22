@@ -146,9 +146,39 @@
 <pre><code class="language-lua">local foo = 1
 </code></pre>
 <h2 id="remarks"><a class="header" href="#remarks">Remarks</a></h2>
+<h3 id="_-prefixing"><a class="header" href="#_-prefixing"><code>_</code> prefixing</a></h3>
 <p>If you intend to create a variable without using it, replace it with <code>_</code> or something that starts with <code>_</code>. You'll see this most in generic for loops.</p>
 <pre><code class="language-lua">for _, value in ipairs(list) do
 </code></pre>
+<h3 id="observes"><a class="header" href="#observes"><code>observes</code></a></h3>
+<p>Standard libraries can apply <a href="../usage/std.html#observes">an <code>observes</code> field</a> to distinguish an argument from being only written to.</p>
+<p>This is so that we can get lints like the following:</p>
+<pre><code class="language-lua">local writtenOnly = {}
+table.insert(writtenOnly, 1)
+</code></pre>
+<pre><code>warning[unused_variable]: writtenOnly is assigned a value, but never used
+  ┌─ example.lua:1:7
+  │
+1 │ local writtenOnly = {}
+  │       ^^^^^^^^^^^
+2 │ table.insert(writtenOnly, 1)
+  │              ----------- `table.insert` only writes to `writtenOnly`
+</code></pre>
+<p>This only applies when the function call is its own statement. So for instance, this:</p>
+<pre><code class="language-lua">local list = {}
+print(table.insert(list, 1))
+</code></pre>
+<p>...will <em>not</em> lint. To understand this, consider if <code>table.insert</code> returned the index. Without this check, this code:</p>
+<pre><code class="language-lua">local list = {}
+local index = table.insert(list, 1)
+</code></pre>
+<p>...would lint <code>list</code> as mutated only, which while technically true, is unimportant considering <code>index</code> is affected by the mutation.</p>
+<p>This also requires that the variable be a static table. This:</p>
+<pre><code class="language-lua">return function(value)
+    table.insert(value, 1)
+end
+</code></pre>
+<p>...will not lint, as we cannot be sure <code>value</code> is unused outside of this.</p>
 
                     </main>
 
