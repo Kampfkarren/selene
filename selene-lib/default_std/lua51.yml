@@ -468,7 +468,6 @@ globals:
       - type: any
       - type: any
       - type: any
-    must_use: true
   require:
     args:
       - type: string
