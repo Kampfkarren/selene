@@ -1,6 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.19.1] - 2022-06-22
+### Fixed
+- Fixed releases coming with Tracy.
+
 ## [0.19.0] - 2022-06-22
 ### Added
 - `table.insert(x)` no longer counts as a read to `x`, which allows selene to alert you that you are only assigning to it.
