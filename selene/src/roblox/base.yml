@@ -5,22 +5,31 @@ globals:
   Axes.new:
     args:
       - type: "..."
+    must_use: true
   BrickColor.Black:
     args: []
+    must_use: true
   BrickColor.Blue:
     args: []
+    must_use: true
   BrickColor.DarkGray:
     args: []
+    must_use: true
   BrickColor.Gray:
     args: []
+    must_use: true
   BrickColor.Green:
     args: []
+    must_use: true
   BrickColor.Red:
     args: []
+    must_use: true
   BrickColor.White:
     args: []
+    must_use: true
   BrickColor.Yellow:
     args: []
+    must_use: true
   BrickColor.new:
     args:
       - type: any
@@ -28,11 +37,14 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   BrickColor.palette:
     args:
       - type: number
+    must_use: true
   BrickColor.random:
     args: []
+    must_use: true
   CFrame.Angles:
     args:
       - required: false
@@ -41,21 +53,25 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   CFrame.fromAxisAngle:
     args:
       - type:
           display: Vector3
       - type: number
+    must_use: true
   CFrame.fromEulerAnglesXYZ:
     args:
       - type: number
       - type: number
       - type: number
+    must_use: true
   CFrame.fromEulerAnglesYXZ:
     args:
       - type: number
       - type: number
       - type: number
+    must_use: true
   CFrame.fromMatrix:
     args:
       - type:
@@ -67,11 +83,13 @@ globals:
       - required: false
         type:
           display: Vector3
+    must_use: true
   CFrame.fromOrientation:
     args:
       - type: number
       - type: number
       - type: number
+    must_use: true
   CFrame.identity:
     property: read-only
   CFrame.lookAt:
@@ -83,6 +101,7 @@ globals:
       - required: false
         type:
           display: Vector3
+    must_use: true
   CFrame.new:
     args:
       - required: false
@@ -109,19 +128,23 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   Color3.fromHSV:
     args:
       - type: number
       - type: number
       - type: number
+    must_use: true
   Color3.fromHex:
     args:
       - type: string
+    must_use: true
   Color3.fromRGB:
     args:
       - type: number
       - type: number
       - type: number
+    must_use: true
   Color3.new:
     args:
       - required: false
@@ -130,24 +153,29 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   Color3.toHSV:
     args:
       - type:
           display: Color3
+    must_use: true
   ColorSequence.new:
     args:
       - type: any
       - required: false
         type:
           display: Color3
+    must_use: true
   ColorSequenceKeypoint.new:
     args:
       - type: number
       - type:
           display: Color3
+    must_use: true
   DateTime.fromIsoDate:
     args:
       - type: string
+    must_use: true
   DateTime.fromLocalTime:
     args:
       - required: false
@@ -164,6 +192,7 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   DateTime.fromUniversalTime:
     args:
       - required: false
@@ -180,16 +209,21 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   DateTime.fromUnixTimestamp:
     args:
       - type: number
+    must_use: true
   DateTime.fromUnixTimestampMillis:
     args:
       - type: number
+    must_use: true
   DateTime.now:
     args: []
+    must_use: true
   DebuggerManager:
     args: []
+    must_use: true
   DockWidgetPluginGuiInfo.new:
     args:
       - required: false
@@ -207,6 +241,7 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   Enum.Font.GothamSemibold:
     deprecated:
       message: "Enum.Font.GothamSemibold was replaced with Enum.Font.GothamMedium"
@@ -216,30 +251,38 @@ globals:
   Enum.GetEnums:
     args: []
     method: true
+    must_use: true
   Faces.new:
     args:
       - type: "..."
+    must_use: true
   Instance.new:
     args:
       - type: string
+    # This is only must_use because we don't allow the second parameter
+    must_use: true
   NumberRange.new:
     args:
       - type: number
       - required: false
         type: number
+    must_use: true
   NumberSequence.new:
     args:
       - type: any
       - required: false
         type: number
+    must_use: true
   NumberSequenceKeypoint.new:
     args:
       - type: number
       - type: number
       - required: false
         type: number
+    must_use: true
   OverlapParams.new:
     args: []
+    must_use: true
   PathWaypoint.new:
     args:
       - required: false
@@ -248,6 +291,7 @@ globals:
       - required: false
         type:
           display: PathWaypointAction
+    must_use: true
   PhysicalProperties.new:
     args:
       - type: any
@@ -259,18 +303,22 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   Random.new:
     args:
       - required: false
         type: number
+    must_use: true
   Ray.new:
     args:
       - type:
           display: Vector3
       - type:
           display: Vector3
+    must_use: true
   RaycastParams.new:
     args: []
+    must_use: true
   Rect.new:
     args:
       - type: any
@@ -279,12 +327,14 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   Region3.new:
     args:
       - type:
           display: Vector3
       - type:
           display: Vector3
+    must_use: true
   Region3int16.new:
     args:
       - required: false
@@ -293,6 +343,7 @@ globals:
       - required: false
         type:
           display: Vector3
+    must_use: true
   TweenInfo.new:
     args:
       - required: false
@@ -309,24 +360,28 @@ globals:
         type: bool
       - required: false
         type: number
+    must_use: true
   UDim.new:
     args:
       - required: false
         type: number
       - required: false
         type: number
+    must_use: true
   UDim2.fromOffset:
     args:
       - required: use UDim2.new() if you want an empty UDim2
         type: number
       - required: false
         type: number
+    must_use: true
   UDim2.fromScale:
     args:
       - required: use UDim2.new() if you want an empty UDim2
         type: number
       - required: false
         type: number
+    must_use: true
   UDim2.new:
     args:
       - required: false
@@ -337,14 +392,17 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   UserSettings:
     args: []
+    must_use: true
   Vector2.new:
     args:
       - required: false
         type: number
       - required: false
         type: number
+    must_use: true
   Vector2.one:
     property: read-only
   Vector2.xAxis:
@@ -359,14 +417,17 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   Vector3.FromAxis:
     args:
       - type:
           display: Axis
+    must_use: true
   Vector3.FromNormalId:
     args:
       - type:
           display: NormalId
+    must_use: true
   Vector3.new:
     args:
       - required: false
@@ -375,6 +436,7 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   Vector3.one:
     property: read-only
   Vector3.xAxis:
@@ -397,41 +459,52 @@ globals:
     args:
       - type: number
       - type: number
+    must_use: true
   bit32.band:
     args:
       - type: "..."
+    must_use: true
   bit32.bnot:
     args:
       - type: number
+    must_use: true
   bit32.bor:
     args:
       - type: "..."
+    must_use: true
   bit32.btest:
     args:
       - type: "..."
+    must_use: true
   bit32.bxor:
     args:
       - type: "..."
+    must_use: true
   bit32.countlz:
     args:
       - type: number
+    must_use: true
   bit32.countrz:
     args:
       - type: number
+    must_use: true
   bit32.extract:
     args:
       - type: number
       - type: number
       - required: false
         type: number
+    must_use: true
   bit32.lrotate:
     args:
       - type: number
       - type: number
+    must_use: true
   bit32.lshift:
     args:
       - type: number
       - type: number
+    must_use: true
   bit32.replace:
     args:
       - type: number
@@ -439,18 +512,22 @@ globals:
       - type: number
       - required: false
         type: number
+    must_use: true
   bit32.rrotate:
     args:
       - type: number
       - type: number
+    must_use: true
   bit32.rshift:
     args:
       - type: number
       - type: number
+    must_use: true
   collectgarbage:
     args:
       - type:
           - count
+    must_use: true
   coroutine.close:
     args:
       - type:
@@ -479,6 +556,7 @@ globals:
       - type: any
       - required: false
         type: string
+    must_use: true
   debug.profilebegin:
     args:
       - type: string
@@ -515,6 +593,7 @@ globals:
         type: number
   gcinfo:
     args: []
+    must_use: true
   io:
     removed: true
   load:
@@ -526,11 +605,13 @@ globals:
       - type: number
       - type: number
       - type: number
+    must_use: true
   math.log:
     args:
       - type: number
       - required: false
         type: number
+    must_use: true
   math.noise:
     args:
       - type: number
@@ -538,12 +619,15 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   math.round:
     args:
       - type: number
+    must_use: true
   math.sign:
     args:
       - type: number
+    must_use: true
   module:
     removed: true
   os.execute:
@@ -578,43 +662,51 @@ globals:
     args:
       - type: string
       - type: "..."
+    must_use: true
   string.packsize:
     args:
       - type: string
+    must_use: true
   string.split:
     args:
       - type: string
       - required: false
         type: string
+    must_use: true
   string.unpack:
     args:
       - type: string
       - type: string
       - required: false
         type: number
+    must_use: true
   table.clear:
     args:
       - type: table
   table.clone:
     args:
       - type: table
+    must_use: true
   table.create:
     args:
       - type: number
       - required: false
         type: any
+    must_use: true
   table.find:
     args:
       - type: table
       - type: any
       - required: false
         type: number
+    must_use: true
   table.freeze:
     args:
       - type: table
   table.isfrozen:
     args:
       - type: table
+    must_use: true
   table.move:
     args:
       - type: table
@@ -626,6 +718,7 @@ globals:
   table.pack:
     args:
       - type: "..."
+    must_use: true
   table.unpack:
     args:
       - type: table
@@ -633,6 +726,7 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   task.cancel:
     args:
       - type:
@@ -675,6 +769,7 @@ globals:
         type: number
       - required: false
         type: "..."
+    must_use: true
   utf8.charpattern:
     property: read-only
   utf8.codepoint:
@@ -684,9 +779,11 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   utf8.codes:
     args:
       - type: string
+    must_use: true
   utf8.graphemes:
     args:
       - type: string
@@ -694,6 +791,7 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   utf8.len:
     args:
       - type: string
@@ -701,12 +799,15 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   utf8.nfcnormalize:
     args:
       - type: string
+    must_use: true
   utf8.nfdnormalize:
     args:
       - type: string
+    must_use: true
   utf8.offset:
     args:
       - type: string
@@ -714,6 +815,7 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   wait:
     args:
       - required: false

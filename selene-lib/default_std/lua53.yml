@@ -9,9 +9,12 @@ globals:
   string.pack:
     args:
       - type: string
+    must_use: true
   string.packsize:
     args:
       - type: string
+    must_use: true
   string.unpack:
     args:
       - type: string
+    must_use: true

@@ -170,6 +170,7 @@ impl RobloxGenerator {
                                 })
                                 .collect(),
                             method: true,
+                            must_use: false,
                         },
                     ))),
                 ),
@@ -249,6 +250,7 @@ impl RobloxGenerator {
                 Field::from_field_kind(FieldKind::Function(FunctionBehavior {
                     arguments: vec![],
                     method: true,
+                    must_use: true,
                 })),
             );
 
@@ -283,6 +285,9 @@ impl RobloxGenerator {
                     observes: Observes::ReadWrite,
                 }],
                 method: false,
+
+                // Only true because we don't allow the second parameter
+                must_use: true,
             })),
         );
     }
@@ -310,6 +315,7 @@ impl RobloxGenerator {
                     observes: Observes::ReadWrite,
                 }],
                 method: true,
+                must_use: true,
             }));
     }
 }

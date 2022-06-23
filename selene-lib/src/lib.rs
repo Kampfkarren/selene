@@ -291,6 +291,7 @@ use_rules! {
     invalid_lint_filter: rules::invalid_lint_filter::InvalidLintFilterLint,
     mismatched_arg_count: rules::mismatched_arg_count::MismatchedArgCountLint,
     multiple_statements: rules::multiple_statements::MultipleStatementsLint,
+    must_use: rules::must_use::MustUseLint,
     parenthese_conditions: rules::parenthese_conditions::ParentheseConditionsLint,
     shadowing: rules::shadowing::ShadowingLint,
     suspicious_reverse_loop: rules::suspicious_reverse_loop::SuspiciousReverseLoopLint,

@@ -117,6 +117,7 @@ pub enum AssignedValue {
 pub struct FunctionCallStmt {
     pub call_name_path: Vec<String>,
     pub initial_reference: Id<Reference>,
+    pub call_prefix_range: Range,
 }
 
 #[derive(Default)]
@@ -570,6 +571,18 @@ impl ScopeVisitor {
         let function_call_stmt_id = self.scope_manager.function_calls.alloc(FunctionCallStmt {
             call_name_path: name_path,
             initial_reference,
+            call_prefix_range: {
+                let (start, prefix_end) = range(call.prefix());
+
+                let mut suffixes = call.suffixes().collect::<Vec<_>>();
+                suffixes.pop();
+
+                if let Some(last_suffix) = suffixes.last() {
+                    (start, range(last_suffix).1)
+                } else {
+                    (start, prefix_end)
+                }
+            },
         });
 
         let last_call = match call.suffixes().last() {

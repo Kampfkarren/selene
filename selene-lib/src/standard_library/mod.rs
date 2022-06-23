@@ -360,9 +360,14 @@ where
 pub struct FunctionBehavior {
     #[serde(rename = "args")]
     pub arguments: Vec<Argument>,
+
     #[serde(default)]
     #[serde(skip_serializing_if = "is_false")]
     pub method: bool,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "is_false")]
+    pub must_use: bool,
 }
 
 fn is_false(value: &bool) -> bool {
