@@ -1,7 +1,7 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.19.0] - 2022-06-22
 ### Added
 - `table.insert(x)` no longer counts as a read to `x`, which allows selene to alert you that you are only assigning to it.
   - This is done through a new standard library field for arguments called `observes`. This takes 3 values: "read-write" (the default), signifying a potential read and write, "read", signifying only a read, and "write", signifying only a write. Only "write" has meaning at this time.
