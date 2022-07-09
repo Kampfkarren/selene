@@ -24,6 +24,7 @@ globals:
         type: number
       - required: false
         type: "..."
+    must_use: true
   utf8.charpattern:
     property: read-only
   utf8.codepoint:
@@ -33,9 +34,11 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   utf8.codes:
     args:
       - type: string
+    must_use: true
   utf8.len:
     args:
       - type: string
@@ -43,9 +46,11 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   utf8.offest:
     args:
       - type: string
       - type: number
       - required: false
         type: number
+    must_use: true
