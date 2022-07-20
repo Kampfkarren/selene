@@ -45,6 +45,9 @@ globals:
   BrickColor.random:
     args: []
     must_use: true
+  CatalogSearchParams.new:
+    args: []
+    must_use: true
   CFrame.Angles:
     args:
       - required: false
@@ -255,6 +258,13 @@ globals:
   Faces.new:
     args:
       - type: "..."
+    must_use: true
+  FloatCurveKey.new:
+    args:
+      - type: number
+      - type: number
+      - type:
+          display: KeyInterpolationMode
     must_use: true
   Instance.new:
     args:
