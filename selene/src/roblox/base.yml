@@ -354,6 +354,13 @@ globals:
         type:
           display: Vector3
     must_use: true
+  RotationCurveKey.new:
+    args:
+      - type: number
+      - type:
+          display: CFrame
+      - type:
+          display: KeyInterpolationMode
   TweenInfo.new:
     args:
       - required: false
