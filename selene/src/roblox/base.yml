@@ -361,6 +361,7 @@ globals:
           display: CFrame
       - type:
           display: KeyInterpolationMode
+    must_use: true
   TweenInfo.new:
     args:
       - required: false
