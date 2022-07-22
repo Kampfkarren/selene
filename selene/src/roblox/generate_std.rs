@@ -114,53 +114,6 @@ impl RobloxGenerator {
                     tags,
                     Some(Field::from_field_kind(FieldKind::Function(
                         FunctionBehavior {
-                            // TODO: Roblox doesn't tell us which parameters are nillable or not
-                            // So results from these are regularly wrong
-                            // The best solution is a manual patch for every method we *know* is nillable
-                            // e.g. WaitForChild
-                            // We can also let some parameters be required in the middle, and fix unused_variable to accept them
-
-                            // arguments: parameters
-                            // .iter()
-                            // .map(|param| Argument {
-                            // required: if param.default.is_some() {
-                            // Required::NotRequired
-                            // } else {
-                            // Required::Required(None)
-                            // },
-                            // argument_type: match &param.parameter_type {
-                            // ApiValueType::Class { name } => {
-                            // ArgumentType::Display(name.to_owned())
-                            // }
-                            //
-                            // ApiValueType::DataType { value } => match value {
-                            // ApiDataType::Content => ArgumentType::String,
-                            // ApiDataType::Other(other) => {
-                            // ArgumentType::Display(other.to_owned())
-                            // }
-                            // },
-                            //
-                            // ApiValueType::Group { value } => match value {
-                            // ApiGroupType::Table => ArgumentType::Table,
-                            // ApiGroupType::Tuple => ArgumentType::Vararg,
-                            // ApiGroupType::Variant => ArgumentType::Any,
-                            // },
-                            //
-                            // ApiValueType::Primitive { value } => match value {
-                            // ApiPrimitiveType::Bool => ArgumentType::Bool,
-                            // ApiPrimitiveType::Double
-                            // | ApiPrimitiveType::Float
-                            // | ApiPrimitiveType::Int
-                            // | ApiPrimitiveType::Int64 => ArgumentType::Number,
-                            // ApiPrimitiveType::String => ArgumentType::String,
-                            // },
-                            //
-                            // ApiValueType::Other { name } => {
-                            // ArgumentType::Display(name.to_owned())
-                            // }
-                            // },
-                            // })
-                            // .collect(),
                             arguments: parameters
                                 .iter()
                                 .map(|_| Argument {
@@ -218,6 +171,15 @@ impl RobloxGenerator {
                         None
                     }
                 }),
+
+                ApiMember::Unknown => {
+                    // I want CI to fail when we see an unknown property, but fall back for users
+                    if cfg!(test) {
+                        panic!("unknown property found in Roblox API dump for {class_name}");
+                    } else {
+                        continue;
+                    }
+                }
             };
 
             let empty = Vec::new();

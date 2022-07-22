@@ -348,13 +348,15 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
 }
 
 fn start(matches: opts::Options) {
+    *OPTIONS.write().unwrap() = Some(matches.clone());
+
     match matches.command {
         #[cfg(feature = "roblox")]
         Some(opts::Command::GenerateRobloxStd) => {
             println!("Generating Roblox standard library...");
 
             if let Err(error) = generate_roblox_std() {
-                error!("Couldn't create roblox standard library: {}", error);
+                error!("Couldn't create Roblox standard library: {error:?}");
                 std::process::exit(1);
             }
 
@@ -384,8 +386,6 @@ fn start(matches: opts::Options) {
 
         None => {}
     }
-
-    *OPTIONS.write().unwrap() = Some(matches.clone());
 
     let config: CheckerConfig<toml::value::Value> = match matches.config {
         Some(config_file) => {
@@ -621,7 +621,7 @@ fn get_opts_safe(mut args: Vec<OsString>, luacheck: bool) -> Result<opts::Option
 }
 
 #[cfg(feature = "roblox")]
-fn generate_roblox_std() -> Result<StandardLibrary, Box<dyn std::error::Error>> {
+fn generate_roblox_std() -> color_eyre::Result<StandardLibrary> {
     let (contents, std) = roblox::RobloxGenerator {
         std: roblox::RobloxGenerator::base_std(),
     }
