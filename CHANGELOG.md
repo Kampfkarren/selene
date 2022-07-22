@@ -6,6 +6,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added [`utf8` globals](https://q-syshelp.qsc.com/Content/Control_Scripting/Lua_5.3_Reference_Manual/Standard_Libraries/4_-_Basic_UTF-8_Support.htm) to the builtin `lua53` standard library.
 - Added Roblox datatype constructors `CatalogSearchParams.new`, `FloatCurveKey.new`, and `RotationCurveKey.new`.
 
+### Changed
+- Errors for generating Roblox API dumps are now more detailed.
+
+### Fixed
+- Fixed newer versions of the Roblox API dump failing to create standard libraries for.
+- Fixed reporting an error when generating standard libraries panicking.
+
 ## [0.19.1] - 2022-06-22
 ### Fixed
 - Fixed releases coming with Tracy.

@@ -59,6 +59,9 @@ pub enum ApiMember {
         #[serde(rename = "ValueType")]
         value_type: ApiValueType,
     },
+
+    #[serde(other)]
+    Unknown,
 }
 
 #[derive(Deserialize)]
@@ -136,6 +139,9 @@ pub enum ApiGroupType {
     Table,
     Tuple,
     Variant,
+
+    #[serde(other)]
+    Unknown,
 }
 
 #[derive(Debug, Deserialize)]
@@ -147,6 +153,9 @@ pub enum ApiPrimitiveType {
     Int,
     Int64,
     String,
+
+    #[serde(other)]
+    Unknown,
 }
 
 #[derive(Debug)]
