@@ -8,7 +8,8 @@ use structopt::{clap::arg_enum, StructOpt};
 #[structopt(setting(structopt::clap::AppSettings::SubcommandsNegateReqs))]
 pub struct Options {
     /// Comma-separated globs to match files to check
-    #[structopt(long, default_value = "**/*.lua,**/*.luau")]
+    #[cfg_attr(feature = "roblox", structopt(long, default_value = "**/*.lua,**/*.luau"))]
+    #[cfg_attr(not(feature = "roblox"), structopt(long, default_value = "**/*.lua"))]
     pub patterns: String,
 
     /// A toml file to configure the behavior of selene [default: selene.toml]
