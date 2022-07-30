@@ -1,4 +1,5 @@
 # CLI Usage
+
 If you want to get a quick understanding of the interface, simply type `selene --help`.
 
 ```
@@ -18,7 +19,7 @@ OPTIONS:
         --display-style <display-style>    Sets the display method [possible values: Json, Rich, Quiet]
         --num-threads <num-threads>        Number of threads to run on, default to the numbers of logical cores on your
                                            system [default: your system's cores]
-        --pattern <pattern>                A glob to match files with to check [default: **/*.lua]
+        --patterns <patterns>              Comma-separated globs to match files to check [default: **/*.lua,**/*.luau]
 
 ARGS:
     <files>...
@@ -72,10 +73,10 @@ Results:
 0 parse errors
 ```
 
-**--num-threads** *num-threads*
+**--num-threads** _num-threads_
 
 Specifies the number of threads for selene to use. Defaults to however many cores your CPU has. If you type `selene --help`, you can see this number because it will show as the default for you.
 
-**--pattern** *pattern*
+**--patterns** _patterns_
 
-A [glob](https://en.wikipedia.org/wiki/Glob_(programming)) to match what files selene should check for. For example, if you only wanted to check files that end with `.spec.lua`, you would input `--pattern **/*.spec.lua`. Defaults to `**/*.lua`, meaning "any lua file".
+Comma-separated [globs](<https://en.wikipedia.org/wiki/Glob_(programming)>) to match what files selene should check for. For example, if you only wanted to check files that end with `.spec.lua`, you would input `--patterns **/*.spec.lua`. Defaults to `**/*.lua,**/*.luau`, meaning "any lua/luau file".
