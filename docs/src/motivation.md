@@ -29,7 +29,7 @@ function Player:SwapWeapons()
 end
 ```
 
-If you were using selene, you would've been alerted right away that your original code looked like an [`almost_swapped`](../lints/almost_swapped.md).
+If you were using selene, you would've been alerted right away that your original code looked like an [`almost_swapped`](lints/almost_swapped.md).
 
 ```
 error[almost_swapped]: this looks like you are trying to swap `self.CurrentWeapon` and `self.SideWeapon`
@@ -97,4 +97,4 @@ Furthermore, selene is meant to be easy for developers to add their own lints to
 local DataStoreService = game:GetService("DataStoreService")
 ```
 
-...creates a warning, discouraging its use. For more information on how to create your own lints, check out the [contribution guide](../contributing.md).
+...creates a warning, discouraging its use. For more information on how to create your own lints, check out the [contribution guide](contributing.md).
