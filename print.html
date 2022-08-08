@@ -169,7 +169,7 @@ end
     self.CurrentWeapon, self.SideWeapon = self.SideWeapon, self.CurrentWeapon
 end
 </code></pre>
-<p>If you were using selene, you would've been alerted right away that your original code looked like an <a href="../lints/almost_swapped.html"><code>almost_swapped</code></a>.</p>
+<p>If you were using selene, you would've been alerted right away that your original code looked like an <a href="lints/almost_swapped.html"><code>almost_swapped</code></a>.</p>
 <pre><code>error[almost_swapped]: this looks like you are trying to swap `self.CurrentWeapon` and `self.SideWeapon`
 
    ┌── fail.lua:4:5 ───
@@ -214,7 +214,7 @@ end
 <p>Furthermore, selene is meant to be easy for developers to add their own lints to. You could create your own lints for your team to prevent behavior that is non-idiomatic to the codebase. For example, let's say you're working on a <a href="https://developer.roblox.com/en-us">Roblox</a> codebase, and you don't want your developers using the data storage methods directly. You could create your own lint so that this code:</p>
 <pre><code class="language-lua">local DataStoreService = game:GetService(&quot;DataStoreService&quot;)
 </code></pre>
-<p>...creates a warning, discouraging its use. For more information on how to create your own lints, check out the <a href="../contributing.html">contribution guide</a>.</p>
+<p>...creates a warning, discouraging its use. For more information on how to create your own lints, check out the <a href="contributing.html">contribution guide</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="luacheck-comparison"><a class="header" href="#luacheck-comparison">Luacheck Comparison</a></h1>
 <h2 id="selene-vs-luacheck"><a class="header" href="#selene-vs-luacheck">selene vs. luacheck</a></h2>
 <p>selene is not the first Lua linter. The main inspiration behind selene is <a href="https://luacheck.readthedocs.io/en/stable/">luacheck</a>. However, the two have very little in common besides inception.</p>
