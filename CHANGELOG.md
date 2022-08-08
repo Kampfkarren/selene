@@ -6,7 +6,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 
 - Match `.luau` filename extension by default.
-- Allow multiple comma-separated glob patterns with `--pattern`.
+- Allow `--pattern` to be passed multiple times.
 
 ## [0.20.0] - 2022-07-21
 ### Added

@@ -485,7 +485,7 @@ fn start(matches: opts::Options) {
 
                     pool.execute(move || read_file(&checker, Path::new(&filename)));
                 } else if metadata.is_dir() {
-                    for pattern in matches.patterns.split(',') {
+                    for pattern in &matches.pattern.vec {
                         let glob = match glob::glob(&format!(
                             "{}/{}",
                             filename.to_string_lossy(),
