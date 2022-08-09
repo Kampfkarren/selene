@@ -80,4 +80,4 @@ Specifies the number of threads for selene to use. Defaults to however many core
 
 **--pattern** *pattern*
 
-Comma-separated [globs](https://en.wikipedia.org/wiki/Glob_(programming)) to match what files selene should check for. For example, if you only wanted to check files that end with `.spec.lua`, you would input `--pattern **/*.spec.lua`. Defaults to `**/*.lua`, meaning "any lua file", or `**/*.lua,**/*.luau` with the roblox feature flag, meaning "any lua/luau file".
+A [glob](https://en.wikipedia.org/wiki/Glob_(programming)) to match what files selene should check for. For example, if you only wanted to check files that end with `.spec.lua`, you would input `--pattern **/*.spec.lua`. Defaults to `**/*.lua`, meaning "any lua file", or `**/*.lua` and `**/*.luau` with the roblox feature flag, meaning "any lua/luau file".
