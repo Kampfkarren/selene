@@ -45,7 +45,6 @@ impl Rule for CompareNanLint {
             .collect()
     }
 }
-    
 
 struct CompareNanVisitor {
     comparisons: Vec<Comparison>,
