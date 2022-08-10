@@ -259,7 +259,7 @@ macro_rules! use_rules {
             fn get_lint_severity<R: Rule>(&self, _lint: &R, name: &'static str) -> Severity {
                 match self.config.rules.get(name) {
                     Some(variation) => variation.to_severity(),
-                    None => R::severity(),
+                    None => R::SEVERITY,
                 }
             }
         }
