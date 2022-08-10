@@ -1,21 +1,6 @@
-use std::{ffi::OsString, path::PathBuf, str::FromStr};
+use std::{ffi::OsString, path::PathBuf};
 
 use structopt::{clap::arg_enum, StructOpt};
-
-#[derive(Clone, Debug)]
-pub struct Patterns {
-    pub vec: Vec<String>,
-}
-
-impl FromStr for Patterns {
-    type Err = Box<dyn std::error::Error>;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Patterns {
-            vec: s.split('\0').map(|x| x.to_string()).collect(),
-        })
-    }
-}
 
 #[derive(Clone, Debug, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
@@ -23,12 +8,8 @@ impl FromStr for Patterns {
 #[structopt(setting(structopt::clap::AppSettings::SubcommandsNegateReqs))]
 pub struct Options {
     /// A glob to match files with to check
-    #[cfg_attr(
-        feature = "roblox",
-        structopt(long, default_value = "**/*.lua\0**/*.luau")
-    )]
-    #[cfg_attr(not(feature = "roblox"), structopt(long, default_value = "**/*.lua"))]
-    pub pattern: Patterns,
+    #[structopt(long)]
+    pub pattern: Vec<String>,
 
     /// A toml file to configure the behavior of selene [default: selene.toml]
     // .default is not used here since if the user explicitly specifies the config file

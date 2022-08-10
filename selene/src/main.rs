@@ -347,8 +347,14 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     );
 }
 
-fn start(matches: opts::Options) {
+fn start(mut matches: opts::Options) {
     *OPTIONS.write().unwrap() = Some(matches.clone());
+
+    if matches.pattern.is_empty() {
+        matches.pattern.push(String::from("**/*.lua"));
+        #[cfg(feature = "roblox")]
+        matches.pattern.push(String::from("**/*.luau"));
+    }
 
     match matches.command {
         #[cfg(feature = "roblox")]
@@ -485,7 +491,7 @@ fn start(matches: opts::Options) {
 
                     pool.execute(move || read_file(&checker, Path::new(&filename)));
                 } else if metadata.is_dir() {
-                    for pattern in &matches.pattern.vec {
+                    for pattern in &matches.pattern {
                         let glob = match glob::glob(&format!(
                             "{}/{}",
                             filename.to_string_lossy(),
