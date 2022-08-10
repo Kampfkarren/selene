@@ -171,11 +171,11 @@ impl Rule for UnusedVariableLint {
         diagnostics
     }
 
-    fn severity(&self) -> Severity {
+    fn severity() -> Severity {
         Severity::Warning
     }
 
-    fn rule_type(&self) -> RuleType {
+    fn rule_type() -> RuleType {
         RuleType::Style
     }
 }

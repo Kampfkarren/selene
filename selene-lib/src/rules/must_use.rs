@@ -51,11 +51,11 @@ impl Rule for MustUseLint {
         diagnostics
     }
 
-    fn severity(&self) -> Severity {
+    fn severity() -> Severity {
         Severity::Warning
     }
 
-    fn rule_type(&self) -> RuleType {
+    fn rule_type() -> RuleType {
         RuleType::Correctness
     }
 }

@@ -28,11 +28,11 @@ impl Rule for DeprecatedLint {
         visitor.diagnostics
     }
 
-    fn rule_type(&self) -> RuleType {
+    fn rule_type() -> RuleType {
         RuleType::Correctness
     }
 
-    fn severity(&self) -> Severity {
+    fn severity() -> Severity {
         Severity::Warning
     }
 }

@@ -42,11 +42,11 @@ impl Rule for CompareNanLint {
             .collect()
     }
 
-    fn severity(&self) -> Severity {
+    fn severity() -> Severity {
         Severity::Error
     }
 
-    fn rule_type(&self) -> RuleType {
+    fn rule_type() -> RuleType {
         RuleType::Correctness
     }
 }

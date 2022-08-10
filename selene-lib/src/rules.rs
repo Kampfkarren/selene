@@ -55,8 +55,8 @@ pub trait Rule {
         ast_context: &AstContext,
     ) -> Vec<Diagnostic>;
 
-    fn severity(&self) -> Severity;
-    fn rule_type(&self) -> RuleType;
+    fn severity() -> Severity;
+    fn rule_type() -> RuleType;
 }
 
 pub enum RuleType {

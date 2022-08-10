@@ -256,10 +256,10 @@ macro_rules! use_rules {
                 diagnostics
             }
 
-            fn get_lint_severity<R: Rule>(&self, lint: &R, name: &'static str) -> Severity {
+            fn get_lint_severity<R: Rule>(&self, _lint: &R, name: &'static str) -> Severity {
                 match self.config.rules.get(name) {
                     Some(variation) => variation.to_severity(),
-                    None => lint.severity(),
+                    None => R::severity(),
                 }
             }
         }

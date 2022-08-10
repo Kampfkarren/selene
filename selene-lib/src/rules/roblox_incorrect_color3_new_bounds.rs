@@ -41,11 +41,11 @@ impl Rule for Color3BoundsLint {
             .collect()
     }
 
-    fn severity(&self) -> Severity {
+    fn severity() -> Severity {
         Severity::Error
     }
 
-    fn rule_type(&self) -> RuleType {
+    fn rule_type() -> RuleType {
         RuleType::Correctness
     }
 }
