@@ -35,6 +35,9 @@ impl Rule for MultipleStatementsLint {
     type Config = MultipleStatementsConfig;
     type Error = Infallible;
 
+    const SEVERITY: Severity = Severity::Warning;
+    const RULE_TYPE: RuleType = RuleType::Style;
+
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(MultipleStatementsLint { config })
     }
@@ -58,14 +61,6 @@ impl Rule for MultipleStatementsLint {
                 )
             })
             .collect()
-    }
-
-    fn severity() -> Severity {
-        Severity::Warning
-    }
-
-    fn rule_type() -> RuleType {
-        RuleType::Style
     }
 }
 

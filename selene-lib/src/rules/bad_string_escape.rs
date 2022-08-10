@@ -27,6 +27,9 @@ impl Rule for BadStringEscapeLint {
     type Config = ();
     type Error = Infallible;
 
+    const SEVERITY: Severity = Severity::Warning;
+    const RULE_TYPE: RuleType = RuleType::Correctness;
+
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(BadStringEscapeLint)
     }
@@ -87,14 +90,6 @@ impl Rule for BadStringEscapeLint {
                 ),
             })
             .collect()
-    }
-
-    fn severity() -> Severity {
-        Severity::Warning
-    }
-
-    fn rule_type() -> RuleType {
-        RuleType::Correctness
     }
 }
 

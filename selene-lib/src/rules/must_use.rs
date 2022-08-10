@@ -9,6 +9,9 @@ impl Rule for MustUseLint {
     type Config = ();
     type Error = Infallible;
 
+    const SEVERITY: Severity = Severity::Warning;
+    const RULE_TYPE: RuleType = RuleType::Correctness;
+
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(MustUseLint)
     }
@@ -49,14 +52,6 @@ impl Rule for MustUseLint {
         }
 
         diagnostics
-    }
-
-    fn severity() -> Severity {
-        Severity::Warning
-    }
-
-    fn rule_type() -> RuleType {
-        RuleType::Correctness
     }
 }
 

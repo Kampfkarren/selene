@@ -24,6 +24,9 @@ impl Rule for MismatchedArgCountLint {
     type Config = ();
     type Error = Infallible;
 
+    const SEVERITY: Severity = Severity::Error;
+    const RULE_TYPE: RuleType = RuleType::Correctness;
+
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(MismatchedArgCountLint)
     }
@@ -72,14 +75,6 @@ impl Rule for MismatchedArgCountLint {
                 )
             })
             .collect()
-    }
-
-    fn severity() -> Severity {
-        Severity::Error
-    }
-
-    fn rule_type() -> RuleType {
-        RuleType::Correctness
     }
 }
 

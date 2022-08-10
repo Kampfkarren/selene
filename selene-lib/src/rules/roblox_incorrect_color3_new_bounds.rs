@@ -13,6 +13,9 @@ impl Rule for Color3BoundsLint {
     type Config = ();
     type Error = Infallible;
 
+    const SEVERITY: Severity = Severity::Error;
+    const RULE_TYPE: RuleType = RuleType::Correctness;
+
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(Color3BoundsLint)
     }
@@ -39,14 +42,6 @@ impl Rule for Color3BoundsLint {
                 )
             })
             .collect()
-    }
-
-    fn severity() -> Severity {
-        Severity::Error
-    }
-
-    fn rule_type() -> RuleType {
-        RuleType::Correctness
     }
 }
 
