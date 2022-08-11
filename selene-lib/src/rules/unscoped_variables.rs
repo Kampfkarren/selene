@@ -27,6 +27,9 @@ impl Rule for UnscopedVariablesLint {
     type Config = UnscopedVariablesConfig;
     type Error = regex::Error;
 
+    const SEVERITY: Severity = Severity::Warning;
+    const RULE_TYPE: RuleType = RuleType::Complexity;
+
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(UnscopedVariablesLint {
             ignore_pattern: Regex::new(&config.ignore_pattern)?,
@@ -60,14 +63,6 @@ impl Rule for UnscopedVariablesLint {
         }
 
         diagnostics
-    }
-
-    fn severity(&self) -> Severity {
-        Severity::Warning
-    }
-
-    fn rule_type(&self) -> RuleType {
-        RuleType::Complexity
     }
 }
 

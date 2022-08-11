@@ -23,6 +23,9 @@ impl Rule for EmptyIfLint {
     type Config = EmptyIfLintConfig;
     type Error = Infallible;
 
+    const SEVERITY: Severity = Severity::Warning;
+    const RULE_TYPE: RuleType = RuleType::Style;
+
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(EmptyIfLint { config })
     }
@@ -63,14 +66,6 @@ impl Rule for EmptyIfLint {
                 )
             })
             .collect()
-    }
-
-    fn severity(&self) -> Severity {
-        Severity::Warning
-    }
-
-    fn rule_type(&self) -> RuleType {
-        RuleType::Style
     }
 }
 

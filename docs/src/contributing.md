@@ -12,10 +12,10 @@ Let's now understand what a lint consists of. selene takes lints in the form of 
 
 - A `Config` associated type that defines what the configuration format is expected to be. Whatever you pass must be [deserializable](https://serde.rs/).
 - An `Error` associated type that implements [`std::error::Error`](https://doc.rust-lang.org/std/error/trait.Error.html). This is used if configurations can be invalid (such as a parameter only being a number within a range). Most of the time, configurations cannot be invalid (other than deserializing errors, which are handled by selene), and so you can set this to [`std::convert::Infallible`](https://doc.rust-lang.org/std/convert/enum.Infallible.html).
+- A `SEVERITY` constant which is either `Severity::Error` or `Severity::Warning`. Use `Error` if the code is positively impossible to be correct.
+- A `RULE_TYPE` constant which is either `Complexity`, `Correctness`, `Performance`, or `Style`. So far not used for anything.
 - A `new` function with the signature `fn new(config: Self::Config) -> Result<Self, Self::Error>`. With the selene CLI, this is called once.
 - A `pass` function with the signature `fn pass(&self, ast: &full_moon::ast::Ast, context: &Context, ast_context: &AstContext) -> Vec<Diagnostic>`. The `ast` argument is the full-moon representation of the code. The `context` argument provides optional additional information, such as the standard library being used. The `ast_context` argument provides context specific to that AST, such as its scopes. Any `Diagnostic` structs returned here are displayed to the user.
-- A `severity` function with the signature `fn severity(&self) -> Severity`. Returns either `Severity::Error` or `Severity::Warning`. Use `Error` if the code is positively impossible to be correct. The `&self` is only provided due to limitations of Rust--the function should be completely constant and pure.
-- A `rule_type` function with the signature `fn rule_type(&self) -> RuleType`. Returns either `Complexity`, `Correctness`, `Performance`, or `Style`. So far not used for anything. Has the same gotcha as `severity` in relation to `&self`.
 
 For our purposes, we're going to write:
 
@@ -29,20 +29,15 @@ impl Rule for CoolLint {
     type Config = ();
     type Error = Infallible;
 
+    const SEVERITY: Severity = Severity::Warning;
+    const RULE_TYPE: RuleType = RuleType::Style;
+
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(CoolLint)
     }
 
     fn pass(&self, ast: &Ast, _: &Context, _: &AstContext) -> Vec<Diagnostic> {
         unimplemented!()
-    }
-
-    fn severity(&self) -> Severity {
-        Severity::Warning
-    }
-
-    fn rule_type(&self) -> RuleType {
-        RuleType::Style
     }
 }
 ```

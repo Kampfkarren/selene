@@ -14,6 +14,9 @@ impl Rule for UndefinedVariableLint {
     type Config = ();
     type Error = Infallible;
 
+    const SEVERITY: Severity = Severity::Error;
+    const RULE_TYPE: RuleType = RuleType::Correctness;
+
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(UndefinedVariableLint)
     }
@@ -42,14 +45,6 @@ impl Rule for UndefinedVariableLint {
         }
 
         diagnostics
-    }
-
-    fn severity(&self) -> Severity {
-        Severity::Error
-    }
-
-    fn rule_type(&self) -> RuleType {
-        RuleType::Correctness
     }
 }
 

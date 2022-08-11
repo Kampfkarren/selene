@@ -13,6 +13,9 @@ impl Rule for GlobalLint {
     type Config = ();
     type Error = Infallible;
 
+    const SEVERITY: Severity = Severity::Warning;
+    const RULE_TYPE: RuleType = RuleType::Complexity;
+
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(GlobalLint)
     }
@@ -43,14 +46,6 @@ impl Rule for GlobalLint {
                 )
             })
             .collect()
-    }
-
-    fn severity(&self) -> Severity {
-        Severity::Warning
-    }
-
-    fn rule_type(&self) -> RuleType {
-        RuleType::Complexity
     }
 }
 

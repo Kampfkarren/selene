@@ -26,6 +26,9 @@ impl Rule for ShadowingLint {
     type Config = ShadowingConfig;
     type Error = regex::Error;
 
+    const SEVERITY: Severity = Severity::Warning;
+    const RULE_TYPE: RuleType = RuleType::Style;
+
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(ShadowingLint {
             ignore_pattern: Regex::new(&config.ignore_pattern)?,
@@ -69,14 +72,6 @@ impl Rule for ShadowingLint {
                 )
             })
             .collect()
-    }
-
-    fn severity(&self) -> Severity {
-        Severity::Warning
-    }
-
-    fn rule_type(&self) -> RuleType {
-        RuleType::Style
     }
 }
 

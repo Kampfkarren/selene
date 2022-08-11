@@ -10,19 +10,14 @@ impl Rule for InvalidLintFilterLint {
     type Config = ();
     type Error = Infallible;
 
+    const SEVERITY: Severity = Severity::Error;
+    const RULE_TYPE: RuleType = RuleType::Correctness;
+
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(InvalidLintFilterLint)
     }
 
     fn pass(&self, _: &full_moon::ast::Ast, _: &Context, _: &AstContext) -> Vec<Diagnostic> {
         Vec::new()
-    }
-
-    fn severity(&self) -> Severity {
-        Severity::Error
-    }
-
-    fn rule_type(&self) -> RuleType {
-        RuleType::Correctness
     }
 }

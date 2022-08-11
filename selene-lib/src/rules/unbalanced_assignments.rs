@@ -14,6 +14,9 @@ impl Rule for UnbalancedAssignmentsLint {
     type Config = ();
     type Error = Infallible;
 
+    const SEVERITY: Severity = Severity::Warning;
+    const RULE_TYPE: RuleType = RuleType::Complexity;
+
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(UnbalancedAssignmentsLint)
     }
@@ -57,14 +60,6 @@ impl Rule for UnbalancedAssignmentsLint {
                 }
             })
             .collect()
-    }
-
-    fn severity(&self) -> Severity {
-        Severity::Warning
-    }
-
-    fn rule_type(&self) -> RuleType {
-        RuleType::Complexity
     }
 }
 

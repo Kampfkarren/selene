@@ -44,6 +44,9 @@ pub trait Rule {
     type Config: DeserializeOwned;
     type Error: std::error::Error;
 
+    const SEVERITY: Severity;
+    const RULE_TYPE: RuleType;
+
     fn new(config: Self::Config) -> Result<Self, Self::Error>
     where
         Self: Sized;
@@ -54,9 +57,6 @@ pub trait Rule {
         context: &Context,
         ast_context: &AstContext,
     ) -> Vec<Diagnostic>;
-
-    fn severity(&self) -> Severity;
-    fn rule_type(&self) -> RuleType;
 }
 
 pub enum RuleType {

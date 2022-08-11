@@ -12,6 +12,9 @@ impl Rule for DeprecatedLint {
     type Config = ();
     type Error = Infallible;
 
+    const SEVERITY: Severity = Severity::Warning;
+    const RULE_TYPE: RuleType = RuleType::Correctness;
+
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(DeprecatedLint)
     }
@@ -26,14 +29,6 @@ impl Rule for DeprecatedLint {
         visitor.visit_ast(ast);
 
         visitor.diagnostics
-    }
-
-    fn rule_type(&self) -> RuleType {
-        RuleType::Correctness
-    }
-
-    fn severity(&self) -> Severity {
-        Severity::Warning
     }
 }
 
