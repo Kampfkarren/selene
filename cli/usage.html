@@ -152,7 +152,7 @@ OPTIONS:
         --display-style &lt;display-style&gt;    Sets the display method [possible values: Json, Rich, Quiet]
         --num-threads &lt;num-threads&gt;        Number of threads to run on, default to the numbers of logical cores on your
                                            system [default: your system's cores]
-        --pattern &lt;pattern&gt;                A glob to match files with to check [default: **/*.lua]
+        --pattern &lt;pattern&gt;                A glob to match files with to check
 
 ARGS:
     &lt;files&gt;...
@@ -160,6 +160,8 @@ ARGS:
 SUBCOMMANDS:
     generate-roblox-std
     help                   Prints this message or the help of the given subcommand(s)
+    update-roblox-std
+    upgrade-std
 </code></pre>
 <h2 id="basic-usage"><a class="header" href="#basic-usage">Basic usage</a></h2>
 <p>All unnamed inputs you give to selene will be treated as files to check for.</p>
@@ -196,7 +198,7 @@ Results:
 <p><strong>--num-threads</strong> <em>num-threads</em></p>
 <p>Specifies the number of threads for selene to use. Defaults to however many cores your CPU has. If you type <code>selene --help</code>, you can see this number because it will show as the default for you.</p>
 <p><strong>--pattern</strong> <em>pattern</em></p>
-<p>A <a href="https://en.wikipedia.org/wiki/Glob_(programming)">glob</a> to match what files selene should check for. For example, if you only wanted to check files that end with <code>.spec.lua</code>, you would input <code>--pattern **/*.spec.lua</code>. Defaults to <code>**/*.lua</code>, meaning &quot;any lua file&quot;.</p>
+<p>A <a href="https://en.wikipedia.org/wiki/Glob_(programming)">glob</a> to match what files selene should check for. For example, if you only wanted to check files that end with <code>.spec.lua</code>, you would input <code>--pattern **/*.spec.lua</code>. Defaults to <code>**/*.lua</code>, meaning &quot;any lua file&quot;, or <code>**/*.lua</code> and <code>**/*.luau</code> with the roblox feature flag, meaning &quot;any lua/luau file&quot;.</p>
 
                     </main>
 
