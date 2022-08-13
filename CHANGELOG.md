@@ -178,7 +178,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Fixed
 - Fixed `--display-style=json` giving an output incompatible with previous tooling.
 
-## [0.9.0] - 2020-11-04
+## [0.9.0] ([Notes][0.9.1]) - 2020-11-04
 ### Added
 - Arguments that aren't required can now be filled with nil.
 - Added support for `math.round` to the Roblox standard library.
@@ -318,3 +318,38 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [0.1.0] - 2019-11-06
 - Initial release
+
+[unreleased]: https://github.com/Kampfkarren/selene/compare/0.20.0...HEAD
+[0.20.0]: https://github.com/Kampfkarren/selene/releases/tag/0.20.0
+[0.19.0]: https://github.com/Kampfkarren/selene/releases/tag/0.19.0
+[0.19.1]: https://github.com/Kampfkarren/selene/releases/tag/0.19.1
+[0.18.2]: https://github.com/Kampfkarren/selene/releases/tag/0.18.2
+[0.18.1]: https://github.com/Kampfkarren/selene/releases/tag/0.18.1
+[0.18.0]: https://github.com/Kampfkarren/selene/releases/tag/0.18.0
+[0.17.0]: https://github.com/Kampfkarren/selene/releases/tag/0.17.0
+[0.16.0]: https://github.com/Kampfkarren/selene/releases/tag/0.16.0
+[0.15.0]: https://github.com/Kampfkarren/selene/releases/tag/0.15.0
+[0.14.0]: https://github.com/Kampfkarren/selene/releases/tag/0.14.0
+[0.13.0]: https://github.com/Kampfkarren/selene/releases/tag/0.13.0
+[0.12.1]: https://github.com/Kampfkarren/selene/releases/tag/0.12.1
+[0.12.0]: https://github.com/Kampfkarren/selene/releases/tag/0.12.1
+[0.11.0]: https://github.com/Kampfkarren/selene/releases/tag/0.11.0
+[0.10.1]: https://github.com/Kampfkarren/selene/releases/tag/0.10.1
+[0.10.0]: https://github.com/Kampfkarren/selene/releases/tag/0.10.0
+[0.9.2]: https://github.com/Kampfkarren/selene/releases/tag/0.9.2
+[0.9.1]: https://github.com/Kampfkarren/selene/releases/tag/0.9.1
+[0.9.0]: https://github.com/Kampfkarren/selene/releases/tag/0.9.0
+[0.8.0]: https://github.com/Kampfkarren/selene/releases/tag/0.8.0
+[0.7.0]: https://github.com/Kampfkarren/selene/releases/tag/0.7.0
+[0.6.0]: https://github.com/Kampfkarren/selene/releases/tag/0.6.0
+[0.5.3]: https://github.com/Kampfkarren/selene/releases/tag/0.5.3
+[0.5.2]: https://github.com/Kampfkarren/selene/releases/tag/0.5.2
+[0.5.1]: https://github.com/Kampfkarren/selene/releases/tag/0.5.2
+[0.5.0]: https://github.com/Kampfkarren/selene/releases/tag/0.5.0
+[0.4.3]: https://github.com/Kampfkarren/selene/releases/tag/0.4.3
+[0.4.2]: https://github.com/Kampfkarren/selene/releases/tag/0.4.2
+[0.4.1]: https://github.com/Kampfkarren/selene/releases/tag/0.4.1
+[0.4.0]: https://github.com/Kampfkarren/selene/releases/tag/0.4.0
+[0.3.0]: https://github.com/Kampfkarren/selene/releases/tag/0.3.0
+[0.2.0]: https://github.com/Kampfkarren/selene/releases/tag/0.2.0
+[0.1.0]: https://github.com/Kampfkarren/selene/releases/tag/0.1.0
