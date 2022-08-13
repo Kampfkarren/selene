@@ -18,7 +18,7 @@ OPTIONS:
         --display-style <display-style>    Sets the display method [possible values: Json, Rich, Quiet]
         --num-threads <num-threads>        Number of threads to run on, default to the numbers of logical cores on your
                                            system [default: your system's cores]
-        --pattern <pattern>                A glob to match files with to check [default: **/*.lua]
+        --pattern <pattern>                A glob to match files with to check
 
 ARGS:
     <files>...
@@ -26,6 +26,8 @@ ARGS:
 SUBCOMMANDS:
     generate-roblox-std
     help                   Prints this message or the help of the given subcommand(s)
+    update-roblox-std
+    upgrade-std
 ```
 
 ## Basic usage
@@ -78,4 +80,4 @@ Specifies the number of threads for selene to use. Defaults to however many core
 
 **--pattern** *pattern*
 
-A [glob](https://en.wikipedia.org/wiki/Glob_(programming)) to match what files selene should check for. For example, if you only wanted to check files that end with `.spec.lua`, you would input `--pattern **/*.spec.lua`. Defaults to `**/*.lua`, meaning "any lua file".
+A [glob](https://en.wikipedia.org/wiki/Glob_(programming)) to match what files selene should check for. For example, if you only wanted to check files that end with `.spec.lua`, you would input `--pattern **/*.spec.lua`. Defaults to `**/*.lua`, meaning "any lua file", or `**/*.lua` and `**/*.luau` with the roblox feature flag, meaning "any lua/luau file".

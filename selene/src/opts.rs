@@ -8,8 +8,8 @@ use structopt::{clap::arg_enum, StructOpt};
 #[structopt(setting(structopt::clap::AppSettings::SubcommandsNegateReqs))]
 pub struct Options {
     /// A glob to match files with to check
-    #[structopt(long, default_value = "**/*.lua")]
-    pub pattern: String,
+    #[structopt(long)]
+    pub pattern: Vec<String>,
 
     /// A toml file to configure the behavior of selene [default: selene.toml]
     // .default is not used here since if the user explicitly specifies the config file
