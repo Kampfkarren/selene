@@ -1,14 +1,14 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.20.0...HEAD)
 
 ### Changed
 
 - Match `.luau` filename extension by default.
 - Allow `--pattern` to be passed multiple times.
 
-## [0.20.0] - 2022-07-21
+## [0.20.0](https://github.com/Kampfkarren/selene/releases/tag/0.20.0) - 2022-07-21
 ### Added
 - Added [`utf8` globals](https://q-syshelp.qsc.com/Content/Control_Scripting/Lua_5.3_Reference_Manual/Standard_Libraries/4_-_Basic_UTF-8_Support.htm) to the builtin `lua53` standard library.
 - Added Roblox datatype constructors `CatalogSearchParams.new`, `FloatCurveKey.new`, and `RotationCurveKey.new`.
@@ -20,11 +20,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fixed newer versions of the Roblox API dump failing to create standard libraries for.
 - Fixed reporting an error when generating standard libraries panicking.
 
-## [0.19.1] - 2022-06-22
+## [0.19.1](https://github.com/Kampfkarren/selene/releases/tag/0.19.1) - 2022-06-22
 ### Fixed
 - Fixed releases coming with Tracy.
 
-## [0.19.0] - 2022-06-22
+## [0.19.0](https://github.com/Kampfkarren/selene/releases/tag/0.19.0) - 2022-06-22
 ### Added
 - `table.insert(x)` no longer counts as a read to `x`, which allows selene to alert you that you are only assigning to it.
   - This is done through a new standard library field for arguments called `observes`. This takes 3 values: "read-write" (the default), signifying a potential read and write, "read", signifying only a read, and "write", signifying only a write. Only "write" has meaning at this time.
@@ -34,15 +34,15 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Fixed
 - Fixed a bunch of performance failures, lowering some benchmarks from 3 seconds to 200ms.
 
-## [0.18.2] - 2022-06-10
+## [0.18.2](https://github.com/Kampfkarren/selene/releases/tag/0.18.2) - 2022-06-10
 ### Fixed
 - Fixed `Enum.NAME.Value` failing in newly generated standard libraries.
 
-## [0.18.1] - 2022-06-07
+## [0.18.1](https://github.com/Kampfkarren/selene/releases/tag/0.18.1) - 2022-06-07
 ### Changed
 - [Updated internal parser](https://github.com/Kampfkarren/full-moon/blob/main/CHANGELOG.md#0151---2022-02-17), bringing bug fixes to type information with generic packs.
 
-## [0.18.0] - 2022-06-07
+## [0.18.0](https://github.com/Kampfkarren/selene/releases/tag/0.18.0) - 2022-06-07
 ### Added
 - Added [new YAML based standard library format](https://kampfkarren.github.io/selene/usage/std.html). The old TOML format is now deprecated and will not have any new functionality added to it, but will be preserved for the forseeable future.
   - You can upgrade old TOML standard libraries by running `selene upgrade-std library.toml`, which will create a new .yml file of the same name in the new format.
@@ -60,7 +60,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Removed
 - With the introduction of the new `deprecated` lint, the `--deprecated` field has been removed from `generate-roblox-std`, and is now implied.
 
-## [0.17.0] - 2022-04-10
+## [0.17.0](https://github.com/Kampfkarren/selene/releases/tag/0.17.0) - 2022-04-10
 ### Added
 - Added `start_line`, `start_column`, `end_line`, and `end_column` to JSON diagnostic output.
 - Added `Color3.fromHex` to the Roblox standard library.
@@ -68,7 +68,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `coroutine.close` to the Roblox standard library.
 - Added `task.cancel` to the Roblox standard library.
 
-## [0.16.0] - 2022-01-30
+## [0.16.0](https://github.com/Kampfkarren/selene/releases/tag/0.16.0) - 2022-01-30
 ### Added
 - Added support for parsing generic type packs, variadic type packs, and explicit type packs in generic arguments for a type under the `roblox` feature flag (`type X<S...> = Y<(string, number), ...string, S...>`)
 - Added support for string and boolean singleton types under the `roblox` feature flag (`type Element = { ["$$typeof"]: number, errorCaught: true, which: "Query" | "Mutation" | "Subscription" }`
@@ -82,7 +82,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Fixed
 - Fixed a bug where empty else blocks were not properly closing their scope, meaning that they could confuse the shadowing lint. [(#116)](https://github.com/Kampfkarren/selene/issues/116)
 
-## [0.15.0] - 2021-11-05
+## [0.15.0](https://github.com/Kampfkarren/selene/releases/tag/0.15.0) - 2021-11-05
 ### Added
 - Added `OverlapParams` to the Roblox standard library.
 - Added `Enum:GetEnums()` to the Roblox standard library. [(#312)](https://github.com/Kampfkarren/selene/issues/312)
@@ -100,7 +100,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Arguments of `collectgarbage` now considered to be optional. [(#287)](https://github.com/Kampfkarren/selene/issues/287)
 - Updated internal parser, adding new Luau syntax.
 
-## [0.14.0] - 2021-07-07
+## [0.14.0](https://github.com/Kampfkarren/selene/releases/tag/0.14.0) - 2021-07-07
 ### Added
 - Added `task` library to Roblox standard library.
 
@@ -111,7 +111,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Fixed
 - Updated internal parser, fixing some bugs with Roblox parsing. [See the changelog here](https://github.com/Kampfkarren/full-moon/blob/main/CHANGELOG.md#0131---2021-07-07).
 
-## [0.13.0] - 2021-07-01
+## [0.13.0](https://github.com/Kampfkarren/selene/releases/tag/0.13.0) - 2021-07-01
 ### Added
 - Added `debug.info` to the Roblox standard library. [(#260)](https://github.com/Kampfkarren/selene/issues/260)
 - Tokenization errors now form rich diagnostics.
@@ -124,11 +124,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fixed internal selene panics exiting with a zero code. Panics will now exit with status code 1, allowing it to be picked up by CI.
 - Fixed variables named `self` not showing as unused if `allow_unused_self` was enabled. The implicit `self` variable being unused will still respect this configuration. [(#215)](https://github.com/Kampfkarren/selene/issues/215)
 
-## [0.12.1] - 2021-05-26
+## [0.12.1](https://github.com/Kampfkarren/selene/releases/tag/0.12.1) - 2021-05-26
 ### Fixed
 - Fixed compile warning about unused variables.
 
-## [0.12.0] - 2021-05-26
+## [0.12.0](https://github.com/Kampfkarren/selene/releases/tag/0.12.1) - 2021-05-26
 ### Added
 - `arg` is now defined in the Lua 5.1 standard library.
 - Root level `...` will no longer be declared an undefined variable.
@@ -145,16 +145,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Updated internal parser. This has shown in practice to catch lints that the previous version did not.
 
-## [0.11.0] - 2021-01-04
+## [0.11.0](https://github.com/Kampfkarren/selene/releases/tag/0.11.0) - 2021-01-04
 ### Added
 - Added support for DateTime in the Roblox standard library.
 - Added support for `table.clear` in the Roblox standard library.
 
-## [0.10.1] - 2020-12-22
+## [0.10.1](https://github.com/Kampfkarren/selene/releases/tag/0.10.1) - 2020-12-22
 ### Fixed
 - Fixed regressions related to numeric for loops.
 
-## [0.10.0] - 2020-12-21
+## [0.10.0](https://github.com/Kampfkarren/selene/releases/tag/0.10.0) - 2020-12-21
 ### Added
 - Added inline lint filtering, read [the documentation](https://kampfkarren.github.io/selene/usage/filtering.html) for more information.
 - More errors now set the exit code.
@@ -170,15 +170,15 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - `UDim2.fromOffset` and `UDim2.fromScale` now require you to use `UDim.new` if no parameters are specified.
 - Updated full-moon, read [the full-moon changelog](https://github.com/Kampfkarren/full-moon/blob/master/CHANGELOG.md#080---2020-12-21) to learn more.
 
-## [0.9.2] - 2020-11-06
+## [0.9.2](https://github.com/Kampfkarren/selene/releases/tag/0.9.2) - 2020-11-06
 ### Changed
 - Updated full-moon, read [the full-moon changelog](https://github.com/Kampfkarren/full-moon/blob/master/CHANGELOG.md#070---2020-11-06) to learn more.
 
-## [0.9.1] - 2020-11-04
+## [0.9.1](https://github.com/Kampfkarren/selene/releases/tag/0.9.1) - 2020-11-04
 ### Fixed
 - Fixed `--display-style=json` giving an output incompatible with previous tooling.
 
-## [0.9.0] ([Notes][0.9.1]) - 2020-11-04
+## [0.9.0](https://github.com/Kampfkarren/selene/releases/tag/0.9.0) ([Notes](https://github.com/Kampfkarren/selene/releases/tag/0.9.1)) - 2020-11-04
 ### Added
 - Arguments that aren't required can now be filled with nil.
 - Added support for `math.round` to the Roblox standard library.
@@ -193,7 +193,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Using a function call as the last argument in a function will silence lint for not passing enough parameters. This means, for example, `math.max(unpack(numbers))` will no longer error.
 - Using an ellipsis on the right side of unbalanced assignments no longer lints.
 
-## [0.8.0] - 2020-08-24
+## [0.8.0](https://github.com/Kampfkarren/selene/releases/tag/0.8.0) - 2020-08-24
 ### Added
 - Added support for `os.clock`.
 - Added `RaycastParams.new`.
@@ -204,7 +204,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Fixed
 - Fixed `coroutine.yield` only accepting coroutines as a first argument.
 
-## [0.7.0] - 2020-06-08
+## [0.7.0](https://github.com/Kampfkarren/selene/releases/tag/0.7.0) - 2020-06-08
 ### Added
 - Added support for `continue`, compound assignments (`+`), intersectional types, and numbers with underscores under the `roblox` feature flag.
 
@@ -216,7 +216,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Made 4th argument to `CFrame.fromMatrix` optional (#113)
 - Made standard library aware that functions and `...` can return multiple values
 
-## [0.6.0] - 2020-04-21
+## [0.6.0](https://github.com/Kampfkarren/selene/releases/tag/0.6.0) - 2020-04-21
 ### Added
 - Added timestamp to generated Roblox standard library
 - Added `debug.getlocal`, `math.cosh`, and `string.reverse`
@@ -235,7 +235,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Changed the argument display type of `io.input` and `io.output` into `file`
 - Updated to version 0.5.0 of full-moon, which should result in speedier parsing
 
-## [0.5.3] - 2020-01-27
+## [0.5.3](https://github.com/Kampfkarren/selene/releases/tag/0.5.3) - 2020-01-27
 ### Added
 - Added tuple argument to `xpcall`
 - Added `CFrame.fromEulerAnglesYXZ` to Roblox standard library
@@ -244,11 +244,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Fixed
 - Fixed comments with tabs reporting as a parse error.
 
-## [0.5.2] - 2020-01-19
+## [0.5.2](https://github.com/Kampfkarren/selene/releases/tag/0.5.2) - 2020-01-19
 ### Fixed
 - Fixed debug output for the standard library.
 
-## [0.5.1] - 2020-01-19
+## [0.5.1](https://github.com/Kampfkarren/selene/releases/tag/0.5.2) - 2020-01-19
 ### Added
 - Added the `utf8` library to the Roblox standard library
 - Added support for Typed Lua when using the Roblox feature flag.
@@ -256,7 +256,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Updated full-moon, which should result in faster parsing.
 
-## [0.5.0] - 2019-12-20
+## [0.5.0](https://github.com/Kampfkarren/selene/releases/tag/0.5.0) - 2019-12-20
 ### Added
 - Added `type_check_inside_call` lint for checking `type(foo == "type")` instead of `type(foo) == "type"`.
 - Added `NumberRange` to the Roblox standard library.
@@ -273,7 +273,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Fixed
 - Fixed ternary expressions resolving as booleans.
 
-## [0.4.3] - 2019-11-20
+## [0.4.3](https://github.com/Kampfkarren/selene/releases/tag/0.4.3) - 2019-11-20
 ### Added
 - Added `display-style` flag to use either rich (default), quiet (equivalent to -q), or JSON.
 
@@ -281,15 +281,15 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fixed a concatenated result always triggering an error when the standard library function expected a constant string (such as `collectgarbage` or `Instance.new`).
 - Fixed parenthese conditions mixed with non-parenthese conditions (such as `(condition) and condition`) tripping the `parenthese_conditions` lint.
 
-## [0.4.2] - 2019-11-13
+## [0.4.2](https://github.com/Kampfkarren/selene/releases/tag/0.4.2) - 2019-11-13
 ### Fixed
 - Fixed Roblox standard library not including structs, and thus failing when using `game`, `script`, etc.
 
-## [0.4.1] - 2019-11-13
+## [0.4.1](https://github.com/Kampfkarren/selene/releases/tag/0.4.1) - 2019-11-13
 ### Fixed
 - Fixed Roblox standard library not including Lua 5.1 globals the first time you ran selene.
 
-## [0.4.0] - 2019-11-13
+## [0.4.0](https://github.com/Kampfkarren/selene/releases/tag/0.4.0) - 2019-11-13
 ### Added
 - A Roblox standard library can now be generated by simply having `std = "roblox"` in your configuration and running selene. If it does not exist, it will create one. This can also be initiated manually with `selene generate-roblox-std`.
 - Added [`roblox_incorrect_color3_new_bounds`](https://kampfkarren.github.io/selene/lints/roblox_incorrect_color3_new_bounds.html).
@@ -299,7 +299,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Changed incorrect_roact_usage to roblox_incorrect_roact_usage. [(#41)](https://github.com/Kampfkarren/selene/issues/41)
 - Changed parsing errors to produce prettier results.
 
-## [0.3.0] - 2019-11-08
+## [0.3.0](https://github.com/Kampfkarren/selene/releases/tag/0.3.0) - 2019-11-08
 ### Added
 - Added `--color` option to specify whether colors could be used on the output.
 - Added [`incorrect_roact_usage`](https://kampfkarren.github.io/selene/lints/incorrect_roact_usage.html) lint to verify correct usage of Roact.createElement.
@@ -312,44 +312,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fixed false positive with `unused_variable` linting function declarations as only mutations. [(#30)](https://github.com/Kampfkarren/selene/issues/30)
 - Fixed terminal colors not resetting properly. [(#33)](https://github.com/Kampfkarren/selene/issues/33)
 
-## [0.2.0] - 2019-11-06
+## [0.2.0](https://github.com/Kampfkarren/selene/releases/tag/0.2.0) - 2019-11-06
 ### Added
 - Added standard library chaining. This means you can combine two standard libraries by setting `std` in selene.toml to `std1+std2`. You can chain as many as you want.
 
-## [0.1.0] - 2019-11-06
+## [0.1.0](https://github.com/Kampfkarren/selene/releases/tag/0.1.0) - 2019-11-06
 - Initial release
-
-[unreleased]: https://github.com/Kampfkarren/selene/compare/0.20.0...HEAD
-[0.20.0]: https://github.com/Kampfkarren/selene/releases/tag/0.20.0
-[0.19.0]: https://github.com/Kampfkarren/selene/releases/tag/0.19.0
-[0.19.1]: https://github.com/Kampfkarren/selene/releases/tag/0.19.1
-[0.18.2]: https://github.com/Kampfkarren/selene/releases/tag/0.18.2
-[0.18.1]: https://github.com/Kampfkarren/selene/releases/tag/0.18.1
-[0.18.0]: https://github.com/Kampfkarren/selene/releases/tag/0.18.0
-[0.17.0]: https://github.com/Kampfkarren/selene/releases/tag/0.17.0
-[0.16.0]: https://github.com/Kampfkarren/selene/releases/tag/0.16.0
-[0.15.0]: https://github.com/Kampfkarren/selene/releases/tag/0.15.0
-[0.14.0]: https://github.com/Kampfkarren/selene/releases/tag/0.14.0
-[0.13.0]: https://github.com/Kampfkarren/selene/releases/tag/0.13.0
-[0.12.1]: https://github.com/Kampfkarren/selene/releases/tag/0.12.1
-[0.12.0]: https://github.com/Kampfkarren/selene/releases/tag/0.12.1
-[0.11.0]: https://github.com/Kampfkarren/selene/releases/tag/0.11.0
-[0.10.1]: https://github.com/Kampfkarren/selene/releases/tag/0.10.1
-[0.10.0]: https://github.com/Kampfkarren/selene/releases/tag/0.10.0
-[0.9.2]: https://github.com/Kampfkarren/selene/releases/tag/0.9.2
-[0.9.1]: https://github.com/Kampfkarren/selene/releases/tag/0.9.1
-[0.9.0]: https://github.com/Kampfkarren/selene/releases/tag/0.9.0
-[0.8.0]: https://github.com/Kampfkarren/selene/releases/tag/0.8.0
-[0.7.0]: https://github.com/Kampfkarren/selene/releases/tag/0.7.0
-[0.6.0]: https://github.com/Kampfkarren/selene/releases/tag/0.6.0
-[0.5.3]: https://github.com/Kampfkarren/selene/releases/tag/0.5.3
-[0.5.2]: https://github.com/Kampfkarren/selene/releases/tag/0.5.2
-[0.5.1]: https://github.com/Kampfkarren/selene/releases/tag/0.5.2
-[0.5.0]: https://github.com/Kampfkarren/selene/releases/tag/0.5.0
-[0.4.3]: https://github.com/Kampfkarren/selene/releases/tag/0.4.3
-[0.4.2]: https://github.com/Kampfkarren/selene/releases/tag/0.4.2
-[0.4.1]: https://github.com/Kampfkarren/selene/releases/tag/0.4.1
-[0.4.0]: https://github.com/Kampfkarren/selene/releases/tag/0.4.0
-[0.3.0]: https://github.com/Kampfkarren/selene/releases/tag/0.3.0
-[0.2.0]: https://github.com/Kampfkarren/selene/releases/tag/0.2.0
-[0.1.0]: https://github.com/Kampfkarren/selene/releases/tag/0.1.0
