@@ -60,6 +60,10 @@ impl Rule for UnusedVariableLint {
             .iter()
             .filter(|(_, variable)| !self.ignore_pattern.is_match(&variable.name))
         {
+            if context.standard_library.global_has_fields(&variable.name) {
+                continue;
+            }
+
             let references = variable
                 .references
                 .iter()
@@ -212,6 +216,15 @@ mod tests {
             UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "explicit_self",
+        );
+    }
+
+    #[test]
+    fn test_function_overriding() {
+        test_lint(
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
+            "unused_variable",
+            "function_overriding",
         );
     }
 

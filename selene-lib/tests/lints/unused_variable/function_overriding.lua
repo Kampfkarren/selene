@@ -1,0 +1,1 @@
+function global.name() end

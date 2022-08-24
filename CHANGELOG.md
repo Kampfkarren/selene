@@ -4,9 +4,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.20.0...HEAD)
 
 ### Changed
-
 - Match `.luau` filename extension by default.
 - Allow `--pattern` to be passed multiple times.
+
+### Fixed
+- Fixed `unused_variable` incorrectly tagging `function global.name()` when `global` is defined in the standard library.
 
 ## [0.20.0](https://github.com/Kampfkarren/selene/releases/tag/0.20.0) - 2022-07-21
 ### Added
