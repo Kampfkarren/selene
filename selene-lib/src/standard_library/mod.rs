@@ -2,7 +2,7 @@ pub mod v1;
 mod v1_upgrade;
 
 use std::{
-    borrow::Cow,
+    borrow::{Borrow, Cow},
     collections::{BTreeMap, HashMap},
     fmt, io,
 };
@@ -261,7 +261,7 @@ impl StandardLibrary {
     /// 5. "x.y.z" where `x.y` or `x.*` is defined as "any"
     /// 6. "x.y" resolving to a read only property if only "x.y.z" (or x.y.*) is explicitly defined
     #[profiling::function]
-    pub fn find_global(&self, names: &[String]) -> Option<&Field> {
+    pub fn find_global<S: Borrow<str>>(&self, names: &[S]) -> Option<&Field> {
         assert!(!names.is_empty());
 
         if let Some(explicit_global) = self.globals.get(&names.join(".")) {
@@ -278,7 +278,7 @@ impl StandardLibrary {
         profiling::scope!("find_global: look through global tree cache");
 
         for name in names.iter().take(names.len() - 1) {
-            let found_segment = current.get(name).or_else(|| current.get("*"))?;
+            let found_segment = current.get(name.borrow()).or_else(|| current.get("*"))?;
             let field = found_segment.field(current_names_to_fields);
 
             match &field.field_kind {
@@ -304,7 +304,7 @@ impl StandardLibrary {
         }
 
         current
-            .get(names.last().unwrap())
+            .get(names.last().unwrap().borrow())
             .or_else(|| current.get("*"))
             .map(|node| node.field(current_names_to_fields))
     }

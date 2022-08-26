@@ -104,7 +104,7 @@ impl NodeVisitor for FilterVisitor {
 
             self.comments_checked.insert(hash);
 
-            for comment in match &*trivia.token_type() {
+            for comment in match trivia.token_type() {
                 TokenType::SingleLineComment { comment } => comment,
                 TokenType::MultiLineComment { comment, .. } => comment,
                 _ => continue,

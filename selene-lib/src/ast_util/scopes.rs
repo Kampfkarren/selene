@@ -87,7 +87,7 @@ pub struct Reference {
     pub write_expr: Option<Range>,
     pub scope_id: Id<Scope>,
     pub read: bool,
-    pub write: bool,
+    pub write: Option<ReferenceWrite>,
     pub within_function_stmt: Option<WithinFunctionStmt>,
 }
 
@@ -136,6 +136,12 @@ pub enum VariableInScope {
     Found(Id<Variable>),
     NotFound,
     Blocked,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ReferenceWrite {
+    Assign,
+    Extend,
 }
 
 fn create_scope<N: Node>(node: N) -> Option<Scope> {
@@ -399,7 +405,7 @@ impl ScopeVisitor {
                     read: true,
                     resolved: None,
                     scope_id: self.current_scope_id(),
-                    write: false,
+                    write: None,
                     write_expr: None,
                     within_function_stmt: None,
                 },
@@ -452,6 +458,15 @@ impl ScopeVisitor {
     }
 
     fn write_name(&mut self, token: &TokenReference, write_expr: Option<Range>) {
+        self.write_name_with(token, write_expr, ReferenceWrite::Assign)
+    }
+
+    fn write_name_with(
+        &mut self,
+        token: &TokenReference,
+        write_expr: Option<Range>,
+        write: ReferenceWrite,
+    ) {
         if token.token_kind() == TokenKind::Identifier {
             self.reference_variable(
                 &token.token().to_string(),
@@ -461,7 +476,7 @@ impl ScopeVisitor {
                     read: false,
                     resolved: None,
                     scope_id: self.current_scope_id(),
-                    write: true,
+                    write: Some(write),
                     write_expr,
                     within_function_stmt: None,
                 },
@@ -816,13 +831,19 @@ impl Visitor for ScopeVisitor {
         let mut names = name.names().iter();
         let base = names.next().unwrap();
 
-        if names.next().is_some() {
-            self.write_name(base, Some(range(declaration.name())));
+        let is_longer_expression = names.next().is_some();
+
+        if is_longer_expression {
+            self.write_name_with(
+                base,
+                Some(range(declaration.name())),
+                ReferenceWrite::Extend,
+            );
         }
 
         self.read_name(base);
 
-        if names.next().is_none() {
+        if !is_longer_expression {
             self.try_hoist();
         }
 

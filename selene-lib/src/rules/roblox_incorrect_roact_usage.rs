@@ -94,7 +94,7 @@ impl IncorrectRoactUsageVisitor {
         &mut self,
         token: &TokenReference,
     ) -> Option<&'static rbx_reflection::RbxClassDescriptor> {
-        let name = if let TokenType::StringLiteral { literal, .. } = &*token.token_type() {
+        let name = if let TokenType::StringLiteral { literal, .. } = token.token_type() {
             literal.to_string()
         } else {
             return None;

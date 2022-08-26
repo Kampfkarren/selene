@@ -30,7 +30,7 @@ pub struct UnusedVariableLint {
     ignore_pattern: Regex,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum AnalyzedReference {
     Read,
     PlainWrite,
@@ -60,6 +60,10 @@ impl Rule for UnusedVariableLint {
             .iter()
             .filter(|(_, variable)| !self.ignore_pattern.is_match(&variable.name))
         {
+            if context.standard_library.global_has_fields(&variable.name) {
+                continue;
+            }
+
             let references = variable
                 .references
                 .iter()
@@ -69,7 +73,7 @@ impl Rule for UnusedVariableLint {
             // We need to make sure that references that are marked as "read" aren't only being read in an "observes: write" context.
             let analyzed_references = references
                 .map(|reference| {
-                    if reference.write {
+                    if reference.write.is_some() {
                         return AnalyzedReference::PlainWrite;
                     }
 
@@ -212,6 +216,15 @@ mod tests {
             UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "explicit_self",
+        );
+    }
+
+    #[test]
+    fn test_function_overriding() {
+        test_lint(
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
+            "unused_variable",
+            "function_overriding",
         );
     }
 

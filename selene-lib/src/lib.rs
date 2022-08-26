@@ -20,6 +20,9 @@ mod util;
 #[cfg(test)]
 mod test_util;
 
+#[cfg(test)]
+mod test_full_runs;
+
 use rules::{AstContext, Context, Diagnostic, Rule, Severity};
 use standard_library::StandardLibrary;
 
