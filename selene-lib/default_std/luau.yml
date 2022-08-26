@@ -164,7 +164,7 @@ globals:
     must_use: true
   module:
     removed: true
-    os.execute:
+  os.execute:
     removed: true
   os.exit:
     removed: true
