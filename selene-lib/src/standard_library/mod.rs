@@ -204,6 +204,7 @@ impl StandardLibrary {
             "lua51" => "../../default_std/lua51.yml",
             "lua52" => "../../default_std/lua52.yml",
             "lua53" => "../../default_std/lua53.yml",
+            "luau" => "../../default_std/luau.yml",
         }
     }
 

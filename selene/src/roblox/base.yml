@@ -1,5 +1,8 @@
+# This is for exclusively Roblox functionality.
+# Valid: CFrame.new(), Instance.new(), task.spawn()
+# Invalid (put in selene-lib/default_std/luau.yml instead): math.sign(), bit32.countlz()
 ---
-base: lua51
+base: luau
 name: roblox
 globals:
   Axes.new:
@@ -473,108 +476,6 @@ globals:
         type: number
       - required: false
         type: number
-  bit32.arshift:
-    args:
-      - type: number
-      - type: number
-    must_use: true
-  bit32.band:
-    args:
-      - type: "..."
-    must_use: true
-  bit32.bnot:
-    args:
-      - type: number
-    must_use: true
-  bit32.bor:
-    args:
-      - type: "..."
-    must_use: true
-  bit32.btest:
-    args:
-      - type: "..."
-    must_use: true
-  bit32.bxor:
-    args:
-      - type: "..."
-    must_use: true
-  bit32.countlz:
-    args:
-      - type: number
-    must_use: true
-  bit32.countrz:
-    args:
-      - type: number
-    must_use: true
-  bit32.extract:
-    args:
-      - type: number
-      - type: number
-      - required: false
-        type: number
-    must_use: true
-  bit32.lrotate:
-    args:
-      - type: number
-      - type: number
-    must_use: true
-  bit32.lshift:
-    args:
-      - type: number
-      - type: number
-    must_use: true
-  bit32.replace:
-    args:
-      - type: number
-      - type: number
-      - type: number
-      - required: false
-        type: number
-    must_use: true
-  bit32.rrotate:
-    args:
-      - type: number
-      - type: number
-    must_use: true
-  bit32.rshift:
-    args:
-      - type: number
-      - type: number
-    must_use: true
-  collectgarbage:
-    args:
-      - type:
-          - count
-    must_use: true
-  coroutine.close:
-    args:
-      - type:
-          display: thread
-  coroutine.isyieldable:
-    args: []
-  debug.debug:
-    removed: true
-  debug.getfenv:
-    removed: true
-  debug.gethook:
-    removed: true
-  debug.getinfo:
-    removed: true
-  debug.getlocal:
-    removed: true
-  debug.getmetatable:
-    removed: true
-  debug.getregistry:
-    removed: true
-  debug.getupvalue:
-    removed: true
-  debug.info:
-    args:
-      - type: any
-      - type: any
-      - required: false
-        type: string
-    must_use: true
   debug.profilebegin:
     args:
       - type: string
@@ -582,88 +483,15 @@ globals:
     args: []
   debug.resetmemorycategory:
     args: []
-  debug.setfenv:
-    removed: true
-  debug.sethook:
-    removed: true
-  debug.setlocal:
-    removed: true
   debug.setmemorycategory:
     args:
       - type: string
-  debug.setmetatable:
-    removed: true
-  debug.setupvalue:
-    removed: true
   delay:
     args:
       - type: number
       - type: function
-  dofile:
-    removed: true
   elapsedTime:
     args: []
-  error:
-    args:
-      - required: Erroring without an explanation is unhelpful to users.
-        type: any
-      - required: false
-        type: number
-  gcinfo:
-    args: []
-    must_use: true
-  io:
-    removed: true
-  load:
-    removed: true
-  loadfile:
-    removed: true
-  math.clamp:
-    args:
-      - type: number
-      - type: number
-      - type: number
-    must_use: true
-  math.log:
-    args:
-      - type: number
-      - required: false
-        type: number
-    must_use: true
-  math.noise:
-    args:
-      - type: number
-      - required: false
-        type: number
-      - required: false
-        type: number
-    must_use: true
-  math.round:
-    args:
-      - type: number
-    must_use: true
-  math.sign:
-    args:
-      - type: number
-    must_use: true
-  module:
-    removed: true
-  os.execute:
-    removed: true
-  os.exit:
-    removed: true
-  os.getenv:
-    removed: true
-  os.remove:
-    removed: true
-  os.rename:
-    removed: true
-  os.setlocale:
-    removed: true
-  os.tmpname:
-    removed: true
-  package:
-    removed: true
   require:
     args:
       - type: number
@@ -674,77 +502,6 @@ globals:
   spawn:
     args:
       - type: function
-  string.dump:
-    removed: true
-  string.pack:
-    args:
-      - type: string
-      - type: "..."
-    must_use: true
-  string.packsize:
-    args:
-      - type: string
-    must_use: true
-  string.split:
-    args:
-      - type: string
-      - required: false
-        type: string
-    must_use: true
-  string.unpack:
-    args:
-      - type: string
-      - type: string
-      - required: false
-        type: number
-    must_use: true
-  table.clear:
-    args:
-      - type: table
-  table.clone:
-    args:
-      - type: table
-    must_use: true
-  table.create:
-    args:
-      - type: number
-      - required: false
-        type: any
-    must_use: true
-  table.find:
-    args:
-      - type: table
-      - type: any
-      - required: false
-        type: number
-    must_use: true
-  table.freeze:
-    args:
-      - type: table
-  table.isfrozen:
-    args:
-      - type: table
-    must_use: true
-  table.move:
-    args:
-      - type: table
-      - type: number
-      - type: number
-      - type: number
-      - required: false
-        type: table
-  table.pack:
-    args:
-      - type: "..."
-    must_use: true
-  table.unpack:
-    args:
-      - type: table
-      - required: false
-        type: number
-      - required: false
-        type: number
-    must_use: true
   task.cancel:
     args:
       - type:
@@ -778,39 +535,7 @@ globals:
     args: []
   time:
     args: []
-  typeof:
-    args:
-      - type: any
-  utf8.char:
-    args:
-      - required: utf8.char should be used with an argument despite it not throwing
-        type: number
-      - required: false
-        type: "..."
-    must_use: true
-  utf8.charpattern:
-    property: read-only
-  utf8.codepoint:
-    args:
-      - type: string
-      - required: false
-        type: number
-      - required: false
-        type: number
-    must_use: true
-  utf8.codes:
-    args:
-      - type: string
-    must_use: true
   utf8.graphemes:
-    args:
-      - type: string
-      - required: false
-        type: number
-      - required: false
-        type: number
-    must_use: true
-  utf8.len:
     args:
       - type: string
       - required: false
@@ -825,14 +550,6 @@ globals:
   utf8.nfdnormalize:
     args:
       - type: string
-    must_use: true
-  utf8.offset:
-    args:
-      - type: string
-      - required: false
-        type: number
-      - required: false
-        type: number
     must_use: true
   wait:
     args:
