@@ -3,12 +3,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.20.0...HEAD)
 
+### Added
+- `undefined_variable` now properly catches `global` as undefined in `function global.name()`.
+
 ### Changed
 - Match `.luau` filename extension by default.
 - Allow `--pattern` to be passed multiple times.
 
 ### Fixed
 - Fixed `unused_variable` incorrectly tagging `function global.name()` when `global` is defined in the standard library.
+- Fixed `unscoped_variables` incorrectly tagging `function global.name()` as creating an unscoped variable for `global`.
 
 ## [0.20.0](https://github.com/Kampfkarren/selene/releases/tag/0.20.0) - 2022-07-21
 ### Added
