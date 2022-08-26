@@ -77,6 +77,15 @@ mod tests {
     }
 
     #[test]
+    fn test_function_overriding() {
+        test_lint(
+            UndefinedVariableLint::new(()).unwrap(),
+            "undefined_variable",
+            "function_overriding",
+        );
+    }
+
+    #[test]
     fn test_hoisting() {
         test_lint(
             UndefinedVariableLint::new(()).unwrap(),

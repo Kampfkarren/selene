@@ -378,7 +378,7 @@ impl MismatchedArgCountVisitor<'_> {
             .copied()
             .chain(variable.references.iter().filter_map(|reference_id| {
                 let reference = self.scope_manager.references.get(*reference_id)?;
-                if reference.write {
+                if reference.write.is_some() {
                     Some(reference.identifier)
                 } else {
                     None

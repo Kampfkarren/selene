@@ -1,0 +1,6 @@
+error[undefined_variable]: `global` is not defined
+  ┌─ function_overriding.lua:1:10
+  │
+1 │ function global.name() end
+  │          ^^^^^^
+

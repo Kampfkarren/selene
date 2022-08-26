@@ -73,7 +73,7 @@ impl Rule for UnusedVariableLint {
             // We need to make sure that references that are marked as "read" aren't only being read in an "observes: write" context.
             let analyzed_references = references
                 .map(|reference| {
-                    if reference.write {
+                    if reference.write.is_some() {
                         return AnalyzedReference::PlainWrite;
                     }
 

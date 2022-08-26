@@ -1,5 +1,8 @@
 use super::{AstContext, Context, Rule};
-use crate::{standard_library::v1, test_util::PrettyString, StandardLibrary};
+use crate::{
+    test_util::{get_standard_library, PrettyString},
+    StandardLibrary,
+};
 use std::{
     fs,
     io::Write,
@@ -43,14 +46,8 @@ pub fn test_lint_config<
 ) {
     let path_base = TEST_PROJECTS_ROOT.join(lint_name).join(test_name);
 
-    if let Ok(test_std_toml_contents) = fs::read_to_string(path_base.with_extension("std.toml")) {
-        config.standard_library = toml::from_str::<v1::StandardLibrary>(&test_std_toml_contents)
-            .unwrap()
-            .into();
-    } else if let Ok(test_std_yml_contents) =
-        fs::read_to_string(path_base.with_extension("std.yml"))
-    {
-        config.standard_library = serde_yaml::from_str(&test_std_yml_contents).unwrap();
+    if let Some(standard_library) = get_standard_library(&path_base) {
+        config.standard_library = standard_library;
     }
 
     let lua_source =

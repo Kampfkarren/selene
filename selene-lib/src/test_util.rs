@@ -1,4 +1,4 @@
-use crate::{Checker, CheckerConfig, Severity, StandardLibrary};
+use crate::{standard_library::v1, Checker, CheckerConfig, Severity, StandardLibrary};
 use std::{
     fmt, fs,
     io::Write,
@@ -24,19 +24,37 @@ impl<'a> fmt::Debug for PrettyString<'a> {
     }
 }
 
+pub fn get_standard_library(path_base: &Path) -> Option<StandardLibrary> {
+    if let Ok(test_std_toml_contents) = fs::read_to_string(path_base.with_extension("std.toml")) {
+        Some(
+            toml::from_str::<v1::StandardLibrary>(&test_std_toml_contents)
+                .unwrap()
+                .into(),
+        )
+    } else if let Ok(test_std_yml_contents) =
+        fs::read_to_string(path_base.with_extension("std.yml"))
+    {
+        Some(serde_yaml::from_str(&test_std_yml_contents).unwrap())
+    } else {
+        None
+    }
+}
+
 // TODO: Most of this is copy and pasted from test_lint_config, try and abstract it out a bit
 pub fn test_full_run_config(
     directory: &'static str,
     test_name: &'static str,
     checker_config: CheckerConfig<serde_json::Value>,
 ) {
+    let path_base = TEST_FULL_RUN_ROOT.join(directory).join(test_name);
+
     let checker = Checker::<serde_json::Value>::new(
         checker_config,
-        StandardLibrary::from_name("lua51").expect("no lua51 standard library"),
+        get_standard_library(&path_base).unwrap_or_else(|| {
+            StandardLibrary::from_name("lua51").expect("no lua51 standard library")
+        }),
     )
     .expect("couldn't create checker");
-
-    let path_base = TEST_FULL_RUN_ROOT.join(directory).join(test_name);
 
     let lua_source =
         fs::read_to_string(path_base.with_extension("lua")).expect("Cannot find lua file");

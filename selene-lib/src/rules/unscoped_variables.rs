@@ -1,3 +1,5 @@
+use crate::ast_util::scopes::ReferenceWrite;
+
 use super::*;
 use std::collections::HashSet;
 
@@ -44,7 +46,7 @@ impl Rule for UnscopedVariablesLint {
 
         for (_, reference) in &ast_context.scope_manager.references {
             if reference.resolved.is_none()
-                && reference.write
+                && reference.write == Some(ReferenceWrite::Assign)
                 && !read.contains(&reference.identifier)
                 && !self.ignore_pattern.is_match(&reference.name)
                 && !context.standard_library.global_has_fields(&reference.name)
@@ -69,6 +71,15 @@ impl Rule for UnscopedVariablesLint {
 #[cfg(test)]
 mod tests {
     use super::{super::test_util::*, *};
+
+    #[test]
+    fn test_function_overriding() {
+        test_lint(
+            UnscopedVariablesLint::new(UnscopedVariablesConfig::default()).unwrap(),
+            "unscoped_variables",
+            "function_overriding",
+        );
+    }
 
     #[test]
     fn test_unscoped_variables() {
