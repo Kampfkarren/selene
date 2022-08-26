@@ -30,7 +30,7 @@ pub struct UnusedVariableLint {
     ignore_pattern: Regex,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum AnalyzedReference {
     Read,
     PlainWrite,
