@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 - `undefined_variable` now properly catches `global` as undefined in `function global.name()`.
+- Added the "luau" builtin library.
 
 ### Changed
 - Match `.luau` filename extension by default.
