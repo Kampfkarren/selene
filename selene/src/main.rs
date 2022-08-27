@@ -551,7 +551,7 @@ fn start(mut matches: opts::Options) {
         log_total(parse_errors, lint_errors, lint_warnings).ok();
     }
 
-    if parse_errors + lint_errors + lint_warnings + pool.panic_count() > 0 {
+    if parse_errors + lint_errors + pool.panic_count() > 0 {
         std::process::exit(1);
     }
 }
