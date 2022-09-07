@@ -58,10 +58,7 @@ pub fn collect_roblox_standard_library<V>(
         ),
     };
 
-    let generated_std = RobloxGenerator {
-        std: RobloxGenerator::base_std(),
-    }
-    .generate();
+    let generated_std = RobloxGenerator::generate();
 
     match (generated_std, cached_library) {
         (Ok((contents, new_library)), _) => {
@@ -102,10 +99,7 @@ fn floating_file_directory() -> color_eyre::Result<PathBuf> {
 }
 
 pub fn update_roblox_std() -> color_eyre::Result<()> {
-    let (contents, _) = RobloxGenerator {
-        std: RobloxGenerator::base_std(),
-    }
-    .generate()?;
+    let (contents, _) = RobloxGenerator::generate()?;
 
     let output_directory = floating_file_directory()?;
     let output_location = output_directory.join("roblox.yml");

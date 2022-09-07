@@ -13,7 +13,14 @@ pub struct RobloxGenerator {
 }
 
 impl RobloxGenerator {
-    pub fn generate(mut self) -> color_eyre::Result<(Vec<u8>, StandardLibrary)> {
+    pub fn generate() -> color_eyre::Result<(Vec<u8>, StandardLibrary)> {
+        RobloxGenerator {
+            std: StandardLibrary::roblox_base(),
+        }
+        .start_generation()
+    }
+
+    fn start_generation(mut self) -> color_eyre::Result<(Vec<u8>, StandardLibrary)> {
         let api: ApiDump = ureq::get(API_DUMP)
             .call()
             .context("error when getting API dump")?
@@ -45,11 +52,6 @@ impl RobloxGenerator {
             .extend(StandardLibrary::from_name(self.std.base.as_ref().unwrap()).unwrap());
 
         Ok((bytes, self.std))
-    }
-
-    pub fn base_std() -> StandardLibrary {
-        serde_yaml::from_str(include_str!("./base.yml"))
-            .expect("Roblox base.yml was an invalid standard library")
     }
 
     fn write_class(&mut self, api: &ApiDump, global_name: &str, class_name: &str) {

@@ -13,9 +13,10 @@ use serde::{
 
 mod ast_util;
 mod lint_filtering;
+mod possible_std;
 pub mod rules;
 pub mod standard_library;
-mod util;
+mod text;
 
 #[cfg(test)]
 mod test_util;
@@ -70,13 +71,12 @@ pub struct CheckerConfig<V> {
     pub roblox_std_source: RobloxStdSource,
 }
 
-// #[derive(Default)] cannot be used since it binds V to Default
 impl<V> Default for CheckerConfig<V> {
     fn default() -> Self {
         CheckerConfig {
             config: HashMap::new(),
             rules: HashMap::new(),
-            std: "lua51".to_owned(),
+            std: "".to_owned(),
             roblox_std_source: RobloxStdSource::default(),
         }
     }
@@ -207,10 +207,13 @@ macro_rules! use_rules {
                             },
                         )+
                     )+
-                    config,
+
                     context: Context {
                         standard_library,
+                        standard_library_is_set: !config.std.is_empty(),
                     },
+
+                    config,
                 })
             }
 

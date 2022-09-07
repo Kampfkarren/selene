@@ -46,7 +46,11 @@ pub fn test_lint_config<
 ) {
     let path_base = TEST_PROJECTS_ROOT.join(lint_name).join(test_name);
 
-    if let Some(standard_library) = get_standard_library(&path_base) {
+    let configured_standard_library = get_standard_library(&path_base);
+    let standard_library_is_set =
+        config.standard_library != StandardLibrary::from_name("lua51").unwrap();
+
+    if let Some(standard_library) = configured_standard_library {
         config.standard_library = standard_library;
     }
 
@@ -58,6 +62,7 @@ pub fn test_lint_config<
         &ast,
         &Context {
             standard_library: config.standard_library,
+            standard_library_is_set,
         },
         &AstContext::from_ast(&ast),
     );

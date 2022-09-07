@@ -630,10 +630,7 @@ fn get_opts_safe(mut args: Vec<OsString>, luacheck: bool) -> Result<opts::Option
 
 #[cfg(feature = "roblox")]
 fn generate_roblox_std() -> color_eyre::Result<StandardLibrary> {
-    let (contents, std) = roblox::RobloxGenerator {
-        std: roblox::RobloxGenerator::base_std(),
-    }
-    .generate()?;
+    let (contents, std) = roblox::RobloxGenerator::generate()?;
 
     fs::File::create("roblox.yml").and_then(|mut file| file.write_all(&contents))?;
 

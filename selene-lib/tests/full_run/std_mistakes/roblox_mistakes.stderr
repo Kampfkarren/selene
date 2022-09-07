@@ -1,0 +1,26 @@
+warning[unused_variable]: color is assigned a value, but never used
+  ┌─ roblox_mistakes.lua:1:7
+  │
+1 │ local color = Color3.fromHex("FFFFFF")
+  │       ^^^^^
+
+error[undefined_variable]: `Color3` is not defined
+  ┌─ roblox_mistakes.lua:1:15
+  │
+1 │ local color = Color3.fromHex("FFFFFF")
+  │               ^^^^^^
+  │
+  = `Color3` was found in the roblox standard libary
+  = you can set the standard library by putting the following inside selene.toml:
+    std = "roblox"
+
+error[incorrect_standard_library_use]: standard library global `debug` does not contain the field `profilebegin`
+  ┌─ roblox_mistakes.lua:2:1
+  │
+2 │ debug.profilebegin("roblox only")
+  │ ^^^^^^^^^^^^^^^^^^
+  │
+  = `debug.profilebegin` was found in the roblox standard libary
+  = you can set the standard library by putting the following inside selene.toml:
+    std = "roblox"
+

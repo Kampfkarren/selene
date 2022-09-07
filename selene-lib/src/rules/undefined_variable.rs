@@ -1,5 +1,8 @@
 use super::*;
-use crate::ast_util::scopes::{Reference, ScopeManager};
+use crate::{
+    ast_util::scopes::{Reference, ScopeManager},
+    possible_std::possible_standard_library_notes,
+};
 use std::{collections::HashSet, convert::Infallible};
 
 use full_moon::ast::Ast;
@@ -36,10 +39,15 @@ impl Rule for UndefinedVariableLint {
             {
                 read.insert(reference.identifier);
 
-                diagnostics.push(Diagnostic::new(
+                diagnostics.push(Diagnostic::new_complete(
                     "undefined_variable",
                     format!("`{}` is not defined", reference.name),
                     Label::new(reference.identifier),
+                    possible_standard_library_notes(
+                        &[reference.name.as_str()],
+                        context.standard_library_is_set,
+                    ),
+                    Vec::new(),
                 ));
             }
         }

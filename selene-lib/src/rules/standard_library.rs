@@ -1,5 +1,8 @@
 use super::{super::standard_library::*, *};
-use crate::ast_util::{name_paths::*, scopes::ScopeManager};
+use crate::{
+    ast_util::{name_paths::*, scopes::ScopeManager},
+    possible_std::possible_standard_library_notes,
+};
 use std::convert::Infallible;
 
 use full_moon::{
@@ -27,6 +30,7 @@ impl Rule for StandardLibraryLint {
             diagnostics: Vec::new(),
             scope_manager: &ast_context.scope_manager,
             standard_library: &context.standard_library,
+            standard_library_is_set: context.standard_library_is_set,
         };
 
         visitor.visit_ast(ast);
@@ -180,6 +184,7 @@ pub struct StandardLibraryVisitor<'std> {
     diagnostics: Vec<Diagnostic>,
     scope_manager: &'std ScopeManager,
     standard_library: &'std StandardLibrary,
+    standard_library_is_set: bool,
 }
 
 impl StandardLibraryVisitor<'_> {
@@ -219,6 +224,9 @@ impl StandardLibraryVisitor<'_> {
                 }
             }
 
+            let mut name_path_with_field = name_path.iter().map(String::as_str).collect::<Vec<_>>();
+            name_path_with_field.push(&field);
+
             self.diagnostics.push(Diagnostic::new_complete(
                 "incorrect_standard_library_use",
                 format!(
@@ -227,7 +235,10 @@ impl StandardLibraryVisitor<'_> {
                     field,
                 ),
                 Label::new((range.0.bytes(), range.1.bytes())),
-                Vec::new(),
+                possible_standard_library_notes(
+                    &name_path_with_field,
+                    self.standard_library_is_set,
+                ),
                 Vec::new(),
             ));
         }
