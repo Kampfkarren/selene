@@ -1,7 +1,5 @@
 use std::borrow::Borrow;
 
-use once_cell::sync::OnceCell;
-
 use crate::{standard_library::StandardLibrary, text};
 
 pub fn possible_standard_library_notes<S: Borrow<str>>(
@@ -50,7 +48,8 @@ fn possible_standard_libraries<S: Borrow<str>>(name_path: &[S]) -> Vec<&'static 
 
     #[cfg(feature = "roblox")]
     {
-        static ROBLOX_BASE_STD: OnceCell<StandardLibrary> = OnceCell::new();
+        static ROBLOX_BASE_STD: once_cell::sync::OnceCell<StandardLibrary> =
+            once_cell::sync::OnceCell::new();
 
         let from_roblox_std = match name_path[0].borrow() {
             "game" | "plugin" | "script" | "workspace" => true,

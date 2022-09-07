@@ -1,0 +1,18 @@
+error[incorrect_standard_library_use]: standard library global `script.Child` is not writable
+  ┌─ wildcard_structs.lua:2:1
+  │
+2 │ script.Child = "Oops"
+  │ ^^^^^^^^^^^^
+
+error[incorrect_standard_library_use]: standard library global `script.Child.Name` does not contain the field `UhOh`
+  ┌─ wildcard_structs.lua:4:1
+  │
+4 │ script.Child.Name.UhOh = "Oops"
+  │ ^^^^^^^^^^^^^^^^^^^^^^
+
+error[incorrect_standard_library_use]: standard library global `script.Child.Grandchild` is not writable
+  ┌─ wildcard_structs.lua:5:1
+  │
+5 │ script.Child.Grandchild = "Oops"
+  │ ^^^^^^^^^^^^^^^^^^^^^^^
+

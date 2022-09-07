@@ -638,6 +638,8 @@ impl PassedArgumentType {
         }
     }
 
+    // Roblox feature flag uses this, and I don't want to lock it
+    #[allow(dead_code)]
     fn same_type(&self, other: &PassedArgumentType) -> bool {
         match (self, other) {
             (PassedArgumentType::Primitive(a), PassedArgumentType::Primitive(b)) => a == b,
@@ -835,19 +837,31 @@ mod tests {
 
     #[test]
     fn test_wildcard() {
-        test_lint(
+        test_lint_config_with_output(
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "wildcard",
+            TestUtilConfig::default(),
+            if cfg!(feature = "roblox") {
+                "stderr"
+            } else {
+                "noroblox.stderr"
+            },
         );
     }
 
     #[test]
     fn test_wildcard_structs() {
-        test_lint(
+        test_lint_config_with_output(
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "wildcard_structs",
+            TestUtilConfig::default(),
+            if cfg!(feature = "roblox") {
+                "stderr"
+            } else {
+                "noroblox.stderr"
+            },
         );
     }
 
