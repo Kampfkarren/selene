@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, fmt::Write};
 
 /// Detects whether the amount provided is singular or plural, and returns the correct form of the string
 #[inline]
@@ -20,10 +20,10 @@ pub fn english_list<'a>(list: &[&'a str]) -> Cow<'a, str> {
             let mut string = String::new();
 
             for item in &list[..list.len() - 1] {
-                string.push_str(&format!("{item}, "));
+                write!(string, "{item}, ").ok();
             }
 
-            string.push_str(&format!("and {}", list[list.len() - 1]));
+            write!(string, "and {}", list[list.len() - 1]).ok();
 
             Cow::Owned(string)
         }
