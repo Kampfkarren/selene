@@ -4,7 +4,7 @@ use super::*;
 use std::convert::Infallible;
 
 use full_moon::{
-    ast::{self, Ast},
+    ast::{self, Ast, BinOp},
     visitors::Visitor,
 };
 
@@ -109,7 +109,18 @@ fn constant_table_match(expression: &ast::Expression) -> Option<ConstantTableMat
 
 impl Visitor for ConstantTableComparisonVisitor {
     fn visit_expression(&mut self, node: &ast::Expression) {
-        if let ast::Expression::BinaryOperator { lhs, binop, rhs } = node {
+        if let ast::Expression::BinaryOperator {
+            lhs,
+            binop:
+                binop @ (BinOp::TwoEqual(_)
+                | BinOp::TildeEqual(_)
+                | BinOp::GreaterThan(_)
+                | BinOp::LessThan(_)
+                | BinOp::GreaterThanEqual(_)
+                | BinOp::LessThanEqual(_)),
+            rhs,
+        } = node
+        {
             match (constant_table_match(lhs), constant_table_match(rhs)) {
                 // The (Some(_), Some(_)) case is rare, but also blatantly useless.
                 // `{} == {}` translating to `next({}) == nil` is clearly silly.
