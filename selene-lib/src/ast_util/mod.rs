@@ -10,10 +10,12 @@ pub mod name_paths;
 mod purge_trivia;
 pub mod scopes;
 mod side_effects;
+mod strip_parentheses;
 pub mod visit_nodes;
 
 pub use purge_trivia::purge_trivia;
 pub use side_effects::HasSideEffects;
+pub use strip_parentheses::strip_parentheses;
 
 pub fn is_type_function(name: &str, roblox: bool) -> bool {
     name == "type" || (name == "typeof" && roblox)
