@@ -15,11 +15,14 @@ use codespan_reporting::{
     },
     term::DisplayStyle as CodespanDisplayStyle,
 };
-use selene_lib::{rules::Severity, standard_library::StandardLibrary, *};
+use selene_lib::{rules::Severity, *};
 use structopt::{clap, StructOpt};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
 use upgrade_std::upgrade_std;
+
+#[cfg(feature = "roblox")]
+use selene_lib::standard_library::StandardLibrary;
 
 mod json_output;
 mod opts;
@@ -630,19 +633,11 @@ fn get_opts_safe(mut args: Vec<OsString>, luacheck: bool) -> Result<opts::Option
 
 #[cfg(feature = "roblox")]
 fn generate_roblox_std() -> color_eyre::Result<StandardLibrary> {
-    let (contents, std) = roblox::RobloxGenerator {
-        std: roblox::RobloxGenerator::base_std(),
-    }
-    .generate()?;
+    let (contents, std) = roblox::RobloxGenerator::generate()?;
 
     fs::File::create("roblox.yml").and_then(|mut file| file.write_all(&contents))?;
 
     Ok(std)
-}
-
-#[cfg(not(feature = "roblox"))]
-fn generate_roblox_std() -> Result<StandardLibrary, std::convert::Infallible> {
-    unreachable!("generate_roblox_std called when Roblox feature was not installed!");
 }
 
 #[cfg(test)]

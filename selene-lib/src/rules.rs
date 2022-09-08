@@ -208,6 +208,7 @@ impl Label {
 #[derive(Clone, Debug)]
 pub struct Context {
     pub standard_library: StandardLibrary,
+    pub standard_library_is_set: bool,
 }
 
 impl Context {

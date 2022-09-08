@@ -1,0 +1,25 @@
+error[incorrect_standard_library_use]: standard library global `table` does not contain the field `unpack`
+  ┌─ std_mistakes.lua:1:1
+  │
+1 │ table.unpack({ "lua 5.2" })
+  │ ^^^^^^^^^^^^
+  │
+  = `table.unpack` was found in the roblox, lua52, lua53, and luau standard libaries
+  = you can set the standard library by putting the following inside selene.toml:
+    std = "roblox"
+    std = "lua52"
+    std = "lua53"
+    std = "luau"
+
+error[undefined_variable]: `utf8` is not defined
+  ┌─ std_mistakes.lua:2:1
+  │
+2 │ utf8.len("lua 5.3")
+  │ ^^^^
+  │
+  = `utf8` was found in the roblox, lua53, and luau standard libaries
+  = you can set the standard library by putting the following inside selene.toml:
+    std = "roblox"
+    std = "lua53"
+    std = "luau"
+

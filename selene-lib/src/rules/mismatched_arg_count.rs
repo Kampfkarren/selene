@@ -4,7 +4,7 @@ use crate::{
         is_function_call, is_vararg, range,
         scopes::{Reference, ScopeManager, Variable},
     },
-    util::plural,
+    text::plural,
 };
 use std::{
     collections::HashMap,

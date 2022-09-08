@@ -34,7 +34,7 @@ impl Default for TestUtilConfig {
     }
 }
 
-pub fn test_lint_config<
+pub fn test_lint_config_with_output<
     C: DeserializeOwned,
     E: std::error::Error,
     R: Rule<Config = C, Error = E>,
@@ -43,10 +43,15 @@ pub fn test_lint_config<
     lint_name: &'static str,
     test_name: &'static str,
     mut config: TestUtilConfig,
+    output_extension: &str,
 ) {
     let path_base = TEST_PROJECTS_ROOT.join(lint_name).join(test_name);
 
-    if let Some(standard_library) = get_standard_library(&path_base) {
+    let configured_standard_library = get_standard_library(&path_base);
+    let standard_library_is_set =
+        config.standard_library != StandardLibrary::from_name("lua51").unwrap();
+
+    if let Some(standard_library) = configured_standard_library {
         config.standard_library = standard_library;
     }
 
@@ -58,6 +63,7 @@ pub fn test_lint_config<
         &ast,
         &Context {
             standard_library: config.standard_library,
+            standard_library_is_set,
         },
         &AstContext::from_ast(&ast),
     );
@@ -83,7 +89,7 @@ pub fn test_lint_config<
     }
 
     let stderr = std::str::from_utf8(output.get_ref()).expect("output not utf-8");
-    let output_path = path_base.with_extension("stderr");
+    let output_path = path_base.with_extension(output_extension);
 
     if let Ok(expected) = fs::read_to_string(&output_path) {
         pretty_assertions::assert_eq!(PrettyString(&expected), PrettyString(stderr));
@@ -93,6 +99,19 @@ pub fn test_lint_config<
             .write_all(output.get_ref())
             .expect("couldn't write to output file");
     }
+}
+
+pub fn test_lint_config<
+    C: DeserializeOwned,
+    E: std::error::Error,
+    R: Rule<Config = C, Error = E>,
+>(
+    rule: R,
+    lint_name: &'static str,
+    test_name: &'static str,
+    config: TestUtilConfig,
+) {
+    test_lint_config_with_output(rule, lint_name, test_name, config, "stderr");
 }
 
 pub fn test_lint<C: DeserializeOwned, E: std::error::Error, R: Rule<Config = C, Error = E>>(
