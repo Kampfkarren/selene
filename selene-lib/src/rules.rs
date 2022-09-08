@@ -10,6 +10,7 @@ use serde::de::DeserializeOwned;
 pub mod almost_swapped;
 pub mod bad_string_escape;
 pub mod compare_nan;
+pub mod constant_table_comparison;
 pub mod deprecated;
 pub mod divide_by_zero;
 pub mod duplicate_keys;

@@ -286,6 +286,7 @@ use_rules! {
     almost_swapped: rules::almost_swapped::AlmostSwappedLint,
     bad_string_escape: rules::bad_string_escape::BadStringEscapeLint,
     compare_nan: rules::compare_nan::CompareNanLint,
+    constant_table_comparison: rules::constant_table_comparison::ConstantTableComparisonLint,
     deprecated: rules::deprecated::DeprecatedLint,
     divide_by_zero: rules::divide_by_zero::DivideByZeroLint,
     duplicate_keys: rules::duplicate_keys::DuplicateKeysLint,

@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - `undefined_variable` now properly catches `global` as undefined in `function global.name()`.
 - Added the "luau" builtin library.
 - `unused_variable` and `incorrect_standard_library_use` will now suggest configuring a standard library if one is detected.
+- Added `constant_table_comparison` check to catch `x == {}`, which will always fail.
 
 ### Changed
 - Match `.luau` filename extension by default.
