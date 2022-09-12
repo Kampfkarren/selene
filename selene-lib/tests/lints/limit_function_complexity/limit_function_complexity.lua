@@ -3,16 +3,19 @@ type Node = {
         id: number,
         sortIndex: number,
 }
-local siftDown, compare
+local DEV = _G.__DEV__
+local PROFILING = _G.__PROFILING__
+local siftDown, compare, month, year
+local React = {
+    createElement = function(...) end
+}
 local exports = {}
 
 local function _x()
-    if _G.__DEV__ then
-        return 0
-    else
-        return 1
-    end
-
+    return React.createElement("TextLabel", { style = if DEV then 0 else 1 },{
+        Child1 = React.createElement("Instance"),
+        React.createElement(if DEV then "TextLabel" else "Instance")
+    })
 end
 
 -- exports.pop = function(heap: Heap): Node?
