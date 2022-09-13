@@ -251,7 +251,7 @@ impl Visitor for LimitFunctionComplexityVisitor {
     fn visit_function_body(&mut self, function_body: &ast::FunctionBody) {
         let complexity = count_block_complexity(function_body.block(), 1);
         if complexity > self.config.maximum_complexity {
-            self.positions.push((range(function_body), complexity));
+            self.positions.push((range(function_body.parameters_parentheses()), complexity));
         }
     }
 }
