@@ -20,7 +20,7 @@ impl Default for LimitFunctionComplexityConfig {
     fn default() -> Self {
         Self {
             // eslint defaults to 20, but testing on OSS Lua shows that 20 is too aggressive
-            maximum_complexity: 40.to_owned(),
+            maximum_complexity: 40,
         }
     }
 }
@@ -248,10 +248,36 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
 }
 
 impl Visitor for LimitFunctionComplexityVisitor {
-    fn visit_function_body(&mut self, function_body: &ast::FunctionBody) {
-        let complexity = count_block_complexity(function_body.block(), 1);
+    fn visit_local_function(&mut self, local_function: &ast::LocalFunction) {
+        let complexity = count_block_complexity(local_function.body().block(), 1);
         if complexity > self.config.maximum_complexity {
-            self.positions.push((range(function_body.parameters_parentheses()), complexity));
+            self.positions.push((
+                (range(local_function.function_token()).0, range(local_function.body().parameters_parentheses()).1),
+                complexity
+            ));
+        }
+    }
+
+    fn visit_function_declaration(&mut self, function_declaration: &ast::FunctionDeclaration) {
+        let complexity = count_block_complexity(function_declaration.body().block(), 1);
+        if complexity > self.config.maximum_complexity {
+            self.positions.push((
+                (range(function_declaration.function_token()).0, range(function_declaration.body().parameters_parentheses()).1),
+                complexity
+            ));
+        }
+    }
+
+    fn visit_value(&mut self, value: &ast::Value) {
+        if let ast::Value::Function(function_value) = value {
+            let function_body = &(function_value).1;
+            let complexity = count_block_complexity(function_body.block(), 1);
+            if complexity > self.config.maximum_complexity {
+                self.positions.push((
+                    (value.start_position().unwrap().bytes() as u32, range(function_body.parameters_parentheses()).1),
+                    complexity
+                ));
+            }
         }
     }
 }
