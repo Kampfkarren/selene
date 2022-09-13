@@ -78,8 +78,7 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
 
     match expression {
         ast::Expression::Parentheses { expression, .. } => {
-            complexity = count_expression_complexity(expression, complexity);
-            return complexity;
+            count_expression_complexity(expression, complexity)
         },
         ast::Expression::Value { value, .. } => match &**value {
             #[cfg(feature = "roblox")]
