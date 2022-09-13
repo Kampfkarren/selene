@@ -127,7 +127,8 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
                         _ => complexity,
                     }
                 }
-                return complexity;
+
+                complexity
             },
             _ => {
                 return complexity;
