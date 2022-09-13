@@ -76,10 +76,13 @@ struct LimitFunctionComplexityVisitor {
 fn count_expression_complexity(expression: &ast::Expression, starting_complexity: u16) -> u16 {
     let mut complexity = starting_complexity;
 
+    #[cfg_attr(
+        feature = "force_exhaustive_checks",
+        deny(non_exhaustive_omitted_patterns)
+    )]
     match expression {
         ast::Expression::Parentheses { expression, .. } => {
-            complexity = count_expression_complexity(expression, complexity);
-            return complexity;
+            count_expression_complexity(expression, complexity)
         },
         ast::Expression::Value { value, .. } => match &**value {
             #[cfg(feature = "roblox")]
@@ -91,10 +94,10 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
                         complexity = count_expression_complexity(else_if_expression.expression(), complexity);
                     }
                 }
-                return complexity;
+                complexity
             },
             ast::Value::ParenthesesExpression(paren_expression) => {
-                return count_expression_complexity(paren_expression, complexity)
+                count_expression_complexity(paren_expression, complexity)
             },
             ast::Value::FunctionCall(call) => {
                 for suffix in call.suffixes() {
@@ -106,7 +109,8 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
                         }
                     }
                 }
-                return complexity;
+
+                complexity
             },
             ast::Value::TableConstructor(table) => {
                 for field in table.fields() {
@@ -124,16 +128,14 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
                             complexity = count_expression_complexity(expression, complexity);
                         },
 
-                        _ => {
-                            return complexity;
-                        }
+                        _ => complexity,
                     }
                 }
-                return complexity;
+
+                complexity
             },
-            _ => {
-                return complexity;
-            },
+
+            _ => complexity,
         },
         ast::Expression::BinaryOperator {
             lhs, binop, rhs, ..
@@ -149,16 +151,12 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
                     complexity += 1;
                     complexity = count_expression_complexity(lhs, complexity);
                     complexity = count_expression_complexity(rhs, complexity);
-                    return complexity;
+                    complexity
                 },
-                _ => {
-                    return complexity;
-                },
+                _ => complexity,
             }
         }
-        _ => {
-            return complexity;
-        }
+        _ => complexity,
     }
 }
 
@@ -236,15 +234,13 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
         }
     };
 
-    if let Some(last_statement) = block.last_stmt() {
-        if let ast::LastStmt::Return(return_) = last_statement {
-            for return_expression in return_.returns() {
-                complexity = count_expression_complexity(return_expression, complexity);
-            }
+    if let Some(ast::LastStmt::Return(return_stmt)) = block.last_stmt() {
+        for return_expression in return_stmt.returns() {
+            complexity = count_expression_complexity(return_expression, complexity);
         }
     }
 
-    return complexity;
+    complexity
 }
 
 impl Visitor for LimitFunctionComplexityVisitor {
