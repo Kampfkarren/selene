@@ -105,7 +105,8 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
                         }
                     }
                 }
-                return complexity;
+
+                complexity
             },
             ast::Value::TableConstructor(table) => {
                 for field in table.fields() {
