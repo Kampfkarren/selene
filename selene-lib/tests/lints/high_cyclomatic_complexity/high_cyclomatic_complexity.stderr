@@ -1,0 +1,5 @@
+warning[limit_function_complexity]: cyclomatic complexity is too high (49 > 40)
+  ┌─ selene-lib/tests/lints/high_cyclomatic_complexity/high_cyclomatic_complexity.lua:6:18
+  │
+6 │ return withStyle(function(props)
+  │                  ^^^^^^^^^^^^^^^
