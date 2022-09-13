@@ -234,11 +234,9 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
         }
     };
 
-    if let Some(last_statement) = block.last_stmt() {
-        if let ast::LastStmt::Return(return_) = last_statement {
-            for return_expression in return_.returns() {
-                complexity = count_expression_complexity(return_expression, complexity);
-            }
+    if let Some(ast::LastStmt::Return(return_stmt)) = block.last_stmt() {
+        for return_expression in return_stmt.returns() {
+            complexity = count_expression_complexity(return_expression, complexity);
         }
     }
 
