@@ -90,7 +90,7 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
                         complexity = count_expression_complexity(else_if_expression.expression(), complexity);
                     }
                 }
-                return complexity;
+                complexity
             },
             ast::Value::ParenthesesExpression(paren_expression) => {
                 return count_expression_complexity(paren_expression, complexity)
