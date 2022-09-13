@@ -76,6 +76,10 @@ struct LimitFunctionComplexityVisitor {
 fn count_expression_complexity(expression: &ast::Expression, starting_complexity: u16) -> u16 {
     let mut complexity = starting_complexity;
 
+    #[cfg_attr(
+        feature = "force_exhaustive_checks",
+        deny(non_exhaustive_omitted_patterns)
+    )]
     match expression {
         ast::Expression::Parentheses { expression, .. } => {
             count_expression_complexity(expression, complexity)
