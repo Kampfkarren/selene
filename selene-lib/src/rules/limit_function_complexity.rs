@@ -130,9 +130,8 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
 
                 complexity
             },
-            _ => {
-                return complexity;
-            },
+
+            _ => complexity,
         },
         ast::Expression::BinaryOperator {
             lhs, binop, rhs, ..
