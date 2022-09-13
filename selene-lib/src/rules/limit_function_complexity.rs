@@ -240,7 +240,7 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
         }
     }
 
-    return complexity;
+    complexity
 }
 
 impl Visitor for LimitFunctionComplexityVisitor {
