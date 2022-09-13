@@ -296,7 +296,7 @@ use_rules! {
     ifs_same_cond: rules::ifs_same_cond::IfsSameCondLint,
     incorrect_standard_library_use: rules::standard_library::StandardLibraryLint,
     invalid_lint_filter: rules::invalid_lint_filter::InvalidLintFilterLint,
-    limit_function_complexity: rules::limit_function_complexity::LimitFunctionComplexityLint,
+    high_cyclomatic_complexity: rules::high_cyclomatic_complexity::HighCyclomaticComplexityLint,
     mismatched_arg_count: rules::mismatched_arg_count::MismatchedArgCountLint,
     multiple_statements: rules::multiple_statements::MultipleStatementsLint,
     must_use: rules::must_use::MustUseLint,

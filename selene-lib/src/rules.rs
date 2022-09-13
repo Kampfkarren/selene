@@ -19,7 +19,7 @@ pub mod global_usage;
 pub mod if_same_then_else;
 pub mod ifs_same_cond;
 pub mod invalid_lint_filter;
-pub mod limit_function_complexity;
+pub mod high_cyclomatic_complexity;
 pub mod mismatched_arg_count;
 pub mod multiple_statements;
 pub mod must_use;
