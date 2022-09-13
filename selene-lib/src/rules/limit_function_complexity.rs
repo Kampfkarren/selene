@@ -35,7 +35,7 @@ impl Rule for LimitFunctionComplexityLint {
     type Config = LimitFunctionComplexityConfig;
     type Error = Infallible;
 
-    const SEVERITY: Severity = Severity::Warning;
+    const SEVERITY: Severity = Severity::Allow;
     const RULE_TYPE: RuleType = RuleType::Style;
 
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
