@@ -73,6 +73,10 @@ fn count_table_complexity(table: &TableConstructor, starting_complexity: u16) ->
     let mut complexity = starting_complexity;
 
     for field in table.fields() {
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         match field {
             ast::Field::ExpressionKey { key, value, .. } => {
                 complexity = count_expression_complexity(key, complexity);
@@ -96,6 +100,10 @@ fn count_table_complexity(table: &TableConstructor, starting_complexity: u16) ->
 fn count_arguments_complexity(function_args: &ast::FunctionArgs, starting_complexity: u16) -> u16 {
     let mut complexity = starting_complexity;
 
+    #[cfg_attr(
+        feature = "force_exhaustive_checks",
+        deny(non_exhaustive_omitted_patterns)
+    )]
     match function_args {
         ast::FunctionArgs::Parentheses { arguments, .. } => {
             for argument in arguments {
@@ -107,6 +115,7 @@ fn count_arguments_complexity(function_args: &ast::FunctionArgs, starting_comple
             complexity = count_table_complexity(table, complexity);
             complexity
         }
+        ast::FunctionArgs::String(_) => complexity,
         _ => complexity,
     }
 }
@@ -122,6 +131,10 @@ fn count_suffix_complexity(suffix: &ast::Suffix, starting_complexity: u16) -> u1
         ast::Suffix::Index(ast::Index::Brackets { expression, .. }) => {
             complexity = count_expression_complexity(expression, complexity)
         }
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         ast::Suffix::Call(call) => match call {
             ast::Call::AnonymousCall(arguments) => {
                 complexity = count_arguments_complexity(arguments, complexity)
@@ -170,6 +183,10 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
             count_expression_complexity(expression, complexity)
         }
 
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         ast::Expression::Value { value, .. } => match &**value {
             // visit_value already tracks this
             ast::Value::Function(_) => complexity,
