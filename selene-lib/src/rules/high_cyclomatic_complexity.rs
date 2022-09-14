@@ -137,21 +137,41 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
 
             _ => complexity,
         },
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            allow(non_exhaustive_omitted_patterns)
+        )]
         ast::Expression::BinaryOperator {
             lhs, binop, rhs, ..
-        } => match binop {
+        } =>
+        {
             #[cfg_attr(
                 feature = "force_exhaustive_checks",
-                allow(non_exhaustive_omitted_patterns)
+                deny(non_exhaustive_omitted_patterns)
             )]
-            ast::BinOp::And(_) | ast::BinOp::Or(_) => {
-                complexity += 1;
-                complexity = count_expression_complexity(lhs, complexity);
-                complexity = count_expression_complexity(rhs, complexity);
-                complexity
+            match binop {
+                ast::BinOp::And(_) | ast::BinOp::Or(_) => {
+                    complexity += 1;
+                    complexity = count_expression_complexity(lhs, complexity);
+                    complexity = count_expression_complexity(rhs, complexity);
+                    complexity
+                }
+                ast::BinOp::TildeEqual(_)
+                | ast::BinOp::Slash(_)
+                | ast::BinOp::TwoEqual(_)
+                | ast::BinOp::Caret(_)
+                | ast::BinOp::GreaterThan(_)
+                | ast::BinOp::GreaterThanEqual(_)
+                | ast::BinOp::LessThan(_)
+                | ast::BinOp::LessThanEqual(_)
+                | ast::BinOp::Plus(_)
+                | ast::BinOp::Minus(_)
+                | ast::BinOp::Star(_)
+                | ast::BinOp::Percent(_)
+                | ast::BinOp::TwoDots(_) => complexity,
+                _ => complexity,
             }
-            _ => complexity,
-        },
+        }
         _ => complexity,
     }
 }
