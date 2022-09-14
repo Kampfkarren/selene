@@ -52,7 +52,7 @@ impl Rule for HighCyclomaticComplexityLint {
             .into_iter()
             .map(|(position, complexity)| {
                 Diagnostic::new(
-                    "limit_function_complexity",
+                    "high_cyclomatic_complexity",
                     format!(
                         "cyclomatic complexity is too high ({complexity} > {})",
                         self.config.maximum_complexity
