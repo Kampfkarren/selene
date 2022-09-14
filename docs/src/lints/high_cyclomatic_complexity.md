@@ -1,6 +1,6 @@
 # high_cyclomatic_complexity
 ## What it does
-Measures the cyclomatic complexity of a function to see if it exceeds the configure maximum.
+Measures the [cyclomatic complexity](https://en.wikipedia.org/wiki/Cyclomatic_complexity) of a function to see if it exceeds the configure maximum.
 
 ## Why this is bad
 High branch complexity can lead to functions that are hard to test, and harder to reason about.
