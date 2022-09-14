@@ -289,8 +289,8 @@ mod tests {
     fn test_limit_function_complexity() {
         test_lint(
             HighCyclomaticComplexityLint::new(HighCyclomaticComplexityConfig::default()).unwrap(),
-            "limit_function_complexity",
-            "limit_function_complexity",
+            "high_cyclomatic_complexity",
+            "high_cyclomatic_complexity",
         );
     }
 }
