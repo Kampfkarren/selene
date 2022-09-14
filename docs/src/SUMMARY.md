@@ -20,6 +20,7 @@
   - [duplicate_keys](./lints/duplicate_keys.md)
   - [empty_if](./lints/empty_if.md)
   - [global_usage](./lints/global_usage.md)
+  - [high_cyclomatic_complexity](./lints/high_cyclomatic_complexity.md)
   - [if_same_then_else](./lints/if_same_then_else.md)
   - [ifs_same_cond](./lints/ifs_same_cond.md)
   - [incorrect_standard_library_use](./lints/incorrect_standard_library_use.md)

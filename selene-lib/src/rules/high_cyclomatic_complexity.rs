@@ -5,7 +5,6 @@ use std::convert::Infallible;
 
 use full_moon::{
     ast::{self, Ast},
-    // node::Node,
     visitors::Visitor,
 };
 
@@ -263,8 +262,7 @@ impl Visitor for HighCyclomaticComplexityVisitor {
     }
 
     fn visit_value(&mut self, value: &ast::Value) {
-        if let ast::Value::Function(function_value) = value {
-            let function_body = &(function_value).1;
+        if let ast::Value::Function((_, function_body)) = value {
             let complexity = count_block_complexity(function_body.block(), 1);
             if complexity > self.config.maximum_complexity {
                 self.positions.push((
