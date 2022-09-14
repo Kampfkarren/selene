@@ -256,8 +256,8 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
                 }
             }
 
-            ast::Stmt::Do(_) => {
-                // doesn't contribute dynamic branches
+            ast::Stmt::Do(do_) => {
+                complexity = count_block_complexity(do_.block(), complexity);
             }
 
             ast::Stmt::FunctionCall(call) => {

@@ -517,7 +517,9 @@ return withStyle(function(purse)
 		if purse == nil then "mallet" else "alice",
 	})
 end)(function()
-	if _G.__DEV__ then
-		print("howdy")
-	end
+    do
+        if _G.__DEV__ then
+            print("howdy")
+        end
+    end
 end)()
