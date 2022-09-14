@@ -59,7 +59,7 @@ impl Rule for HighCyclomaticComplexityLint {
                         "cyclomatic complexity is too high ({} > {})",
                         position.1,
                         self.config.maximum_complexity
-                    ).to_owned(),
+                    ),
                     Label::new(position.0),
                 )
             })
@@ -104,7 +104,7 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
                         ast::FunctionArgs::Parentheses { arguments, .. }
                     )) = suffix {
                         for argument in arguments {
-                            complexity = count_expression_complexity(&argument, complexity)
+                            complexity = count_expression_complexity(argument, complexity)
                         }
                     }
                 }
@@ -222,7 +222,7 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
                         ast::FunctionArgs::Parentheses { arguments, .. }
                     )) = suffix {
                         for argument in arguments {
-                            complexity = count_expression_complexity(&argument, complexity)
+                            complexity = count_expression_complexity(argument, complexity)
                         }
                     }
                 }
