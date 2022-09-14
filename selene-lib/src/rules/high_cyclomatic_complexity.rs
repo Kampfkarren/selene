@@ -3,7 +3,7 @@ use crate::ast_util::range;
 use std::convert::Infallible;
 
 use full_moon::{
-    ast::{self, Ast},
+    ast::{self, Ast, TableConstructor},
     visitors::Visitor,
 };
 
@@ -69,6 +69,74 @@ struct HighCyclomaticComplexityVisitor {
     config: HighCyclomaticComplexityConfig,
 }
 
+fn count_table_complexity(table: &TableConstructor, starting_complexity: u16) -> u16 {
+    let mut complexity = starting_complexity;
+
+    for field in table.fields() {
+        match field {
+            ast::Field::ExpressionKey { key, value, .. } => {
+                complexity = count_expression_complexity(key, complexity);
+                complexity = count_expression_complexity(value, complexity);
+            }
+
+            ast::Field::NameKey { value, .. } => {
+                complexity = count_expression_complexity(value, complexity);
+            }
+
+            ast::Field::NoKey(expression) => {
+                complexity = count_expression_complexity(expression, complexity);
+            }
+
+            _ => {}
+        }
+    }
+    complexity
+}
+
+fn count_arguments_complexity(function_args: &ast::FunctionArgs, starting_complexity: u16) -> u16 {
+    let mut complexity = starting_complexity;
+
+    match function_args {
+        ast::FunctionArgs::Parentheses { arguments, .. } => {
+            for argument in arguments {
+                complexity = count_expression_complexity(argument, complexity)
+            }
+            complexity
+        }
+        ast::FunctionArgs::TableConstructor(table) => {
+            complexity = count_table_complexity(table, complexity);
+            complexity
+        }
+        _ => complexity,
+    }
+}
+
+fn count_suffix_complexity(suffix: &ast::Suffix, starting_complexity: u16) -> u16 {
+    let mut complexity = starting_complexity;
+
+    #[cfg_attr(
+        feature = "force_exhaustive_checks",
+        deny(non_exhaustive_omitted_patterns)
+    )]
+    match suffix {
+        ast::Suffix::Index(ast::Index::Brackets { expression, .. }) => {
+            complexity = count_expression_complexity(expression, complexity)
+        }
+        ast::Suffix::Call(call) => match call {
+            ast::Call::AnonymousCall(arguments) => {
+                complexity = count_arguments_complexity(arguments, complexity)
+            }
+            ast::Call::MethodCall(method_call) => {
+                complexity = count_arguments_complexity(method_call.args(), complexity)
+            }
+            _ => {}
+        },
+        _ => {}
+    }
+
+    complexity
+}
+
 fn count_expression_complexity(expression: &ast::Expression, starting_complexity: u16) -> u16 {
     let mut complexity = starting_complexity;
 
@@ -108,14 +176,7 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
 
             ast::Value::FunctionCall(call) => {
                 for suffix in call.suffixes() {
-                    if let ast::Suffix::Call(ast::Call::AnonymousCall(
-                        ast::FunctionArgs::Parentheses { arguments, .. },
-                    )) = suffix
-                    {
-                        for argument in arguments {
-                            complexity = count_expression_complexity(argument, complexity)
-                        }
-                    }
+                    complexity = count_suffix_complexity(suffix, complexity)
                 }
 
                 complexity
@@ -129,48 +190,11 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
             ast::Value::String(_) => complexity,
             ast::Value::Symbol(_) => complexity,
 
-            ast::Value::TableConstructor(table) => {
-                for field in table.fields() {
-                    match field {
-                        ast::Field::ExpressionKey { key, value, .. } => {
-                            complexity = count_expression_complexity(key, complexity);
-                            complexity = count_expression_complexity(value, complexity);
-                        }
-
-                        ast::Field::NameKey { value, .. } => {
-                            complexity = count_expression_complexity(value, complexity);
-                        }
-
-                        ast::Field::NoKey(expression) => {
-                            complexity = count_expression_complexity(expression, complexity);
-                        }
-
-                        _ => {}
-                    }
-                }
-
-                complexity
-            }
+            ast::Value::TableConstructor(table) => count_table_complexity(table, complexity),
 
             ast::Value::Var(ast::Var::Expression(var_expression)) => {
                 for suffix in var_expression.suffixes() {
-                    #[cfg_attr(
-                        feature = "force_exhaustive_checks",
-                        deny(non_exhaustive_omitted_patterns)
-                    )]
-                    match suffix {
-                        ast::Suffix::Index(ast::Index::Brackets { expression, .. }) => {
-                            complexity = count_expression_complexity(expression, complexity)
-                        }
-                        ast::Suffix::Call(ast::Call::AnonymousCall(
-                            ast::FunctionArgs::Parentheses { arguments, .. },
-                        )) => {
-                            for argument in arguments {
-                                complexity = count_expression_complexity(argument, complexity)
-                            }
-                        }
-                        _ => {}
-                    }
+                    complexity = count_suffix_complexity(suffix, complexity)
                 }
                 complexity
             }
@@ -221,14 +245,7 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
 
             ast::Stmt::FunctionCall(call) => {
                 for suffix in call.suffixes() {
-                    if let ast::Suffix::Call(ast::Call::AnonymousCall(
-                        ast::FunctionArgs::Parentheses { arguments, .. },
-                    )) = suffix
-                    {
-                        for argument in arguments {
-                            complexity = count_expression_complexity(argument, complexity)
-                        }
-                    }
+                    complexity = count_suffix_complexity(suffix, complexity)
                 }
             }
 
