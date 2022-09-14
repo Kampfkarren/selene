@@ -98,8 +98,8 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
             count_expression_complexity(expression, complexity)
         }
 
-        ast::Expression::UnaryOperator { unop, expression } => {
-            todo!()
+        ast::Expression::UnaryOperator { expression, .. } => {
+            count_expression_complexity(expression, complexity)
         }
 
         ast::Expression::Value { value, .. } => match &**value {
@@ -152,8 +152,27 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
                 complexity
             }
 
-            ast::Value::Var(ast::Var::Expression(expression)) => {
-                todo!()
+            ast::Value::Var(ast::Var::Expression(var_expression)) => {
+                for suffix in var_expression.suffixes() {
+                    #[cfg_attr(
+                        feature = "force_exhaustive_checks",
+                        deny(non_exhaustive_omitted_patterns)
+                    )]
+                    match suffix {
+                        ast::Suffix::Index(ast::Index::Brackets { expression, .. }) => {
+                            complexity = count_expression_complexity(expression, complexity)
+                        }
+                        ast::Suffix::Call(ast::Call::AnonymousCall(
+                            ast::FunctionArgs::Parentheses { arguments, .. },
+                        )) => {
+                            for argument in arguments {
+                                complexity = count_expression_complexity(argument, complexity)
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+                complexity
             }
 
             ast::Value::Var(ast::Var::Name(_)) => complexity,
@@ -182,6 +201,8 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
 
 fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
     let mut complexity = starting_complexity;
+
+    // we don't immediately return from the matched blocks so that we can add in any complexity from the last statement
     for statement in block.stmts() {
         #[cfg_attr(
             feature = "force_exhaustive_checks",
@@ -194,8 +215,8 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
                 }
             }
 
-            ast::Stmt::Do(do_node) => {
-                todo!()
+            ast::Stmt::Do(_) => {
+                // doesn't contribute dynamic branches
             }
 
             ast::Stmt::FunctionCall(call) => {
@@ -211,9 +232,8 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
                 }
             }
 
-            ast::Stmt::FunctionDeclaration(function_declaration) => {
-                todo!()
-            }
+            // visit_function_declaration already tracks this
+            ast::Stmt::FunctionDeclaration(_) => {}
 
             ast::Stmt::GenericFor(generic_for) => {
                 complexity += 1;
@@ -269,28 +289,28 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
             }
 
             #[cfg(feature = "roblox")]
-            ast::Stmt::CompoundAssignment(compound_assignment) => {
-                todo!()
+            ast::Stmt::CompoundAssignment(compound_expression) => {
+                complexity = count_expression_complexity(compound_expression.rhs(), complexity)
             }
 
             #[cfg(feature = "roblox")]
-            ast::Stmt::ExportedTypeDeclaration(exported_type_declaration) => {
-                todo!()
+            ast::Stmt::ExportedTypeDeclaration(_) => {
+                // doesn't contribute dynamic branches
             }
 
             #[cfg(feature = "roblox")]
-            ast::Stmt::TypeDeclaration(type_declaration) => {
-                todo!()
+            ast::Stmt::TypeDeclaration(_) => {
+                // doesn't contain branch points
             }
 
             #[cfg(feature = "lua52")]
-            ast::Stmt::Goto(goto) => {
-                todo!()
+            ast::Stmt::Goto(_) => {
+                // not a dynamic branch point itself
             }
 
             #[cfg(feature = "lua52")]
-            ast::Stmt::Label(label) => {
-                todo!()
+            ast::Stmt::Label(_) => {
+                // not a dynamic branch point itself
             }
 
             _ => {}
@@ -359,6 +379,11 @@ mod tests {
             HighCyclomaticComplexityLint::new(HighCyclomaticComplexityConfig::default()).unwrap(),
             "high_cyclomatic_complexity",
             "high_cyclomatic_complexity",
+        );
+        test_lint(
+            HighCyclomaticComplexityLint::new(HighCyclomaticComplexityConfig::default()).unwrap(),
+            "complex_var_expressions",
+            "complex_var_expressions",
         );
     }
 }

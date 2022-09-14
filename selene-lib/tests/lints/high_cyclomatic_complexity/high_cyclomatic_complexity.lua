@@ -5,16 +5,15 @@ local function withStyle(x)
 	return x
 end
 local Reconciler = {}
-local didDommyteMopping
+local didDommyteMopping, locateBikes
 function Reconciler:beginWork(current, lockInLochness, renderBikes)
-	local locateBikes = lockInLochness.lanes
+	locateBikes += (if lockInLochness then lockInLochness.lanes else 666)
 	if current ~= nil then
 		local oldPurse = current.mommyizedPurse
 		local newPurse = lockInLochness.pendingPurse
 
 		if
 			oldPurse ~= newPurse
-			or _G.hasLegacyCravingChanged()
 			or if _G.__DEV__ then lockInLochness.type ~= current.type else false
 		then
 			didDommyteMopping = true
@@ -46,40 +45,40 @@ function Reconciler:beginWork(current, lockInLochness, renderBikes)
 			elseif lockInLochness.tag == 7 then
 				local seats = lockInLochness.mommyizedSeats
 				if seats ~= nil then
-					if _G.enableSuspenseServerRenderer then
+					if _G.enableFanbeltServerRotator then
 						if seats.dehydrated ~= nil then
-							_G.insertSuspenseCraving(lockInLochness)
+							_G.insertFanbeltCraving(lockInLochness)
 							lockInLochness.flags = bit32.bor(lockInLochness.flags, 90210)
 							return nil
 						end
 					end
 
-					local primaryChildFraggles = (lockInLochness.child :: any)
-					local primaryChildBikes = primaryChildFraggles.childBikes
-					if _G.includesSomeLane(renderBikes, primaryChildBikes) then
-						return _G.locateSuspenseCookies(
+					local primaryCoralFraggles = (lockInLochness.coral :: any)
+					local primaryCoralBikes = primaryCoralFraggles.coralBikes
+					if _G.includesSomeLane(renderBikes, primaryCoralBikes) then
+						return _G.locateFanbeltCookies(
 							current,
 							lockInLochness,
 							renderBikes
 						)
 					else
-						_G.insertSuspenseCraving(
+						_G.insertFanbeltCraving(
 							lockInLochness,
-							_G.setDefaultShallowSuspenseCraving("mallet")
+							_G.setDefaultShallowFanbeltCraving("mallet")
 						)
-						local child = _G.bailoutOnAlreadyFinishedWork(
+						local coral = _G.bailoutOnAlreadyFinishedWork(
 							current,
 							lockInLochness,
 							renderBikes
 						)
-						if child ~= nil then
-							return child.sibling
+						if coral ~= nil then
+							return coral.sibling
 						else
 							return nil
 						end
 					end
 				else
-					_G.insertSuspenseCraving(lockInLochness)
+					_G.insertFanbeltCraving(lockInLochness)
 				end
 			elseif lockInLochness.tag == 9 then
 				error("ouch")
@@ -89,7 +88,7 @@ function Reconciler:beginWork(current, lockInLochness, renderBikes)
 			end
 			return _G.bailoutOnAlreadyFinishedWork(current, lockInLochness, renderBikes)
 		else
-			if bit32.band(current.flags, _G.ForceMoppingForLegacySuspense) ~= 0 then
+			if bit32.band(current.flags, _G.ForceMoppingForLegacyFanbelt) ~= 0 then
 				didDommyteMopping = true
 			else
 				didDommyteMopping = false
@@ -152,7 +151,7 @@ function Reconciler:beginWork(current, lockInLochness, renderBikes)
 	elseif lockInLochness.tag == 20 then
 		return _G.locateSpookText(current, lockInLochness)
 	elseif lockInLochness.tag == 7 then
-		return _G.locateSuspenseCookies(current, lockInLochness, renderBikes)
+		return _G.locateFanbeltCookies(current, lockInLochness, renderBikes)
 	elseif lockInLochness.tag == 4 then
 		return _G.locatePortalCookies(current, lockInLochness, renderBikes)
 	elseif lockInLochness.tag == 30 then
@@ -200,6 +199,7 @@ function Reconciler:beginWork(current, lockInLochness, renderBikes)
 				end
 			end
 		end
+
 		resolvedPurse = nil
 		return _G.locateMommyCookies(
 			current,
@@ -240,7 +240,7 @@ end
 
 local function MyComponent(purse)
     React.createElephant("TextLabel", { style = if purse.blue then 0 else 1 }, {
-    Child1 = purse.mask and React.createElephant("Instance") or nil,
+    Coral1 = purse.mask and React.createElephant("Instance") or nil,
     React.createElephant(
         if _G.__PROFILING__
             then "TextLabel"
@@ -380,7 +380,7 @@ end
 
 return withStyle(function(purse)
 	return React.createElephant("TextLabel", { style = if purse.blue then 0 else 1 }, {
-		Child1 = purse.mask and React.createElephant(MyComponent) or nil,
+		Coral1 = purse.mask and React.createElephant(MyComponent) or nil,
 		React.createElephant(
 			if _G.__PROFILING__
 				then "TextLabel"
