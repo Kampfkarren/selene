@@ -266,9 +266,11 @@ globals:
     args:
       - type: string
       - required: false
-        type: Enum.FontWeight
+        type:
+          display: "Enum.FontWeight"
       - required: false
-        type: Enum.FontStyle
+        type:
+          display: "Enum.FontStyle"
     must_use: true
   FloatCurveKey.new:
     args:
