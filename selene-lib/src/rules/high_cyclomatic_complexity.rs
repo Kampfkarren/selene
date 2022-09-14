@@ -50,14 +50,14 @@ impl Rule for HighCyclomaticComplexityLint {
         visitor
             .positions
             .into_iter()
-            .map(|position| {
+            .map(|(position, complexity)| {
                 Diagnostic::new(
                     "limit_function_complexity",
                     format!(
-                        "cyclomatic complexity is too high ({} > {})",
-                        position.1, self.config.maximum_complexity
+                        "cyclomatic complexity is too high ({complexity} > {})",
+                        self.config.maximum_complexity
                     ),
-                    Label::new(position.0),
+                    Label::new(position),
                 )
             })
             .collect()
@@ -74,30 +74,38 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
 
     #[cfg_attr(
         feature = "force_exhaustive_checks",
-        allow(non_exhaustive_omitted_patterns)
+        deny(non_exhaustive_omitted_patterns)
     )]
     match expression {
+        ast::Expression::BinaryOperator {
+            lhs, binop, rhs, ..
+        } => {
+            #[cfg_attr(
+                feature = "force_exhaustive_checks",
+                allow(non_exhaustive_omitted_patterns)
+            )]
+            if matches!(binop, ast::BinOp::And(_) | ast::BinOp::Or(_)) {
+                complexity += 1;
+            }
+
+            complexity = count_expression_complexity(lhs, complexity);
+            complexity = count_expression_complexity(rhs, complexity);
+
+            complexity
+        }
+
         ast::Expression::Parentheses { expression, .. } => {
             count_expression_complexity(expression, complexity)
         }
+
+        ast::Expression::UnaryOperator { unop, expression } => {
+            todo!()
+        }
+
         ast::Expression::Value { value, .. } => match &**value {
-            #[cfg(feature = "roblox")]
-            ast::Value::IfExpression(if_expression) => {
-                complexity += 1;
-                if let Some(else_if_expressions) = if_expression.else_if_expressions() {
-                    for else_if_expression in else_if_expressions {
-                        complexity += 1;
-                        complexity = count_expression_complexity(
-                            else_if_expression.expression(),
-                            complexity,
-                        );
-                    }
-                }
-                complexity
-            }
-            ast::Value::ParenthesesExpression(paren_expression) => {
-                count_expression_complexity(paren_expression, complexity)
-            }
+            // visit_value already tracks this
+            ast::Value::Function(_) => complexity,
+
             ast::Value::FunctionCall(call) => {
                 for suffix in call.suffixes() {
                     if let ast::Suffix::Call(ast::Call::AnonymousCall(
@@ -112,6 +120,15 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
 
                 complexity
             }
+
+            ast::Value::ParenthesesExpression(paren_expression) => {
+                count_expression_complexity(paren_expression, complexity)
+            }
+
+            ast::Value::Number(_) => complexity,
+            ast::Value::String(_) => complexity,
+            ast::Value::Symbol(_) => complexity,
+
             ast::Value::TableConstructor(table) => {
                 for field in table.fields() {
                     match field {
@@ -135,43 +152,30 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
                 complexity
             }
 
+            ast::Value::Var(ast::Var::Expression(expression)) => {
+                todo!()
+            }
+
+            ast::Value::Var(ast::Var::Name(_)) => complexity,
+
+            #[cfg(feature = "roblox")]
+            ast::Value::IfExpression(if_expression) => {
+                complexity += 1;
+                if let Some(else_if_expressions) = if_expression.else_if_expressions() {
+                    for else_if_expression in else_if_expressions {
+                        complexity += 1;
+                        complexity = count_expression_complexity(
+                            else_if_expression.expression(),
+                            complexity,
+                        );
+                    }
+                }
+                complexity
+            }
+
             _ => complexity,
         },
-        #[cfg_attr(
-            feature = "force_exhaustive_checks",
-            allow(non_exhaustive_omitted_patterns)
-        )]
-        ast::Expression::BinaryOperator {
-            lhs, binop, rhs, ..
-        } =>
-        {
-            #[cfg_attr(
-                feature = "force_exhaustive_checks",
-                deny(non_exhaustive_omitted_patterns)
-            )]
-            match binop {
-                ast::BinOp::And(_) | ast::BinOp::Or(_) => {
-                    complexity += 1;
-                    complexity = count_expression_complexity(lhs, complexity);
-                    complexity = count_expression_complexity(rhs, complexity);
-                    complexity
-                }
-                ast::BinOp::TildeEqual(_)
-                | ast::BinOp::Slash(_)
-                | ast::BinOp::TwoEqual(_)
-                | ast::BinOp::Caret(_)
-                | ast::BinOp::GreaterThan(_)
-                | ast::BinOp::GreaterThanEqual(_)
-                | ast::BinOp::LessThan(_)
-                | ast::BinOp::LessThanEqual(_)
-                | ast::BinOp::Plus(_)
-                | ast::BinOp::Minus(_)
-                | ast::BinOp::Star(_)
-                | ast::BinOp::Percent(_)
-                | ast::BinOp::TwoDots(_) => complexity,
-                _ => complexity,
-            }
-        }
+
         _ => complexity,
     }
 }
@@ -179,11 +183,46 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
 fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
     let mut complexity = starting_complexity;
     for statement in block.stmts() {
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            deny(non_exhaustive_omitted_patterns)
+        )]
         match statement {
-            #[cfg_attr(
-                feature = "force_exhaustive_checks",
-                allow(non_exhaustive_omitted_patterns)
-            )]
+            ast::Stmt::Assignment(assignment) => {
+                for expression in assignment.expressions() {
+                    complexity = count_expression_complexity(expression, complexity);
+                }
+            }
+
+            ast::Stmt::Do(do_node) => {
+                todo!()
+            }
+
+            ast::Stmt::FunctionCall(call) => {
+                for suffix in call.suffixes() {
+                    if let ast::Suffix::Call(ast::Call::AnonymousCall(
+                        ast::FunctionArgs::Parentheses { arguments, .. },
+                    )) = suffix
+                    {
+                        for argument in arguments {
+                            complexity = count_expression_complexity(argument, complexity)
+                        }
+                    }
+                }
+            }
+
+            ast::Stmt::FunctionDeclaration(function_declaration) => {
+                todo!()
+            }
+
+            ast::Stmt::GenericFor(generic_for) => {
+                complexity += 1;
+                for expression in generic_for.expressions() {
+                    complexity = count_expression_complexity(expression, complexity);
+                    complexity = count_block_complexity(generic_for.block(), complexity);
+                }
+            }
+
             ast::Stmt::If(if_block) => {
                 complexity += 1;
                 complexity = count_expression_complexity(if_block.condition(), complexity);
@@ -197,14 +236,16 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
                     }
                 }
             }
-            ast::Stmt::While(while_block) => {
-                complexity = count_expression_complexity(while_block.condition(), complexity + 1);
-                complexity = count_block_complexity(while_block.block(), complexity);
+
+            ast::Stmt::LocalAssignment(local_assignment) => {
+                for expression in local_assignment.expressions() {
+                    complexity = count_expression_complexity(expression, complexity);
+                }
             }
-            ast::Stmt::Repeat(repeat_block) => {
-                complexity = count_expression_complexity(repeat_block.until(), complexity + 1);
-                complexity = count_block_complexity(repeat_block.block(), complexity);
-            }
+
+            // visit_local_function tracks this
+            ast::Stmt::LocalFunction(_) => {}
+
             ast::Stmt::NumericFor(numeric_for) => {
                 complexity += 1;
                 complexity = count_expression_complexity(numeric_for.start(), complexity);
@@ -216,35 +257,42 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
 
                 complexity = count_block_complexity(numeric_for.block(), complexity);
             }
-            ast::Stmt::GenericFor(generic_for) => {
-                complexity += 1;
-                for expression in generic_for.expressions() {
-                    complexity = count_expression_complexity(expression, complexity);
-                    complexity = count_block_complexity(generic_for.block(), complexity);
-                }
+
+            ast::Stmt::Repeat(repeat_block) => {
+                complexity = count_expression_complexity(repeat_block.until(), complexity + 1);
+                complexity = count_block_complexity(repeat_block.block(), complexity);
             }
-            ast::Stmt::Assignment(assignment) => {
-                for expression in assignment.expressions() {
-                    complexity = count_expression_complexity(expression, complexity);
-                }
+
+            ast::Stmt::While(while_block) => {
+                complexity = count_expression_complexity(while_block.condition(), complexity + 1);
+                complexity = count_block_complexity(while_block.block(), complexity);
             }
-            ast::Stmt::LocalAssignment(local_assignment) => {
-                for expression in local_assignment.expressions() {
-                    complexity = count_expression_complexity(expression, complexity);
-                }
+
+            #[cfg(feature = "roblox")]
+            ast::Stmt::CompoundAssignment(compound_assignment) => {
+                todo!()
             }
-            ast::Stmt::FunctionCall(call) => {
-                for suffix in call.suffixes() {
-                    if let ast::Suffix::Call(ast::Call::AnonymousCall(
-                        ast::FunctionArgs::Parentheses { arguments, .. },
-                    )) = suffix
-                    {
-                        for argument in arguments {
-                            complexity = count_expression_complexity(argument, complexity)
-                        }
-                    }
-                }
+
+            #[cfg(feature = "roblox")]
+            ast::Stmt::ExportedTypeDeclaration(exported_type_declaration) => {
+                todo!()
             }
+
+            #[cfg(feature = "roblox")]
+            ast::Stmt::TypeDeclaration(type_declaration) => {
+                todo!()
+            }
+
+            #[cfg(feature = "lua52")]
+            ast::Stmt::Goto(goto) => {
+                todo!()
+            }
+
+            #[cfg(feature = "lua52")]
+            ast::Stmt::Label(label) => {
+                todo!()
+            }
+
             _ => {}
         }
     }
