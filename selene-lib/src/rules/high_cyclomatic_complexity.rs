@@ -77,7 +77,7 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
 
     #[cfg_attr(
         feature = "force_exhaustive_checks",
-        deny(non_exhaustive_omitted_patterns)
+        allow(non_exhaustive_omitted_patterns)
     )]
     match expression {
         ast::Expression::Parentheses { expression, .. } => {
