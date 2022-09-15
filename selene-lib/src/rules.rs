@@ -1,5 +1,5 @@
 use crate::{ast_util::scopes::ScopeManager, standard_library::StandardLibrary};
-use std::convert::TryInto;
+use std::{borrow::Cow, convert::TryInto};
 
 use codespan_reporting::diagnostic::{
     Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
@@ -84,7 +84,7 @@ pub enum Severity {
 
 #[derive(Debug)]
 pub struct Diagnostic {
-    pub code: &'static str,
+    pub code: Cow<'static, str>,
     pub message: String,
     pub notes: Vec<String>,
     pub primary_label: Label,
@@ -92,9 +92,9 @@ pub struct Diagnostic {
 }
 
 impl Diagnostic {
-    pub fn new(code: &'static str, message: String, primary_label: Label) -> Self {
+    pub fn new<C: Into<Cow<'static, str>>>(code: C, message: String, primary_label: Label) -> Self {
         Self {
-            code,
+            code: code.into(),
             message,
             primary_label,
 
@@ -103,15 +103,15 @@ impl Diagnostic {
         }
     }
 
-    pub fn new_complete(
-        code: &'static str,
+    pub fn new_complete<C: Into<Cow<'static, str>>>(
+        code: C,
         message: String,
         primary_label: Label,
         notes: Vec<String>,
         secondary_labels: Vec<Label>,
     ) -> Self {
         Self {
-            code,
+            code: code.into(),
             message,
             notes,
             primary_label,
@@ -132,7 +132,7 @@ impl Diagnostic {
         }));
 
         CodespanDiagnostic {
-            code: Some(self.code.to_owned()),
+            code: Some(self.code.to_string()),
             labels,
             message: self.message.to_owned(),
             notes: self.notes,

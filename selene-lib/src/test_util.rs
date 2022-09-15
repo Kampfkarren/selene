@@ -40,15 +40,19 @@ pub fn get_standard_library(path_base: &Path) -> Option<StandardLibrary> {
     }
 }
 
+fn get_path(directory: &'static str, test_name: &'static str) -> PathBuf {
+    TEST_FULL_RUN_ROOT.join(directory).join(test_name)
+}
+
 pub fn test_full_run_config_with_output(
     directory: &'static str,
     test_name: &'static str,
-    checker_config: CheckerConfig<serde_json::Value>,
+    checker_config: CheckerConfig<toml::Value>,
     output_extension: &str,
 ) {
-    let path_base = TEST_FULL_RUN_ROOT.join(directory).join(test_name);
+    let path_base = get_path(directory, test_name);
 
-    let checker = Checker::<serde_json::Value>::new(
+    let checker = Checker::<toml::Value>::new(
         checker_config,
         get_standard_library(&path_base).unwrap_or_else(|| {
             StandardLibrary::from_name("lua51").expect("no lua51 standard library")
@@ -102,15 +106,38 @@ pub fn test_full_run_config_with_output(
     }
 }
 
+fn find_checker_config(
+    directory: &'static str,
+    test_name: &'static str,
+) -> CheckerConfig<toml::Value> {
+    let path_base = get_path(directory, test_name);
+
+    let mut checker_config = if let Ok(test_config_toml_contents) =
+        fs::read_to_string(path_base.with_extension("selene.toml"))
+    {
+        toml::from_str(&test_config_toml_contents).expect("couldn't parse selene.toml")
+    } else {
+        CheckerConfig::default()
+    };
+
+    checker_config.absolutize_paths(&TEST_FULL_RUN_ROOT.join(directory));
+
+    checker_config
+}
+
 // TODO: Most of this is copy and pasted from test_lint_config, try and abstract it out a bit
 pub fn test_full_run_config(
     directory: &'static str,
     test_name: &'static str,
-    checker_config: CheckerConfig<serde_json::Value>,
+    checker_config: CheckerConfig<toml::Value>,
 ) {
     test_full_run_config_with_output(directory, test_name, checker_config, "stderr");
 }
 
 pub fn test_full_run(directory: &'static str, test_name: &'static str) {
-    test_full_run_config(directory, test_name, CheckerConfig::default());
+    test_full_run_config(
+        directory,
+        test_name,
+        find_checker_config(directory, test_name),
+    );
 }

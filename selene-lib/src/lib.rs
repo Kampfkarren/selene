@@ -3,7 +3,7 @@
     feature = "force_exhaustive_checks",
     feature(non_exhaustive_omitted_patterns_lint)
 )]
-use std::{collections::HashMap, error::Error, fmt};
+use std::{collections::HashMap, error::Error, fmt, path::Path};
 
 use full_moon::ast::Ast;
 use serde::{
@@ -13,6 +13,7 @@ use serde::{
 
 mod ast_util;
 mod lint_filtering;
+mod plugins;
 mod possible_std;
 pub mod rules;
 pub mod standard_library;
@@ -28,30 +29,33 @@ use rules::{AstContext, Context, Diagnostic, Rule, Severity};
 use standard_library::StandardLibrary;
 
 #[derive(Debug)]
-pub struct CheckerError {
-    pub name: &'static str,
-    pub problem: CheckerErrorProblem,
-}
+pub enum CheckerError {
+    ConfigDeserializeError {
+        name: &'static str,
+        problem: Box<dyn Error>,
+    },
 
-#[derive(Debug)]
-pub enum CheckerErrorProblem {
-    ConfigDeserializeError(Box<dyn Error>),
-    RuleNewError(Box<dyn Error>),
+    InvalidPlugin(Box<dyn Error>),
+
+    RuleNewError {
+        name: &'static str,
+        problem: Box<dyn Error>,
+    },
 }
 
 impl fmt::Display for CheckerError {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        use CheckerErrorProblem::*;
-
-        write!(formatter, "[{}] ", self.name)?;
-
-        match &self.problem {
-            ConfigDeserializeError(error) => write!(
+        match &self {
+            CheckerError::ConfigDeserializeError { name, problem } => write!(
                 formatter,
-                "Configuration was incorrectly formatted: {}",
-                error
+                "[{name}] Configuration was incorrectly formatted: {problem}",
             ),
-            RuleNewError(error) => write!(formatter, "{}", error),
+
+            CheckerError::InvalidPlugin(error) => {
+                write!(formatter, "Couldn't load plugin: {error}")
+            }
+
+            CheckerError::RuleNewError { name, problem } => write!(formatter, "[{name}] {problem}"),
         }
     }
 }
@@ -63,6 +67,7 @@ impl Error for CheckerError {}
 #[serde(rename_all = "kebab-case")]
 pub struct CheckerConfig<V> {
     pub config: HashMap<String, V>,
+    pub plugins: Vec<plugins::config::PluginConfig>,
     pub rules: HashMap<String, RuleVariation>,
     pub std: String,
 
@@ -71,11 +76,22 @@ pub struct CheckerConfig<V> {
     pub roblox_std_source: RobloxStdSource,
 }
 
+impl<V> CheckerConfig<V> {
+    // PLUGIN TODO: Don't allow escaping base
+    pub fn absolutize_paths(&mut self, base: &Path) {
+        for plugin in &mut self.plugins {
+            plugin.source = base.join(&plugin.source);
+        }
+    }
+}
+
+// Necessary because #[derive(Default)] would bind V: Default
 impl<V> Default for CheckerConfig<V> {
     fn default() -> Self {
         CheckerConfig {
             config: HashMap::new(),
             rules: HashMap::new(),
+            plugins: Vec::new(),
             std: "".to_owned(),
             roblox_std_source: RobloxStdSource::default(),
         }
@@ -144,6 +160,7 @@ macro_rules! use_rules {
         pub struct Checker<V: 'static + DeserializeOwned> {
             config: CheckerConfig<V>,
             context: Context,
+            plugins: Vec<plugins::LuaPlugin>,
 
             $(
                 $rule_name: $rule_path,
@@ -171,9 +188,9 @@ macro_rules! use_rules {
                             match config.config.remove(rule_name) {
                                 Some(entry_generic) => {
                                     <$path as Rule>::Config::deserialize(entry_generic).map_err(|error| {
-                                        CheckerError {
+                                        CheckerError::ConfigDeserializeError {
                                             name: rule_name,
-                                            problem: CheckerErrorProblem::ConfigDeserializeError(Box::new(error)),
+                                            problem: Box::new(error),
                                         }
                                     })?
                                 }
@@ -183,9 +200,9 @@ macro_rules! use_rules {
                                 }
                             }
                         }).map_err(|error| {
-                            CheckerError {
+                            CheckerError::RuleNewError {
                                 name: stringify!($name),
-                                problem: CheckerErrorProblem::RuleNewError(Box::new(error)),
+                                problem: Box::new(error),
                             }
                         })?;
 
@@ -212,6 +229,8 @@ macro_rules! use_rules {
                         standard_library,
                         standard_library_is_set: !config.std.is_empty(),
                     },
+
+                    plugins: create_plugins_from_config(&config)?,
 
                     config,
                 })
@@ -253,6 +272,42 @@ macro_rules! use_rules {
                     )+
                 )+
 
+                for plugin in &self.plugins {
+                    let plugin_name = format!("plugin_{}", plugin.name);
+
+                    let plugin_pass = {
+                        profiling::scope!(plugin_name);
+                        plugin.pass(ast, &self.context, &ast_context)
+                    };
+
+                    match plugin_pass {
+                        Ok(plugin_diagnostics) => {
+                            diagnostics.extend(&mut plugin_diagnostics.into_iter().map(|diagnostic| {
+                                CheckerDiagnostic {
+                                    diagnostic,
+                                    severity: match self.config.rules.get(&plugin_name) {
+                                        Some(variation) => variation.to_severity(),
+                                        None => plugin.severity,
+                                    },
+                                }
+                            }));
+                        }
+
+                        // PLUGIN TODO: Split by RuntimeError and internal mlua errors?
+                        Err(error) => {
+                            diagnostics.push(CheckerDiagnostic {
+                                diagnostic: Diagnostic::new(
+                                    plugin_name,
+                                    format!("error running plugin: {error}"),
+                                    // PLUGIN TODO: Support not pointing at anything in particular
+                                    rules::Label::new((0, 0)),
+                                ),
+                                severity: Severity::Error,
+                            });
+                        }
+                    }
+                }
+
                 diagnostics = lint_filtering::filter_diagnostics(
                     ast,
                     diagnostics,
@@ -261,15 +316,32 @@ macro_rules! use_rules {
 
                 diagnostics
             }
-
-            fn get_lint_severity<R: Rule>(&self, _lint: &R, name: &'static str) -> Severity {
-                match self.config.rules.get(name) {
-                    Some(variation) => variation.to_severity(),
-                    None => R::SEVERITY,
-                }
-            }
         }
     };
+}
+
+impl<V: 'static + DeserializeOwned> Checker<V> {
+    fn get_lint_severity<R: Rule>(&self, _lint: &R, name: &'static str) -> Severity {
+        match self.config.rules.get(name) {
+            Some(variation) => variation.to_severity(),
+            None => R::SEVERITY,
+        }
+    }
+}
+
+fn create_plugins_from_config<V>(
+    config: &CheckerConfig<V>,
+) -> Result<Vec<plugins::LuaPlugin>, CheckerError> {
+    let mut plugins = Vec::new();
+
+    for plugin_config in &config.plugins {
+        plugins.push(
+            plugins::LuaPlugin::new(plugin_config)
+                .map_err(|error| CheckerError::InvalidPlugin(error))?,
+        );
+    }
+
+    Ok(plugins)
 }
 
 #[derive(Debug)]

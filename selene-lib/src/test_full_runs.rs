@@ -1,15 +1,16 @@
 use crate::{
-    test_util::{test_full_run_config, test_full_run_config_with_output},
+    test_util::{test_full_run, test_full_run_config, test_full_run_config_with_output},
     CheckerConfig,
 };
 
 #[test]
 fn function_overriding() {
-    test_full_run_config(
-        "function_overriding",
-        "function_overriding",
-        CheckerConfig::default(),
-    );
+    test_full_run("function_overriding", "function_overriding");
+}
+
+#[test]
+fn plugin_block_table_calls() {
+    test_full_run("plugins", "block_table_calls");
 }
 
 #[test]

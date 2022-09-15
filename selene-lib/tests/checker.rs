@@ -37,11 +37,16 @@ fn errors_with_bad_config() {
         StandardLibrary::default(),
     ) {
         Err(error) => {
-            assert_eq!(error.name, "empty_if");
-            match error.problem {
-                CheckerErrorProblem::ConfigDeserializeError(_) => {}
-                other => panic!("error was not ConfigDeserializeError: {:?}", other),
-            }
+            assert!(
+                matches!(
+                    error,
+                    CheckerError::ConfigDeserializeError {
+                        name: "empty_if",
+                        ..
+                    }
+                ),
+                "error was {error:?}, not ConfigDeserializeError",
+            );
         }
 
         _ => panic!("new returned Ok"),

@@ -1,0 +1,2 @@
+[[plugins]]
+source = "block_table_calls_plugin.lua"

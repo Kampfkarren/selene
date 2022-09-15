@@ -1,0 +1,6 @@
+- documentation of EVERYTHING
+- unit test errors
+- permissions
+- create FromLua stuff for Context, AstContext
+- ScopeVisitor library
+- Document multithreading behavior (one lua per thread)
