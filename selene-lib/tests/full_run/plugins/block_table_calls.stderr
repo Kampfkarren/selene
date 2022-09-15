@@ -1,0 +1,6 @@
+warning[plugin_block_table_calls]: table calls are not allowed
+  ┌─ block_table_calls.lua:1:7
+  │
+1 │ print { "hello world" }
+  │       ^^^^^^^^^^^^^^^^^
+

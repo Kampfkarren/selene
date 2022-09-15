@@ -3,7 +3,13 @@
     feature = "force_exhaustive_checks",
     feature(non_exhaustive_omitted_patterns_lint)
 )]
-use std::{collections::HashMap, error::Error, fmt, path::Path};
+use std::{
+    collections::HashMap,
+    error::Error,
+    fmt,
+    path::Path,
+    sync::{Arc, Mutex},
+};
 
 use full_moon::ast::Ast;
 use serde::{
@@ -272,41 +278,7 @@ macro_rules! use_rules {
                     )+
                 )+
 
-                for plugin in &self.plugins {
-                    let plugin_name = format!("plugin_{}", plugin.name);
-
-                    let plugin_pass = {
-                        profiling::scope!(plugin_name);
-                        plugin.pass(ast, &self.context, &ast_context)
-                    };
-
-                    match plugin_pass {
-                        Ok(plugin_diagnostics) => {
-                            diagnostics.extend(&mut plugin_diagnostics.into_iter().map(|diagnostic| {
-                                CheckerDiagnostic {
-                                    diagnostic,
-                                    severity: match self.config.rules.get(&plugin_name) {
-                                        Some(variation) => variation.to_severity(),
-                                        None => plugin.severity,
-                                    },
-                                }
-                            }));
-                        }
-
-                        // PLUGIN TODO: Split by RuntimeError and internal mlua errors?
-                        Err(error) => {
-                            diagnostics.push(CheckerDiagnostic {
-                                diagnostic: Diagnostic::new(
-                                    plugin_name,
-                                    format!("error running plugin: {error}"),
-                                    // PLUGIN TODO: Support not pointing at anything in particular
-                                    rules::Label::new((0, 0)),
-                                ),
-                                severity: Severity::Error,
-                            });
-                        }
-                    }
-                }
+                self.run_plugins(&mut diagnostics, ast, &ast_context);
 
                 diagnostics = lint_filtering::filter_diagnostics(
                     ast,
@@ -325,6 +297,55 @@ impl<V: 'static + DeserializeOwned> Checker<V> {
         match self.config.rules.get(name) {
             Some(variation) => variation.to_severity(),
             None => R::SEVERITY,
+        }
+    }
+
+    fn run_plugins(
+        &self,
+        diagnostics: &mut Vec<CheckerDiagnostic>,
+        ast: &Ast,
+        ast_context: &AstContext,
+    ) {
+        if self.plugins.is_empty() {
+            return;
+        }
+
+        let lua_ast = Arc::new(Mutex::new(full_moon_lua_types::Ast::from(ast)));
+
+        for plugin in &self.plugins {
+            let plugin_name = plugin.full_name();
+
+            let plugin_pass = {
+                profiling::scope!(plugin_name);
+                plugin.pass(Arc::clone(&lua_ast), &self.context, ast_context)
+            };
+
+            match plugin_pass {
+                Ok(plugin_diagnostics) => {
+                    diagnostics.extend(&mut plugin_diagnostics.into_iter().map(|diagnostic| {
+                        CheckerDiagnostic {
+                            diagnostic,
+                            severity: match self.config.rules.get(&plugin_name) {
+                                Some(variation) => variation.to_severity(),
+                                None => plugin.severity,
+                            },
+                        }
+                    }));
+                }
+
+                // PLUGIN TODO: Split by RuntimeError and internal mlua errors?
+                Err(error) => {
+                    diagnostics.push(CheckerDiagnostic {
+                        diagnostic: Diagnostic::new(
+                            plugin_name,
+                            format!("error running plugin: {error}"),
+                            // PLUGIN TODO: Support not pointing at anything in particular
+                            rules::Label::new((0, 0)),
+                        ),
+                        severity: Severity::Error,
+                    });
+                }
+            }
         }
     }
 }

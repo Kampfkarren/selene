@@ -48,7 +48,7 @@ impl LuaPlugin {
 
     pub fn pass(
         &self,
-        ast: &full_moon::ast::Ast,
+        ast: Arc<Mutex<full_moon_lua_types::Ast>>,
         context: &Context,
         ast_context: &AstContext,
     ) -> mlua::Result<Vec<Diagnostic>> {
@@ -57,49 +57,48 @@ impl LuaPlugin {
         LUA.with(|lua| -> mlua::Result<()> {
             let lua = lua.get().expect("Lua not initialized");
 
-            // PLUGIN TODO: i don't like that this happens regardless of if lint is actually called
-            let name = self.name.clone();
+            // PLUGIN TODO: i don't like that this happens regardless of if lint is actually called.
+            // Could fix by collating the diagnostics at the end (makes it easier to create more complete lint calls)
+            let full_name = self.full_name();
 
             lua.globals().set(
                 "lint",
-                lua.create_function_mut(
-                    move |lua, (message, has_range): (String, mlua::Value)| {
-                        let has_range_userdata = match &has_range {
-                            mlua::Value::UserData(userdata) => userdata,
-                            _ => todo!("non userdata passed to lint"),
-                        };
+                lua.create_function_mut(move |_, (message, has_range): (String, mlua::Value)| {
+                    let has_range_userdata = match &has_range {
+                        mlua::Value::UserData(userdata) => userdata,
+                        _ => todo!("non userdata passed to lint"),
+                    };
 
-                        let metatable = has_range_userdata
-                            .get_metatable()
-                            .expect("NYI: get_metatable() fail");
+                    let metatable = has_range_userdata
+                        .get_metatable()
+                        .expect("NYI: get_metatable() fail");
 
-                        let index = metatable
-                            .get::<_, mlua::Function>(mlua::MetaMethod::Index)
-                            .expect("NYI: get __index fail");
+                    let index = metatable
+                        .get::<_, mlua::Function>(mlua::MetaMethod::Index)
+                        .expect("NYI: get __index fail");
 
-                        let range_function: mlua::Function = index
-                            .call((has_range_userdata.clone(), "range"))
-                            .expect("NYI: handle __index fail or range doesn't exist");
+                    let range_function: mlua::Function = index
+                        .call((has_range_userdata.clone(), "range"))
+                        .expect("NYI: handle __index fail or range doesn't exist");
 
-                        let range: (u32, u32) = range_function
-                            .call(has_range)
-                            .expect("NYI: handle range call fail");
+                    let range: (u32, u32) = range_function
+                        .call(has_range)
+                        .expect("NYI: handle range call fail");
 
-                        let mut diagnostics = diagnostics.lock().unwrap();
+                    let mut diagnostics = diagnostics.lock().unwrap();
 
-                        diagnostics.push(Diagnostic::new(
-                            format!("plugin_{}", name),
-                            message,
-                            Label::new(range),
-                        ));
+                    diagnostics.push(Diagnostic::new(
+                        full_name.clone(),
+                        message,
+                        Label::new(range),
+                    ));
 
-                        Ok(())
-                    },
-                )?,
+                    Ok(())
+                })?,
             )?;
 
             let pass: mlua::Function<'static> = lua.named_registry_value(&self.registry_key)?;
-            pass.call(full_moon_lua_types::Ast::from(ast))?;
+            pass.call(ast)?;
 
             Ok(())
         })?;
@@ -108,6 +107,10 @@ impl LuaPlugin {
         let mut lock = diagnostics.lock().unwrap();
 
         Ok(lock.drain(..).collect())
+    }
+
+    pub fn full_name(&self) -> String {
+        format!("plugin_{}", self.name)
     }
 }
 
