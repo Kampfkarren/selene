@@ -192,6 +192,9 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
             ast::Value::Function(_) => complexity,
 
             ast::Value::FunctionCall(call) => {
+                if let ast::Prefix::Expression(prefix_expression) = call.prefix() {
+                    complexity = count_expression_complexity(prefix_expression, complexity)
+                }
                 for suffix in call.suffixes() {
                     complexity = count_suffix_complexity(suffix, complexity)
                 }
@@ -251,6 +254,13 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
         )]
         match statement {
             ast::Stmt::Assignment(assignment) => {
+                for var in assignment.variables() {
+                    if let ast::Var::Expression(var_expression) = var {
+                        for suffix in var_expression.suffixes() {
+                            complexity = count_suffix_complexity(suffix, complexity)
+                        }
+                    }
+                }
                 for expression in assignment.expressions() {
                     complexity = count_expression_complexity(expression, complexity);
                 }
@@ -261,6 +271,9 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
             }
 
             ast::Stmt::FunctionCall(call) => {
+                if let ast::Prefix::Expression(prefix_expression) = call.prefix() {
+                    complexity = count_expression_complexity(prefix_expression, complexity)
+                }
                 for suffix in call.suffixes() {
                     complexity = count_suffix_complexity(suffix, complexity)
                 }
