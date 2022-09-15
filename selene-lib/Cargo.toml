@@ -12,10 +12,10 @@ edition = "2021"
 [dependencies]
 codespan = "0.9.5"
 codespan-reporting = "0.9.5"
-# full_moon = { git = "https://github.com/Kampfkarren/full-moon", branch = "lua-types" }
-# full-moon-lua-types = { git = "https://github.com/Kampfkarren/full-moon", branch = "lua-types" }
-full_moon = { path = "E:/User/Documents/projects/rust/full-moon/full-moon" }
-full-moon-lua-types = { path = "E:/User/Documents/projects/rust/full-moon/full-moon-lua-types" }
+full_moon = { git = "https://github.com/Kampfkarren/full-moon", branch = "lua-types" }
+full-moon-lua-types = { git = "https://github.com/Kampfkarren/full-moon", branch = "lua-types" }
+# full_moon = { path = "E:/User/Documents/projects/rust/full-moon/full-moon" }
+# full-moon-lua-types = { path = "E:/User/Documents/projects/rust/full-moon/full-moon-lua-types" }
 id-arena = "2.2"
 if_chain = "1.0"
 lazy_static = "1.4"
