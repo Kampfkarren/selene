@@ -421,6 +421,7 @@ mod tests {
     use super::{super::test_util::test_lint, *};
 
     #[test]
+    #[cfg(feature = "roblox")]
     fn test_high_cyclomatic_complexity() {
         test_lint(
             HighCyclomaticComplexityLint::new(HighCyclomaticComplexityConfig::default()).unwrap(),
