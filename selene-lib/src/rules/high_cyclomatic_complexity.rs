@@ -421,7 +421,7 @@ mod tests {
     use super::{super::test_util::test_lint, *};
 
     #[test]
-    fn test_limit_function_complexity() {
+    fn test_high_cyclomatic_complexity() {
         test_lint(
             HighCyclomaticComplexityLint::new(HighCyclomaticComplexityConfig::default()).unwrap(),
             "high_cyclomatic_complexity",
@@ -429,7 +429,7 @@ mod tests {
         );
         test_lint(
             HighCyclomaticComplexityLint::new(HighCyclomaticComplexityConfig::default()).unwrap(),
-            "complex_var_expressions",
+            "high_cyclomatic_complexity",
             "complex_var_expressions",
         );
     }
