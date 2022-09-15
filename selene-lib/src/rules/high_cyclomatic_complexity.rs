@@ -429,7 +429,7 @@ mod tests {
         );
         test_lint(
             HighCyclomaticComplexityLint::new(HighCyclomaticComplexityConfig::default()).unwrap(),
-            "complex_var_expressions",
+            "high_cyclomatic_complexity",
             "complex_var_expressions",
         );
     }
