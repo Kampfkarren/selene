@@ -273,8 +273,8 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
                 complexity += 1;
                 for expression in generic_for.expressions() {
                     complexity = count_expression_complexity(expression, complexity);
-                    complexity = count_block_complexity(generic_for.block(), complexity);
                 }
+                complexity = count_block_complexity(generic_for.block(), complexity);
             }
 
             ast::Stmt::If(if_block) => {
