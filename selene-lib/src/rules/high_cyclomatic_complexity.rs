@@ -441,7 +441,10 @@ mod tests {
     #[test]
     fn test_lua51_basic_complexity() {
         test_lint(
-            HighCyclomaticComplexityLint::new(HighCyclomaticComplexityConfig { maximum_complexity: 1 }).unwrap(),
+            HighCyclomaticComplexityLint::new(HighCyclomaticComplexityConfig {
+                maximum_complexity: 1,
+            })
+            .unwrap(),
             "high_cyclomatic_complexity",
             "lua51_basic_complexity",
         );
