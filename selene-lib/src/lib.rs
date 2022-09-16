@@ -292,6 +292,7 @@ use_rules! {
     duplicate_keys: rules::duplicate_keys::DuplicateKeysLint,
     empty_if: rules::empty_if::EmptyIfLint,
     global_usage: rules::global_usage::GlobalLint,
+    high_cyclomatic_complexity: rules::high_cyclomatic_complexity::HighCyclomaticComplexityLint,
     if_same_then_else: rules::if_same_then_else::IfSameThenElseLint,
     ifs_same_cond: rules::ifs_same_cond::IfsSameCondLint,
     incorrect_standard_library_use: rules::standard_library::StandardLibraryLint,

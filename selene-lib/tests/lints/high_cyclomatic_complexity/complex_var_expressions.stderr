@@ -1,0 +1,6 @@
+error[high_cyclomatic_complexity]: cyclomatic complexity is too high (42 > 40)
+  ┌─ complex_var_expressions.lua:4:1
+  │
+4 │ function f()
+  │ ^^^^^^^^^^^^
+

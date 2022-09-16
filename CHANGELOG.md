@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added the "luau" builtin library.
 - `unused_variable` and `incorrect_standard_library_use` will now suggest configuring a standard library if one is detected.
 - Added `constant_table_comparison` check to catch `x == {}`, which will always fail.
+- Added `high_cyclomatic_complexity` check to catch overly complex functions that are hard to test, and harder to reason about. This lint is disabled by default.
 - Added `Font.new` to the Roblox standard library.
 
 ### Changed
