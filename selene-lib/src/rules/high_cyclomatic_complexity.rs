@@ -429,6 +429,7 @@ mod tests {
             "high_cyclomatic_complexity",
         );
     }
+
     #[test]
     #[cfg(feature = "roblox")]
     fn test_complex_var_expressions() {
@@ -438,6 +439,7 @@ mod tests {
             "complex_var_expressions",
         );
     }
+
     #[test]
     fn test_lua51_basic_complexity() {
         test_lint(
