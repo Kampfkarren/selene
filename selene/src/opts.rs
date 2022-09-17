@@ -61,6 +61,9 @@ pub struct Options {
 
     #[structopt(subcommand)]
     pub command: Option<Command>,
+
+    #[structopt(long)]
+    pub exclude_path: Option<String>,
 }
 
 impl Options {

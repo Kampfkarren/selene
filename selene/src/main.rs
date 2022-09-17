@@ -479,6 +479,8 @@ fn start(mut matches: opts::Options) {
 
     let pool = ThreadPool::new(matches.num_threads);
 
+    let exclude_path = &matches.exclude_path.as_ref();
+
     for filename in &matches.files {
         if filename == "-" {
             let checker = Arc::clone(&checker);
@@ -510,6 +512,15 @@ fn start(mut matches: opts::Options) {
                         for entry in glob {
                             match entry {
                                 Ok(path) => {
+                                    match exclude_path {
+                                        Some(exclude) => {
+                                            if path.starts_with(exclude) {
+                                                continue;
+                                            }
+                                        }
+                                        None => {}
+                                    }
+
                                     let checker = Arc::clone(&checker);
 
                                     pool.execute(move || read_file(&checker, &path));
