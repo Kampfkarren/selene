@@ -22,3 +22,9 @@ error[roblox_incorrect_roact_usage]: `ThisDoesntExist` is not a valid class
 19 │ e("ThisDoesntExist", {})
    │   ^^^^^^^^^^^^^^^^^
 
+error[roblox_incorrect_roact_usage]: `ThisDoesntExist` is not a valid class
+   ┌─ roblox_incorrect_roact_usage.lua:27:3
+   │
+27 │ e("ThisDoesntExist")
+   │   ^^^^^^^^^^^^^^^^^
+

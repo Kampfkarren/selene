@@ -180,7 +180,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
             if let Some(ast::Suffix::Call(ast::Call::AnonymousCall(
                 ast::FunctionArgs::Parentheses { arguments, .. }
             ))) = call_suffix;
-            if arguments.len() >= 2;
+            if !arguments.is_empty();
             let mut iter = arguments.iter();
 
             // Get first argument, check if it is a Roblox class
@@ -190,8 +190,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
             if let Some((name, class)) = self.check_class_name(token);
 
             // Get second argument, check if it is a table
-            let arg = iter.next().unwrap();
-            if let ast::Expression::Value { value, .. } = arg;
+            if let Some(ast::Expression::Value { value, .. }) = iter.next();
             if let ast::Value::TableConstructor(table) = &**value;
 
             then {

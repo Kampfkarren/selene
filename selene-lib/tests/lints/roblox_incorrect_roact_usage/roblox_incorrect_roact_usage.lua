@@ -23,3 +23,5 @@ e(Components.FooComponent, {
 })
 
 call("foo", {})
+
+e("ThisDoesntExist")
