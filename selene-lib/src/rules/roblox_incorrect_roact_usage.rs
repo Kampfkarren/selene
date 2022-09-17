@@ -1,6 +1,9 @@
 use super::*;
-use crate::ast_util::range;
-use std::{collections::HashSet, convert::Infallible};
+use crate::{ast_util::range, standard_library::RobloxClass};
+use std::{
+    collections::{BTreeMap, HashSet},
+    convert::Infallible,
+};
 
 use full_moon::{
     ast::{self, Ast},
@@ -27,7 +30,14 @@ impl Rule for IncorrectRoactUsageLint {
             return Vec::new();
         }
 
-        let mut visitor = IncorrectRoactUsageVisitor::default();
+        let mut visitor = IncorrectRoactUsageVisitor {
+            definitions_of_create_element: HashSet::new(),
+            invalid_properties: Vec::new(),
+            unknown_class: Vec::new(),
+
+            roblox_classes: &context.standard_library.roblox_classes,
+        };
+
         visitor.visit_ast(ast);
 
         let mut diagnostics = Vec::new();
@@ -69,11 +79,13 @@ fn is_roact_create_element(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]) -> b
     }
 }
 
-#[derive(Debug, Default)]
-struct IncorrectRoactUsageVisitor {
+#[derive(Debug)]
+struct IncorrectRoactUsageVisitor<'a> {
     definitions_of_create_element: HashSet<String>,
     invalid_properties: Vec<InvalidProperty>,
     unknown_class: Vec<UnknownClass>,
+
+    roblox_classes: &'a BTreeMap<String, RobloxClass>,
 }
 
 #[derive(Debug)]
@@ -89,19 +101,16 @@ struct UnknownClass {
     range: (usize, usize),
 }
 
-impl IncorrectRoactUsageVisitor {
-    fn check_class_name(
-        &mut self,
-        token: &TokenReference,
-    ) -> Option<&'static rbx_reflection::RbxClassDescriptor> {
+impl<'a> IncorrectRoactUsageVisitor<'a> {
+    fn check_class_name(&mut self, token: &TokenReference) -> Option<(String, &'a RobloxClass)> {
         let name = if let TokenType::StringLiteral { literal, .. } = token.token_type() {
             literal.to_string()
         } else {
             return None;
         };
 
-        match rbx_reflection::get_class_descriptor(&name) {
-            option @ Some(_) => option,
+        match dbg!(self.roblox_classes).get(&name) {
+            Some(roblox_class) => Some((name, roblox_class)),
 
             None => {
                 self.unknown_class.push(UnknownClass {
@@ -115,7 +124,7 @@ impl IncorrectRoactUsageVisitor {
     }
 }
 
-impl Visitor for IncorrectRoactUsageVisitor {
+impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         // Check if caller is Roact.createElement or a variable defined to it
         let mut suffixes = call.suffixes().collect::<Vec<_>>();
@@ -144,7 +153,7 @@ impl Visitor for IncorrectRoactUsageVisitor {
             return;
         }
 
-        let (mut class, arguments) = if_chain! {
+        let ((name, class), arguments) = if_chain! {
             if let Some(ast::Suffix::Call(ast::Call::AnonymousCall(
                 ast::FunctionArgs::Parentheses { arguments, .. }
             ))) = call_suffix;
@@ -155,7 +164,7 @@ impl Visitor for IncorrectRoactUsageVisitor {
             let name_arg = iter.next().unwrap();
             if let ast::Expression::Value { value, .. } = name_arg;
             if let ast::Value::String(token) = &**value;
-            if let Some(class) = self.check_class_name(token);
+            if let Some((name, class)) = self.check_class_name(token);
 
             // Get second argument, check if it is a table
             let arg = iter.next().unwrap();
@@ -163,34 +172,18 @@ impl Visitor for IncorrectRoactUsageVisitor {
             if let ast::Value::TableConstructor(table) = &**value;
 
             then {
-                (class, table)
+                ((name, class), table)
             } else {
                 return;
             }
         };
 
-        let mut valid_properties = HashSet::new();
-
-        loop {
-            for (property, descriptor) in class.iter_property_descriptors() {
-                if descriptor.is_canonical() {
-                    valid_properties.insert(property);
-                }
-            }
-
-            if let Some(superclass) = class.superclass() {
-                class = rbx_reflection::get_class_descriptor(superclass).unwrap();
-            } else {
-                break;
-            }
-        }
-
         for field in arguments.fields() {
             if let ast::Field::NameKey { key, .. } = field {
                 let property_name = key.token().to_string();
-                if !valid_properties.contains(property_name.as_str()) {
+                if !class.has_property(self.roblox_classes, &property_name) {
                     self.invalid_properties.push(InvalidProperty {
-                        class_name: class.name().to_string(),
+                        class_name: name.clone(),
                         property_name,
                         range: range(key),
                     });

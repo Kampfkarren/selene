@@ -1,0 +1,9 @@
+---
+name: roblox
+roblox_classes:
+  Frame:
+    superclass: GuiObject
+    properties: []
+  GuiObject:
+    properties:
+      - Size

@@ -1,10 +1,10 @@
-error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Instance`
+error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Frame`
   ┌─ roblox_incorrect_roact_usage.lua:2:5
   │
 2 │     ThisPropertyDoesntExist = true,
   │     ^^^^^^^^^^^^^^^^^^^^^^^
 
-error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Instance`
+error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Frame`
    ┌─ roblox_incorrect_roact_usage.lua:10:5
    │
 10 │     ThisPropertyDoesntExist = true,

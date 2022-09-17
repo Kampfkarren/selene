@@ -265,3 +265,11 @@ This specifies the name of the standard library. This is used internally for cas
 ### last_updated
 
 A timestamp of when the standard library was last updated. This is used by the Roblox standard library generator to update when it gets too old.
+
+### last_selene_version
+
+A timestamp of the last selene version that generated this standard library. This is used by the Roblox standard library generator to update when it gets too old.
+
+### roblox_classes
+
+A map of every Roblox class and their properties, for [roblox_incorrect_roact_usage](../lints/roblox_incorrect_roact_usage.md).

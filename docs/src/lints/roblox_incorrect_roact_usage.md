@@ -23,6 +23,4 @@ This lint is naive and makes several assumptions about the way you write your co
 
 This lint does not verify if the value you are giving is correct, so `Text = UDim2.new()` will be treated as correct. This lint, right now, only checks property and class names.
 
-Additionally, this lint is based off of [rbx_reflection](https://docs.rs/rbx_reflection/3/rbx_reflection/). In practice, this means that if Roblox adds new properties or classes, selene will not know they exist until you update it.
-
 This lint is only active if you are using the Roblox standard library.
