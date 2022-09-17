@@ -33,13 +33,20 @@ impl Rule for IncorrectRoactUsageLint {
             return Vec::new();
         }
 
+        let roblox_classes = &context.standard_library.roblox_classes;
+
+        // Old roblox standard library
+        if roblox_classes.is_empty() {
+            return Vec::new();
+        }
+
         let mut visitor = IncorrectRoactUsageVisitor {
             definitions_of_create_element: HashSet::new(),
             invalid_events: Vec::new(),
             invalid_properties: Vec::new(),
             unknown_class: Vec::new(),
 
-            roblox_classes: &context.standard_library.roblox_classes,
+            roblox_classes,
         };
 
         visitor.visit_ast(ast);
@@ -263,6 +270,15 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
 #[cfg(test)]
 mod tests {
     use super::{super::test_util::test_lint, *};
+
+    #[test]
+    fn test_old_roblox_std() {
+        test_lint(
+            IncorrectRoactUsageLint::new(()).unwrap(),
+            "roblox_incorrect_roact_usage",
+            "old_roblox_std",
+        );
+    }
 
     #[test]
     fn test_roblox_incorrect_roact_usage() {
