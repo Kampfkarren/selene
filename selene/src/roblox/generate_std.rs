@@ -35,11 +35,14 @@ impl RobloxGenerator {
         self.write_enums(&api);
         self.write_instance_new(&api);
         self.write_get_service(&api);
+        self.write_roblox_classes(&api);
 
         let mut bytes = Vec::new();
 
         let time = Local::now();
         self.std.last_updated = Some(time.timestamp());
+
+        self.std.last_selene_version = Some(env!("CARGO_PKG_VERSION").to_owned());
 
         writeln!(
             bytes,
@@ -281,5 +284,29 @@ impl RobloxGenerator {
                 method: true,
                 must_use: true,
             }));
+    }
+
+    fn write_roblox_classes(&mut self, api: &ApiDump) {
+        for class in &api.classes {
+            let mut events = Vec::new();
+            let mut properties = Vec::new();
+
+            for member in &class.members {
+                match member {
+                    ApiMember::Event { name, .. } => events.push(name.to_owned()),
+                    ApiMember::Property { name, .. } => properties.push(name.to_owned()),
+                    _ => {}
+                }
+            }
+
+            self.std.roblox_classes.insert(
+                class.name.clone(),
+                RobloxClass {
+                    superclass: class.superclass.clone(),
+                    events,
+                    properties,
+                },
+            );
+        }
     }
 }

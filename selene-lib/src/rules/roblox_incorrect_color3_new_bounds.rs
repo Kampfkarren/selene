@@ -54,7 +54,7 @@ impl Visitor for Color3BoundsVisitor {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         if_chain::if_chain! {
             if let ast::Prefix::Name(token) = call.prefix();
-            if token.to_string() == "Color3";
+            if token.token().to_string() == "Color3";
             let mut suffixes = call.suffixes().collect::<Vec<_>>();
 
             if suffixes.len() == 2; // .new and ()
@@ -62,7 +62,7 @@ impl Visitor for Color3BoundsVisitor {
             let index_suffix = suffixes.pop().unwrap();
 
             if let ast::Suffix::Index(ast::Index::Dot { name, .. }) = index_suffix;
-            if name.to_string() == "new";
+            if name.token().to_string() == "new";
 
             if let ast::Suffix::Call(ast::Call::AnonymousCall(
                 ast::FunctionArgs::Parentheses { arguments, .. }

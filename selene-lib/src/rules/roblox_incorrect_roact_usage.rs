@@ -1,6 +1,12 @@
 use super::*;
-use crate::ast_util::range;
-use std::{collections::HashSet, convert::Infallible};
+use crate::{
+    ast_util::{range, strip_parentheses},
+    standard_library::RobloxClass,
+};
+use std::{
+    collections::{BTreeMap, HashSet},
+    convert::Infallible,
+};
 
 use full_moon::{
     ast::{self, Ast},
@@ -27,10 +33,36 @@ impl Rule for IncorrectRoactUsageLint {
             return Vec::new();
         }
 
-        let mut visitor = IncorrectRoactUsageVisitor::default();
+        let roblox_classes = &context.standard_library.roblox_classes;
+
+        // Old roblox standard library
+        if roblox_classes.is_empty() {
+            return Vec::new();
+        }
+
+        let mut visitor = IncorrectRoactUsageVisitor {
+            definitions_of_create_element: HashSet::new(),
+            invalid_events: Vec::new(),
+            invalid_properties: Vec::new(),
+            unknown_class: Vec::new(),
+
+            roblox_classes,
+        };
+
         visitor.visit_ast(ast);
 
         let mut diagnostics = Vec::new();
+
+        for invalid_event in visitor.invalid_events {
+            diagnostics.push(Diagnostic::new(
+                "incorrect_roact_usage",
+                format!(
+                    "`{}` is not a valid event for `{}`",
+                    invalid_event.event_name, invalid_event.class_name
+                ),
+                Label::new(invalid_event.range),
+            ));
+        }
 
         for invalid_property in visitor.invalid_properties {
             diagnostics.push(Diagnostic::new(
@@ -69,11 +101,21 @@ fn is_roact_create_element(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]) -> b
     }
 }
 
-#[derive(Debug, Default)]
-struct IncorrectRoactUsageVisitor {
+#[derive(Debug)]
+struct IncorrectRoactUsageVisitor<'a> {
     definitions_of_create_element: HashSet<String>,
+    invalid_events: Vec<InvalidEvent>,
     invalid_properties: Vec<InvalidProperty>,
     unknown_class: Vec<UnknownClass>,
+
+    roblox_classes: &'a BTreeMap<String, RobloxClass>,
+}
+
+#[derive(Debug)]
+struct InvalidEvent {
+    class_name: String,
+    event_name: String,
+    range: (usize, usize),
 }
 
 #[derive(Debug)]
@@ -89,19 +131,16 @@ struct UnknownClass {
     range: (usize, usize),
 }
 
-impl IncorrectRoactUsageVisitor {
-    fn check_class_name(
-        &mut self,
-        token: &TokenReference,
-    ) -> Option<&'static rbx_reflection::RbxClassDescriptor> {
+impl<'a> IncorrectRoactUsageVisitor<'a> {
+    fn check_class_name(&mut self, token: &TokenReference) -> Option<(String, &'a RobloxClass)> {
         let name = if let TokenType::StringLiteral { literal, .. } = token.token_type() {
             literal.to_string()
         } else {
             return None;
         };
 
-        match rbx_reflection::get_class_descriptor(&name) {
-            option @ Some(_) => option,
+        match self.roblox_classes.get(&name) {
+            Some(roblox_class) => Some((name, roblox_class)),
 
             None => {
                 self.unknown_class.push(UnknownClass {
@@ -115,7 +154,7 @@ impl IncorrectRoactUsageVisitor {
     }
 }
 
-impl Visitor for IncorrectRoactUsageVisitor {
+impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         // Check if caller is Roact.createElement or a variable defined to it
         let mut suffixes = call.suffixes().collect::<Vec<_>>();
@@ -144,57 +183,72 @@ impl Visitor for IncorrectRoactUsageVisitor {
             return;
         }
 
-        let (mut class, arguments) = if_chain! {
+        let ((name, class), arguments) = if_chain! {
             if let Some(ast::Suffix::Call(ast::Call::AnonymousCall(
                 ast::FunctionArgs::Parentheses { arguments, .. }
             ))) = call_suffix;
-            if arguments.len() >= 2;
+            if !arguments.is_empty();
             let mut iter = arguments.iter();
 
             // Get first argument, check if it is a Roblox class
             let name_arg = iter.next().unwrap();
             if let ast::Expression::Value { value, .. } = name_arg;
             if let ast::Value::String(token) = &**value;
-            if let Some(class) = self.check_class_name(token);
+            if let Some((name, class)) = self.check_class_name(token);
 
             // Get second argument, check if it is a table
-            let arg = iter.next().unwrap();
-            if let ast::Expression::Value { value, .. } = arg;
+            if let Some(ast::Expression::Value { value, .. }) = iter.next();
             if let ast::Value::TableConstructor(table) = &**value;
 
             then {
-                (class, table)
+                ((name, class), table)
             } else {
                 return;
             }
         };
 
-        let mut valid_properties = HashSet::new();
-
-        loop {
-            for (property, descriptor) in class.iter_property_descriptors() {
-                if descriptor.is_canonical() {
-                    valid_properties.insert(property);
-                }
-            }
-
-            if let Some(superclass) = class.superclass() {
-                class = rbx_reflection::get_class_descriptor(superclass).unwrap();
-            } else {
-                break;
-            }
-        }
-
         for field in arguments.fields() {
-            if let ast::Field::NameKey { key, .. } = field {
-                let property_name = key.token().to_string();
-                if !valid_properties.contains(property_name.as_str()) {
-                    self.invalid_properties.push(InvalidProperty {
-                        class_name: class.name().to_string(),
-                        property_name,
-                        range: range(key),
-                    });
+            match field {
+                ast::Field::NameKey { key, .. } => {
+                    let property_name = key.token().to_string();
+                    if !class.has_property(self.roblox_classes, &property_name) {
+                        self.invalid_properties.push(InvalidProperty {
+                            class_name: name.clone(),
+                            property_name,
+                            range: range(key),
+                        });
+                    }
                 }
+
+                ast::Field::ExpressionKey { brackets, key, .. } => {
+                    let key = strip_parentheses(key);
+
+                    if_chain::if_chain! {
+                        if let ast::Expression::Value { value, .. } = key;
+                        if let ast::Value::Var(ast::Var::Expression(var_expression)) = &**value;
+
+                        if let ast::Prefix::Name(constant_roact_name) = var_expression.prefix();
+                        if constant_roact_name.token().to_string() == "Roact";
+
+                        let mut suffixes = var_expression.suffixes();
+                        if let Some(ast::Suffix::Index(ast::Index::Dot { name: constant_event_name, .. })) = suffixes.next();
+                        if constant_event_name.token().to_string() == "Event";
+
+                        if let Some(ast::Suffix::Index(ast::Index::Dot { name: event_name, .. })) = suffixes.next();
+                        then {
+                            let event_name = event_name.token().to_string();
+                            if !class.has_event(self.roblox_classes, &event_name) {
+                                self.invalid_events.push(InvalidEvent {
+                                    class_name: name.clone(),
+                                    event_name,
+                                    range: range(brackets),
+                                });
+                            }
+                        }
+                    }
+                }
+
+                _ => {}
             }
         }
     }
@@ -216,6 +270,15 @@ impl Visitor for IncorrectRoactUsageVisitor {
 #[cfg(test)]
 mod tests {
     use super::{super::test_util::test_lint, *};
+
+    #[test]
+    fn test_old_roblox_std() {
+        test_lint(
+            IncorrectRoactUsageLint::new(()).unwrap(),
+            "roblox_incorrect_roact_usage",
+            "old_roblox_std",
+        );
+    }
 
     #[test]
     fn test_roblox_incorrect_roact_usage() {

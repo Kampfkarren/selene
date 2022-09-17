@@ -1,18 +1,30 @@
-error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Instance`
+error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Frame`
   ┌─ roblox_incorrect_roact_usage.lua:2:5
   │
 2 │     ThisPropertyDoesntExist = true,
   │     ^^^^^^^^^^^^^^^^^^^^^^^
 
-error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Instance`
-   ┌─ roblox_incorrect_roact_usage.lua:10:5
+error[incorrect_roact_usage]: `ThisEventDoesntExist` is not a valid event for `Frame`
+  ┌─ roblox_incorrect_roact_usage.lua:8:5
+  │
+8 │     [Roact.Event.ThisEventDoesntExist] = function()
+  │     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Frame`
+   ┌─ roblox_incorrect_roact_usage.lua:16:5
    │
-10 │     ThisPropertyDoesntExist = true,
+16 │     ThisPropertyDoesntExist = true,
    │     ^^^^^^^^^^^^^^^^^^^^^^^
 
 error[roblox_incorrect_roact_usage]: `ThisDoesntExist` is not a valid class
-   ┌─ roblox_incorrect_roact_usage.lua:13:3
+   ┌─ roblox_incorrect_roact_usage.lua:19:3
    │
-13 │ e("ThisDoesntExist", {})
+19 │ e("ThisDoesntExist", {})
+   │   ^^^^^^^^^^^^^^^^^
+
+error[roblox_incorrect_roact_usage]: `ThisDoesntExist` is not a valid class
+   ┌─ roblox_incorrect_roact_usage.lua:27:3
+   │
+27 │ e("ThisDoesntExist")
    │   ^^^^^^^^^^^^^^^^^
 
