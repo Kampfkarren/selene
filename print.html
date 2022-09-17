@@ -675,6 +675,10 @@ script.*.*:
 <p>This specifies the name of the standard library. This is used internally for cases such as only giving Roblox lints if the standard library is named <code>&quot;roblox&quot;</code>.</p>
 <h3 id="last_updated"><a class="header" href="#last_updated">last_updated</a></h3>
 <p>A timestamp of when the standard library was last updated. This is used by the Roblox standard library generator to update when it gets too old.</p>
+<h3 id="last_selene_version"><a class="header" href="#last_selene_version">last_selene_version</a></h3>
+<p>A timestamp of the last selene version that generated this standard library. This is used by the Roblox standard library generator to update when it gets too old.</p>
+<h3 id="roblox_classes"><a class="header" href="#roblox_classes">roblox_classes</a></h3>
+<p>A map of every Roblox class and their properties, for <a href="usage/../lints/roblox_incorrect_roact_usage.html">roblox_incorrect_roact_usage</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="roblox-guide"><a class="header" href="#roblox-guide">Roblox Guide</a></h1>
 <p>selene is built with Roblox development in mind, and has special features for Roblox developers.</p>
 <p>If you try to run selene on a Roblox codebase, you'll get a bunch of errors saying things such as &quot;<code>game</code> is not defined&quot;. This is because these are Roblox specific globals that selene does not know about. You'll need to install the Roblox <a href="./usage/configuration">standard library</a> in order to fix these issues, as well as get Roblox specific lints.</p>
@@ -1111,6 +1115,8 @@ while x do
 <h2 id="example-16"><a class="header" href="#example-16">Example</a></h2>
 <pre><code class="language-lua">Roact.createElement(&quot;Frame&quot;, {
     ThisPropertyDoesntExist = true,
+
+    [Roact.Event.ThisEventDoesntExist] = function() end,
 })
 
 Roact.createElement(&quot;BadClass&quot;, {})
@@ -1123,7 +1129,6 @@ Roact.createElement(&quot;BadClass&quot;, {})
 <li>It assumes Roact is defined. <a href="lints/./undefined_variable.html"><code>undefined_variable</code></a> will still lint, however.</li>
 </ol>
 <p>This lint does not verify if the value you are giving is correct, so <code>Text = UDim2.new()</code> will be treated as correct. This lint, right now, only checks property and class names.</p>
-<p>Additionally, this lint is based off of <a href="https://docs.rs/rbx_reflection/3/rbx_reflection/">rbx_reflection</a>. In practice, this means that if Roblox adds new properties or classes, selene will not know they exist until you update it.</p>
 <p>This lint is only active if you are using the Roblox standard library.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="shadowing"><a class="header" href="#shadowing">shadowing</a></h1>
 <h2 id="what-it-does-17"><a class="header" href="#what-it-does-17">What it does</a></h2>

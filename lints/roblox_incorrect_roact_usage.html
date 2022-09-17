@@ -142,6 +142,8 @@
 <h2 id="example"><a class="header" href="#example">Example</a></h2>
 <pre><code class="language-lua">Roact.createElement(&quot;Frame&quot;, {
     ThisPropertyDoesntExist = true,
+
+    [Roact.Event.ThisEventDoesntExist] = function() end,
 })
 
 Roact.createElement(&quot;BadClass&quot;, {})
@@ -154,7 +156,6 @@ Roact.createElement(&quot;BadClass&quot;, {})
 <li>It assumes Roact is defined. <a href="./undefined_variable.html"><code>undefined_variable</code></a> will still lint, however.</li>
 </ol>
 <p>This lint does not verify if the value you are giving is correct, so <code>Text = UDim2.new()</code> will be treated as correct. This lint, right now, only checks property and class names.</p>
-<p>Additionally, this lint is based off of <a href="https://docs.rs/rbx_reflection/3/rbx_reflection/">rbx_reflection</a>. In practice, this means that if Roblox adds new properties or classes, selene will not know they exist until you update it.</p>
 <p>This lint is only active if you are using the Roblox standard library.</p>
 
                     </main>
