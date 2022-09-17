@@ -22,6 +22,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fixed `unused_variable` incorrectly tagging `function global.name()` when `global` is defined in the standard library.
 - Fixed `unscoped_variables` incorrectly tagging `function global.name()` as creating an unscoped variable for `global`.
 - Fixed `roblox_incorrect_roact_usage` always showing the class name as "Instance". ([#297](https://github.com/Kampfkarren/selene/issues/297))
+- Fixed issues where `roblox_incorrect_color3_new_bounds` would sometimes fail to run.
 
 ## [0.20.0](https://github.com/Kampfkarren/selene/releases/tag/0.20.0) - 2022-07-21
 ### Added
