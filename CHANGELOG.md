@@ -3,6 +3,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.20.0...HEAD)
 
+## [0.21.0](https://github.com/Kampfkarren/selene/releases/tag/0.21.0) - 2022-09-17
+
 ### Added
 - `undefined_variable` now properly catches `global` as undefined in `function global.name()`.
 - Added the "luau" builtin library.
