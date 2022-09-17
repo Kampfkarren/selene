@@ -10,14 +10,18 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `constant_table_comparison` check to catch `x == {}`, which will always fail.
 - Added `high_cyclomatic_complexity` check to catch overly complex functions that are hard to test, and harder to reason about. This lint is disabled by default.
 - Added `Font.new` to the Roblox standard library.
+- `roblox_incorrect_roact_usage` now lints for invalid events.
 
 ### Changed
 - Match `.luau` filename extension by default.
 - Allow `--pattern` to be passed multiple times.
+- `roblox_incorrect_roact_usage` now uses the generated standard library to know what classes and properties exist, meaning a selene update is no longer necessary to update.
+- Roblox standard libraries are now guaranteed to regenerate when the previously generated standard library is on a different version.
 
 ### Fixed
 - Fixed `unused_variable` incorrectly tagging `function global.name()` when `global` is defined in the standard library.
 - Fixed `unscoped_variables` incorrectly tagging `function global.name()` as creating an unscoped variable for `global`.
+- Fixed `roblox_incorrect_roact_usage` always showing the class name as "Instance". ([#297](https://github.com/Kampfkarren/selene/issues/297))
 
 ## [0.20.0](https://github.com/Kampfkarren/selene/releases/tag/0.20.0) - 2022-07-21
 ### Added
