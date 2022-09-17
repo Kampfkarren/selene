@@ -9,6 +9,8 @@ This is guaranteed to fail once it is rendered. Furthermore, the createElement i
 ```lua
 Roact.createElement("Frame", {
     ThisPropertyDoesntExist = true,
+
+    [Roact.Event.ThisEventDoesntExist] = function() end,
 })
 
 Roact.createElement("BadClass", {})

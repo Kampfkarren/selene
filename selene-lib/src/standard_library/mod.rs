@@ -795,24 +795,35 @@ impl Default for Observes {
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub struct RobloxClass {
-    superclass: Option<String>,
-    properties: Vec<String>,
+    pub superclass: String,
+    pub events: Vec<String>,
+    pub properties: Vec<String>,
 }
 
 impl RobloxClass {
+    pub fn has_event(&self, roblox_classes: &BTreeMap<String, RobloxClass>, event: &str) -> bool {
+        if self.events.iter().any(|other_event| other_event == event) {
+            true
+        } else if let Some(superclass) = roblox_classes.get(&self.superclass) {
+            superclass.has_event(roblox_classes, event)
+        } else {
+            false
+        }
+    }
+
     pub fn has_property(
         &self,
         roblox_classes: &BTreeMap<String, RobloxClass>,
         property: &str,
     ) -> bool {
-        if self.properties.contains(&property.to_owned()) {
+        if self
+            .properties
+            .iter()
+            .any(|other_property| other_property == property)
+        {
             true
-        } else if let Some(superclass_name) = &self.superclass {
-            if let Some(superclass) = roblox_classes.get(superclass_name) {
-                superclass.has_property(roblox_classes, property)
-            } else {
-                false
-            }
+        } else if let Some(superclass) = roblox_classes.get(&self.superclass) {
+            superclass.has_property(roblox_classes, property)
         } else {
             false
         }

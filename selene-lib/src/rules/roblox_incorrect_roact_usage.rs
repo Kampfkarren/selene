@@ -1,5 +1,8 @@
 use super::*;
-use crate::{ast_util::range, standard_library::RobloxClass};
+use crate::{
+    ast_util::{range, strip_parentheses},
+    standard_library::RobloxClass,
+};
 use std::{
     collections::{BTreeMap, HashSet},
     convert::Infallible,
@@ -32,6 +35,7 @@ impl Rule for IncorrectRoactUsageLint {
 
         let mut visitor = IncorrectRoactUsageVisitor {
             definitions_of_create_element: HashSet::new(),
+            invalid_events: Vec::new(),
             invalid_properties: Vec::new(),
             unknown_class: Vec::new(),
 
@@ -41,6 +45,17 @@ impl Rule for IncorrectRoactUsageLint {
         visitor.visit_ast(ast);
 
         let mut diagnostics = Vec::new();
+
+        for invalid_event in visitor.invalid_events {
+            diagnostics.push(Diagnostic::new(
+                "incorrect_roact_usage",
+                format!(
+                    "`{}` is not a valid event for `{}`",
+                    invalid_event.event_name, invalid_event.class_name
+                ),
+                Label::new(invalid_event.range),
+            ));
+        }
 
         for invalid_property in visitor.invalid_properties {
             diagnostics.push(Diagnostic::new(
@@ -82,10 +97,18 @@ fn is_roact_create_element(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]) -> b
 #[derive(Debug)]
 struct IncorrectRoactUsageVisitor<'a> {
     definitions_of_create_element: HashSet<String>,
+    invalid_events: Vec<InvalidEvent>,
     invalid_properties: Vec<InvalidProperty>,
     unknown_class: Vec<UnknownClass>,
 
     roblox_classes: &'a BTreeMap<String, RobloxClass>,
+}
+
+#[derive(Debug)]
+struct InvalidEvent {
+    class_name: String,
+    event_name: String,
+    range: (usize, usize),
 }
 
 #[derive(Debug)]
@@ -109,7 +132,7 @@ impl<'a> IncorrectRoactUsageVisitor<'a> {
             return None;
         };
 
-        match dbg!(self.roblox_classes).get(&name) {
+        match self.roblox_classes.get(&name) {
             Some(roblox_class) => Some((name, roblox_class)),
 
             None => {
@@ -179,15 +202,47 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
         };
 
         for field in arguments.fields() {
-            if let ast::Field::NameKey { key, .. } = field {
-                let property_name = key.token().to_string();
-                if !class.has_property(self.roblox_classes, &property_name) {
-                    self.invalid_properties.push(InvalidProperty {
-                        class_name: name.clone(),
-                        property_name,
-                        range: range(key),
-                    });
+            match field {
+                ast::Field::NameKey { key, .. } => {
+                    let property_name = key.token().to_string();
+                    if !class.has_property(self.roblox_classes, &property_name) {
+                        self.invalid_properties.push(InvalidProperty {
+                            class_name: name.clone(),
+                            property_name,
+                            range: range(key),
+                        });
+                    }
                 }
+
+                ast::Field::ExpressionKey { brackets, key, .. } => {
+                    let key = strip_parentheses(key);
+
+                    if_chain::if_chain! {
+                        if let ast::Expression::Value { value, .. } = key;
+                        if let ast::Value::Var(ast::Var::Expression(var_expression)) = &**value;
+
+                        if let ast::Prefix::Name(constant_roact_name) = var_expression.prefix();
+                        if constant_roact_name.token().to_string() == "Roact";
+
+                        let mut suffixes = var_expression.suffixes();
+                        if let Some(ast::Suffix::Index(ast::Index::Dot { name: constant_event_name, .. })) = suffixes.next();
+                        if constant_event_name.token().to_string() == "Event";
+
+                        if let Some(ast::Suffix::Index(ast::Index::Dot { name: event_name, .. })) = suffixes.next();
+                        then {
+                            let event_name = event_name.token().to_string();
+                            if !class.has_event(self.roblox_classes, &event_name) {
+                                self.invalid_events.push(InvalidEvent {
+                                    class_name: name.clone(),
+                                    event_name,
+                                    range: range(brackets),
+                                });
+                            }
+                        }
+                    }
+                }
+
+                _ => {}
             }
         }
     }

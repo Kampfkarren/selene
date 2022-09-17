@@ -35,6 +35,7 @@ impl RobloxGenerator {
         self.write_enums(&api);
         self.write_instance_new(&api);
         self.write_get_service(&api);
+        self.write_roblox_classes(&api);
 
         let mut bytes = Vec::new();
 
@@ -283,5 +284,30 @@ impl RobloxGenerator {
                 method: true,
                 must_use: true,
             }));
+    }
+
+    fn write_roblox_classes(&mut self, api: &ApiDump) {
+        for class in &api.classes {
+            // self.std.roblox_classes.insert(
+            //     class.superclass,
+            //     class
+            //         .members
+            //         .iter()
+            //         .filter(|member| {
+            //             if let ApiMember::Property { security, .. } = member {
+            //                 *security == ApiPropertySecurity::default()
+            //             } else {
+            //                 true
+            //             }
+            //         })
+            //         .map(|member| match member {
+            //             ApiMember::Event { name, .. } => name.to_owned(),
+            //             ApiMember::Function { name, .. } => name.to_owned(),
+            //             ApiMember::Property { name, .. } => name.to_owned(),
+            //             ApiMember::Unknown => unreachable!(),
+            //         })
+            //         .collect(),
+            // );
+        }
     }
 }
