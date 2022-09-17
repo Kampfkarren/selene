@@ -288,26 +288,25 @@ impl RobloxGenerator {
 
     fn write_roblox_classes(&mut self, api: &ApiDump) {
         for class in &api.classes {
-            // self.std.roblox_classes.insert(
-            //     class.superclass,
-            //     class
-            //         .members
-            //         .iter()
-            //         .filter(|member| {
-            //             if let ApiMember::Property { security, .. } = member {
-            //                 *security == ApiPropertySecurity::default()
-            //             } else {
-            //                 true
-            //             }
-            //         })
-            //         .map(|member| match member {
-            //             ApiMember::Event { name, .. } => name.to_owned(),
-            //             ApiMember::Function { name, .. } => name.to_owned(),
-            //             ApiMember::Property { name, .. } => name.to_owned(),
-            //             ApiMember::Unknown => unreachable!(),
-            //         })
-            //         .collect(),
-            // );
+            let mut events = Vec::new();
+            let mut properties = Vec::new();
+
+            for member in &class.members {
+                match member {
+                    ApiMember::Event { name, .. } => events.push(name.to_owned()),
+                    ApiMember::Property { name, .. } => properties.push(name.to_owned()),
+                    _ => {}
+                }
+            }
+
+            self.std.roblox_classes.insert(
+                class.name.clone(),
+                RobloxClass {
+                    superclass: class.superclass.clone(),
+                    events,
+                    properties,
+                },
+            );
         }
     }
 }
