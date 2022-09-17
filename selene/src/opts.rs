@@ -63,7 +63,7 @@ pub struct Options {
     pub command: Option<Command>,
 
     #[structopt(long)]
-    pub exclude_path: Option<String>,
+    pub exclude_dir: Option<String>,
 }
 
 impl Options {

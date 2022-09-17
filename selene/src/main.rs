@@ -479,7 +479,7 @@ fn start(mut matches: opts::Options) {
 
     let pool = ThreadPool::new(matches.num_threads);
 
-    let exclude_path = &matches.exclude_path.as_ref();
+    let exclude_dir = &matches.exclude_dir.as_ref();
 
     for filename in &matches.files {
         if filename == "-" {
@@ -512,7 +512,7 @@ fn start(mut matches: opts::Options) {
                         for entry in glob {
                             match entry {
                                 Ok(path) => {
-                                    match exclude_path {
+                                    match exclude_dir {
                                         Some(exclude) => {
                                             if path.starts_with(exclude) {
                                                 continue;
