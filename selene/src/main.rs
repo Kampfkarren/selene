@@ -471,7 +471,7 @@ fn start(mut matches: opts::Options) {
 
     let mut builder = globset::GlobSetBuilder::new();
     for pattern in &config.exclude {
-        builder.add(match globset::Glob::new(&pattern) {
+        builder.add(match globset::Glob::new(pattern) {
             Ok(glob) => glob,
             Err(error) => {
                 error!("Invalid glob pattern: {error}");
