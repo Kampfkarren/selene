@@ -62,3 +62,10 @@ For example, if we had `game.toml` and `engine.toml` standard libraries, we coul
 ```toml
 std = "game+engine"
 ```
+
+### Excluding files from being linted
+It is possible to exclude files from being linted using the exclude option:
+
+```toml
+exclude = ["external/*", "*.spec.lua"]
+```

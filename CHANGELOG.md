@@ -1,7 +1,10 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.20.0...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.21.0...HEAD)
+
+### Added
+- Added exclude option to selene.toml for excluding files from lints
 
 ## [0.21.0](https://github.com/Kampfkarren/selene/releases/tag/0.21.0) - 2022-09-17
 
