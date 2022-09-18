@@ -471,10 +471,10 @@ fn start(mut matches: opts::Options) {
 
     let mut builder = globset::GlobSetBuilder::new();
     for pattern in &config.exclude {
-        builder.add(match globset::Glob::new(&format!("{}", pattern)) {
+        builder.add(match globset::Glob::new(&pattern) {
             Ok(glob) => glob,
             Err(error) => {
-                error!("Invalid glob pattern: {}", error);
+                error!("Invalid glob pattern: {error}");
                 return;
             }
         });
@@ -532,6 +532,7 @@ fn start(mut matches: opts::Options) {
                                     if exclude_set.is_match(&path) {
                                         continue;
                                     }
+
                                     let checker = Arc::clone(&checker);
 
                                     pool.execute(move || read_file(&checker, &path));
