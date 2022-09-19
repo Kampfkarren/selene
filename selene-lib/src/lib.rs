@@ -64,11 +64,17 @@ impl Error for CheckerError {}
 pub struct CheckerConfig<V> {
     pub config: HashMap<String, V>,
     pub rules: HashMap<String, RuleVariation>,
-    pub std: String,
+    pub std: Option<String>,
 
     // Not locked behind Roblox feature so that selene.toml for Roblox will
     // run even without it.
     pub roblox_std_source: RobloxStdSource,
+}
+
+impl<V> CheckerConfig<V> {
+    pub fn std(&self) -> &str {
+        self.std.as_deref().unwrap_or("lua51")
+    }
 }
 
 impl<V> Default for CheckerConfig<V> {
@@ -76,7 +82,7 @@ impl<V> Default for CheckerConfig<V> {
         CheckerConfig {
             config: HashMap::new(),
             rules: HashMap::new(),
-            std: "".to_owned(),
+            std: None,
             roblox_std_source: RobloxStdSource::default(),
         }
     }
@@ -210,7 +216,7 @@ macro_rules! use_rules {
 
                     context: Context {
                         standard_library,
-                        standard_library_is_set: !config.std.is_empty(),
+                        standard_library_is_set: config.std.is_some(),
                     },
 
                     config,

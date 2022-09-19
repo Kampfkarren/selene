@@ -431,7 +431,7 @@ fn start(mut matches: opts::Options) {
     let current_dir = std::env::current_dir().unwrap();
 
     let standard_library =
-        match standard_library::collect_standard_library(&config, &config.std, &current_dir) {
+        match standard_library::collect_standard_library(&config, config.std(), &current_dir) {
             Ok(Some(library)) => library,
 
             Ok(None) => {
@@ -441,7 +441,7 @@ fn start(mut matches: opts::Options) {
 
             Err(error) => {
                 let missing_files: Vec<_> = config
-                    .std
+                    .std()
                     .split('+')
                     .filter(|name| {
                         !PathBuf::from(format!("{name}.yml")).exists()
@@ -453,7 +453,7 @@ fn start(mut matches: opts::Options) {
                 if !missing_files.is_empty() {
                     eprintln!(
                         "`std = \"{}\"`, but some libraries could not be found:",
-                        config.std
+                        config.std()
                     );
 
                     for library_name in missing_files {
