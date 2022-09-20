@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Added exclude option to selene.toml for excluding files from lints
 
+## [0.21.1](https://github.com/Kampfkarren/selene/releases/tag/0.21.0) - 2022-09-19
+### Fixed
+- Fixed not being able to use projects without selene.toml.
+
 ## [0.21.0](https://github.com/Kampfkarren/selene/releases/tag/0.21.0) - 2022-09-17
 
 ### Added
