@@ -13,7 +13,14 @@ pub struct RobloxGenerator {
 }
 
 impl RobloxGenerator {
-    pub fn generate(mut self) -> color_eyre::Result<(Vec<u8>, StandardLibrary)> {
+    pub fn generate() -> color_eyre::Result<(Vec<u8>, StandardLibrary)> {
+        RobloxGenerator {
+            std: StandardLibrary::roblox_base(),
+        }
+        .start_generation()
+    }
+
+    fn start_generation(mut self) -> color_eyre::Result<(Vec<u8>, StandardLibrary)> {
         let api: ApiDump = ureq::get(API_DUMP)
             .call()
             .context("error when getting API dump")?
@@ -28,11 +35,14 @@ impl RobloxGenerator {
         self.write_enums(&api);
         self.write_instance_new(&api);
         self.write_get_service(&api);
+        self.write_roblox_classes(&api);
 
         let mut bytes = Vec::new();
 
         let time = Local::now();
         self.std.last_updated = Some(time.timestamp());
+
+        self.std.last_selene_version = Some(env!("CARGO_PKG_VERSION").to_owned());
 
         writeln!(
             bytes,
@@ -45,11 +55,6 @@ impl RobloxGenerator {
             .extend(StandardLibrary::from_name(self.std.base.as_ref().unwrap()).unwrap());
 
         Ok((bytes, self.std))
-    }
-
-    pub fn base_std() -> StandardLibrary {
-        serde_yaml::from_str(include_str!("./base.yml"))
-            .expect("Roblox base.yml was an invalid standard library")
     }
 
     fn write_class(&mut self, api: &ApiDump, global_name: &str, class_name: &str) {
@@ -279,5 +284,29 @@ impl RobloxGenerator {
                 method: true,
                 must_use: true,
             }));
+    }
+
+    fn write_roblox_classes(&mut self, api: &ApiDump) {
+        for class in &api.classes {
+            let mut events = Vec::new();
+            let mut properties = Vec::new();
+
+            for member in &class.members {
+                match member {
+                    ApiMember::Event { name, .. } => events.push(name.to_owned()),
+                    ApiMember::Property { name, .. } => properties.push(name.to_owned()),
+                    _ => {}
+                }
+            }
+
+            self.std.roblox_classes.insert(
+                class.name.clone(),
+                RobloxClass {
+                    superclass: class.superclass.clone(),
+                    events,
+                    properties,
+                },
+            );
+        }
     }
 }

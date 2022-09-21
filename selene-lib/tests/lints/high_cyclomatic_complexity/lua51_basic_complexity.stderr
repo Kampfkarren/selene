@@ -1,0 +1,6 @@
+error[high_cyclomatic_complexity]: cyclomatic complexity is too high (2 > 1)
+  ┌─ lua51_basic_complexity.lua:2:11
+  │
+2 │ local h = function()
+  │           ^^^^^^^^^^
+

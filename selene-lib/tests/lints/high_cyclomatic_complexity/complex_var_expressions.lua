@@ -1,0 +1,45 @@
+local x = {}
+local f, g
+g = function(...) end
+function f()
+    local y = x:method(if _G.__DEV__ then "blue" else "black").z
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y[(if _G.__DEV__ then g else f)()][x["fog"] or "clear"] = true
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]()
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+    y = x[g(if _G.__DEV__ then "blue" else "black")]
+    y = if _G.__PROFILING__ then 31337 else 90210
+end

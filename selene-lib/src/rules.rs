@@ -10,11 +10,13 @@ use serde::de::DeserializeOwned;
 pub mod almost_swapped;
 pub mod bad_string_escape;
 pub mod compare_nan;
+pub mod constant_table_comparison;
 pub mod deprecated;
 pub mod divide_by_zero;
 pub mod duplicate_keys;
 pub mod empty_if;
 pub mod global_usage;
+pub mod high_cyclomatic_complexity;
 pub mod if_same_then_else;
 pub mod ifs_same_cond;
 pub mod invalid_lint_filter;
@@ -208,6 +210,7 @@ impl Label {
 #[derive(Clone, Debug)]
 pub struct Context {
     pub standard_library: StandardLibrary,
+    pub standard_library_is_set: bool,
 }
 
 impl Context {

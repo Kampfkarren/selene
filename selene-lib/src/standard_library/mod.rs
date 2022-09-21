@@ -121,6 +121,14 @@ pub struct StandardLibrary {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_updated: Option<i64>,
 
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_selene_version: Option<String>,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub roblox_classes: BTreeMap<String, RobloxClass>,
+
     #[serde(skip)]
     global_tree_cache: OnceCell<GlobalTreeCache>,
 }
@@ -167,47 +175,6 @@ impl From<io::Error> for StandardLibraryError {
 }
 
 impl StandardLibrary {
-    pub fn from_name(name: &str) -> Option<StandardLibrary> {
-        macro_rules! names {
-            {$($name:expr => $path:expr,)+} => {
-                match name {
-                    $(
-                        $name => {
-                            let mut std = serde_yaml::from_str::<StandardLibrary>(
-                                include_str!($path)
-                            ).unwrap_or_else(|error| {
-                                panic!(
-                                    "default standard library '{}' failed deserialization: {}",
-                                    name,
-                                    error,
-                                )
-                            });
-
-                            if let Some(base_name) = &std.base {
-                                let base = StandardLibrary::from_name(base_name);
-
-                                std.extend(
-                                    base.expect("built-in library based off of non-existent built-in"),
-                                );
-                            }
-
-                            Some(std)
-                        },
-                    )+
-
-                    _ => None
-                }
-            };
-        }
-
-        names! {
-            "lua51" => "../../default_std/lua51.yml",
-            "lua52" => "../../default_std/lua52.yml",
-            "lua53" => "../../default_std/lua53.yml",
-            "luau" => "../../default_std/luau.yml",
-        }
-    }
-
     // This assumes globals has not changed, which it shouldn't by the time this is being used.
     fn global_tree_cache(&self) -> &BTreeMap<String, GlobalTreeNode> {
         // O(n) debug check to make sure globals doesn't change
@@ -348,6 +315,71 @@ impl StandardLibrary {
 
         self.globals = globals;
     }
+
+    #[cfg(feature = "roblox")]
+    pub fn roblox_base() -> StandardLibrary {
+        StandardLibrary::from_builtin_name(
+            "roblox",
+            include_str!("../../default_std/roblox_base.yml"),
+        )
+        .expect("roblox_base.yml is missing")
+    }
+
+    fn from_builtin_name(name: &str, contents: &str) -> Option<StandardLibrary> {
+        let mut std = serde_yaml::from_str::<StandardLibrary>(contents).unwrap_or_else(|error| {
+            panic!("default standard library '{name}' failed deserialization: {error}")
+        });
+
+        if let Some(base_name) = &std.base {
+            let base = StandardLibrary::from_name(base_name);
+
+            std.extend(base.expect("built-in library based off of non-existent built-in"));
+        }
+
+        Some(std)
+    }
+}
+
+macro_rules! names {
+    {$($name:expr => $path:expr,)+} => {
+        impl StandardLibrary {
+            pub fn from_name(name: &str) -> Option<StandardLibrary> {
+                match name {
+                    $(
+                        $name => {
+                            StandardLibrary::from_builtin_name(name, include_str!($path))
+                        },
+                    )+
+
+                    _ => None
+                }
+            }
+
+            pub fn all_default_standard_libraries() -> &'static HashMap<&'static str, StandardLibrary> {
+                static CACHED_RESULT: OnceCell<HashMap<&'static str, StandardLibrary>> = OnceCell::new();
+
+                CACHED_RESULT.get_or_init(|| {
+                    let mut stds = HashMap::new();
+
+                    $(
+                        stds.insert(
+                            $name,
+                            StandardLibrary::from_name($name).unwrap(),
+                        );
+                    )+
+
+                    stds
+                })
+            }
+        }
+    };
+}
+
+names! {
+    "lua51" => "../../default_std/lua51.yml",
+    "lua52" => "../../default_std/lua52.yml",
+    "lua53" => "../../default_std/lua53.yml",
+    "luau" => "../../default_std/luau.yml",
 }
 
 fn is_default<T>(value: &T) -> bool
@@ -758,6 +790,43 @@ pub enum Observes {
 impl Default for Observes {
     fn default() -> Self {
         Self::ReadWrite
+    }
+}
+
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
+pub struct RobloxClass {
+    pub superclass: String,
+    pub events: Vec<String>,
+    pub properties: Vec<String>,
+}
+
+impl RobloxClass {
+    pub fn has_event(&self, roblox_classes: &BTreeMap<String, RobloxClass>, event: &str) -> bool {
+        if self.events.iter().any(|other_event| other_event == event) {
+            true
+        } else if let Some(superclass) = roblox_classes.get(&self.superclass) {
+            superclass.has_event(roblox_classes, event)
+        } else {
+            false
+        }
+    }
+
+    pub fn has_property(
+        &self,
+        roblox_classes: &BTreeMap<String, RobloxClass>,
+        property: &str,
+    ) -> bool {
+        if self
+            .properties
+            .iter()
+            .any(|other_property| other_property == property)
+        {
+            true
+        } else if let Some(superclass) = roblox_classes.get(&self.superclass) {
+            superclass.has_property(roblox_classes, property)
+        } else {
+            false
+        }
     }
 }
 

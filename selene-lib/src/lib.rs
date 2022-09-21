@@ -13,9 +13,10 @@ use serde::{
 
 mod ast_util;
 mod lint_filtering;
+mod possible_std;
 pub mod rules;
 pub mod standard_library;
-mod util;
+mod text;
 
 #[cfg(test)]
 mod test_util;
@@ -63,20 +64,25 @@ impl Error for CheckerError {}
 pub struct CheckerConfig<V> {
     pub config: HashMap<String, V>,
     pub rules: HashMap<String, RuleVariation>,
-    pub std: String,
+    pub std: Option<String>,
 
     // Not locked behind Roblox feature so that selene.toml for Roblox will
     // run even without it.
     pub roblox_std_source: RobloxStdSource,
 }
 
-// #[derive(Default)] cannot be used since it binds V to Default
+impl<V> CheckerConfig<V> {
+    pub fn std(&self) -> &str {
+        self.std.as_deref().unwrap_or("lua51")
+    }
+}
+
 impl<V> Default for CheckerConfig<V> {
     fn default() -> Self {
         CheckerConfig {
             config: HashMap::new(),
             rules: HashMap::new(),
-            std: "lua51".to_owned(),
+            std: None,
             roblox_std_source: RobloxStdSource::default(),
         }
     }
@@ -207,10 +213,13 @@ macro_rules! use_rules {
                             },
                         )+
                     )+
-                    config,
+
                     context: Context {
                         standard_library,
+                        standard_library_is_set: config.std.is_some(),
                     },
+
+                    config,
                 })
             }
 
@@ -283,11 +292,13 @@ use_rules! {
     almost_swapped: rules::almost_swapped::AlmostSwappedLint,
     bad_string_escape: rules::bad_string_escape::BadStringEscapeLint,
     compare_nan: rules::compare_nan::CompareNanLint,
+    constant_table_comparison: rules::constant_table_comparison::ConstantTableComparisonLint,
     deprecated: rules::deprecated::DeprecatedLint,
     divide_by_zero: rules::divide_by_zero::DivideByZeroLint,
     duplicate_keys: rules::duplicate_keys::DuplicateKeysLint,
     empty_if: rules::empty_if::EmptyIfLint,
     global_usage: rules::global_usage::GlobalLint,
+    high_cyclomatic_complexity: rules::high_cyclomatic_complexity::HighCyclomaticComplexityLint,
     if_same_then_else: rules::if_same_then_else::IfSameThenElseLint,
     ifs_same_cond: rules::ifs_same_cond::IfsSameCondLint,
     incorrect_standard_library_use: rules::standard_library::StandardLibraryLint,

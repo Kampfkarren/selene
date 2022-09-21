@@ -1,0 +1,18 @@
+error[high_cyclomatic_complexity]: cyclomatic complexity is too high (55 > 40)
+  ┌─ high_cyclomatic_complexity.lua:9:1
+  │
+9 │ function Reconciler:beginWork(current, lockInLochness, renderBikes)
+  │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[high_cyclomatic_complexity]: cyclomatic complexity is too high (49 > 40)
+    ┌─ high_cyclomatic_complexity.lua:241:7
+    │
+241 │ local function MyComponent(purse)
+    │       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[high_cyclomatic_complexity]: cyclomatic complexity is too high (49 > 40)
+    ┌─ high_cyclomatic_complexity.lua:381:18
+    │
+381 │ return withStyle(function(purse)
+    │                  ^^^^^^^^^^^^^^^
+

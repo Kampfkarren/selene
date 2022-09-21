@@ -40,11 +40,11 @@ pub fn get_standard_library(path_base: &Path) -> Option<StandardLibrary> {
     }
 }
 
-// TODO: Most of this is copy and pasted from test_lint_config, try and abstract it out a bit
-pub fn test_full_run_config(
+pub fn test_full_run_config_with_output(
     directory: &'static str,
     test_name: &'static str,
     checker_config: CheckerConfig<serde_json::Value>,
+    output_extension: &str,
 ) {
     let path_base = TEST_FULL_RUN_ROOT.join(directory).join(test_name);
 
@@ -90,7 +90,7 @@ pub fn test_full_run_config(
     }
 
     let stderr = std::str::from_utf8(output.get_ref()).expect("output not utf-8");
-    let output_path = path_base.with_extension("stderr");
+    let output_path = path_base.with_extension(output_extension);
 
     if let Ok(expected) = fs::read_to_string(&output_path) {
         pretty_assertions::assert_eq!(PrettyString(&expected), PrettyString(stderr));
@@ -100,6 +100,15 @@ pub fn test_full_run_config(
             .write_all(output.get_ref())
             .expect("couldn't write to output file");
     }
+}
+
+// TODO: Most of this is copy and pasted from test_lint_config, try and abstract it out a bit
+pub fn test_full_run_config(
+    directory: &'static str,
+    test_name: &'static str,
+    checker_config: CheckerConfig<serde_json::Value>,
+) {
+    test_full_run_config_with_output(directory, test_name, checker_config, "stderr");
 }
 
 pub fn test_full_run(directory: &'static str, test_name: &'static str) {

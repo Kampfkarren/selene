@@ -1,6 +1,6 @@
 # This is for general Luau functionality.
 # Valid: math.sign(), bit32.countlz()
-# Invalid (put in selene/src/roblox/base.yml instead): CFrame.new(), Instance.new(), task.spawn()
+# Invalid (put in selene-lib/default_std/roblox_base.yml instead): CFrame.new(), Instance.new(), task.spawn()
 ---
 base: lua51
 globals:

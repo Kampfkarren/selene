@@ -9,10 +9,6 @@ error[incorrect_standard_library_use]: standard library global `script.Child.Nam
   │
 4 │ script.Child.Name.UhOh = "Oops"
   │ ^^^^^^^^^^^^^^^^^^^^^^
-  │
-  = `script.Child.Name.UhOh` was found in the roblox standard libary
-  = you can set the standard library by putting the following inside selene.toml:
-    std = "roblox"
 
 error[incorrect_standard_library_use]: standard library global `script.Child.Grandchild` is not writable
   ┌─ wildcard_structs.lua:5:1
