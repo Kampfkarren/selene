@@ -3,6 +3,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.21.0...HEAD)
 
+### Added
+- Added `--allow-warnings` option to have selene pass on warnings only.
+
 ## [0.21.1](https://github.com/Kampfkarren/selene/releases/tag/0.21.0) - 2022-09-19
 ### Fixed
 - Fixed not being able to use projects without selene.toml.

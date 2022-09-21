@@ -7,10 +7,11 @@ USAGE:
     selene <SUBCOMMAND>
 
 FLAGS:
-    -h, --help          Prints help information
-    -n, --no-summary    Suppress summary information
-    -q, --quiet         Display only the necessary information. Equivalent to --display-style="quiet"
-    -V, --version       Prints version information
+    -a, --allow-warnings    Pass on warnings only
+    -h, --help              Prints help information
+    -n, --no-summary        Suppress summary information
+    -q, --quiet             Display only the necessary information. Equivalent to --display-style="quiet"
+    -V, --version           Prints version information
 
 OPTIONS:
         --color <color>                     [default: auto]  [possible values: Always, Auto, Never]

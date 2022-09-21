@@ -554,8 +554,14 @@ fn start(mut matches: opts::Options) {
         log_total(parse_errors, lint_errors, lint_warnings).ok();
     }
 
-    if parse_errors + lint_errors + pool.panic_count() > 0 {
-        std::process::exit(1);
+    let error_count = parse_errors + lint_errors + lint_warnings + pool.panic_count();
+    if error_count > 0 {
+        let lock = OPTIONS.read().unwrap();
+        let opts = lock.as_ref().unwrap();
+
+        if error_count != lint_warnings || opts.allow_warnings {
+            std::process::exit(1);
+        }
     }
 }
 
