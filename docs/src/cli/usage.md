@@ -7,7 +7,7 @@ USAGE:
     selene <SUBCOMMAND>
 
 FLAGS:
-    -a, --allow-warnings    Pass when only warnings occur
+        --allow-warnings    Pass when only warnings occur
     -h, --help              Prints help information
     -n, --no-summary        Suppress summary information
     -q, --quiet             Display only the necessary information. Equivalent to --display-style="quiet"

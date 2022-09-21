@@ -49,7 +49,7 @@ pub struct Options {
     pub no_summary: bool,
 
     /// Pass when only warnings occur
-    #[structopt(long, short)]
+    #[structopt(long)]
     pub allow_warnings: bool,
 
     /// Whether to pretend to be luacheck for existing consumers
