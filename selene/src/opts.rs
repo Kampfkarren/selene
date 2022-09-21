@@ -48,7 +48,7 @@ pub struct Options {
     #[structopt(long, short)]
     pub no_summary: bool,
 
-    /// Pass on warnings only
+    /// Pass when only warnings occur
     #[structopt(long, short)]
     pub allow_warnings: bool,
 
