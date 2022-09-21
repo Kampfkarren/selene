@@ -48,6 +48,10 @@ pub struct Options {
     #[structopt(long, short)]
     pub no_summary: bool,
 
+    /// Pass on warnings only
+    #[structopt(long, short)]
+    pub allow_warnings: bool,
+
     /// Whether to pretend to be luacheck for existing consumers
     #[structopt(long, hidden(true))]
     pub luacheck: bool,
