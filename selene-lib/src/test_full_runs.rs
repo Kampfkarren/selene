@@ -10,7 +10,7 @@ fn function_overriding() {
 
 #[test]
 fn plugin_block_table_calls() {
-    test_full_run("plugins", "block_table_calls");
+    test_full_run("plugins/block_table_calls", "block_table_calls");
 }
 
 #[test]

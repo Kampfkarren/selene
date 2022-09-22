@@ -323,7 +323,7 @@ dependencies = [
 [[package]]
 name = "full-moon-lua-types"
 version = "0.1.0"
-source = "git+https://github.com/Kampfkarren/full-moon?branch=lua-types#c79d1231e25a7c1c4fcbf89ed6813b65f5e6b761"
+source = "git+https://github.com/Kampfkarren/full-moon?branch=lua-types#46b6c692c28be6f30e7c9ad8b8bf03cff83b299d"
 dependencies = [
  "full_moon",
  "full_moon_lua_types_derive",
@@ -333,8 +333,8 @@ dependencies = [
 
 [[package]]
 name = "full_moon"
-version = "0.15.1"
-source = "git+https://github.com/Kampfkarren/full-moon?branch=lua-types#c79d1231e25a7c1c4fcbf89ed6813b65f5e6b761"
+version = "0.16.2"
+source = "git+https://github.com/Kampfkarren/full-moon?branch=lua-types#46b6c692c28be6f30e7c9ad8b8bf03cff83b299d"
 dependencies = [
  "bytecount",
  "cfg-if 1.0.0",
@@ -348,8 +348,8 @@ dependencies = [
 
 [[package]]
 name = "full_moon_derive"
-version = "0.10.0"
-source = "git+https://github.com/Kampfkarren/full-moon?branch=lua-types#c79d1231e25a7c1c4fcbf89ed6813b65f5e6b761"
+version = "0.11.0"
+source = "git+https://github.com/Kampfkarren/full-moon?branch=lua-types#46b6c692c28be6f30e7c9ad8b8bf03cff83b299d"
 dependencies = [
  "indexmap",
  "proc-macro2",
@@ -360,7 +360,7 @@ dependencies = [
 [[package]]
 name = "full_moon_lua_types_derive"
 version = "0.1.0"
-source = "git+https://github.com/Kampfkarren/full-moon?branch=lua-types#c79d1231e25a7c1c4fcbf89ed6813b65f5e6b761"
+source = "git+https://github.com/Kampfkarren/full-moon?branch=lua-types#46b6c692c28be6f30e7c9ad8b8bf03cff83b299d"
 dependencies = [
  "proc-macro2",
  "quote",

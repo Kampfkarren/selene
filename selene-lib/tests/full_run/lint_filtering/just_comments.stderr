@@ -2,5 +2,5 @@ error[invalid_lint_filter]: no lint named `lint_thatll_never_be_created` exists
   ┌─ just_comments.lua:1:1
   │
 1 │ -- selene: allow(lint_thatll_never_be_created)
-  │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
