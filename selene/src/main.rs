@@ -162,70 +162,74 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
     let mut files = codespan::Files::new();
     let source_id = files.add(filename.as_os_str(), &*contents);
 
-    let ast = match full_moon::parse(&contents) {
-        Ok(ast) => ast,
-        Err(error) => {
-            PARSE_ERRORS.fetch_add(1, Ordering::SeqCst);
+    let ast = {
+        profiling::scope!("full_moon::parse");
 
-            match error {
-                full_moon::Error::AstError(full_moon::ast::AstError::UnexpectedToken {
-                    token,
-                    additional,
-                }) => emit_codespan_locked(
-                    &files,
-                    &CodespanDiagnostic {
-                        severity: CodespanSeverity::Error,
-                        code: Some("parse_error".to_owned()),
-                        message: format!("unexpected token `{}`", token),
-                        labels: vec![CodespanLabel::primary(
-                            source_id,
-                            codespan::Span::new(
-                                token.start_position().bytes() as u32,
-                                token.end_position().bytes() as u32,
-                            ),
-                        )
-                        .with_message(additional.unwrap_or_default())],
-                        notes: Vec::new(),
-                    },
-                ),
-                full_moon::Error::TokenizerError(error) => emit_codespan_locked(
-                    &files,
-                    &CodespanDiagnostic {
-                        severity: CodespanSeverity::Error,
-                        code: Some("parse_error".to_owned()),
-                        message: match error.error() {
-                            full_moon::tokenizer::TokenizerErrorType::UnclosedComment => {
-                                "unclosed comment".to_string()
-                            }
-                            full_moon::tokenizer::TokenizerErrorType::UnclosedString => {
-                                "unclosed string".to_string()
-                            }
-                            full_moon::tokenizer::TokenizerErrorType::UnexpectedShebang => {
-                                "unexpected shebang".to_string()
-                            }
-                            full_moon::tokenizer::TokenizerErrorType::UnexpectedToken(
-                                character,
-                            ) => {
-                                format!("unexpected character {}", character)
-                            }
-                            full_moon::tokenizer::TokenizerErrorType::InvalidSymbol(symbol) => {
-                                format!("invalid symbol {}", symbol)
-                            }
+        match full_moon::parse(&contents) {
+            Ok(ast) => ast,
+            Err(error) => {
+                PARSE_ERRORS.fetch_add(1, Ordering::SeqCst);
+
+                match error {
+                    full_moon::Error::AstError(full_moon::ast::AstError::UnexpectedToken {
+                        token,
+                        additional,
+                    }) => emit_codespan_locked(
+                        &files,
+                        &CodespanDiagnostic {
+                            severity: CodespanSeverity::Error,
+                            code: Some("parse_error".to_owned()),
+                            message: format!("unexpected token `{}`", token),
+                            labels: vec![CodespanLabel::primary(
+                                source_id,
+                                codespan::Span::new(
+                                    token.start_position().bytes() as u32,
+                                    token.end_position().bytes() as u32,
+                                ),
+                            )
+                            .with_message(additional.unwrap_or_default())],
+                            notes: Vec::new(),
                         },
-                        labels: vec![CodespanLabel::primary(
-                            source_id,
-                            codespan::Span::new(
-                                error.position().bytes() as u32,
-                                error.position().bytes() as u32,
-                            ),
-                        )],
-                        notes: Vec::new(),
-                    },
-                ),
-                _ => error!("Error parsing {}: {}", filename.display(), error),
-            }
+                    ),
+                    full_moon::Error::TokenizerError(error) => emit_codespan_locked(
+                        &files,
+                        &CodespanDiagnostic {
+                            severity: CodespanSeverity::Error,
+                            code: Some("parse_error".to_owned()),
+                            message: match error.error() {
+                                full_moon::tokenizer::TokenizerErrorType::UnclosedComment => {
+                                    "unclosed comment".to_string()
+                                }
+                                full_moon::tokenizer::TokenizerErrorType::UnclosedString => {
+                                    "unclosed string".to_string()
+                                }
+                                full_moon::tokenizer::TokenizerErrorType::UnexpectedShebang => {
+                                    "unexpected shebang".to_string()
+                                }
+                                full_moon::tokenizer::TokenizerErrorType::UnexpectedToken(
+                                    character,
+                                ) => {
+                                    format!("unexpected character {}", character)
+                                }
+                                full_moon::tokenizer::TokenizerErrorType::InvalidSymbol(symbol) => {
+                                    format!("invalid symbol {}", symbol)
+                                }
+                            },
+                            labels: vec![CodespanLabel::primary(
+                                source_id,
+                                codespan::Span::new(
+                                    error.position().bytes() as u32,
+                                    error.position().bytes() as u32,
+                                ),
+                            )],
+                            notes: Vec::new(),
+                        },
+                    ),
+                    _ => error!("Error parsing {}: {}", filename.display(), error),
+                }
 
-            return;
+                return;
+            }
         }
     };
 

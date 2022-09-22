@@ -18,7 +18,7 @@ codespan = { version = "0.9", features = ["serialization"] }
 codespan-reporting = { version = "0.9", features = ["serialization"] }
 color-eyre = "0.6.1"
 dirs = "4.0.0"
-full_moon = "0.15.1"
+full_moon = "0.16.1"
 glob = "0.3"
 lazy_static = "1.4"
 num_cpus = "1.10"

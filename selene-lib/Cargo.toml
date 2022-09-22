@@ -12,7 +12,7 @@ edition = "2021"
 [dependencies]
 codespan = "0.9"
 codespan-reporting = "0.9"
-full_moon = "0.15.1"
+full_moon = "0.16.1"
 id-arena = "2.2"
 if_chain = "1.0.2"
 lazy_static = "1.4"
