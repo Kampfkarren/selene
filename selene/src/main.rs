@@ -563,7 +563,7 @@ fn start(mut matches: opts::Options) {
         let lock = OPTIONS.read().unwrap();
         let opts = lock.as_ref().unwrap();
 
-        if error_count != lint_warnings || opts.allow_warnings {
+        if error_count != lint_warnings || !opts.allow_warnings {
             std::process::exit(1);
         }
     }

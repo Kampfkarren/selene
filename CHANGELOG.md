@@ -8,6 +8,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Updated internal parser, giving substantial parsing speed increases.
 
+### Fixed
+- Fixed `--allow-warnings` option check.
+
 ## [0.21.1](https://github.com/Kampfkarren/selene/releases/tag/0.21.0) - 2022-09-19
 ### Fixed
 - Fixed not being able to use projects without selene.toml.
