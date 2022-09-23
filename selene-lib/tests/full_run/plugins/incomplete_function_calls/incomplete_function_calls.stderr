@@ -1,0 +1,12 @@
+warning[plugin_incomplete_function_calls]: not enough arguments. expected 3, got 1
+  ┌─ incomplete_function_calls.lua:4:1
+  │
+4 │ my_function(1)
+  │ ^^^^^^^^^^^^^^
+
+error[undefined_variable]: `bad_function` is not defined
+  ┌─ incomplete_function_calls.lua:5:1
+  │
+5 │ bad_function()
+  │ ^^^^^^^^^^^^
+

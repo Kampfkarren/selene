@@ -1,9 +1,8 @@
 use std::{
-    cell::RefCell,
     error::Error,
     sync::{
         atomic::{AtomicU32, Ordering},
-        Arc, Mutex, RwLock,
+        Arc, Mutex,
     },
 };
 
@@ -12,11 +11,10 @@ use once_cell::unsync::OnceCell;
 
 use crate::rules::*;
 
-use super::config::PluginConfig;
+use super::{config::PluginConfig, context::Contexts};
 
 static LUA_PLUGIN_COUNT: AtomicU32 = AtomicU32::new(0);
 
-// static LUA: OnceCell<Arc<Mutex<mlua::Lua>>> = OnceCell::new();
 thread_local! {
     static LUA: OnceCell<&'static mlua::Lua> = OnceCell::new();
 }
@@ -97,8 +95,8 @@ impl LuaPlugin {
                 })?,
             )?;
 
-            let pass: mlua::Function<'static> = lua.named_registry_value(&self.registry_key)?;
-            pass.call(ast)?;
+            let pass: mlua::Function = lua.named_registry_value(&self.registry_key)?;
+            lua.scope(|scope| pass.call((ast, Contexts::from_scope(scope, context, ast_context))))?;
 
             Ok(())
         })?;

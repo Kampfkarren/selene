@@ -339,7 +339,7 @@ impl<V: 'static + DeserializeOwned> Checker<V> {
                         diagnostic: Diagnostic::new(
                             plugin_name,
                             format!("error running plugin: {error}"),
-                            // PLUGIN TODO: Support not pointing at anything in particular
+                            // PLUGIN TODO: Support not pointing at anything in particular (and allow lint(message) to do the same)
                             rules::Label::new((0, 0)),
                         ),
                         severity: Severity::Error,
