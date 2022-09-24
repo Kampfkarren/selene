@@ -6,10 +6,11 @@ use std::{
     },
 };
 
+use full_moon_lua_types::{AnyNode, AstToLua};
 use mlua::StdLib;
 use once_cell::unsync::OnceCell;
 
-use crate::rules::*;
+use crate::{ast_util::purge_trivia, rules::*};
 
 use super::{config::PluginConfig, context::Contexts};
 
@@ -95,6 +96,13 @@ impl LuaPlugin {
                 })?,
             )?;
 
+            lua.globals().set(
+                "purge_trivia",
+                lua.create_function(move |lua, any_node: AnyNode| {
+                    LuaPlugin::purge_trivia(lua, any_node)
+                })?,
+            )?;
+
             let pass: mlua::Function = lua.named_registry_value(&self.registry_key)?;
             lua.scope(|scope| pass.call((ast, Contexts::from_scope(scope, context, ast_context))))?;
 
@@ -109,6 +117,48 @@ impl LuaPlugin {
 
     pub fn full_name(&self) -> String {
         format!("plugin_{}", self.name)
+    }
+
+    #[rustfmt::skip]
+    fn purge_trivia(lua: &mlua::Lua, any_node: AnyNode) -> mlua::Result<mlua::Value> {
+        match any_node {
+            AnyNode::Ast(ast) => purge_trivia(ast.nodes()).ast_to_lua(lua),
+            AnyNode::Assignment(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::BinOp(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::Block(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::Call(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::Do(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::ElseIf(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::Expression(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::Field(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::FunctionArgs(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::FunctionBody(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::FunctionCall(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::FunctionDeclaration(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::FunctionName(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::GenericFor(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::If(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::Index(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::LastStmt(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::LocalAssignment(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::LocalFunction(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::MethodCall(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::NumericFor(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::Parameter(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::Prefix(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::Repeat(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::Return(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::Stmt(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::Suffix(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::TableConstructor(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::UnOp(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::Value(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::Var(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::VarExpression(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::While(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::ContainedSpan(node) => purge_trivia(&node).ast_to_lua(lua),
+            AnyNode::TokenReference(node) => purge_trivia(&node).ast_to_lua(lua),
+        }
     }
 }
 

@@ -54,9 +54,22 @@ pub fn test_full_run_config_with_output(
 
     let checker = Checker::<toml::Value>::new(
         checker_config,
-        get_standard_library(&path_base).unwrap_or_else(|| {
-            StandardLibrary::from_name("lua51").expect("no lua51 standard library")
-        }),
+        match get_standard_library(&path_base) {
+            Some(mut provided_std) => {
+                let extended_library = provided_std
+                    .base
+                    .as_deref()
+                    .and_then(StandardLibrary::from_name);
+
+                if let Some(extended_library) = extended_library {
+                    provided_std.extend(extended_library);
+                }
+
+                provided_std
+            }
+
+            None => StandardLibrary::from_name("lua51").expect("no lua51 standard library"),
+        },
     )
     .expect("couldn't create checker");
 

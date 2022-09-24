@@ -1,0 +1,6 @@
+warning[plugin_require_pcall]: `can_error` must be wrapped in a pcall
+  ┌─ require_pcall.lua:2:1
+  │
+2 │ can_error()
+  │ ^^^^^^^^^
+

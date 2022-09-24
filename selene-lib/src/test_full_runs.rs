@@ -41,3 +41,8 @@ fn plugin_incomplete_function_calls() {
         "incomplete_function_calls",
     );
 }
+
+#[test]
+fn plugin_require_pcall() {
+    test_full_run("plugins/require_pcall", "require_pcall");
+}

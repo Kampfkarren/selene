@@ -1,0 +1,11 @@
+---
+base: lua51
+globals:
+  can_error:
+    args: []
+    extra:
+      require_pcall: true
+  cant_error:
+    args: []
+  this.will_error:
+    args: []

@@ -34,7 +34,6 @@ function incomplete_function_calls.pass(ast, context)
 			end
 
 			local expectedArgCount = functions[tostring(resolvedReference.id)]
-			print("expectedArgCount = ", expectedArgCount)
 			if expectedArgCount == nil then
 				return
 			end
