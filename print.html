@@ -404,6 +404,10 @@ empty_if = { comments_count = true }
 <p>For example, if we had <code>game.toml</code> and <code>engine.toml</code> standard libraries, we could chain them together like so:</p>
 <pre><code class="language-toml">std = &quot;game+engine&quot;
 </code></pre>
+<h3 id="excluding-files-from-being-linted"><a class="header" href="#excluding-files-from-being-linted">Excluding files from being linted</a></h3>
+<p>It is possible to exclude files from being linted using the exclude option:</p>
+<pre><code class="language-toml">exclude = [&quot;external/*&quot;, &quot;*.spec.lua&quot;]
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="filtering"><a class="header" href="#filtering">Filtering</a></h1>
 <p>Lints can be toggled on and off in the middle of code when necessary through the use of special comments.</p>
 <h2 id="allowingdenying-lints-for-a-piece-of-code"><a class="header" href="#allowingdenying-lints-for-a-piece-of-code">Allowing/denying lints for a piece of code</a></h2>
