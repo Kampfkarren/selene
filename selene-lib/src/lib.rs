@@ -65,6 +65,7 @@ pub struct CheckerConfig<V> {
     pub config: HashMap<String, V>,
     pub rules: HashMap<String, RuleVariation>,
     pub std: Option<String>,
+    pub exclude: Vec<String>,
 
     // Not locked behind Roblox feature so that selene.toml for Roblox will
     // run even without it.
@@ -83,6 +84,8 @@ impl<V> Default for CheckerConfig<V> {
             config: HashMap::new(),
             rules: HashMap::new(),
             std: None,
+            exclude: Vec::new(),
+
             roblox_std_source: RobloxStdSource::default(),
         }
     }
