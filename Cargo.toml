@@ -5,8 +5,8 @@ members = [
 ]
 
 [workspace.dependencies]
-# full_moon = { git = "https://github.com/Kampfkarren/full-moon", branch = "lua-types" }
-full_moon = { path = "../full-moon/full-moon" }
+full_moon = { git = "https://github.com/Kampfkarren/full-moon", branch = "lua-types" }
+# full_moon = { path = "../full-moon/full-moon" }
 
-# full_moon_lua_types = { git = "https://github.com/Kampfkarren/full-moon", branch = "lua-types" }
-full-moon-lua-types = { path = "../full-moon/full-moon-lua-types" }
+full-moon-lua-types = { git = "https://github.com/Kampfkarren/full-moon", branch = "lua-types" }
+# full-moon-lua-types = { path = "../full-moon/full-moon-lua-types" }

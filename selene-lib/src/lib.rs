@@ -333,7 +333,6 @@ impl<V: 'static + DeserializeOwned> Checker<V> {
                     }));
                 }
 
-                // PLUGIN TODO: Split by RuntimeError and internal mlua errors?
                 Err(error) => {
                     diagnostics.push(CheckerDiagnostic {
                         diagnostic: Diagnostic::new(
