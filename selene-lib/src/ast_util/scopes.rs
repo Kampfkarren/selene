@@ -34,13 +34,10 @@ impl ScopeManager {
     }
 
     fn reference_at_byte_mut(&mut self, byte: usize) -> Option<&mut Reference> {
-        for (_, reference) in self.references.iter_mut() {
-            if byte >= reference.identifier.0 && byte <= reference.identifier.1 {
-                return Some(reference);
-            }
-        }
-
-        None
+        self.references
+            .iter_mut()
+            .map(|(_, reference)| reference)
+            .find(|reference| byte >= reference.identifier.0 && byte <= reference.identifier.1)
     }
 
     pub fn reference_at_byte_with_id(&self, byte: usize) -> Option<(Id<Reference>, &Reference)> {
