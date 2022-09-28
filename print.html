@@ -866,6 +866,8 @@ b = a
 <p>Checks for use of deprecated fields and functions, as configured <a href="lints/../usage/std.html#deprecated">by your standard library</a>.</p>
 <h2 id="why-this-is-bad-2"><a class="header" href="#why-this-is-bad-2">Why this is bad</a></h2>
 <p>Deprecated fields may not be getting any support, or even face the possibility of being removed.</p>
+<h2 id="configuration-1"><a class="header" href="#configuration-1">Configuration</a></h2>
+<p><code>allow</code> - A list of patterns where the deprecated lint will not throw. For instance, <code>[&quot;table.getn&quot;]</code> will allow you to use <code>table.getn</code>, even though it is deprecated. This supports wildcards, so <code>table.*</code> will allow both <code>table.getn</code> and <code>table.foreach</code>.</p>
 <h2 id="example-2"><a class="header" href="#example-2">Example</a></h2>
 <pre><code class="language-lua">local count = table.getn(x)
 </code></pre>
@@ -916,7 +918,7 @@ Array-like values are also handled, where <code>{&quot;foo&quot;}</code> is impl
 <p>Checks for empty if blocks.</p>
 <h2 id="why-this-is-bad-5"><a class="header" href="#why-this-is-bad-5">Why this is bad</a></h2>
 <p>You most likely forgot to write code in there or commented it out without commenting out the if statement itself.</p>
-<h2 id="configuration-1"><a class="header" href="#configuration-1">Configuration</a></h2>
+<h2 id="configuration-2"><a class="header" href="#configuration-2">Configuration</a></h2>
 <p><code>comments_count</code> (default: <code>false</code>) - A bool that determines whether or not if statements with exclusively comments are empty.</p>
 <h2 id="example-5"><a class="header" href="#example-5">Example</a></h2>
 <pre><code class="language-lua">-- Each of these branches count as an empty if.
@@ -944,7 +946,7 @@ end
 <p>Measures the <a href="https://en.wikipedia.org/wiki/Cyclomatic_complexity">cyclomatic complexity</a> of a function to see if it exceeds the configure maximum.</p>
 <h2 id="why-this-is-bad-7"><a class="header" href="#why-this-is-bad-7">Why this is bad</a></h2>
 <p>High branch complexity can lead to functions that are hard to test, and harder to reason about.</p>
-<h2 id="configuration-2"><a class="header" href="#configuration-2">Configuration</a></h2>
+<h2 id="configuration-3"><a class="header" href="#configuration-3">Configuration</a></h2>
 <p><code>maximum_complexity</code> (default: <code>40</code>) - A number that determines the maximum threshold for cyclomatic complexity, beyond which the lint will report.</p>
 <h2 id="example-7"><a class="header" href="#example-7">Example</a></h2>
 <pre><code class="language-lua">function MyComponent(props)
@@ -1058,7 +1060,7 @@ log(&quot;LOG MESSAGE&quot;, &quot;Something happened!&quot;)
 <p>Checks for multiple statements on the same line.</p>
 <h2 id="why-this-is-bad-11"><a class="header" href="#why-this-is-bad-11">Why this is bad</a></h2>
 <p>This can make your code difficult to read.</p>
-<h2 id="configuration-3"><a class="header" href="#configuration-3">Configuration</a></h2>
+<h2 id="configuration-4"><a class="header" href="#configuration-4">Configuration</a></h2>
 <p><code>one_line_if</code> (default: <code>&quot;break-return-only&quot;</code>) - Defines whether or not one line if statements should be allowed. One of three options:</p>
 <ul>
 <li>&quot;break-return-only&quot; (default) - <code>if x then return end</code> or <code>if x then break end</code> is ok, but <code>if x then call() end</code> is not.</li>
@@ -1140,7 +1142,7 @@ Roact.createElement(&quot;BadClass&quot;, {})
 <p>Checks for overriding of variables under the same name.</p>
 <h2 id="why-this-is-bad-16"><a class="header" href="#why-this-is-bad-16">Why this is bad</a></h2>
 <p>This can cause confusion when reading the code when trying to understand which variable is being used, and if you want to use the original variable you either have to redefine it under a temporary name or refactor the code that shadowed it.</p>
-<h2 id="configuration-4"><a class="header" href="#configuration-4">Configuration</a></h2>
+<h2 id="configuration-5"><a class="header" href="#configuration-5">Configuration</a></h2>
 <p><code>ignore_pattern</code> (default: <code>&quot;^_&quot;</code>) - A <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a> that is used to specify names that are allowed to be shadowed. The default allows for variables like <code>_</code> to be shadowed, as they shouldn't be used anyway.</p>
 <h2 id="example-17"><a class="header" href="#example-17">Example</a></h2>
 <pre><code class="language-lua">local x = 1
@@ -1220,7 +1222,7 @@ prinnt(&quot;hello, world!&quot;)
 <p>Checks for variables that are unscoped (don't have a local variable attached).</p>
 <h2 id="why-this-is-bad-21"><a class="header" href="#why-this-is-bad-21">Why this is bad</a></h2>
 <p>Unscoped variables make code harder to read and debug, as well as making it harder for selene to analyze.</p>
-<h2 id="configuration-5"><a class="header" href="#configuration-5">Configuration</a></h2>
+<h2 id="configuration-6"><a class="header" href="#configuration-6">Configuration</a></h2>
 <p><code>ignore_pattern</code> (default: <code>&quot;^_&quot;</code>) - A <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a> for variables that are allowed to be unscoped. The default allows for variables like <code>_</code> to be unscoped, as they shouldn't be used anyway.</p>
 <h2 id="example-22"><a class="header" href="#example-22">Example</a></h2>
 <pre><code class="language-lua">baz = 3
@@ -1230,7 +1232,7 @@ prinnt(&quot;hello, world!&quot;)
 <p>Checks for variables that are unused.</p>
 <h2 id="why-this-is-bad-22"><a class="header" href="#why-this-is-bad-22">Why this is bad</a></h2>
 <p>The existence of unused variables could indicate buggy code.</p>
-<h2 id="configuration-6"><a class="header" href="#configuration-6">Configuration</a></h2>
+<h2 id="configuration-7"><a class="header" href="#configuration-7">Configuration</a></h2>
 <p><code>allow_unused_self</code> (default: <code>true</code>) - A bool that determines whether not using <code>self</code> in a method function (<code>function Player:SwapWeapons()</code>) is allowed.</p>
 <p><code>ignore_pattern</code> (default: <code>&quot;^_&quot;</code>) - A <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a> for variables that are allowed to be unused. The default allows for variables like <code>_</code> to be unused, as they shouldn't be used anyway.</p>
 <h2 id="example-23"><a class="header" href="#example-23">Example</a></h2>

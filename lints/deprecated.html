@@ -139,6 +139,8 @@
 <p>Checks for use of deprecated fields and functions, as configured <a href="../usage/std.html#deprecated">by your standard library</a>.</p>
 <h2 id="why-this-is-bad"><a class="header" href="#why-this-is-bad">Why this is bad</a></h2>
 <p>Deprecated fields may not be getting any support, or even face the possibility of being removed.</p>
+<h2 id="configuration"><a class="header" href="#configuration">Configuration</a></h2>
+<p><code>allow</code> - A list of patterns where the deprecated lint will not throw. For instance, <code>[&quot;table.getn&quot;]</code> will allow you to use <code>table.getn</code>, even though it is deprecated. This supports wildcards, so <code>table.*</code> will allow both <code>table.getn</code> and <code>table.foreach</code>.</p>
 <h2 id="example"><a class="header" href="#example">Example</a></h2>
 <pre><code class="language-lua">local count = table.getn(x)
 </code></pre>
