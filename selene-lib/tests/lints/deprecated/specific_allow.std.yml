@@ -1,0 +1,18 @@
+---
+globals:
+  deprecated_allowed:
+    any: true
+    deprecated:
+      message: "this is deprecated"
+  deprecated_blocked:
+    args: []
+    deprecated:
+      message: "this is deprecated"
+  more.deprecated_allowed:
+    args: []
+    deprecated:
+      message: "this is deprecated"
+  wow.extra.deprecated_allowed:
+    args: []
+    deprecated:
+      message: "this is deprecated"

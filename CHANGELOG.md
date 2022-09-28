@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.21.1...HEAD)
 ### Added
 - Added `--allow-warnings` option to have selene pass when only warnings occur.
+- Added the ability to allow specific patterns in the `deprecated` lint.
 
 ### Changed
 - Updated internal parser, giving substantial parsing speed increases.
