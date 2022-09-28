@@ -1,0 +1,8 @@
+error[deprecated]: standard library function `deprecated_blocked` is deprecated
+  ┌─ specific_allow.lua:2:1
+  │
+2 │ deprecated_blocked()
+  │ ^^^^^^^^^^^^^^^^^^^^
+  │
+  = this is deprecated
+

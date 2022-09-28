@@ -1,30 +1,39 @@
 use std::convert::Infallible;
 
 use full_moon::{ast, visitors::Visitor};
+use serde::Deserialize;
 
 use crate::ast_util::{name_paths::*, scopes::ScopeManager};
 
 use super::{super::standard_library::*, *};
 
-pub struct DeprecatedLint;
+#[derive(Clone, Default, Deserialize)]
+#[serde(default)]
+pub struct DeprecatedLintConfig {
+    pub allow: Vec<String>,
+}
+
+pub struct DeprecatedLint {
+    config: DeprecatedLintConfig,
+}
 
 impl Rule for DeprecatedLint {
-    type Config = ();
+    type Config = DeprecatedLintConfig;
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Warning;
     const RULE_TYPE: RuleType = RuleType::Correctness;
 
-    fn new(_: Self::Config) -> Result<Self, Self::Error> {
-        Ok(DeprecatedLint)
+    fn new(config: Self::Config) -> Result<Self, Self::Error> {
+        Ok(DeprecatedLint { config })
     }
 
     fn pass(&self, ast: &Ast, context: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
-        let mut visitor = DeprecatedVisitor {
-            diagnostics: Vec::new(),
-            scope_manager: &ast_context.scope_manager,
-            standard_library: &context.standard_library,
-        };
+        let mut visitor = DeprecatedVisitor::new(
+            &self.config,
+            &ast_context.scope_manager,
+            &context.standard_library,
+        );
 
         visitor.visit_ast(ast);
 
@@ -33,12 +42,53 @@ impl Rule for DeprecatedLint {
 }
 
 struct DeprecatedVisitor<'a> {
+    allow: Vec<Vec<String>>,
     diagnostics: Vec<Diagnostic>,
     scope_manager: &'a ScopeManager,
     standard_library: &'a StandardLibrary,
 }
 
-impl DeprecatedVisitor<'_> {
+impl<'a> DeprecatedVisitor<'a> {
+    fn new(
+        config: &DeprecatedLintConfig,
+        scope_manager: &'a ScopeManager,
+        standard_library: &'a StandardLibrary,
+    ) -> Self {
+        Self {
+            diagnostics: Vec::new(),
+            scope_manager,
+            standard_library,
+
+            allow: config
+                .allow
+                .iter()
+                .map(|allow| allow.split('.').map(ToOwned::to_owned).collect())
+                .collect(),
+        }
+    }
+
+    fn allowed(&self, name_path: &[String]) -> bool {
+        'next_allow_path: for allow_path in &self.allow {
+            if allow_path.len() > name_path.len() {
+                continue;
+            }
+
+            for (allow_word, name_word) in allow_path.iter().zip(name_path.iter()) {
+                if allow_word == "*" {
+                    continue;
+                }
+
+                if allow_word != name_word {
+                    continue 'next_allow_path;
+                }
+            }
+
+            return true;
+        }
+
+        false
+    }
+
     fn check_name_path<N: Node>(
         &mut self,
         node: &N,
@@ -47,6 +97,10 @@ impl DeprecatedVisitor<'_> {
         parameters: &[String],
     ) {
         assert!(!name_path.is_empty());
+
+        if self.allowed(name_path) {
+            return;
+        }
 
         for bound in 1..=name_path.len() {
             profiling::scope!("DeprecatedVisitor::check_name_path check in bound");
@@ -165,7 +219,7 @@ mod tests {
     #[test]
     fn test_deprecated_fields() {
         test_lint(
-            DeprecatedLint::new(()).unwrap(),
+            DeprecatedLint::new(DeprecatedLintConfig::default()).unwrap(),
             "deprecated",
             "deprecated_fields",
         );
@@ -174,16 +228,32 @@ mod tests {
     #[test]
     fn test_deprecated_functions() {
         test_lint(
-            DeprecatedLint::new(()).unwrap(),
+            DeprecatedLint::new(DeprecatedLintConfig::default()).unwrap(),
             "deprecated",
             "deprecated_functions",
         );
     }
 
     #[test]
+    fn test_specific_allow() {
+        test_lint(
+            DeprecatedLint::new(DeprecatedLintConfig {
+                allow: vec![
+                    "deprecated_allowed".to_owned(),
+                    "more.*".to_owned(),
+                    "wow.*.deprecated_allowed".to_owned(),
+                ],
+            })
+            .unwrap(),
+            "deprecated",
+            "specific_allow",
+        );
+    }
+
+    #[test]
     fn test_toml_forwards_compatibility() {
         test_lint(
-            DeprecatedLint::new(()).unwrap(),
+            DeprecatedLint::new(DeprecatedLintConfig::default()).unwrap(),
             "deprecated",
             "toml_forwards_compatibility",
         );
