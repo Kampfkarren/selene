@@ -2,17 +2,17 @@
 name = "selene-lib"
 version.workspace = true
 license.workspace = true
-authors = ["Kampfkarren <kampfkarren@gmail.com>"]
+authors.workspace = true
 description = "A library for linting Lua code. You probably want selene instead."
-categories = ["command-line-utilities"]
-keywords = ["lua", "linter", "lua51"]
+categories.workspace = true
+keywords.workspace = true
 repository.workspace = true
 edition.workspace = true
 
 [dependencies]
 codespan = "0.9"
 codespan-reporting = "0.9"
-full_moon = "0.16.1"
+full_moon.workspace = true
 id-arena = "2.2"
 if_chain = "1.0.2"
 lazy_static = "1.4"

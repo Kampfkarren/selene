@@ -2,10 +2,10 @@
 name = "selene"
 version.workspace = true
 license.workspace = true
-authors = ["Kampfkarren <kampfkarren@gmail.com>"]
+authors.workspace = true
 description = "A blazing-fast modern Lua linter written in Rust"
-categories = ["command-line-utilities"]
-keywords = ["lua", "linter", "lua51"]
+categories.workspace = true
+keywords.workspace = true
 repository.workspace = true
 documentation = "https://kampfkarren.github.io/selene/"
 edition.workspace = true
@@ -18,7 +18,7 @@ codespan = { version = "0.9", features = ["serialization"] }
 codespan-reporting = { version = "0.9", features = ["serialization"] }
 color-eyre = "0.6.1"
 dirs = "4.0.0"
-full_moon = "0.16.1"
+full_moon.workspace = true
 glob = "0.3"
 globset = "0.4.9"
 lazy_static = "1.4"
