@@ -329,9 +329,8 @@ globals:
     must_use: true
   math.random:
     args:
-      - required: false
-        type: number
-      - required: false
+      - type: number
+      - required: math.random should be called with 2 parameters
         type: number
     must_use: true
   math.randomseed:
