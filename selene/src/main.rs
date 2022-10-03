@@ -479,7 +479,7 @@ fn start(mut matches: opts::Options) {
             Ok(glob) => glob,
             Err(error) => {
                 error!("Invalid glob pattern: {error}");
-                return;
+                std::process::exit(1);
             }
         });
     }
@@ -488,7 +488,7 @@ fn start(mut matches: opts::Options) {
         Ok(globset) => globset,
         Err(error) => {
             error!("{error}");
-            return;
+            std::process::exit(1);
         }
     };
 
@@ -526,7 +526,7 @@ fn start(mut matches: opts::Options) {
                             Ok(glob) => glob,
                             Err(error) => {
                                 error!("Invalid glob pattern: {}", error);
-                                return;
+                                std::process::exit(1);
                             }
                         };
 
