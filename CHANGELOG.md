@@ -6,7 +6,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `--allow-warnings` option to have selene pass when only warnings occur.
 - Added the ability to allow specific patterns in the `deprecated` lint.
 - Added exclude option to selene.toml for excluding files from lints
-- Added `testez.yaml` as a supported _Testez_ configuration file.
+- Adds support for `.yaml` extensions to be used for standard libraries alongside `.yml`.
 
 ### Changed
 - Updated internal parser, giving substantial parsing speed increases.
