@@ -5,12 +5,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Added `--allow-warnings` option to have selene pass when only warnings occur.
 - Added the ability to allow specific patterns in the `deprecated` lint.
+- Added exclude option to selene.toml for excluding files from lints
 
 ### Changed
 - Updated internal parser, giving substantial parsing speed increases.
-
-### Added
-- Added exclude option to selene.toml for excluding files from lints
 
 ## [0.21.1](https://github.com/Kampfkarren/selene/releases/tag/0.21.0) - 2022-09-19
 ### Fixed
