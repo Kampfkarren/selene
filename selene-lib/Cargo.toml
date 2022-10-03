@@ -1,13 +1,13 @@
 [package]
 name = "selene-lib"
-version = "0.21.1"
-license = "MPL-2.0"
+version.workspace = true
+license.workspace = true
 authors = ["Kampfkarren <kampfkarren@gmail.com>"]
 description = "A library for linting Lua code. You probably want selene instead."
 categories = ["command-line-utilities"]
 keywords = ["lua", "linter", "lua51"]
-repository = "https://github.com/Kampfkarren/selene"
-edition = "2021"
+repository.workspace = true
+edition.workspace = true
 
 [dependencies]
 codespan = "0.9"

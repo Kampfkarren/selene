@@ -1,14 +1,14 @@
 [package]
 name = "selene"
-version = "0.21.1"
-license = "MPL-2.0"
+version.workspace = true
+license.workspace = true
 authors = ["Kampfkarren <kampfkarren@gmail.com>"]
 description = "A blazing-fast modern Lua linter written in Rust"
 categories = ["command-line-utilities"]
 keywords = ["lua", "linter", "lua51"]
-repository = "https://github.com/Kampfkarren/selene"
+repository.workspace = true
 documentation = "https://kampfkarren.github.io/selene/"
-edition = "2021"
+edition.workspace = true
 
 [dependencies]
 atty = "0.2"

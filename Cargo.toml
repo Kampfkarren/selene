@@ -4,3 +4,11 @@ members = [
 	"selene",
     "selene-lib",
 ]
+
+[workspace.package]
+version = "0.21.1"
+edition = "2021"
+homepage = "https://kampfkarren.github.io/selene/"
+license = "MPL-2.0"
+repository = "https://github.com/Kampfkarren/selene"
+rust-version = "1.64"
