@@ -24,7 +24,7 @@ Roblox has provided an open source testing utility called [TestEZ](https://roblo
 
 `std = "roblox+testez"`
 
-But first you'll need to create a `testez.yml` or `testez.yaml` file, which you can do so [with this template](https://gist.github.com/Kampfkarren/f2dddc2ebfa4e0662e44b8702e519c2d).
+But first you'll need to create a `testez.yml` file, which you can do so [with this template](https://gist.github.com/Kampfkarren/f2dddc2ebfa4e0662e44b8702e519c2d).
 
 ## Pinned standard library
 
