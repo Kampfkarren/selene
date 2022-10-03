@@ -71,10 +71,11 @@ fn from_name<V>(
 
         library = v1_library.into();
     } else {
-        let yaml_file = directory.join(format!("{standard_library_name}.yml"));
+        let mut yaml_file = directory.join(format!("{standard_library_name}.yml"));
         if !yaml_file.exists() {
             yaml_file = directory.join(format!("{standard_library_name}.yaml"));
         }
+
         if yaml_file.exists() {
             let content = fs::read_to_string(&yaml_file)
                 .with_context(|| format!("failed to read {}", yaml_file.display()))?;
