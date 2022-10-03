@@ -8,8 +8,6 @@ members = [
 [workspace.package]
 version = "0.21.1"
 authors = ["Kampfkarren <kampfkarren@gmail.com>"]
-categories = ["command-line-utilities"]
-keywords = ["lua", "linter", "lua51"]
 edition = "2021"
 homepage = "https://kampfkarren.github.io/selene/"
 license = "MPL-2.0"

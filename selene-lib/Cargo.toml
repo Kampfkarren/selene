@@ -4,8 +4,8 @@ version.workspace = true
 license.workspace = true
 authors.workspace = true
 description = "A library for linting Lua code. You probably want selene instead."
-categories.workspace = true
-keywords.workspace = true
+categories = ["command-line-utilities"]
+keywords = ["lua", "linter", "lua51"]
 repository.workspace = true
 edition.workspace = true
 
