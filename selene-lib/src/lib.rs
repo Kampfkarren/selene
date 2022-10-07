@@ -13,8 +13,8 @@ use serde::{
 
 mod ast_util;
 mod lint_filtering;
-mod possible_std;
 pub mod lints;
+mod possible_std;
 pub mod standard_library;
 mod text;
 
@@ -63,7 +63,7 @@ impl Error for CheckerError {}
 #[serde(rename_all = "kebab-case")]
 pub struct CheckerConfig<V> {
     pub config: HashMap<String, V>,
-		#[serde(alias = "rules")]
+    #[serde(alias = "rules")]
     pub lints: HashMap<String, LintVariation>,
     pub std: Option<String>,
     pub exclude: Vec<String>,
