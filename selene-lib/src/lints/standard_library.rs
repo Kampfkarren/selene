@@ -14,12 +14,12 @@ use full_moon::{
 
 pub struct StandardLibraryLint;
 
-impl Rule for StandardLibraryLint {
+impl Lint for StandardLibraryLint {
     type Config = ();
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Error;
-    const RULE_TYPE: RuleType = RuleType::Correctness;
+    const RULE_TYPE: LintType = LintType::Correctness;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(StandardLibraryLint)

@@ -6,9 +6,9 @@ selene uses [Full Moon](https://github.com/Kampfkarren/full-moon) to parse the L
 TODO: Upload selene-lib on crates.io and link the docs.rs page for that as well as throughout the rest of this article.
 
 ## Writing a lint
-In selene, lints are created in isolated modules. To start, create a file in `selene-lib/src/rules` with the name of your lint. In this example, we're going to call the lint `cool_lint.rs`.
+In selene, lints are created in isolated modules. To start, create a file in `selene-lib/src/lints` with the name of your lint. In this example, we're going to call the lint `cool_lint.rs`.
 
-Let's now understand what a lint consists of. selene takes lints in the form of structs that implement the `Rule` trait. The `Rule` trait expects:
+Let's now understand what a lint consists of. selene takes lints in the form of structs that implement the `Lint` trait. The `Lint` trait expects:
 
 - A `Config` associated type that defines what the configuration format is expected to be. Whatever you pass must be [deserializable](https://serde.rs/).
 - An `Error` associated type that implements [`std::error::Error`](https://doc.rust-lang.org/std/error/trait.Error.html). This is used if configurations can be invalid (such as a parameter only being a number within a range). Most of the time, configurations cannot be invalid (other than deserializing errors, which are handled by selene), and so you can set this to [`std::convert::Infallible`](https://doc.rust-lang.org/std/convert/enum.Infallible.html).
@@ -25,12 +25,12 @@ use std::convert::Infallible;
 
 struct CoolLint;
 
-impl Rule for CoolLint {
+impl Lint for CoolLint {
     type Config = ();
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Warning;
-    const RULE_TYPE: RuleType = RuleType::Style;
+    const RULE_TYPE: LintType = LintType::Style;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(CoolLint)
@@ -44,20 +44,20 @@ impl Rule for CoolLint {
 
 The implementation of `pass` is completely up to you, but there are a few common patterns.
 
-- Creating a visitor over the ast provided and creating diagnostics based off of that. See [`divide_by_zero`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/rules/divide_by_zero.rs) and [`suspicious_reverse_loop`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/rules/suspicious_reverse_loop.rs) for straight forward examples.
-- Using the `ScopeManager` struct to lint based off of usage of variables and references. See [`shadowing`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/rules/shadowing.rs) and [`global_usage`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/rules/global_usage.rs).
+- Creating a visitor over the ast provided and creating diagnostics based off of that. See [`divide_by_zero`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/lints/divide_by_zero.rs) and [`suspicious_reverse_loop`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/lints/suspicious_reverse_loop.rs) for straight forward examples.
+- Using the `ScopeManager` struct to lint based off of usage of variables and references. See [`shadowing`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/lints/shadowing.rs) and [`global_usage`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/lints/global_usage.rs).
 
 ### Getting selene to recognize the new lint
 
 Now that we have our lint, we have to make sure selene actually knows to use it. There are two places you need to update.
 
-In selene-lib/src/lib.rs, search for `use_rules!`. You will see something such as:
+In selene-lib/src/lib.rs, search for `use_lints!`. You will see something such as:
 
 ```rs
-use_rules! {
-    almost_swapped: rules::almost_swapped::AlmostSwappedLint,
-    divide_by_zero: rules::divide_by_zero::DivideByZeroLint,
-    empty_if: rules::empty_if::EmptyIfLint,
+use_lints! {
+    almost_swapped: lints::almost_swapped::AlmostSwappedLint,
+    divide_by_zero: lints::divide_by_zero::DivideByZeroLint,
+    empty_if: lints::empty_if::EmptyIfLint,
     ...
 }
 ```
@@ -65,16 +65,16 @@ use_rules! {
 Put your lint in this list (alphabetical order) as the following format:
 
 ```
-lint_name: rules::module_name::LintObject,
+lint_name: lints::module_name::LintObject,
 ```
 
 For us, this would be:
 
 ```
-cool_lint: rules::cool_lint::CoolLint,
+cool_lint: lints::cool_lint::CoolLint,
 ```
 
-Next, in `selene-lib/src/rules.rs`, search for `pub mod`, and you will see:
+Next, in `selene-lib/src/lints.rs`, search for `pub mod`, and you will see:
 
 ```rs
 pub mod almost_swapped;
@@ -128,7 +128,7 @@ The `.unwrap()` is just because `CoolLint::new` returns a `Result`. If you want 
 
 The first `"cool_lint"` is the name of the folder we created. The second `"cool_lint"` is the name of the *Lua file* we created.
 
-Now, just run `cargo test`, and a `.stderr` file will be automatically generated! You can manipulate it however you see fit as well as modifying your rule, and so long as the file is there, selene will make sure that its accurate.
+Now, just run `cargo test`, and a `.stderr` file will be automatically generated! You can manipulate it however you see fit as well as modifying your lint, and so long as the file is there, selene will make sure that its accurate.
 
 Optionally, you can add a `.std.toml` with the same name as the test next to the lua file, where you can specify a custom [standard library](./usage/std.html) to use. If you do not, the Lua 5.1 standard library will be used.
 
@@ -141,7 +141,7 @@ To document a new lint, edit `docs/src/SUMMARY.md`, and add your lint to the tab
 Then, edit the markdown file it creates (if you have `mdbook serve` on, it'll create it for you), and write it in this format:
 
 ````
-# rule_name
+# lint_name
 ## What it does
 Explain what your lint does, simply.
 
@@ -166,4 +166,4 @@ Specify any configuration if it exists.
 If there's anything else a user should know when using this lint, write it here.
 ````
 
-This isn't a strict format, and you can mess with it as appropriate. For example, `standard_library` does not have a "Why this is bad" section as not only is it a very encompassing rule, but it should be fairly obvious. Many rules don't specify a "...should be written as..." as it is either something with various potential fixes (such as [`global_usage`](./lints/global_usage.md)) or because the "good code" is just removing parts entirely (such as [`unbalanced_assignments`](./lints/unbalanced_assignments.md)).
+This isn't a strict format, and you can mess with it as appropriate. For example, `standard_library` does not have a "Why this is bad" section as not only is it a very encompassing lint, but it should be fairly obvious. Many lints don't specify a "...should be written as..." as it is either something with various potential fixes (such as [`global_usage`](./lints/global_usage.md)) or because the "good code" is just removing parts entirely (such as [`unbalanced_assignments`](./lints/unbalanced_assignments.md)).

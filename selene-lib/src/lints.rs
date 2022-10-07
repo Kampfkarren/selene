@@ -42,12 +42,12 @@ pub mod roblox_incorrect_roact_usage;
 #[cfg(test)]
 mod test_util;
 
-pub trait Rule {
+pub trait Lint {
     type Config: DeserializeOwned;
     type Error: std::error::Error;
 
     const SEVERITY: Severity;
-    const RULE_TYPE: RuleType;
+    const RULE_TYPE: LintType;
 
     fn new(config: Self::Config) -> Result<Self, Self::Error>
     where
@@ -61,7 +61,7 @@ pub trait Rule {
     ) -> Vec<Diagnostic>;
 }
 
-pub enum RuleType {
+pub enum LintType {
     /// Code that does something simple but in a complex way
     Complexity,
 

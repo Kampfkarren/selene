@@ -20,12 +20,12 @@ use id_arena::Id;
 
 pub struct MismatchedArgCountLint;
 
-impl Rule for MismatchedArgCountLint {
+impl Lint for MismatchedArgCountLint {
     type Config = ();
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Error;
-    const RULE_TYPE: RuleType = RuleType::Correctness;
+    const RULE_TYPE: LintType = LintType::Correctness;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(MismatchedArgCountLint)
@@ -185,7 +185,7 @@ impl ParameterCount {
                 }
             }
 
-            // `f(a, b, ...)` vs. `f(a, ...)`. Same rules apply, just preserve the smaller minimum.
+            // `f(a, b, ...)` vs. `f(a, ...)`. Same lints apply, just preserve the smaller minimum.
             (ParameterCount::Minimum(this_minimum), ParameterCount::Minimum(other_minimum)) => {
                 ParameterCount::Minimum(this_minimum.min(other_minimum))
             }

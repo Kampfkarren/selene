@@ -23,12 +23,12 @@ enum ReasonWhy {
 
 pub struct BadStringEscapeLint;
 
-impl Rule for BadStringEscapeLint {
+impl Lint for BadStringEscapeLint {
     type Config = ();
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Warning;
-    const RULE_TYPE: RuleType = RuleType::Correctness;
+    const RULE_TYPE: LintType = LintType::Correctness;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(BadStringEscapeLint)

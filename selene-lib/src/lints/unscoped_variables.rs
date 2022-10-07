@@ -25,12 +25,12 @@ pub struct UnscopedVariablesLint {
     ignore_pattern: Regex,
 }
 
-impl Rule for UnscopedVariablesLint {
+impl Lint for UnscopedVariablesLint {
     type Config = UnscopedVariablesConfig;
     type Error = regex::Error;
 
     const SEVERITY: Severity = Severity::Warning;
-    const RULE_TYPE: RuleType = RuleType::Complexity;
+    const RULE_TYPE: LintType = LintType::Complexity;
 
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(UnscopedVariablesLint {
