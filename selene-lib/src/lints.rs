@@ -47,7 +47,7 @@ pub trait Lint {
     type Error: std::error::Error;
 
     const SEVERITY: Severity;
-    const RULE_TYPE: LintType;
+    const LINT_TYPE: LintType;
 
     fn new(config: Self::Config) -> Result<Self, Self::Error>
     where

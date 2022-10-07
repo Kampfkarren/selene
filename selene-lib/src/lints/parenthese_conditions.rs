@@ -14,7 +14,7 @@ impl Lint for ParentheseConditionsLint {
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Warning;
-    const RULE_TYPE: LintType = LintType::Style;
+    const LINT_TYPE: LintType = LintType::Style;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(ParentheseConditionsLint)

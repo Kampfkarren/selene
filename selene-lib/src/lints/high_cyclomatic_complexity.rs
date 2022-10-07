@@ -33,7 +33,7 @@ impl Lint for HighCyclomaticComplexityLint {
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Allow;
-    const RULE_TYPE: LintType = LintType::Style;
+    const LINT_TYPE: LintType = LintType::Style;
 
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(HighCyclomaticComplexityLint { config })

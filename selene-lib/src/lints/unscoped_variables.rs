@@ -30,7 +30,7 @@ impl Lint for UnscopedVariablesLint {
     type Error = regex::Error;
 
     const SEVERITY: Severity = Severity::Warning;
-    const RULE_TYPE: LintType = LintType::Complexity;
+    const LINT_TYPE: LintType = LintType::Complexity;
 
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(UnscopedVariablesLint {

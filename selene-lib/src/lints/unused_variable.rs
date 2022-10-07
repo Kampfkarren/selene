@@ -42,7 +42,7 @@ impl Lint for UnusedVariableLint {
     type Error = regex::Error;
 
     const SEVERITY: Severity = Severity::Warning;
-    const RULE_TYPE: LintType = LintType::Style;
+    const LINT_TYPE: LintType = LintType::Style;
 
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(Self {

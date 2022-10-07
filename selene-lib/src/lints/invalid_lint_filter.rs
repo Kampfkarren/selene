@@ -11,7 +11,7 @@ impl Lint for InvalidLintFilterLint {
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Error;
-    const RULE_TYPE: LintType = LintType::Correctness;
+    const LINT_TYPE: LintType = LintType::Correctness;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(InvalidLintFilterLint)

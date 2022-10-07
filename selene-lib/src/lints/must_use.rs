@@ -10,7 +10,7 @@ impl Lint for MustUseLint {
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Warning;
-    const RULE_TYPE: LintType = LintType::Correctness;
+    const LINT_TYPE: LintType = LintType::Correctness;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(MustUseLint)
