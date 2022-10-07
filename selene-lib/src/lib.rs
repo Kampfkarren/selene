@@ -63,6 +63,7 @@ impl Error for CheckerError {}
 #[serde(rename_all = "kebab-case")]
 pub struct CheckerConfig<V> {
     pub config: HashMap<String, V>,
+		#[serde(alias = "rules")]
     pub lints: HashMap<String, LintVariation>,
     pub std: Option<String>,
     pub exclude: Vec<String>,
