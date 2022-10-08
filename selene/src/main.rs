@@ -449,6 +449,7 @@ fn start(mut matches: opts::Options) {
                     .split('+')
                     .filter(|name| {
                         !PathBuf::from(format!("{name}.yml")).exists()
+                            && !PathBuf::from(format!("{name}.yaml")).exists()
                             && !PathBuf::from(format!("{name}.toml")).exists()
                     })
                     .filter(|name| !cfg!(feature = "roblox") || *name != "roblox")
