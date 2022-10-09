@@ -6,12 +6,12 @@ use std::convert::Infallible;
 // This exists for the purpose of letting the user disable lint related to lint filtering (such as invalid names)
 pub struct InvalidLintFilterLint;
 
-impl Rule for InvalidLintFilterLint {
+impl Lint for InvalidLintFilterLint {
     type Config = ();
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Error;
-    const RULE_TYPE: RuleType = RuleType::Correctness;
+    const LINT_TYPE: LintType = LintType::Correctness;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(InvalidLintFilterLint)

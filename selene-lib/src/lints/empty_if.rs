@@ -19,12 +19,12 @@ pub struct EmptyIfLint {
     config: EmptyIfLintConfig,
 }
 
-impl Rule for EmptyIfLint {
+impl Lint for EmptyIfLint {
     type Config = EmptyIfLintConfig;
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Warning;
-    const RULE_TYPE: RuleType = RuleType::Style;
+    const LINT_TYPE: LintType = LintType::Style;
 
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(EmptyIfLint { config })

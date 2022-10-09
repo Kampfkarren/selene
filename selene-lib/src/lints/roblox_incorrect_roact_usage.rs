@@ -17,12 +17,12 @@ use if_chain::if_chain;
 
 pub struct IncorrectRoactUsageLint;
 
-impl Rule for IncorrectRoactUsageLint {
+impl Lint for IncorrectRoactUsageLint {
     type Config = ();
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Error;
-    const RULE_TYPE: RuleType = RuleType::Correctness;
+    const LINT_TYPE: LintType = LintType::Correctness;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(IncorrectRoactUsageLint)

@@ -9,12 +9,12 @@ use full_moon::{
 
 pub struct ParentheseConditionsLint;
 
-impl Rule for ParentheseConditionsLint {
+impl Lint for ParentheseConditionsLint {
     type Config = ();
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Warning;
-    const RULE_TYPE: RuleType = RuleType::Style;
+    const LINT_TYPE: LintType = LintType::Style;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(ParentheseConditionsLint)

@@ -22,12 +22,12 @@ pub struct ShadowingLint {
     ignore_pattern: Regex,
 }
 
-impl Rule for ShadowingLint {
+impl Lint for ShadowingLint {
     type Config = ShadowingConfig;
     type Error = regex::Error;
 
     const SEVERITY: Severity = Severity::Warning;
-    const RULE_TYPE: RuleType = RuleType::Style;
+    const LINT_TYPE: LintType = LintType::Style;
 
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(ShadowingLint {

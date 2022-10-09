@@ -28,12 +28,12 @@ pub struct HighCyclomaticComplexityLint {
     config: HighCyclomaticComplexityConfig,
 }
 
-impl Rule for HighCyclomaticComplexityLint {
+impl Lint for HighCyclomaticComplexityLint {
     type Config = HighCyclomaticComplexityConfig;
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Allow;
-    const RULE_TYPE: RuleType = RuleType::Style;
+    const LINT_TYPE: LintType = LintType::Style;
 
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(HighCyclomaticComplexityLint { config })

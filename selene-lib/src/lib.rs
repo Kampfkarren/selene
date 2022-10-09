@@ -14,7 +14,7 @@ use serde::{
 mod ast_util;
 mod lint_filtering;
 mod possible_std;
-pub mod rules;
+pub mod lints;
 pub mod standard_library;
 mod text;
 
@@ -24,7 +24,7 @@ mod test_util;
 #[cfg(test)]
 mod test_full_runs;
 
-use rules::{AstContext, Context, Diagnostic, Rule, Severity};
+use lints::{AstContext, Context, Diagnostic, Lint, Severity};
 use standard_library::StandardLibrary;
 
 #[derive(Debug)]
@@ -36,7 +36,7 @@ pub struct CheckerError {
 #[derive(Debug)]
 pub enum CheckerErrorProblem {
     ConfigDeserializeError(Box<dyn Error>),
-    RuleNewError(Box<dyn Error>),
+    LintNewError(Box<dyn Error>),
 }
 
 impl fmt::Display for CheckerError {
@@ -51,7 +51,7 @@ impl fmt::Display for CheckerError {
                 "Configuration was incorrectly formatted: {}",
                 error
             ),
-            RuleNewError(error) => write!(formatter, "{}", error),
+            LintNewError(error) => write!(formatter, "{}", error),
         }
     }
 }
@@ -63,7 +63,8 @@ impl Error for CheckerError {}
 #[serde(rename_all = "kebab-case")]
 pub struct CheckerConfig<V> {
     pub config: HashMap<String, V>,
-    pub rules: HashMap<String, RuleVariation>,
+		#[serde(alias = "rules")]
+    pub lints: HashMap<String, LintVariation>,
     pub std: Option<String>,
     pub exclude: Vec<String>,
 
@@ -82,7 +83,7 @@ impl<V> Default for CheckerConfig<V> {
     fn default() -> Self {
         CheckerConfig {
             config: HashMap::new(),
-            rules: HashMap::new(),
+            lints: HashMap::new(),
             std: None,
             exclude: Vec::new(),
 
@@ -93,18 +94,18 @@ impl<V> Default for CheckerConfig<V> {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "kebab-case")]
-pub enum RuleVariation {
+pub enum LintVariation {
     Allow,
     Deny,
     Warn,
 }
 
-impl RuleVariation {
+impl LintVariation {
     pub fn to_severity(self) -> Severity {
         match self {
-            RuleVariation::Allow => Severity::Allow,
-            RuleVariation::Deny => Severity::Error,
-            RuleVariation::Warn => Severity::Warning,
+            LintVariation::Allow => Severity::Allow,
+            LintVariation::Deny => Severity::Error,
+            LintVariation::Warn => Severity::Warning,
         }
     }
 }
@@ -122,29 +123,29 @@ impl Default for RobloxStdSource {
     }
 }
 
-macro_rules! use_rules {
+macro_rules! use_lints {
     {
         $(
-            $rule_name:ident: $rule_path:ty,
+            $lint_name:ident: $lint_path:ty,
         )+
 
         $(
             #[$meta:meta]
             {
-                $($meta_rule_name:ident: $meta_rule_path:ty,)+
+                $($meta_lint_name:ident: $meta_lint_path:ty,)+
             },
         )+
     } => {
         lazy_static::lazy_static! {
-            static ref ALL_RULES: Vec<&'static str> = vec![
+            static ref ALL_LINTS: Vec<&'static str> = vec![
                 $(
-                    stringify!($rule_name),
+                    stringify!($lint_name),
                 )+
 
                 $(
                     $(
                         #[$meta]
-                        stringify!($meta_rule_name),
+                        stringify!($meta_lint_name),
                     )+
                 )+
             ];
@@ -155,13 +156,13 @@ macro_rules! use_rules {
             context: Context,
 
             $(
-                $rule_name: $rule_path,
+                $lint_name: $lint_path,
             )+
 
             $(
                 $(
                     #[$meta]
-                    $meta_rule_name: $meta_rule_path,
+                    $meta_lint_name: $meta_lint_path,
                 )+
             )+
         }
@@ -172,47 +173,47 @@ macro_rules! use_rules {
                 mut config: CheckerConfig<V>,
                 standard_library: StandardLibrary,
             ) -> Result<Self, CheckerError> where V: for<'de> Deserializer<'de> {
-                macro_rules! rule_field {
+                macro_rules! lint_field {
                     ($name:ident, $path:ty) => {{
-                        let rule_name = stringify!($name);
+                        let lint_name = stringify!($name);
 
-                        let rule = <$path>::new({
-                            match config.config.remove(rule_name) {
+                        let lint = <$path>::new({
+                            match config.config.remove(lint_name) {
                                 Some(entry_generic) => {
-                                    <$path as Rule>::Config::deserialize(entry_generic).map_err(|error| {
+                                    <$path as Lint>::Config::deserialize(entry_generic).map_err(|error| {
                                         CheckerError {
-                                            name: rule_name,
+                                            name: lint_name,
                                             problem: CheckerErrorProblem::ConfigDeserializeError(Box::new(error)),
                                         }
                                     })?
                                 }
 
                                 None => {
-                                    <$path as Rule>::Config::default()
+                                    <$path as Lint>::Config::default()
                                 }
                             }
                         }).map_err(|error| {
                             CheckerError {
                                 name: stringify!($name),
-                                problem: CheckerErrorProblem::RuleNewError(Box::new(error)),
+                                problem: CheckerErrorProblem::LintNewError(Box::new(error)),
                             }
                         })?;
 
-                        rule
+                        lint
                     }};
                 }
 
                 Ok(Self {
                     $(
-                        $rule_name: {
-                            rule_field!($rule_name, $rule_path)
+                        $lint_name: {
+                            lint_field!($lint_name, $lint_path)
                         },
                     )+
                     $(
                         $(
                             #[$meta]
-                            $meta_rule_name: {
-                                rule_field!($meta_rule_name, $meta_rule_path)
+                            $meta_lint_name: {
+                                lint_field!($meta_lint_name, $meta_lint_path)
                             },
                         )+
                     )+
@@ -231,33 +232,33 @@ macro_rules! use_rules {
 
                 let ast_context = AstContext::from_ast(ast);
 
-                macro_rules! check_rule {
+                macro_rules! check_lint {
                     ($name:ident) => {
-                        let rule = &self.$name;
+                        let lint = &self.$name;
 
-                        let rule_pass = {
+                        let lint_pass = {
                             profiling::scope!(&format!("lint: {}", stringify!($name)));
-                            rule.pass(ast, &self.context, &ast_context)
+                            lint.pass(ast, &self.context, &ast_context)
                         };
 
-                        diagnostics.extend(&mut rule_pass.into_iter().map(|diagnostic| {
+                        diagnostics.extend(&mut lint_pass.into_iter().map(|diagnostic| {
                             CheckerDiagnostic {
                                 diagnostic,
-                                severity: self.get_lint_severity(rule, stringify!($name)),
+                                severity: self.get_lint_severity(lint, stringify!($name)),
                             }
                         }));
                     };
                 }
 
                 $(
-                    check_rule!($rule_name);
+                    check_lint!($lint_name);
                 )+
 
                 $(
                     $(
                         #[$meta]
                         {
-                            check_rule!($meta_rule_name);
+                            check_lint!($meta_lint_name);
                         }
                     )+
                 )+
@@ -271,8 +272,8 @@ macro_rules! use_rules {
                 diagnostics
             }
 
-            fn get_lint_severity<R: Rule>(&self, _lint: &R, name: &'static str) -> Severity {
-                match self.config.rules.get(name) {
+            fn get_lint_severity<R: Lint>(&self, _lint: &R, name: &'static str) -> Severity {
+                match self.config.lints.get(name) {
                     Some(variation) => variation.to_severity(),
                     None => R::SEVERITY,
                 }
@@ -287,40 +288,40 @@ pub struct CheckerDiagnostic {
     pub severity: Severity,
 }
 
-pub fn rule_exists(name: &str) -> bool {
-    ALL_RULES.contains(&name)
+pub fn lint_exists(name: &str) -> bool {
+    ALL_LINTS.contains(&name)
 }
 
-use_rules! {
-    almost_swapped: rules::almost_swapped::AlmostSwappedLint,
-    bad_string_escape: rules::bad_string_escape::BadStringEscapeLint,
-    compare_nan: rules::compare_nan::CompareNanLint,
-    constant_table_comparison: rules::constant_table_comparison::ConstantTableComparisonLint,
-    deprecated: rules::deprecated::DeprecatedLint,
-    divide_by_zero: rules::divide_by_zero::DivideByZeroLint,
-    duplicate_keys: rules::duplicate_keys::DuplicateKeysLint,
-    empty_if: rules::empty_if::EmptyIfLint,
-    global_usage: rules::global_usage::GlobalLint,
-    high_cyclomatic_complexity: rules::high_cyclomatic_complexity::HighCyclomaticComplexityLint,
-    if_same_then_else: rules::if_same_then_else::IfSameThenElseLint,
-    ifs_same_cond: rules::ifs_same_cond::IfsSameCondLint,
-    incorrect_standard_library_use: rules::standard_library::StandardLibraryLint,
-    invalid_lint_filter: rules::invalid_lint_filter::InvalidLintFilterLint,
-    mismatched_arg_count: rules::mismatched_arg_count::MismatchedArgCountLint,
-    multiple_statements: rules::multiple_statements::MultipleStatementsLint,
-    must_use: rules::must_use::MustUseLint,
-    parenthese_conditions: rules::parenthese_conditions::ParentheseConditionsLint,
-    shadowing: rules::shadowing::ShadowingLint,
-    suspicious_reverse_loop: rules::suspicious_reverse_loop::SuspiciousReverseLoopLint,
-    type_check_inside_call: rules::type_check_inside_call::TypeCheckInsideCallLint,
-    unbalanced_assignments: rules::unbalanced_assignments::UnbalancedAssignmentsLint,
-    undefined_variable: rules::undefined_variable::UndefinedVariableLint,
-    unscoped_variables: rules::unscoped_variables::UnscopedVariablesLint,
-    unused_variable: rules::unused_variable::UnusedVariableLint,
+use_lints! {
+    almost_swapped: lints::almost_swapped::AlmostSwappedLint,
+    bad_string_escape: lints::bad_string_escape::BadStringEscapeLint,
+    compare_nan: lints::compare_nan::CompareNanLint,
+    constant_table_comparison: lints::constant_table_comparison::ConstantTableComparisonLint,
+    deprecated: lints::deprecated::DeprecatedLint,
+    divide_by_zero: lints::divide_by_zero::DivideByZeroLint,
+    duplicate_keys: lints::duplicate_keys::DuplicateKeysLint,
+    empty_if: lints::empty_if::EmptyIfLint,
+    global_usage: lints::global_usage::GlobalLint,
+    high_cyclomatic_complexity: lints::high_cyclomatic_complexity::HighCyclomaticComplexityLint,
+    if_same_then_else: lints::if_same_then_else::IfSameThenElseLint,
+    ifs_same_cond: lints::ifs_same_cond::IfsSameCondLint,
+    incorrect_standard_library_use: lints::standard_library::StandardLibraryLint,
+    invalid_lint_filter: lints::invalid_lint_filter::InvalidLintFilterLint,
+    mismatched_arg_count: lints::mismatched_arg_count::MismatchedArgCountLint,
+    multiple_statements: lints::multiple_statements::MultipleStatementsLint,
+    must_use: lints::must_use::MustUseLint,
+    parenthese_conditions: lints::parenthese_conditions::ParentheseConditionsLint,
+    shadowing: lints::shadowing::ShadowingLint,
+    suspicious_reverse_loop: lints::suspicious_reverse_loop::SuspiciousReverseLoopLint,
+    type_check_inside_call: lints::type_check_inside_call::TypeCheckInsideCallLint,
+    unbalanced_assignments: lints::unbalanced_assignments::UnbalancedAssignmentsLint,
+    undefined_variable: lints::undefined_variable::UndefinedVariableLint,
+    unscoped_variables: lints::unscoped_variables::UnscopedVariablesLint,
+    unused_variable: lints::unused_variable::UnusedVariableLint,
 
     #[cfg(feature = "roblox")]
     {
-        roblox_incorrect_color3_new_bounds: rules::roblox_incorrect_color3_new_bounds::Color3BoundsLint,
-        roblox_incorrect_roact_usage: rules::roblox_incorrect_roact_usage::IncorrectRoactUsageLint,
+        roblox_incorrect_color3_new_bounds: lints::roblox_incorrect_color3_new_bounds::Color3BoundsLint,
+        roblox_incorrect_roact_usage: lints::roblox_incorrect_roact_usage::IncorrectRoactUsageLint,
     },
 }

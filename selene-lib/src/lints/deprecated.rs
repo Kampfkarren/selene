@@ -17,12 +17,12 @@ pub struct DeprecatedLint {
     config: DeprecatedLintConfig,
 }
 
-impl Rule for DeprecatedLint {
+impl Lint for DeprecatedLint {
     type Config = DeprecatedLintConfig;
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Warning;
-    const RULE_TYPE: RuleType = RuleType::Correctness;
+    const LINT_TYPE: LintType = LintType::Correctness;
 
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(DeprecatedLint { config })

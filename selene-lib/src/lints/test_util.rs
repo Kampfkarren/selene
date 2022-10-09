@@ -1,4 +1,4 @@
-use super::{AstContext, Context, Rule};
+use super::{AstContext, Context, Lint};
 use crate::{
     test_util::{get_standard_library, PrettyString},
     StandardLibrary,
@@ -37,9 +37,9 @@ impl Default for TestUtilConfig {
 pub fn test_lint_config_with_output<
     C: DeserializeOwned,
     E: std::error::Error,
-    R: Rule<Config = C, Error = E>,
+    R: Lint<Config = C, Error = E>,
 >(
-    rule: R,
+    lint: R,
     lint_name: &'static str,
     test_name: &'static str,
     mut config: TestUtilConfig,
@@ -59,7 +59,7 @@ pub fn test_lint_config_with_output<
         fs::read_to_string(path_base.with_extension("lua")).expect("Cannot find lua file");
 
     let ast = full_moon::parse(&lua_source).expect("Cannot parse lua file");
-    let mut diagnostics = rule.pass(
+    let mut diagnostics = lint.pass(
         &ast,
         &Context {
             standard_library: config.standard_library,
@@ -104,20 +104,20 @@ pub fn test_lint_config_with_output<
 pub fn test_lint_config<
     C: DeserializeOwned,
     E: std::error::Error,
-    R: Rule<Config = C, Error = E>,
+    R: Lint<Config = C, Error = E>,
 >(
-    rule: R,
+    lint: R,
     lint_name: &'static str,
     test_name: &'static str,
     config: TestUtilConfig,
 ) {
-    test_lint_config_with_output(rule, lint_name, test_name, config, "stderr");
+    test_lint_config_with_output(lint, lint_name, test_name, config, "stderr");
 }
 
-pub fn test_lint<C: DeserializeOwned, E: std::error::Error, R: Rule<Config = C, Error = E>>(
-    rule: R,
+pub fn test_lint<C: DeserializeOwned, E: std::error::Error, R: Lint<Config = C, Error = E>>(
+    lint: R,
     lint_name: &'static str,
     test_name: &'static str,
 ) {
-    test_lint_config(rule, lint_name, test_name, TestUtilConfig::default());
+    test_lint_config(lint, lint_name, test_name, TestUtilConfig::default());
 }

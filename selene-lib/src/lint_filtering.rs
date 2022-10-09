@@ -3,9 +3,9 @@ use crate::{
         first_code,
         visit_nodes::{NodeVisitor, VisitorType},
     },
-    rule_exists,
-    rules::{Diagnostic, Label, Severity},
-    CheckerDiagnostic, RuleVariation,
+    lint_exists,
+    lints::{Diagnostic, Label, Severity},
+    CheckerDiagnostic, LintVariation,
 };
 use full_moon::{ast::Ast, node::Node, tokenizer::TokenType};
 use std::collections::HashSet;
@@ -24,7 +24,7 @@ lazy_static::lazy_static! {
 struct FilterConfiguration {
     global: bool,
     lint: String,
-    variation: RuleVariation,
+    variation: LintVariation,
 }
 
 #[derive(Clone, Debug)]
@@ -69,9 +69,9 @@ fn parse_comment(comment: &str) -> Option<Vec<FilterConfiguration>> {
     }
 
     let variation = match variation.as_str() {
-        "allow" => RuleVariation::Allow,
-        "deny" => RuleVariation::Deny,
-        "warn" => RuleVariation::Warn,
+        "allow" => LintVariation::Allow,
+        "deny" => LintVariation::Deny,
+        "warn" => LintVariation::Warn,
         _ => return None,
     };
 
@@ -129,7 +129,7 @@ impl NodeVisitor for FilterVisitor {
 
                 self.ranges
                     .extend(configurations.into_iter().map(|configuration| {
-                        if rule_exists(&configuration.lint) {
+                        if lint_exists(&configuration.lint) {
                             Ok(Filter {
                                 configuration,
                                 comment_range: (
@@ -346,7 +346,7 @@ pub fn filter_diagnostics(
 mod tests {
     use crate::{
         test_util::{test_full_run, test_full_run_config},
-        CheckerConfig, RuleVariation,
+        CheckerConfig, LintVariation,
     };
     use std::collections::HashMap;
 
@@ -366,9 +366,9 @@ mod tests {
             "lint_filtering",
             "deny_allowed_in_config",
             CheckerConfig {
-                rules: {
+                lints: {
                     let mut map = HashMap::new();
-                    map.insert("unused_variable".to_owned(), RuleVariation::Allow);
+                    map.insert("unused_variable".to_owned(), LintVariation::Allow);
                     map
                 },
                 ..CheckerConfig::default()

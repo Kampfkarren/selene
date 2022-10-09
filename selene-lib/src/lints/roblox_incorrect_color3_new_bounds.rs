@@ -9,12 +9,12 @@ use full_moon::{
 
 pub struct Color3BoundsLint;
 
-impl Rule for Color3BoundsLint {
+impl Lint for Color3BoundsLint {
     type Config = ();
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Error;
-    const RULE_TYPE: RuleType = RuleType::Correctness;
+    const LINT_TYPE: LintType = LintType::Correctness;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(Color3BoundsLint)

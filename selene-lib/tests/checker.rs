@@ -49,11 +49,11 @@ fn errors_with_bad_config() {
 }
 
 #[test]
-fn uses_rule_variation_allow() {
+fn uses_lint_variation_allow() {
     let checker: Checker<serde_json::Value> = Checker::new(
         CheckerConfig {
-            rules: map! {
-                "empty_if".to_owned() => RuleVariation::Allow,
+            lints: map! {
+                "empty_if".to_owned() => LintVariation::Allow,
             },
             ..CheckerConfig::default()
         },

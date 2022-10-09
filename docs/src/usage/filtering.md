@@ -30,7 +30,7 @@ local something = 1
 This also works with settings other than `allow`--you can `warn` or `deny` lints in the same fashion. For example, you can have a project with the following `selene.toml` [configuration](./configuration.md):
 
 ```toml
-[rules]
+[lints]
 unused_variable = "allow" # I'm fine with unused variables in code
 ```
 
