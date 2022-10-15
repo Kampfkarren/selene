@@ -106,6 +106,7 @@ arg_enum! {
     #[derive(Clone, Copy, Debug, Eq, PartialEq)]
     pub enum DisplayStyle {
         Json,
+        Json2,
         Rich,
         Quiet,
     }

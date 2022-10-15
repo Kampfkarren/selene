@@ -118,16 +118,32 @@ fn emit_codespan(
         ..Default::default()
     };
 
-    if let Some(opts::DisplayStyle::Json) = opts.display_style {
-        writeln!(
-            writer,
-            "{}",
-            json_output::diagnostic_to_json(diagnostic, files).unwrap()
-        )
-        .unwrap();
-    } else {
-        codespan_reporting::term::emit(writer, config, files, diagnostic)
-            .expect("couldn't emit error to codespan");
+    match opts.display_style {
+        Some(opts::DisplayStyle::Json) => {
+            writeln!(
+                writer,
+                "{}",
+                serde_json::to_string(&json_output::diagnostic_to_json(diagnostic, files)).unwrap()
+            )
+            .unwrap();
+        }
+
+        Some(opts::DisplayStyle::Json2) => {
+            writeln!(
+                writer,
+                "{}",
+                serde_json::to_string(&json_output::JsonOutput::Diagnostic(
+                    json_output::diagnostic_to_json(diagnostic, files)
+                ))
+                .unwrap()
+            )
+            .unwrap();
+        }
+
+        Some(opts::DisplayStyle::Rich) | Some(opts::DisplayStyle::Quiet) | None => {
+            codespan_reporting::term::emit(writer, config, files, diagnostic)
+                .expect("couldn't emit error to codespan");
+        }
     }
 }
 
