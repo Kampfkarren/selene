@@ -109,7 +109,7 @@ jobs:
         zip -rj selene-macos.zip ./artifacts/selene-macos/*
         zip -rj selene-windows.zip ./artifacts/selene-windows/*
 
-        VERSION=`grep -Po '(?<=^version = ")([^"]+)' ./selene/Cargo.toml`
+        VERSION=`grep -Po '(?<=^version = ")([^"]+)' ./Cargo.toml`
         echo "VERSION=$VERSION" >> $GITHUB_ENV
     - name: Get changelog
       run: |
