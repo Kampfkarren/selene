@@ -1,5 +1,5 @@
 import * as vscode from "vscode"
-import { Diagnostic } from "./diagnostic"
+import { Diagnostic } from "./structures/diagnostic"
 import { TextDecoder, TextEncoder } from "util"
 
 const SETUP_CONFIGURATION = "Setup Configuration"
