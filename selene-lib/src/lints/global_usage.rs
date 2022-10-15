@@ -9,12 +9,12 @@ fn is_global(name: &str, roblox: bool) -> bool {
 
 pub struct GlobalLint;
 
-impl Rule for GlobalLint {
+impl Lint for GlobalLint {
     type Config = ();
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Warning;
-    const RULE_TYPE: RuleType = RuleType::Complexity;
+    const LINT_TYPE: LintType = LintType::Complexity;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(GlobalLint)

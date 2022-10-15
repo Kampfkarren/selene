@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added the ability to allow specific patterns in the `deprecated` lint.
 - Added exclude option to selene.toml for excluding files from lints
 - Adds support for `.yaml` extensions to be used for standard libraries alongside `.yml`.
+- Normalized "lint" terminology over "rule" throughout codebase. "rules" in `selene.toml` should now be "lints", but "rules" will still be supported for backwards compatibility.
 
 ### Changed
 - Updated internal parser, giving substantial parsing speed increases.

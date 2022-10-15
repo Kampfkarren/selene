@@ -37,12 +37,12 @@ pub enum AnalyzedReference {
     ObservedWrite(Label),
 }
 
-impl Rule for UnusedVariableLint {
+impl Lint for UnusedVariableLint {
     type Config = UnusedVariableConfig;
     type Error = regex::Error;
 
     const SEVERITY: Severity = Severity::Warning;
-    const RULE_TYPE: RuleType = RuleType::Style;
+    const LINT_TYPE: LintType = LintType::Style;
 
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(Self {

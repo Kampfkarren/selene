@@ -15,7 +15,7 @@ use codespan_reporting::{
     },
     term::DisplayStyle as CodespanDisplayStyle,
 };
-use selene_lib::{rules::Severity, *};
+use selene_lib::{lints::Severity, *};
 use structopt::{clap, StructOpt};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;

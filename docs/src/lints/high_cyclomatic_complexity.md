@@ -32,6 +32,6 @@ end
 This lint is off by default. In order to enable it, add this to your selene.toml:
 
 ```toml
-[rules]
+[lints]
 high_cyclomatic_complexity = "warn" # Or "deny"
 ```

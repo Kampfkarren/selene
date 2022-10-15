@@ -9,12 +9,12 @@ use full_moon::{
 
 pub struct DivideByZeroLint;
 
-impl Rule for DivideByZeroLint {
+impl Lint for DivideByZeroLint {
     type Config = ();
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Warning;
-    const RULE_TYPE: RuleType = RuleType::Complexity;
+    const LINT_TYPE: LintType = LintType::Complexity;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
         Ok(DivideByZeroLint)
