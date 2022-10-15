@@ -1,12 +1,9 @@
 [workspace]
 
-members = [
-	"selene",
-    "selene-lib",
-]
+members = ["selene", "selene-lib"]
 
 [workspace.package]
-version = "0.21.1"
+version = "0.22.0"
 authors = ["Kampfkarren <kampfkarren@gmail.com>"]
 edition = "2021"
 homepage = "https://kampfkarren.github.io/selene/"
@@ -14,5 +11,4 @@ license = "MPL-2.0"
 repository = "https://github.com/Kampfkarren/selene"
 
 [workspace.dependencies]
-full_moon = "0.16.1"
-
+full_moon = "0.16.2"

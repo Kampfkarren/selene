@@ -1,7 +1,9 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.21.1...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.22.0...HEAD)
+
+## [0.22.0](https://github.com/Kampfkarren/selene/releases/tag/0.22.0) - 2022-10-15
 ### Added
 - Added `--allow-warnings` option to have selene pass when only warnings occur.
 - Added the ability to allow specific patterns in the `deprecated` lint.
