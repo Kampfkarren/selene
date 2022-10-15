@@ -139,7 +139,7 @@
 <p>Configuration files are placed in the directory you are running selene in and are named <strong>selene.toml</strong>. As the name suggests, the configurations use the <a href="https://github.com/toml-lang/toml">Tom's Obvious, Minimal Language (TOML)</a> format. It is recommended you quickly brush up on the syntax, though it is very easy.</p>
 <h2 id="changing-the-severity-of-lints"><a class="header" href="#changing-the-severity-of-lints">Changing the severity of lints</a></h2>
 <p>You can change the severity of lints by entering the following into selene.toml:</p>
-<pre><code class="language-toml">[rules]
+<pre><code class="language-toml">[lints]
 lint_1 = &quot;severity&quot;
 lint_2 = &quot;severity&quot;
 ...
@@ -151,14 +151,14 @@ lint_2 = &quot;severity&quot;
 <li><code>&quot;deny&quot;</code> - Error for this lint</li>
 </ul>
 <p>Note that &quot;deny&quot; and &quot;warn&quot; are effectively the same, only warn will give orange text while error gives red text, and they both have different counters.</p>
-<h2 id="configuring-specific-rules"><a class="header" href="#configuring-specific-rules">Configuring specific rules</a></h2>
-<p>You can configure specific rules by entering the following into selene.toml:</p>
+<h2 id="configuring-specific-lints"><a class="header" href="#configuring-specific-lints">Configuring specific lints</a></h2>
+<p>You can configure specific lints by entering the following into selene.toml:</p>
 <pre><code class="language-toml">[config]
-rule1 = ...
-rule2 = ...
+lint1 = ...
+lint2 = ...
 ...
 </code></pre>
-<p>Where the value is whatever the special configuration of that rule is. You can learn these on the lints specific page in the <a href="../lints/index.html">list of lints</a>. For example, if we wanted to allow empty if branches if the contents contain comments, then we would write:</p>
+<p>Where the value is whatever the special configuration of that lint is. You can learn these on the lints specific page in the <a href="../lints/index.html">list of lints</a>. For example, if we wanted to allow empty if branches if the contents contain comments, then we would write:</p>
 <pre><code class="language-toml">[config]
 empty_if = { comments_count = true }
 </code></pre>
