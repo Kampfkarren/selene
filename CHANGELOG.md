@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.22.0...HEAD)
 ### Added
 - Added `--display-style=json2`, which gives the same outputs as `--display-style=json`, but with an extra `type` field so that it can support more than diagnostics. Extensions should move over to `--display-style=json2` as more becomes available for it, but take care to check for `type`. Currently the only possible value is "Diagnostic".
+- Added `rawlen` to the Luau standard library.
 
 ## [0.22.0](https://github.com/Kampfkarren/selene/releases/tag/0.22.0) - 2022-10-15
 ### Added
