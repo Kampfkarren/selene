@@ -9,7 +9,7 @@ globals:
   assert:
     args:
       - type: any
-      - required: A failed assertion without a message is unhelpful to users.
+      - required: false
         type: string
   collectgarbage:
     args:
