@@ -180,6 +180,10 @@ globals:
     removed: true
   package:
     removed: true
+  rawlen:
+    args:
+      - type: table
+    must_use: true
   string.dump:
     removed: true
   string.pack:
