@@ -32,6 +32,7 @@ pub fn collect_roblox_standard_library<V>(
                     - chrono::Local.timestamp(library.last_updated.unwrap_or(0), 0))
                 .num_hours()
                     < HOUR_CACHE
+                    && library.last_selene_version.as_deref() == Some(env!("CARGO_PKG_VERSION"))
                 {
                     if let Some(base) = &library.base {
                         let base_library = StandardLibrary::from_name(base)

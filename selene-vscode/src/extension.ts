@@ -3,7 +3,8 @@ import * as selene from "./selene"
 import * as timers from "timers"
 import * as util from "./util"
 import * as vscode from "vscode"
-import { Diagnostic, Severity, Label } from "./diagnostic"
+import { Diagnostic, Severity, Label } from "./structures/diagnostic"
+import { Output } from "./structures/output"
 
 let trySelene: Promise<boolean>
 
@@ -102,7 +103,7 @@ export async function activate(
 
         const output = await selene.seleneCommand(
             context.globalStorageUri,
-            "--display-style=json --no-summary -",
+            "--display-style=json2 --no-summary -",
             selene.Expectation.Stderr,
             vscode.workspace.getWorkspaceFolder(document.uri),
             document.getText(),
@@ -118,13 +119,18 @@ export async function activate(
         const byteOffsets = new Set<number>()
 
         for (const line of output.split("\n")) {
-            const data: Diagnostic = JSON.parse(line)
-            dataToAdd.push(data)
-            byteOffsets.add(data.primary_label.span.start)
-            byteOffsets.add(data.primary_label.span.end)
-            for (const label of data.secondary_labels) {
-                byteOffsets.add(label.span.start)
-                byteOffsets.add(label.span.end)
+            const output: Output = JSON.parse(line)
+
+            switch (output.type) {
+                case "diagnostic":
+                    dataToAdd.push(output)
+                    byteOffsets.add(output.primary_label.span.start)
+                    byteOffsets.add(output.primary_label.span.end)
+                    for (const label of output.secondary_labels) {
+                        byteOffsets.add(label.span.start)
+                        byteOffsets.add(label.span.end)
+                    }
+                    break
             }
         }
 

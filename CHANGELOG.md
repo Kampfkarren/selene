@@ -1,22 +1,48 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.20.0...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.22.0...HEAD)
+### Added
+- Added `--display-style=json2`, which gives the same outputs as `--display-style=json`, but with an extra `type` field so that it can support more than diagnostics. Extensions should move over to `--display-style=json2` as more becomes available for it, but take care to check for `type`. Currently the only possible value is "Diagnostic".
+- Added `rawlen` to the Luau standard library.
 
+## [0.22.0](https://github.com/Kampfkarren/selene/releases/tag/0.22.0) - 2022-10-15
+### Added
+- Added `--allow-warnings` option to have selene pass when only warnings occur.
+- Added the ability to allow specific patterns in the `deprecated` lint.
+- Added exclude option to selene.toml for excluding files from lints
+- Adds support for `.yaml` extensions to be used for standard libraries alongside `.yml`.
+- Normalized "lint" terminology over "rule" throughout codebase. "rules" in `selene.toml` should now be "lints", but "rules" will still be supported for backwards compatibility.
+
+### Changed
+- Updated internal parser, giving substantial parsing speed increases.
+
+## [0.21.1](https://github.com/Kampfkarren/selene/releases/tag/0.21.0) - 2022-09-19
+### Fixed
+- Fixed not being able to use projects without selene.toml.
+
+## [0.21.0](https://github.com/Kampfkarren/selene/releases/tag/0.21.0) - 2022-09-17
 ### Added
 - `undefined_variable` now properly catches `global` as undefined in `function global.name()`.
 - Added the "luau" builtin library.
 - `unused_variable` and `incorrect_standard_library_use` will now suggest configuring a standard library if one is detected.
 - Added `constant_table_comparison` check to catch `x == {}`, which will always fail.
+- Added `high_cyclomatic_complexity` check to catch overly complex functions that are hard to test, and harder to reason about. This lint is disabled by default.
 - Added `Font.new` to the Roblox standard library.
+- `roblox_incorrect_roact_usage` now lints for invalid events.
 
 ### Changed
 - Match `.luau` filename extension by default.
 - Allow `--pattern` to be passed multiple times.
+- `roblox_incorrect_roact_usage` now uses the generated standard library to know what classes and properties exist, meaning a selene update is no longer necessary to update.
+- Roblox standard libraries are now guaranteed to regenerate when the previously generated standard library is on a different version.
 
 ### Fixed
 - Fixed `unused_variable` incorrectly tagging `function global.name()` when `global` is defined in the standard library.
 - Fixed `unscoped_variables` incorrectly tagging `function global.name()` as creating an unscoped variable for `global`.
+- Fixed `roblox_incorrect_roact_usage` always showing the class name as "Instance". ([#297](https://github.com/Kampfkarren/selene/issues/297))
+- `roblox_incorrect_roact_usage` will now find instances of createElement that do not specify properties.
+- Fixed issues where `roblox_incorrect_color3_new_bounds` would sometimes fail to run.
 
 ## [0.20.0](https://github.com/Kampfkarren/selene/releases/tag/0.20.0) - 2022-07-21
 ### Added

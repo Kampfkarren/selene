@@ -15,7 +15,7 @@ use codespan_reporting::{
     },
     term::DisplayStyle as CodespanDisplayStyle,
 };
-use selene_lib::{rules::Severity, *};
+use selene_lib::{lints::Severity, *};
 use structopt::{clap, StructOpt};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
@@ -118,16 +118,32 @@ fn emit_codespan(
         ..Default::default()
     };
 
-    if let Some(opts::DisplayStyle::Json) = opts.display_style {
-        writeln!(
-            writer,
-            "{}",
-            json_output::diagnostic_to_json(diagnostic, files).unwrap()
-        )
-        .unwrap();
-    } else {
-        codespan_reporting::term::emit(writer, config, files, diagnostic)
-            .expect("couldn't emit error to codespan");
+    match opts.display_style {
+        Some(opts::DisplayStyle::Json) => {
+            writeln!(
+                writer,
+                "{}",
+                serde_json::to_string(&json_output::diagnostic_to_json(diagnostic, files)).unwrap()
+            )
+            .unwrap();
+        }
+
+        Some(opts::DisplayStyle::Json2) => {
+            writeln!(
+                writer,
+                "{}",
+                serde_json::to_string(&json_output::JsonOutput::Diagnostic(
+                    json_output::diagnostic_to_json(diagnostic, files)
+                ))
+                .unwrap()
+            )
+            .unwrap();
+        }
+
+        Some(opts::DisplayStyle::Rich) | Some(opts::DisplayStyle::Quiet) | None => {
+            codespan_reporting::term::emit(writer, config, files, diagnostic)
+                .expect("couldn't emit error to codespan");
+        }
     }
 }
 
@@ -162,70 +178,74 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
     let mut files = codespan::Files::new();
     let source_id = files.add(filename.as_os_str(), &*contents);
 
-    let ast = match full_moon::parse(&contents) {
-        Ok(ast) => ast,
-        Err(error) => {
-            PARSE_ERRORS.fetch_add(1, Ordering::SeqCst);
+    let ast = {
+        profiling::scope!("full_moon::parse");
 
-            match error {
-                full_moon::Error::AstError(full_moon::ast::AstError::UnexpectedToken {
-                    token,
-                    additional,
-                }) => emit_codespan_locked(
-                    &files,
-                    &CodespanDiagnostic {
-                        severity: CodespanSeverity::Error,
-                        code: Some("parse_error".to_owned()),
-                        message: format!("unexpected token `{}`", token),
-                        labels: vec![CodespanLabel::primary(
-                            source_id,
-                            codespan::Span::new(
-                                token.start_position().bytes() as u32,
-                                token.end_position().bytes() as u32,
-                            ),
-                        )
-                        .with_message(additional.unwrap_or_default())],
-                        notes: Vec::new(),
-                    },
-                ),
-                full_moon::Error::TokenizerError(error) => emit_codespan_locked(
-                    &files,
-                    &CodespanDiagnostic {
-                        severity: CodespanSeverity::Error,
-                        code: Some("parse_error".to_owned()),
-                        message: match error.error() {
-                            full_moon::tokenizer::TokenizerErrorType::UnclosedComment => {
-                                "unclosed comment".to_string()
-                            }
-                            full_moon::tokenizer::TokenizerErrorType::UnclosedString => {
-                                "unclosed string".to_string()
-                            }
-                            full_moon::tokenizer::TokenizerErrorType::UnexpectedShebang => {
-                                "unexpected shebang".to_string()
-                            }
-                            full_moon::tokenizer::TokenizerErrorType::UnexpectedToken(
-                                character,
-                            ) => {
-                                format!("unexpected character {}", character)
-                            }
-                            full_moon::tokenizer::TokenizerErrorType::InvalidSymbol(symbol) => {
-                                format!("invalid symbol {}", symbol)
-                            }
+        match full_moon::parse(&contents) {
+            Ok(ast) => ast,
+            Err(error) => {
+                PARSE_ERRORS.fetch_add(1, Ordering::SeqCst);
+
+                match error {
+                    full_moon::Error::AstError(full_moon::ast::AstError::UnexpectedToken {
+                        token,
+                        additional,
+                    }) => emit_codespan_locked(
+                        &files,
+                        &CodespanDiagnostic {
+                            severity: CodespanSeverity::Error,
+                            code: Some("parse_error".to_owned()),
+                            message: format!("unexpected token `{}`", token),
+                            labels: vec![CodespanLabel::primary(
+                                source_id,
+                                codespan::Span::new(
+                                    token.start_position().bytes() as u32,
+                                    token.end_position().bytes() as u32,
+                                ),
+                            )
+                            .with_message(additional.unwrap_or_default())],
+                            notes: Vec::new(),
                         },
-                        labels: vec![CodespanLabel::primary(
-                            source_id,
-                            codespan::Span::new(
-                                error.position().bytes() as u32,
-                                error.position().bytes() as u32,
-                            ),
-                        )],
-                        notes: Vec::new(),
-                    },
-                ),
-                _ => error!("Error parsing {}: {}", filename.display(), error),
-            }
+                    ),
+                    full_moon::Error::TokenizerError(error) => emit_codespan_locked(
+                        &files,
+                        &CodespanDiagnostic {
+                            severity: CodespanSeverity::Error,
+                            code: Some("parse_error".to_owned()),
+                            message: match error.error() {
+                                full_moon::tokenizer::TokenizerErrorType::UnclosedComment => {
+                                    "unclosed comment".to_string()
+                                }
+                                full_moon::tokenizer::TokenizerErrorType::UnclosedString => {
+                                    "unclosed string".to_string()
+                                }
+                                full_moon::tokenizer::TokenizerErrorType::UnexpectedShebang => {
+                                    "unexpected shebang".to_string()
+                                }
+                                full_moon::tokenizer::TokenizerErrorType::UnexpectedToken(
+                                    character,
+                                ) => {
+                                    format!("unexpected character {}", character)
+                                }
+                                full_moon::tokenizer::TokenizerErrorType::InvalidSymbol(symbol) => {
+                                    format!("invalid symbol {}", symbol)
+                                }
+                            },
+                            labels: vec![CodespanLabel::primary(
+                                source_id,
+                                codespan::Span::new(
+                                    error.position().bytes() as u32,
+                                    error.position().bytes() as u32,
+                                ),
+                            )],
+                            notes: Vec::new(),
+                        },
+                    ),
+                    _ => error!("Error parsing {}: {}", filename.display(), error),
+                }
 
-            return;
+                return;
+            }
         }
     };
 
@@ -431,7 +451,7 @@ fn start(mut matches: opts::Options) {
     let current_dir = std::env::current_dir().unwrap();
 
     let standard_library =
-        match standard_library::collect_standard_library(&config, &config.std, &current_dir) {
+        match standard_library::collect_standard_library(&config, config.std(), &current_dir) {
             Ok(Some(library)) => library,
 
             Ok(None) => {
@@ -441,10 +461,11 @@ fn start(mut matches: opts::Options) {
 
             Err(error) => {
                 let missing_files: Vec<_> = config
-                    .std
+                    .std()
                     .split('+')
                     .filter(|name| {
                         !PathBuf::from(format!("{name}.yml")).exists()
+                            && !PathBuf::from(format!("{name}.yaml")).exists()
                             && !PathBuf::from(format!("{name}.toml")).exists()
                     })
                     .filter(|name| !cfg!(feature = "roblox") || *name != "roblox")
@@ -453,7 +474,7 @@ fn start(mut matches: opts::Options) {
                 if !missing_files.is_empty() {
                     eprintln!(
                         "`std = \"{}\"`, but some libraries could not be found:",
-                        config.std
+                        config.std()
                     );
 
                     for library_name in missing_files {
@@ -468,6 +489,25 @@ fn start(mut matches: opts::Options) {
                 std::process::exit(1);
             }
         };
+
+    let mut builder = globset::GlobSetBuilder::new();
+    for pattern in &config.exclude {
+        builder.add(match globset::Glob::new(pattern) {
+            Ok(glob) => glob,
+            Err(error) => {
+                error!("Invalid glob pattern: {error}");
+                std::process::exit(1);
+            }
+        });
+    }
+
+    let exclude_set = match builder.build() {
+        Ok(globset) => globset,
+        Err(error) => {
+            error!("{error}");
+            std::process::exit(1);
+        }
+    };
 
     let checker = Arc::new(match Checker::new(config, standard_library) {
         Ok(checker) => checker,
@@ -503,13 +543,17 @@ fn start(mut matches: opts::Options) {
                             Ok(glob) => glob,
                             Err(error) => {
                                 error!("Invalid glob pattern: {}", error);
-                                return;
+                                std::process::exit(1);
                             }
                         };
 
                         for entry in glob {
                             match entry {
                                 Ok(path) => {
+                                    if exclude_set.is_match(&path) {
+                                        continue;
+                                    }
+
                                     let checker = Arc::clone(&checker);
 
                                     pool.execute(move || read_file(&checker, &path));
@@ -554,8 +598,14 @@ fn start(mut matches: opts::Options) {
         log_total(parse_errors, lint_errors, lint_warnings).ok();
     }
 
-    if parse_errors + lint_errors + lint_warnings + pool.panic_count() > 0 {
-        std::process::exit(1);
+    let error_count = parse_errors + lint_errors + lint_warnings + pool.panic_count();
+    if error_count > 0 {
+        let lock = OPTIONS.read().unwrap();
+        let opts = lock.as_ref().unwrap();
+
+        if error_count != lint_warnings || !opts.allow_warnings {
+            std::process::exit(1);
+        }
     }
 }
 

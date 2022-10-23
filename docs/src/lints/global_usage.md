@@ -6,7 +6,7 @@ Prohibits use of `_G`.
 `_G` is global mutable state, which is heavily regarded as harmful. You should instead refactor your code to be more modular in nature.
 
 ## Remarks
-If you are using the Roblox standard library, use of `shared` is prohibited under this rule.
+If you are using the Roblox standard library, use of `shared` is prohibited under this lint.
 
 ## Example
 ```lua

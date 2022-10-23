@@ -7,15 +7,16 @@ USAGE:
     selene <SUBCOMMAND>
 
 FLAGS:
-    -h, --help          Prints help information
-    -n, --no-summary    Suppress summary information
-    -q, --quiet         Display only the necessary information. Equivalent to --display-style="quiet"
-    -V, --version       Prints version information
+        --allow-warnings    Pass when only warnings occur
+    -h, --help              Prints help information
+    -n, --no-summary        Suppress summary information
+    -q, --quiet             Display only the necessary information. Equivalent to --display-style="quiet"
+    -V, --version           Prints version information
 
 OPTIONS:
         --color <color>                     [default: auto]  [possible values: Always, Auto, Never]
         --config <config>                  A toml file to configure the behavior of selene [default: selene.toml]
-        --display-style <display-style>    Sets the display method [possible values: Json, Rich, Quiet]
+        --display-style <display-style>    Sets the display method [possible values: Json, Json2, Rich, Quiet]
         --num-threads <num-threads>        Number of threads to run on, default to the numbers of logical cores on your
                                            system [default: your system's cores]
         --pattern <pattern>                A glob to match files with to check

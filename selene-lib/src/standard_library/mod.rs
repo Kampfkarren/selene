@@ -122,6 +122,14 @@ pub struct StandardLibrary {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_updated: Option<i64>,
 
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_selene_version: Option<String>,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub roblox_classes: BTreeMap<String, RobloxClass>,
+
     #[serde(skip)]
     global_tree_cache: OnceCell<GlobalTreeCache>,
 }
@@ -788,6 +796,43 @@ pub enum Observes {
 impl Default for Observes {
     fn default() -> Self {
         Self::ReadWrite
+    }
+}
+
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
+pub struct RobloxClass {
+    pub superclass: String,
+    pub events: Vec<String>,
+    pub properties: Vec<String>,
+}
+
+impl RobloxClass {
+    pub fn has_event(&self, roblox_classes: &BTreeMap<String, RobloxClass>, event: &str) -> bool {
+        if self.events.iter().any(|other_event| other_event == event) {
+            true
+        } else if let Some(superclass) = roblox_classes.get(&self.superclass) {
+            superclass.has_event(roblox_classes, event)
+        } else {
+            false
+        }
+    }
+
+    pub fn has_property(
+        &self,
+        roblox_classes: &BTreeMap<String, RobloxClass>,
+        property: &str,
+    ) -> bool {
+        if self
+            .properties
+            .iter()
+            .any(|other_property| other_property == property)
+        {
+            true
+        } else if let Some(superclass) = roblox_classes.get(&self.superclass) {
+            superclass.has_property(roblox_classes, property)
+        } else {
+            false
+        }
     }
 }
 

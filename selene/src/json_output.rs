@@ -4,7 +4,13 @@ use codespan_reporting::diagnostic::{
 use serde::Serialize;
 
 #[derive(Serialize)]
-struct JsonDiagnostic {
+#[serde(tag = "type")]
+pub enum JsonOutput {
+    Diagnostic(JsonDiagnostic),
+}
+
+#[derive(Serialize)]
+pub struct JsonDiagnostic {
     severity: Severity,
     code: Option<String>,
     message: String,
@@ -55,8 +61,8 @@ fn label_to_serializable(
 pub fn diagnostic_to_json(
     diagnostic: &CodespanDiagnostic<codespan::FileId>,
     files: &codespan::Files<&str>,
-) -> serde_json::Result<String> {
-    serde_json::to_string(&JsonDiagnostic {
+) -> JsonDiagnostic {
+    JsonDiagnostic {
         code: diagnostic.code.to_owned(),
         message: diagnostic.message.to_owned(),
         severity: diagnostic.severity.to_owned(),
@@ -71,5 +77,5 @@ pub fn diagnostic_to_json(
             .filter(|label| label.style == LabelStyle::Secondary)
             .map(|label| label_to_serializable(label, files))
             .collect(),
-    })
+    }
 }

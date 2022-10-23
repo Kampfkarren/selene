@@ -10,7 +10,7 @@ use full_moon_lua_types::{AnyNode, AstToLua};
 use mlua::StdLib;
 use once_cell::unsync::OnceCell;
 
-use crate::{ast_util::purge_trivia, rules::*};
+use crate::{ast_util::purge_trivia, lints::*};
 
 use super::{config::PluginConfig, context::Contexts};
 

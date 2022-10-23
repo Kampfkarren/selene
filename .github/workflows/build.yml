@@ -109,11 +109,11 @@ jobs:
         zip -rj selene-macos.zip ./artifacts/selene-macos/*
         zip -rj selene-windows.zip ./artifacts/selene-windows/*
 
-        VERSION=`grep -Po '(?<=^version = ")([^"]+)' ./selene/Cargo.toml`
+        VERSION=`grep -Po '(?<=^version = ")([^"]+)' ./Cargo.toml`
         echo "VERSION=$VERSION" >> $GITHUB_ENV
     - name: Get changelog
       run: |
-        CHANGELOG_ENTRY=`grep --color=never -m 1 -Po '## \K(\[[0-9\.]+\].+)' CHANGELOG.md`
+        CHANGELOG_ENTRY=`grep --color=never -m 1 -Po '## \K(\[[0-9\.]+\].+)' CHANGELOG.md | sed -E 's/\(.+?\)//g'`
         DESCRIPTION=`bash ./misc/extract-changelog.sh $CHANGELOG_ENTRY`
 
         echo "CHANGELOG_ENTRY=$CHANGELOG_ENTRY" >> $GITHUB_ENV

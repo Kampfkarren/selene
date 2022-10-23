@@ -1,6 +1,6 @@
 use mlua::ToLua;
 
-use crate::rules::{AstContext, Context};
+use crate::lints::{AstContext, Context};
 
 pub struct Contexts<'lua> {
     scope_manager: mlua::AnyUserData<'lua>,
