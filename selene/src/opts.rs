@@ -52,6 +52,10 @@ pub struct Options {
     #[structopt(long)]
     pub allow_warnings: bool,
 
+    /// Whether or not to always allow plugins, skipping the prompt.
+    #[structopt(long)]
+    pub allow_plugins: bool,
+
     /// Whether to pretend to be luacheck for existing consumers
     #[structopt(long, hidden(true))]
     pub luacheck: bool,

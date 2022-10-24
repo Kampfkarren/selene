@@ -26,6 +26,7 @@ use selene_lib::standard_library::StandardLibrary;
 
 mod json_output;
 mod opts;
+mod plugins;
 #[cfg(feature = "roblox")]
 mod roblox;
 mod standard_library;
@@ -370,16 +371,16 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     );
 }
 
-fn start(mut matches: opts::Options) {
-    *OPTIONS.write().unwrap() = Some(matches.clone());
+fn start(mut options: opts::Options) {
+    *OPTIONS.write().unwrap() = Some(options.clone());
 
-    if matches.pattern.is_empty() {
-        matches.pattern.push(String::from("**/*.lua"));
+    if options.pattern.is_empty() {
+        options.pattern.push(String::from("**/*.lua"));
         #[cfg(feature = "roblox")]
-        matches.pattern.push(String::from("**/*.luau"));
+        options.pattern.push(String::from("**/*.luau"));
     }
 
-    match matches.command {
+    match &options.command {
         #[cfg(feature = "roblox")]
         Some(opts::Command::GenerateRobloxStd) => {
             println!("Generating Roblox standard library...");
@@ -416,7 +417,10 @@ fn start(mut matches: opts::Options) {
         None => {}
     }
 
-    let config: CheckerConfig<toml::value::Value> = match matches.config {
+    // If we support selene.toml outside of current_dir, this can be changed
+    let config_filename = PathBuf::from(options.config.as_deref().unwrap_or("selene.toml"));
+
+    let mut config: CheckerConfig<toml::value::Value> = match &options.config {
         Some(config_file) => {
             let config_contents = match fs::read_to_string(config_file) {
                 Ok(contents) => contents,
@@ -447,6 +451,13 @@ fn start(mut matches: opts::Options) {
             Err(_) => CheckerConfig::default(),
         },
     };
+
+    if !config.plugins.is_empty() {
+        let canon_filename = std::fs::canonicalize(config_filename)
+            .expect("plugins weren't empty, but config_filename could not be canonicalized");
+
+        plugins::authorize_plugins(&options, &mut config, canon_filename);
+    }
 
     let current_dir = std::env::current_dir().unwrap();
 
@@ -517,9 +528,9 @@ fn start(mut matches: opts::Options) {
         }
     });
 
-    let pool = ThreadPool::new(matches.num_threads);
+    let pool = ThreadPool::new(options.num_threads);
 
-    for filename in &matches.files {
+    for filename in &options.files {
         if filename == "-" {
             let checker = Arc::clone(&checker);
             pool.execute(move || read(&checker, Path::new("-"), io::stdin().lock()));
@@ -534,7 +545,7 @@ fn start(mut matches: opts::Options) {
 
                     pool.execute(move || read_file(&checker, Path::new(&filename)));
                 } else if metadata.is_dir() {
-                    for pattern in &matches.pattern {
+                    for pattern in &options.pattern {
                         let glob = match glob::glob(&format!(
                             "{}/{}",
                             filename.to_string_lossy(),
@@ -594,7 +605,7 @@ fn start(mut matches: opts::Options) {
         LINT_WARNINGS.load(Ordering::SeqCst),
     );
 
-    if !matches.luacheck && !matches.no_summary {
+    if !options.luacheck && !options.no_summary {
         log_total(parse_errors, lint_errors, lint_warnings).ok();
     }
 

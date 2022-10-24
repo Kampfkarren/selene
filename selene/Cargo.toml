@@ -34,6 +34,7 @@ tracy-client = { version = "0.13.2", optional = true }
 threadpool = "1.7"
 toml = "0.5"
 ureq = { version = "2.4.0", features = ["json"], optional = true }
+inquire = "0.4.0"
 
 [features]
 default = ["roblox"]

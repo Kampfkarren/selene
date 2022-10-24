@@ -144,6 +144,108 @@ impl Default for RobloxStdSource {
     }
 }
 
+pub struct Checker<V: 'static + DeserializeOwned> {
+    config: CheckerConfig<V>,
+    context: Context,
+    plugins: Vec<plugins::LuaPlugin>,
+
+    lints: Lints,
+}
+
+impl<V: 'static + DeserializeOwned> Checker<V> {
+    // TODO: Be more strict about config? Make sure all keys exist
+    pub fn new(
+        mut config: CheckerConfig<V>,
+        standard_library: StandardLibrary,
+    ) -> Result<Self, CheckerError>
+    where
+        V: for<'de> Deserializer<'de>,
+    {
+        Ok(Self {
+            context: Context {
+                standard_library,
+                standard_library_is_set: config.std.is_some(),
+            },
+
+            plugins: create_plugins_from_config(&config)?,
+
+            lints: Lints::new(&mut config)?,
+
+            config,
+        })
+    }
+
+    pub fn test_on(&self, ast: &Ast) -> Vec<CheckerDiagnostic> {
+        let ast_context = AstContext::from_ast(ast);
+        let mut diagnostics = self.lints.test_on(ast, self, &ast_context, &self.context);
+
+        self.run_plugins(&mut diagnostics, ast, &ast_context);
+
+        diagnostics = lint_filtering::filter_diagnostics(
+            ast,
+            diagnostics,
+            self.get_lint_severity(&self.lints.invalid_lint_filter, "invalid_lint_filter"),
+        );
+
+        diagnostics
+    }
+
+    pub fn get_lint_severity<L: Lint>(&self, _lint: &L, name: &'static str) -> Severity {
+        match self.config.lints.get(name) {
+            Some(variation) => variation.to_severity(),
+            None => L::SEVERITY,
+        }
+    }
+
+    fn run_plugins(
+        &self,
+        diagnostics: &mut Vec<CheckerDiagnostic>,
+        ast: &Ast,
+        ast_context: &AstContext,
+    ) {
+        if self.plugins.is_empty() {
+            return;
+        }
+
+        let lua_ast = Arc::new(Mutex::new(full_moon_lua_types::Ast::from(ast)));
+
+        for plugin in &self.plugins {
+            let plugin_name = plugin.full_name();
+
+            let plugin_pass = {
+                profiling::scope!(plugin_name);
+                plugin.pass(Arc::clone(&lua_ast), &self.context, ast_context)
+            };
+
+            match plugin_pass {
+                Ok(plugin_diagnostics) => {
+                    diagnostics.extend(&mut plugin_diagnostics.into_iter().map(|diagnostic| {
+                        CheckerDiagnostic {
+                            diagnostic,
+                            severity: match self.config.lints.get(&plugin_name) {
+                                Some(variation) => variation.to_severity(),
+                                None => plugin.severity(),
+                            },
+                        }
+                    }));
+                }
+
+                Err(error) => {
+                    diagnostics.push(CheckerDiagnostic {
+                        diagnostic: Diagnostic::new(
+                            plugin_name,
+                            format!("error running plugin: {error}"),
+                            // PLUGIN TODO: Support not pointing at anything in particular (and allow lint(message) to do the same)
+                            lints::Label::new((0, 0)),
+                        ),
+                        severity: Severity::Error,
+                    });
+                }
+            }
+        }
+    }
+}
+
 macro_rules! use_lints {
     {
         $(
@@ -172,29 +274,24 @@ macro_rules! use_lints {
             ];
         }
 
-        pub struct Checker<V: 'static + DeserializeOwned> {
-            config: CheckerConfig<V>,
-            context: Context,
-            plugins: Vec<plugins::LuaPlugin>,
-
+        pub struct Lints {
             $(
-                $lint_name: $lint_path,
+                pub $lint_name: $lint_path,
             )+
 
             $(
                 $(
                     #[$meta]
-                    $meta_lint_name: $meta_lint_path,
+                    pub $meta_lint_name: $meta_lint_path,
                 )+
             )+
         }
 
-        impl<V: 'static + DeserializeOwned> Checker<V> {
-            // TODO: Be more strict about config? Make sure all keys exist
-            pub fn new(
-                mut config: CheckerConfig<V>,
-                standard_library: StandardLibrary,
-            ) -> Result<Self, CheckerError> where V: for<'de> Deserializer<'de> {
+        impl Lints {
+            fn new<V: 'static + DeserializeOwned>(config: &mut CheckerConfig<V>) -> Result<Self, CheckerError>
+            where
+                V: for<'de> Deserializer<'de>,
+            {
                 macro_rules! lint_field {
                     ($name:ident, $path:ty) => {{
                         let lint_name = stringify!($name);
@@ -239,22 +336,11 @@ macro_rules! use_lints {
                             },
                         )+
                     )+
-
-                    context: Context {
-                        standard_library,
-                        standard_library_is_set: config.std.is_some(),
-                    },
-
-                    plugins: create_plugins_from_config(&config)?,
-
-                    config,
                 })
             }
 
-            pub fn test_on(&self, ast: &Ast) -> Vec<CheckerDiagnostic> {
+            fn test_on<V: 'static + DeserializeOwned>(&self, ast: &Ast, checker: &Checker<V>, ast_context: &AstContext, context: &Context) -> Vec<CheckerDiagnostic> {
                 let mut diagnostics = Vec::new();
-
-                let ast_context = AstContext::from_ast(ast);
 
                 macro_rules! check_lint {
                     ($name:ident) => {
@@ -262,13 +348,13 @@ macro_rules! use_lints {
 
                         let lint_pass = {
                             profiling::scope!(&format!("lint: {}", stringify!($name)));
-                            lint.pass(ast, &self.context, &ast_context)
+                            lint.pass(ast, context, ast_context)
                         };
 
                         diagnostics.extend(&mut lint_pass.into_iter().map(|diagnostic| {
                             CheckerDiagnostic {
                                 diagnostic,
-                                severity: self.get_lint_severity(lint, stringify!($name)),
+                                severity: checker.get_lint_severity(lint, stringify!($name)),
                             }
                         }));
                     };
@@ -287,75 +373,10 @@ macro_rules! use_lints {
                     )+
                 )+
 
-                self.run_plugins(&mut diagnostics, ast, &ast_context);
-
-                diagnostics = lint_filtering::filter_diagnostics(
-                    ast,
-                    diagnostics,
-                    self.get_lint_severity(&self.invalid_lint_filter, "invalid_lint_filter"),
-                );
-
                 diagnostics
             }
         }
     };
-}
-
-impl<V: 'static + DeserializeOwned> Checker<V> {
-    fn get_lint_severity<L: Lint>(&self, _lint: &L, name: &'static str) -> Severity {
-        match self.config.lints.get(name) {
-            Some(variation) => variation.to_severity(),
-            None => L::SEVERITY,
-        }
-    }
-
-    fn run_plugins(
-        &self,
-        diagnostics: &mut Vec<CheckerDiagnostic>,
-        ast: &Ast,
-        ast_context: &AstContext,
-    ) {
-        if self.plugins.is_empty() {
-            return;
-        }
-
-        let lua_ast = Arc::new(Mutex::new(full_moon_lua_types::Ast::from(ast)));
-
-        for plugin in &self.plugins {
-            let plugin_name = plugin.full_name();
-
-            let plugin_pass = {
-                profiling::scope!(plugin_name);
-                plugin.pass(Arc::clone(&lua_ast), &self.context, ast_context)
-            };
-
-            match plugin_pass {
-                Ok(plugin_diagnostics) => {
-                    diagnostics.extend(&mut plugin_diagnostics.into_iter().map(|diagnostic| {
-                        CheckerDiagnostic {
-                            diagnostic,
-                            severity: match self.config.lints.get(&plugin_name) {
-                                Some(variation) => variation.to_severity(),
-                                None => plugin.severity,
-                            },
-                        }
-                    }));
-                }
-
-                Err(error) => {
-                    diagnostics.push(CheckerDiagnostic {
-                        diagnostic: Diagnostic::new(
-                            plugin_name,
-                            format!("error running plugin: {error}"),
-                            // PLUGIN TODO: Support not pointing at anything in particular (and allow lint(message) to do the same)
-                            lints::Label::new((0, 0)),
-                        ),
-                        severity: Severity::Error,
-                    });
-                }
-            }
-        }
-    }
 }
 
 fn create_plugins_from_config<V>(
