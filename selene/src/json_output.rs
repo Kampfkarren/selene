@@ -32,6 +32,7 @@ pub struct JsonDiagnostic {
 
 #[derive(Serialize)]
 struct Label {
+    filename: String,
     span: Span,
     message: String,
 }
@@ -47,6 +48,7 @@ struct Span {
 }
 
 fn label_to_serializable(
+    filename: &String,
     label: &CodespanLabel<codespan::FileId>,
     files: &codespan::Files<&str>,
 ) -> Label {
@@ -57,6 +59,7 @@ fn label_to_serializable(
         .location(label.file_id, label.range.end as u32)
         .expect("unable to determine end location for label");
     Label {
+        filename: filename.to_string(),
         message: label.message.to_owned(),
         span: Span {
             start: label.range.start,
@@ -73,20 +76,20 @@ pub fn diagnostic_to_json(
     diagnostic: &CodespanDiagnostic<codespan::FileId>,
     files: &codespan::Files<&str>,
 ) -> JsonDiagnostic {
+    let label = diagnostic.labels.first().expect("no labels passed");
+    let filename = files.name(label.file_id).to_string_lossy().into_owned();
+
     JsonDiagnostic {
         code: diagnostic.code.to_owned(),
         message: diagnostic.message.to_owned(),
         severity: diagnostic.severity.to_owned(),
         notes: diagnostic.notes.to_owned(),
-        primary_label: label_to_serializable(
-            diagnostic.labels.first().expect("no labels passed"),
-            files,
-        ),
+        primary_label: label_to_serializable(&filename, label, files),
         secondary_labels: diagnostic
             .labels
             .iter()
             .filter(|label| label.style == LabelStyle::Secondary)
-            .map(|label| label_to_serializable(label, files))
+            .map(|label| label_to_serializable(&filename, label, files))
             .collect(),
     }
 }
