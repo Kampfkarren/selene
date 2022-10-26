@@ -1,10 +1,10 @@
-use std::io;
+use std::io::{self, Write};
+
 use codespan_reporting::diagnostic::{
     Diagnostic as CodespanDiagnostic, Label as CodespanLabel, LabelStyle, Severity,
 };
 use serde::Serialize;
 use termcolor::StandardStream;
-use std::io::Write;
 
 #[derive(Serialize)]
 #[serde(tag = "type")]
