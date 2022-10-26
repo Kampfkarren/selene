@@ -23,8 +23,8 @@ use upgrade_std::upgrade_std;
 
 #[cfg(feature = "roblox")]
 use selene_lib::standard_library::StandardLibrary;
-use crate::json_output::log_total_json;
-use crate::opts::DisplayStyle;
+
+use crate::{json_output::log_total_json, opts::DisplayStyle};
 
 mod json_output;
 mod opts;
