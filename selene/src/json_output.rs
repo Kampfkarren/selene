@@ -15,9 +15,9 @@ pub enum JsonOutput {
 
 #[derive(Serialize)]
 pub struct JsonSummary {
-    pub(crate) errors: usize,
-    pub(crate) warnings: usize,
-    pub(crate) parse_errors: usize,
+    errors: usize,
+    warnings: usize,
+    parse_errors: usize,
 }
 
 #[derive(Serialize)]
@@ -104,10 +104,8 @@ pub fn log_total_json(
             errors: lint_errors,
             warnings: lint_warnings,
             parse_errors
-        }))
-            .unwrap()
-    )
-        .unwrap();
+        }))?
+    )?;
 
     Ok(())
 }

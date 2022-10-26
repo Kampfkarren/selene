@@ -86,7 +86,7 @@ fn log_total(parse_errors: usize, lint_errors: usize, lint_warnings: usize) -> i
     stdout.reset()?;
 
     match opts.display_style {
-        Some(DisplayStyle::Json) | Some(DisplayStyle::Json2) => {
+        Some(DisplayStyle::Json2) => {
             log_total_json(stdout, parse_errors, lint_errors, lint_warnings)
         }
         _ => log_total_text(stdout, parse_errors, lint_errors, lint_warnings),
