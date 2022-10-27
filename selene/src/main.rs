@@ -414,6 +414,22 @@ fn start(mut options: opts::Options) {
             return;
         }
 
+        Some(opts::Command::InternalPath { internal_path }) => match internal_path {
+            opts::InternalPath::PluginAuthorization => {
+                print!("{}", plugins::plugin_authorization_path().display());
+                return;
+            }
+        },
+
+        Some(opts::Command::PluginAuthorization { path, block }) => {
+            if let Err(error) = plugins::allow_plugin_by_bool(path, !block) {
+                error!("{error}");
+                std::process::exit(1);
+            }
+
+            return;
+        }
+
         None => {}
     }
 
@@ -456,7 +472,7 @@ fn start(mut options: opts::Options) {
         let canon_filename = std::fs::canonicalize(config_filename)
             .expect("plugins weren't empty, but config_filename could not be canonicalized");
 
-        plugins::authorize_plugins(&options, &mut config, canon_filename);
+        plugins::authorize_plugins_prompt(&options, &mut config, canon_filename);
     }
 
     let current_dir = std::env::current_dir().unwrap();

@@ -1,10 +1,33 @@
-use std::{fmt::Display, path::PathBuf};
+use std::{
+    fmt::Display,
+    path::{Path, PathBuf},
+};
 
 use color_eyre::eyre::Context;
 use selene_lib::CheckerConfig;
 use serde::{Deserialize, Serialize};
 
-use crate::opts::Options;
+use crate::{
+    json_output,
+    opts::{DisplayStyle, Options},
+};
+
+#[derive(Deserialize, Serialize)]
+#[serde(default)]
+pub struct PluginAuthorizations {
+    authorizations: Vec<PluginAuthorization>,
+    version: u32,
+}
+
+impl Default for PluginAuthorizations {
+    fn default() -> Self {
+        Self {
+            version: 1,
+
+            authorizations: Default::default(),
+        }
+    }
+}
 
 #[derive(Default, Deserialize, Serialize)]
 #[serde(default)]
@@ -13,7 +36,7 @@ struct PluginAuthorization {
     allowed: bool,
 }
 
-fn plugin_authorization_path() -> PathBuf {
+pub fn plugin_authorization_path() -> PathBuf {
     let data_local_dir = dirs::data_local_dir().expect("could not find data local directory");
     data_local_dir
         .join("selene")
@@ -30,10 +53,11 @@ fn plugin_authorizations() -> color_eyre::Result<Vec<PluginAuthorization>> {
         }
     };
 
-    Ok(serde_yaml::from_str(&contents)?)
+    // PLUGIN TODO: Check version, stop if it's too high
+    Ok(serde_yaml::from_str::<PluginAuthorizations>(&contents)?.authorizations)
 }
 
-pub fn authorize_plugins<V>(
+pub fn authorize_plugins_prompt<V>(
     options: &Options,
     config: &mut CheckerConfig<V>,
     canon_filename: PathBuf,
@@ -63,7 +87,9 @@ pub fn authorize_plugins<V>(
     };
 
     if !atty::is(atty::Stream::Stdin) {
-        todo!("implement non-interactive mode");
+        config.plugins.clear();
+        non_interactive_message(options, canon_filename);
+        return;
     }
 
     let mut prompt = format!(
@@ -116,7 +142,9 @@ pub fn authorize_plugins<V>(
 
         // We shouldn't have gotten this far, but maybe it knows something atty doesn't
         Err(inquire::InquireError::NotTTY) => {
-            todo!("implement non-interactive mode (caught by inquire)");
+            config.plugins.clear();
+            non_interactive_message(options, canon_filename);
+            return;
         }
 
         Err(error) => {
@@ -125,16 +153,7 @@ pub fn authorize_plugins<V>(
         }
     }
 
-    let path = plugin_authorization_path();
-    if let Err(error) = std::fs::create_dir_all(path.parent().unwrap()) {
-        eprintln!("error when creating directory for plugin authorization file: {error}");
-        std::process::exit(1);
-    }
-
-    if let Err(error) = std::fs::write(&path, serde_yaml::to_string(&authorizations).unwrap()) {
-        eprintln!("error when writing plugin authorization file: {error}");
-        std::process::exit(1);
-    }
+    write_plugin_authorizations_or_die(authorizations);
 }
 
 #[derive(Clone, Copy)]
@@ -155,5 +174,64 @@ impl Display for PluginAuthorizationChoice {
                 Self::Never => "no, never",
             }
         )
+    }
+}
+
+pub fn allow_plugin_by_bool(path: &Path, allowed: bool) -> color_eyre::Result<()> {
+    let canonical_path = path.canonicalize()?;
+
+    let mut authorizations = plugin_authorizations()?;
+
+    if let Some(authorization) = authorizations
+        .iter_mut()
+        .find(|authorization| authorization.path == canonical_path)
+    {
+        authorization.allowed = allowed;
+    } else {
+        authorizations.push(PluginAuthorization {
+            path: canonical_path.to_path_buf(),
+            allowed,
+        });
+    }
+
+    write_plugin_authorizations_or_die(authorizations);
+
+    Ok(())
+}
+
+fn write_plugin_authorizations_or_die(new_authorizations: Vec<PluginAuthorization>) {
+    let path = plugin_authorization_path();
+    if let Err(error) = std::fs::create_dir_all(path.parent().unwrap()) {
+        eprintln!("error when creating directory for plugin authorization file: {error}");
+        std::process::exit(1);
+    }
+
+    if let Err(error) = std::fs::write(
+        &path,
+        serde_yaml::to_string(&PluginAuthorizations {
+            version: 1,
+            authorizations: new_authorizations,
+        })
+        .unwrap(),
+    ) {
+        eprintln!("error when writing plugin authorization file: {error}");
+        std::process::exit(1);
+    }
+}
+
+fn non_interactive_message(options: &Options, canon_filename: PathBuf) {
+    match options.display_style() {
+        DisplayStyle::Rich => {
+            eprintln!("plugins attempted to run, but do not have permission. run with --allow-plugins to allow plugins if you grant them permission.");
+        }
+
+        DisplayStyle::Json2 => {
+            json_output::print_json(json_output::JsonOutput::PluginsNotLoaded {
+                authorization_path: plugin_authorization_path(),
+                canon_filename,
+            });
+        }
+
+        DisplayStyle::Quiet | DisplayStyle::Json => {}
     }
 }
