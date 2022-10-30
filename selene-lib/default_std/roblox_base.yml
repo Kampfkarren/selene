@@ -262,15 +262,40 @@ globals:
     args:
       - type: "..."
     must_use: true
+  Font.fromEnum:
+    args:
+      - type:
+          display: Font
+    must_use: true
+  Font.fromName:
+    args:
+      - type: string
+      - required: false
+        type:
+          display: FontWeight
+      - required: false
+        type:
+          display: FontStyle
+    must_use: true
+  Font.fromId:
+    args:
+      - type: number
+      - required: false
+        type:
+          display: FontWeight
+      - required: false
+        type:
+          display: FontStyle
+    must_use: true
   Font.new:
     args:
       - type: string
       - required: false
         type:
-          display: "Enum.FontWeight"
+          display: FontWeight
       - required: false
         type:
-          display: "Enum.FontStyle"
+          display: FontStyle
     must_use: true
   FloatCurveKey.new:
     args:
