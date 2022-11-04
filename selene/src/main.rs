@@ -24,6 +24,8 @@ use upgrade_std::upgrade_std;
 #[cfg(feature = "roblox")]
 use selene_lib::standard_library::StandardLibrary;
 
+use crate::{json_output::log_total_json, opts::DisplayStyle};
+
 mod json_output;
 mod opts;
 #[cfg(feature = "roblox")]
@@ -77,9 +79,26 @@ pub fn error(text: &str) {
 }
 
 fn log_total(parse_errors: usize, lint_errors: usize, lint_warnings: usize) -> io::Result<()> {
-    let mut stdout = StandardStream::stdout(get_color());
+    let lock = OPTIONS.read().unwrap();
+    let opts = lock.as_ref().unwrap();
 
+    let mut stdout = StandardStream::stdout(get_color());
     stdout.reset()?;
+
+    match opts.display_style {
+        Some(DisplayStyle::Json2) => {
+            log_total_json(stdout, parse_errors, lint_errors, lint_warnings)
+        }
+        _ => log_total_text(stdout, parse_errors, lint_errors, lint_warnings),
+    }
+}
+
+fn log_total_text(
+    mut stdout: StandardStream,
+    parse_errors: usize,
+    lint_errors: usize,
+    lint_warnings: usize,
+) -> io::Result<()> {
     writeln!(&mut stdout, "Results:")?;
 
     let mut stat = |number: usize, label: &str| -> io::Result<()> {

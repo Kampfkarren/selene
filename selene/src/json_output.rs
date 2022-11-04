@@ -1,12 +1,23 @@
+use std::io::{self, Write};
+
 use codespan_reporting::diagnostic::{
     Diagnostic as CodespanDiagnostic, Label as CodespanLabel, LabelStyle, Severity,
 };
 use serde::Serialize;
+use termcolor::StandardStream;
 
 #[derive(Serialize)]
 #[serde(tag = "type")]
 pub enum JsonOutput {
     Diagnostic(JsonDiagnostic),
+    Summary(JsonSummary),
+}
+
+#[derive(Serialize)]
+pub struct JsonSummary {
+    errors: usize,
+    warnings: usize,
+    parse_errors: usize,
 }
 
 #[derive(Serialize)]
@@ -78,4 +89,23 @@ pub fn diagnostic_to_json(
             .map(|label| label_to_serializable(label, files))
             .collect(),
     }
+}
+
+pub fn log_total_json(
+    mut stdout: StandardStream,
+    parse_errors: usize,
+    lint_errors: usize,
+    lint_warnings: usize,
+) -> io::Result<()> {
+    writeln!(
+        stdout,
+        "{}",
+        serde_json::to_string(&JsonOutput::Summary(JsonSummary {
+            errors: lint_errors,
+            warnings: lint_warnings,
+            parse_errors
+        }))?
+    )?;
+
+    Ok(())
 }
