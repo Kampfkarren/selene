@@ -90,7 +90,7 @@
         "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-prettier": "^3.4.0",
         "glob": "^7.1.5",
-        "mocha": "^6.2.3",
+        "mocha": "^10.1.0",
         "prettier": "2.3.1",
         "tslint": "^5.20.0",
         "typescript": "^3.8.3",
