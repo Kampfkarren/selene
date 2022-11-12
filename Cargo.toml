@@ -11,4 +11,4 @@ license = "MPL-2.0"
 repository = "https://github.com/Kampfkarren/selene"
 
 [workspace.dependencies]
-full_moon = "0.16.2"
+full_moon = { git = "https://github.com/Kampfkarren/full-moon", branch = "string-interpolation-aaa" }

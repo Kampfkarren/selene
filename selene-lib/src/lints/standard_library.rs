@@ -114,6 +114,18 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                 }
             }
 
+            #[cfg(feature = "roblox")]
+            ast::Value::InterpolatedString(interpolated_string) => {
+                if interpolated_string.expressions().next().is_some() {
+                    Some(ArgumentType::String.into())
+                } else {
+                    // Simple string, aka `Workspace`
+                    Some(PassedArgumentType::from_string(
+                        interpolated_string.last_string().token().to_string(),
+                    ))
+                }
+            }
+
             _ => None,
         },
 
@@ -881,6 +893,16 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "if_expressions",
+        );
+    }
+
+    #[cfg(feature = "roblox")]
+    #[test]
+    fn test_string_interpolation() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "string_interpolation",
         );
     }
 }

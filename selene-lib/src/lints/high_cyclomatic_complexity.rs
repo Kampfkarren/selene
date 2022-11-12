@@ -236,6 +236,15 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
                 complexity
             }
 
+            #[cfg(feature = "roblox")]
+            ast::Value::InterpolatedString(interpolated_string) => {
+                for expression in interpolated_string.expressions() {
+                    complexity = count_expression_complexity(expression, complexity)
+                }
+
+                complexity
+            }
+
             _ => complexity,
         },
 

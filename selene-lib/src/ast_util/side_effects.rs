@@ -103,6 +103,17 @@ impl HasSideEffects for ast::Value {
                 false
             }
 
+            #[cfg(feature = "roblox")]
+            ast::Value::InterpolatedString(interpolated_string) => {
+                for expression in interpolated_string.expressions() {
+                    if expression.has_side_effects() {
+                        return true;
+                    }
+                }
+
+                false
+            }
+
             _ => true,
         }
     }

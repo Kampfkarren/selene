@@ -346,6 +346,13 @@ impl ScopeVisitor {
                     self.read_expression(if_expression.else_expression());
                 }
 
+                #[cfg(feature = "roblox")]
+                ast::Value::InterpolatedString(interpolated_string) => {
+                    for expression in interpolated_string.expressions() {
+                        self.read_expression(expression);
+                    }
+                }
+
                 ast::Value::Number(_) | ast::Value::String(_) => {}
 
                 _ => {}
