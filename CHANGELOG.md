@@ -7,6 +7,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `rawlen` to the Luau standard library.
 - Added `Font.fromEnum`, `Font.fromName`, and `Font.fromId` to the Roblox standard library.
 
+### Changed
+- Updated internal parser, giving support for string interpolation for Luau and fixing some parsing bugs.
+
 ## [0.22.0](https://github.com/Kampfkarren/selene/releases/tag/0.22.0) - 2022-10-15
 ### Added
 - Added `--allow-warnings` option to have selene pass when only warnings occur.
