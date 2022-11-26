@@ -13,7 +13,9 @@
     ],
     "activationEvents": [
         "onLanguage:lua",
-        "onCommand:selene.reinstall"
+        "onCommand:selene.reinstall",
+        "onCommand:selene.update-roblox-std",
+        "onCommand:selene.generate-roblox-std"
     ],
     "main": "./out/extension.js",
     "scripts": {
@@ -28,6 +30,16 @@
             {
                 "command": "selene.reinstall",
                 "title": "Reinstall Selene",
+                "category": "Selene"
+            },
+            {
+                "command": "selene.update-roblox-std",
+                "title": "update-roblox-std",
+                "category": "Selene"
+            },
+            {
+                "command": "selene.generate-roblox-std",
+                "title": "generate-roblox-std",
                 "category": "Selene"
             }
         ],

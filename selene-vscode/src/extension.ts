@@ -84,6 +84,37 @@ export async function activate(
                 .catch(() => false)
             return trySelene
         }),
+        vscode.commands.registerCommand("selene.update-roblox-std", async () => {
+            const output = (
+                await selene.seleneCommand(
+                    context.globalStorageUri,
+                    "update-roblox-std",
+                    selene.Expectation.Stdout,
+                ).catch((error) => {
+                    vscode.window.showErrorMessage(
+                        `Couldn't update Roblox standard library: \n${error}`,
+                    )
+                    return false
+                }
+                ))
+            vscode.window.showInformationMessage(String(output)?.trim())
+        }),
+        vscode.commands.registerCommand("selene.generate-roblox-std", async () => {
+            const output = (
+                await selene.seleneCommand(
+                    context.globalStorageUri,
+                    "generate-roblox-std",
+                    selene.Expectation.Stdout,
+                ).catch((error) => {
+                    vscode.window.showErrorMessage(
+                        `Couldn't create Roblox standard library: \n${error}`,
+                    )
+                    return false
+                }
+                ))
+            vscode.window.showInformationMessage(String(output)?.trim())
+        })
+
     )
 
     const diagnosticsCollection =
