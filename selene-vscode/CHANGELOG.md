@@ -4,6 +4,9 @@ All notable changes to the "selene-vscode" extension will be documented in this 
 
 If you want to stay up to date with selene itself, you can find the changelog in [selene's CHANGELOG.md](https://github.com/Kampfkarren/selene/blob/master/CHANGELOG.md).
 
+## [1.2.1]
+- Added `update-roblox-std` and `generate-roblox-std` subcommands to vscode command palette
+
 ## [1.2.0]
 - Temporary paths, such as Git diff previews, will now use your current workspace folder for configuration.
 - Fixed a bug where the extension would become unusable if it couldn't connect to the internet.
