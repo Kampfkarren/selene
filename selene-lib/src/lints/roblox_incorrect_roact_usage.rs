@@ -55,7 +55,7 @@ impl Lint for IncorrectRoactUsageLint {
 
         for invalid_event in visitor.invalid_events {
             diagnostics.push(Diagnostic::new(
-                "incorrect_roact_usage",
+                "roblox_incorrect_roact_usage",
                 format!(
                     "`{}` is not a valid event for `{}`",
                     invalid_event.event_name, invalid_event.class_name
