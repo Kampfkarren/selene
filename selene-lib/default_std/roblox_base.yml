@@ -614,6 +614,10 @@ structs:
       args:
         - type: function
       method: true
+    Once:
+      args:
+        - type: function
+      method: true
     Wait:
       args: []
       method: true
