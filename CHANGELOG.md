@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.23.0...HEAD)
+
+## [0.23.1](https://github.com/Kampfkarren/selene/releases/tag/0.23.1) - 2022-12-06
 ### Fixed
 - Fixed event warnings not being possible to filter out with `roblox_incorrect_roact_usage`.
 
