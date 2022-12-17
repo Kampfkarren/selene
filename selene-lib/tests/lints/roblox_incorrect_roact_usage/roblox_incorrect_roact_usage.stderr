@@ -4,7 +4,7 @@ error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property
 2 │     ThisPropertyDoesntExist = true,
   │     ^^^^^^^^^^^^^^^^^^^^^^^
 
-error[incorrect_roact_usage]: `ThisEventDoesntExist` is not a valid event for `Frame`
+error[roblox_incorrect_roact_usage]: `ThisEventDoesntExist` is not a valid event for `Frame`
   ┌─ roblox_incorrect_roact_usage.lua:8:5
   │
 8 │     [Roact.Event.ThisEventDoesntExist] = function()
