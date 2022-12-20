@@ -34,12 +34,12 @@
             },
             {
                 "command": "selene.update-roblox-std",
-                "title": "update-roblox-std",
+                "title": "Update installed Roblox standard library (update-roblox-std)",
                 "category": "Selene"
             },
             {
                 "command": "selene.generate-roblox-std",
-                "title": "generate-roblox-std",
+                "title": "Generate Roblox standard library as roblox.yml (generate-roblox-std)",
                 "category": "Selene"
             }
         ],
