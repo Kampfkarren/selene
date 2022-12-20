@@ -99,7 +99,7 @@ export async function activate(
                         )
                         return false
                     })
-                vscode.window.showInformationMessage(String(output)?.trim())
+                vscode.window.showInformationMessage(output?.toString() || "")
             },
         ),
         vscode.commands.registerCommand(
@@ -117,7 +117,7 @@ export async function activate(
                         )
                         return false
                     })
-                vscode.window.showInformationMessage(String(output)?.trim())
+                vscode.window.showInformationMessage(output?.toString() || "")
             },
         ),
     )
