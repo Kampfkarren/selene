@@ -21,9 +21,9 @@ lazy_static::lazy_static! {
 }
 
 #[derive(Clone, Debug)]
-struct FilterConfiguration {
+pub struct FilterConfiguration {
     global: bool,
-    lint: String,
+    pub lint: String,
     variation: LintVariation,
 }
 
@@ -40,10 +40,14 @@ struct FilterVisitor {
     ranges: Vec<Result<Filter, Diagnostic>>,
 }
 
-fn parse_comment(comment: &str) -> Option<Vec<FilterConfiguration>> {
+pub fn parse_comment(comment_original: &str) -> Option<Vec<FilterConfiguration>> {
+    let comment = comment_original.split_whitespace().collect::<String>();
+
     let global_stripped = comment.strip_prefix(GLOBAL_LINT_PREFIX);
     let global = global_stripped.is_some();
-    let config = global_stripped.unwrap_or(comment).strip_prefix("selene:")?;
+    let config = global_stripped
+        .unwrap_or(&comment)
+        .strip_prefix("selene:")?;
 
     let mut variation = String::new();
     let mut lint = String::new();
@@ -110,9 +114,8 @@ impl NodeVisitor for FilterVisitor {
                 _ => continue,
             }
             .lines()
-            .map(|line| line.split_whitespace().collect::<String>())
             {
-                let configurations = match parse_comment(&comment) {
+                let configurations = match parse_comment(comment) {
                     Some(configurations) => configurations,
                     None => continue,
                 };
@@ -358,6 +361,11 @@ mod tests {
     #[test]
     fn test_just_comments() {
         test_full_run("lint_filtering", "just_comments");
+    }
+
+    #[test]
+    fn test_manual_table_clone() {
+        test_full_run("lint_filtering", "manual_table_clone");
     }
 
     #[test]
