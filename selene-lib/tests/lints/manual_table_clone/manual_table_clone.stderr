@@ -1,0 +1,107 @@
+error[manual_table_clone]: manual implementation of table.clone
+  ┌─ manual_table_clone.lua:1:1
+  │  
+1 │ ╭ local new1 = {}
+2 │ │ for key, value in pairs(stuff) do
+3 │ │     new1[key] = value -- fail
+4 │ │ end
+  │ ╰───^
+  │  
+  = try `local new1 = table.clone(stuff)`
+
+error[manual_table_clone]: manual implementation of table.clone
+  ┌─ manual_table_clone.lua:6:1
+  │  
+6 │ ╭ local new2 = {}
+7 │ │ for key, value in ipairs(stuff) do
+8 │ │     new2[key] = value -- fail
+9 │ │ end
+  │ ╰───^
+  │  
+  = try `local new2 = table.clone(stuff)`
+  = if this is a mixed table, then table.clone is not equivalent, as ipairs only goes over the array portion.
+    ignore this lint with `-- selene: allow(manual_table_clone)` if this is the case.
+
+error[manual_table_clone]: manual implementation of table.clone
+   ┌─ manual_table_clone.lua:11:1
+   │  
+11 │ ╭ local new3 = {}
+12 │ │ for key, value in next, stuff do
+13 │ │     new3[key] = value -- fail
+14 │ │ end
+   │ ╰───^
+   │  
+   = try `local new3 = table.clone(stuff)`
+
+error[manual_table_clone]: manual implementation of table.clone
+   ┌─ manual_table_clone.lua:16:1
+   │  
+16 │ ╭ local new4 = {}
+17 │ │ for key, value in stuff do
+18 │ │     new4[key] = value -- fail
+19 │ │ end
+   │ ╰───^
+   │  
+   = try `local new4 = table.clone(stuff)`
+
+error[manual_table_clone]: manual implementation of table.clone
+   ┌─ manual_table_clone.lua:34:1
+   │  
+34 │ ╭ local new7 = {}
+35 │ │ for key, value in pairs(stuff) do
+36 │ │     new7[key] = value -- fail
+37 │ │ end
+   │ ╰───^
+   │  
+   = try `local new7 = table.clone(stuff)`
+
+error[manual_table_clone]: manual implementation of table.clone
+   ┌─ manual_table_clone.lua:40:1
+   │  
+40 │ ╭ local new8 = {}
+41 │ │ for key, value in pairs(getStuff()) do
+42 │ │     new8[key] = value -- fail
+43 │ │ end
+   │ ╰───^
+   │  
+   = try `local new8 = table.clone(getStuff())`
+
+error[manual_table_clone]: manual implementation of table.clone
+   ┌─ manual_table_clone.lua:45:1
+   │  
+45 │ ╭ local new9 = {}
+46 │ │ 
+47 │ │ -- For Luau, this can be treated the same as looping over a table result
+48 │ │ for key, value in what(stuff) do
+49 │ │     new9[key] = value -- fail
+50 │ │ end
+   │ ╰───^
+   │  
+   = try `local new9 = table.clone(what(stuff))`
+
+error[manual_table_clone]: manual implementation of table.clone
+    ┌─ manual_table_clone.lua:105:1
+    │  
+105 │   local new19 = {}
+    │   ---------------- remove this definition
+    ·  
+108 │ ╭ for key, value in pairs(stuff) do
+109 │ │     new19[key] = value -- fail
+110 │ │ end
+    │ ╰───^
+    │  
+    = try `local new19 = table.clone(stuff)`
+
+error[manual_table_clone]: manual implementation of table.clone
+    ┌─ manual_table_clone.lua:114:1
+    │  
+114 │ ╭ local newWeirdIpairs = {}
+115 │ │ for key, value in ipairs(stuff) do
+116 │ │     newWeirdIpairs[key] = value -- fail, but don't report as ipairs
+117 │ │ end
+    │ ╰───^
+    │  
+    = try `local newWeirdIpairs = table.clone(stuff)`
+    = if this is a mixed table, then table.clone is not equivalent, as ipairs only goes over the array portion.
+      ignore this lint with `-- selene: allow(manual_table_clone)` if this is the case.
+
