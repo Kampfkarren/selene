@@ -115,7 +115,7 @@ impl NodeVisitor for FilterVisitor {
             }
             .lines()
             {
-                let configurations = match parse_comment(&comment) {
+                let configurations = match parse_comment(comment) {
                     Some(configurations) => configurations,
                     None => continue,
                 };
