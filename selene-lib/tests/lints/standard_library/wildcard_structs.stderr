@@ -10,7 +10,7 @@ error[incorrect_standard_library_use]: standard library global `script.Child.Nam
 4 │ script.Child.Name.UhOh = "Oops"
   │ ^^^^^^^^^^^^^^^^^^^^^^
   │
-  = `script.Child.Name.UhOh` was found in the roblox standard libary
+  = `script.Child.Name.UhOh` was found in the roblox standard library
   = you can set the standard library by putting the following inside selene.toml:
     std = "roblox"
 

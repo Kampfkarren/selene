@@ -13,7 +13,7 @@ pub fn possible_standard_library_notes<S: Borrow<str>>(
     }
 
     let mut notes = vec![format!(
-        "`{}` was found in the {} standard libar{}",
+        "`{}` was found in the {} standard librar{}",
         name_path.join("."),
         text::english_list(&possible_standard_libraries),
         text::plural(possible_standard_libraries.len(), "y", "ies"),
