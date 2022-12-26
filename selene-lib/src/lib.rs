@@ -220,7 +220,9 @@ macro_rules! use_lints {
 
                     context: Context {
                         standard_library,
-                        standard_library_is_set: config.std.is_some(),
+                        user_set_standard_library: config.std.as_ref().map(|std_text| {
+                            std_text.split('+').map(ToOwned::to_owned).collect()
+                        }),
                     },
 
                     config,
