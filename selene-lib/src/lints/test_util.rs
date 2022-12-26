@@ -63,7 +63,11 @@ pub fn test_lint_config_with_output<
         &ast,
         &Context {
             standard_library: config.standard_library,
-            standard_library_is_set,
+            user_set_standard_library: if standard_library_is_set {
+                Some(vec!["test-set".to_owned()])
+            } else {
+                None
+            },
         },
         &AstContext::from_ast(&ast),
     );
