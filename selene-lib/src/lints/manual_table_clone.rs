@@ -223,6 +223,32 @@ impl ManualTableCloneVisitor<'_> {
     }
 }
 
+fn has_filter_comment(for_loop: &ast::GenericFor) -> bool {
+    let (leading_trivia, ..) = for_loop.surrounding_trivia();
+
+    for trivia in leading_trivia {
+        let comment = match trivia.token_type() {
+            full_moon::tokenizer::TokenType::SingleLineComment { comment } => comment,
+            full_moon::tokenizer::TokenType::MultiLineComment { comment, .. } => comment,
+            _ => continue,
+        };
+
+        let filters = match crate::lint_filtering::parse_comment(comment.trim()) {
+            Some(filters) => filters,
+            None => continue,
+        };
+
+        if filters
+            .into_iter()
+            .any(|filter| filter.lint == "manual_table_clone")
+        {
+            return true;
+        }
+    }
+
+    false
+}
+
 impl Visitor for ManualTableCloneVisitor<'_> {
     fn visit_generic_for(&mut self, node: &ast::GenericFor) {
         let (loop_type, looping_over) = match self.loop_expression(node.expressions()) {
@@ -345,18 +371,19 @@ impl Visitor for ManualTableCloneVisitor<'_> {
 
         let (position_start, position_end) = range(node);
 
-        let statement_in_way_of_definition =
-            self.statement_in_way_of_definition(*definition_end, position_start);
+        let only_use_loop_range = self
+            .statement_in_way_of_definition(*definition_end, position_start)
+            || has_filter_comment(node);
 
         self.matches.push(ManualTableCloneMatch {
-            range: if statement_in_way_of_definition {
+            range: if only_use_loop_range {
                 (position_start, position_end)
             } else {
                 (*definition_start, position_end)
             },
             assigning_into: assigning_into.token().to_string(),
             looping_over: looping_over.to_string(),
-            replaces_definition_range: if statement_in_way_of_definition {
+            replaces_definition_range: if only_use_loop_range {
                 Some((*definition_start, *definition_end))
             } else {
                 None
