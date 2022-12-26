@@ -2,6 +2,9 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.23.0...HEAD)
+### Changed
+- Improved the error message for using a standard library that can be detected as outdated.
+
 ### Fixed
 - Fixed "library" being typo'd as "libary" in the error when finding a usage.
 

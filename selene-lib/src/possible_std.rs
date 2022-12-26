@@ -4,7 +4,7 @@ use crate::{standard_library::StandardLibrary, text};
 
 pub fn possible_standard_library_notes<S: Borrow<str>>(
     name_path: &[S],
-    standard_library_is_set: bool,
+    user_set_standard_library: &Option<Vec<String>>,
 ) -> Vec<String> {
     let possible_standard_libraries = possible_standard_libraries(name_path);
 
@@ -19,7 +19,21 @@ pub fn possible_standard_library_notes<S: Borrow<str>>(
         text::plural(possible_standard_libraries.len(), "y", "ies"),
     )];
 
-    if !standard_library_is_set {
+    if let Some(user_set_standard_library) = user_set_standard_library {
+        if possible_standard_libraries.iter().all(|library| {
+            user_set_standard_library
+                .iter()
+                .any(|set_library| set_library == library)
+        }) {
+            let example = &possible_standard_libraries[0];
+
+            notes.push(format!(
+                "it looks like all of the possible standard libraries are set.\n\
+                you may have an outdated copy in your root. try deleting it and running selene again.\n\
+                for example, delete `{example}.yml` if you have it.",
+            ));
+        }
+    } else {
         notes.push(format!(
             "you can set the standard library by putting the following inside selene.toml:\n{}",
             possible_standard_libraries
