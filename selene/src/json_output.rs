@@ -48,7 +48,7 @@ struct Span {
 }
 
 fn label_to_serializable(
-    filename: &String,
+    filename: &str,
     label: &CodespanLabel<codespan::FileId>,
     files: &codespan::Files<&str>,
 ) -> Label {
