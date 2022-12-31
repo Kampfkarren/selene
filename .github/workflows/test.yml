@@ -10,11 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Run clippy
-      run: cargo clippy -- -D warnings
-    - name: Run Rustfmt
-      run: cargo fmt -- --check
+    - uses: actions/checkout@v3
     - name: Run tests (selene, all features)
       run: cargo test
       working-directory: selene
@@ -37,3 +33,15 @@ jobs:
     - name: Run exhaustive check tests
       run: cargo check --features force_exhaustive_checks
       working-directory: selene-lib
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run clippy
+      run: cargo clippy -- -D warnings
+  rustfmt:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Rustfmt
+      run: cargo fmt -- --check
