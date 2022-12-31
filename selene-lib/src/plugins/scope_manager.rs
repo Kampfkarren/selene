@@ -70,6 +70,9 @@ impl UserData for ReferenceWithId {
 #[derive(Clone)]
 struct VariableWithId {
     id: Id<Variable>,
+
+    #[allow(dead_code)]
+    // TODO: Add API for this
     variable: Variable,
 }
 
