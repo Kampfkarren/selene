@@ -1,10 +1,30 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.22.0...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.23.0...HEAD)
+### Added
+- Added new [`manual_table_clone` lint](https://kampfkarren.github.io/selene/lints/manual_table_clone.html), which will catch manual re-implementations of `table.clone` in Luau.
+- Added `filename` field to diagnostic message labels in JSON output, indicating for which file the message was generated (#453)
+
+### Changed
+- Improved the error message for using a standard library that can be detected as outdated.
+
+### Fixed
+- Fixed "library" being typo'd as "libary" in the error when finding a usage.
+
+## [0.23.1](https://github.com/Kampfkarren/selene/releases/tag/0.23.1) - 2022-12-06
+### Fixed
+- Fixed event warnings not being possible to filter out with `roblox_incorrect_roact_usage`.
+
+## [0.23.0](https://github.com/Kampfkarren/selene/releases/tag/0.23.0) - 2022-12-06
 ### Added
 - Added `--display-style=json2`, which gives the same outputs as `--display-style=json`, but with an extra `type` field so that it can support more than diagnostics. Extensions should move over to `--display-style=json2` as more becomes available for it, but take care to check for `type`. Currently the only possible value is "Diagnostic".
 - Added `rawlen` to the Luau standard library.
+- Added `Font.fromEnum`, `Font.fromName`, and `Font.fromId` to the Roblox standard library.
+- Added the missing `table.foreachi` function to Lua 5.1 standard library as deprecated.
+
+### Fixed
+- `warn` in the Roblox standard library now properly works with all data types instead of only strings.
 
 ## [0.22.0](https://github.com/Kampfkarren/selene/releases/tag/0.22.0) - 2022-10-15
 ### Added

@@ -4,7 +4,7 @@ error[incorrect_standard_library_use]: standard library global `table` does not 
 1 │ table.unpack({ "lua 5.2" })
   │ ^^^^^^^^^^^^
   │
-  = `table.unpack` was found in the lua52, lua53, and luau standard libaries
+  = `table.unpack` was found in the lua52, lua53, and luau standard libraries
   = you can set the standard library by putting the following inside selene.toml:
     std = "lua52"
     std = "lua53"
@@ -16,7 +16,7 @@ error[undefined_variable]: `utf8` is not defined
 2 │ utf8.len("lua 5.3")
   │ ^^^^
   │
-  = `utf8` was found in the lua53 and luau standard libaries
+  = `utf8` was found in the lua53 and luau standard libraries
   = you can set the standard library by putting the following inside selene.toml:
     std = "lua53"
     std = "luau"

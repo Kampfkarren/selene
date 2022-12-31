@@ -1,9 +1,11 @@
+use std::io::{self, Write};
 use std::path::PathBuf;
 
 use codespan_reporting::diagnostic::{
     Diagnostic as CodespanDiagnostic, Label as CodespanLabel, LabelStyle, Severity,
 };
 use serde::Serialize;
+use termcolor::StandardStream;
 
 #[derive(Serialize)]
 #[serde(tag = "type")]
@@ -14,6 +16,14 @@ pub enum JsonOutput {
         authorization_path: PathBuf,
         canon_filename: PathBuf,
     },
+    Summary(JsonSummary),
+}
+
+#[derive(Serialize)]
+pub struct JsonSummary {
+    errors: usize,
+    warnings: usize,
+    parse_errors: usize,
 }
 
 #[derive(Serialize)]
@@ -28,6 +38,7 @@ pub struct JsonDiagnostic {
 
 #[derive(Serialize)]
 struct Label {
+    filename: String,
     span: Span,
     message: String,
 }
@@ -43,6 +54,7 @@ struct Span {
 }
 
 fn label_to_serializable(
+    filename: &str,
     label: &CodespanLabel<codespan::FileId>,
     files: &codespan::Files<&str>,
 ) -> Label {
@@ -53,6 +65,7 @@ fn label_to_serializable(
         .location(label.file_id, label.range.end as u32)
         .expect("unable to determine end location for label");
     Label {
+        filename: filename.to_string(),
         message: label.message.to_owned(),
         span: Span {
             start: label.range.start,
@@ -69,20 +82,20 @@ pub fn diagnostic_to_json(
     diagnostic: &CodespanDiagnostic<codespan::FileId>,
     files: &codespan::Files<&str>,
 ) -> JsonDiagnostic {
+    let label = diagnostic.labels.first().expect("no labels passed");
+    let filename = files.name(label.file_id).to_string_lossy().into_owned();
+
     JsonDiagnostic {
         code: diagnostic.code.to_owned(),
         message: diagnostic.message.to_owned(),
         severity: diagnostic.severity.to_owned(),
         notes: diagnostic.notes.to_owned(),
-        primary_label: label_to_serializable(
-            diagnostic.labels.first().expect("no labels passed"),
-            files,
-        ),
+        primary_label: label_to_serializable(&filename, label, files),
         secondary_labels: diagnostic
             .labels
             .iter()
             .filter(|label| label.style == LabelStyle::Secondary)
-            .map(|label| label_to_serializable(label, files))
+            .map(|label| label_to_serializable(&filename, label, files))
             .collect(),
     }
 }
@@ -92,4 +105,23 @@ pub fn print_json(output: JsonOutput) {
         "{}",
         serde_json::to_string(&output).expect("unable to serialize json output")
     );
+}
+
+pub fn log_total_json(
+    mut stdout: StandardStream,
+    parse_errors: usize,
+    lint_errors: usize,
+    lint_warnings: usize,
+) -> io::Result<()> {
+    writeln!(
+        stdout,
+        "{}",
+        serde_json::to_string(&JsonOutput::Summary(JsonSummary {
+            errors: lint_errors,
+            warnings: lint_warnings,
+            parse_errors
+        }))?
+    )?;
+
+    Ok(())
 }

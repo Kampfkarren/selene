@@ -24,6 +24,8 @@ use upgrade_std::upgrade_std;
 #[cfg(feature = "roblox")]
 use selene_lib::standard_library::StandardLibrary;
 
+use crate::{json_output::log_total_json, opts::DisplayStyle};
+
 mod json_output;
 mod opts;
 mod plugins;
@@ -78,9 +80,26 @@ pub fn error(text: &str) {
 }
 
 fn log_total(parse_errors: usize, lint_errors: usize, lint_warnings: usize) -> io::Result<()> {
-    let mut stdout = StandardStream::stdout(get_color());
+    let lock = OPTIONS.read().unwrap();
+    let opts = lock.as_ref().unwrap();
 
+    let mut stdout = StandardStream::stdout(get_color());
     stdout.reset()?;
+
+    match opts.display_style {
+        Some(DisplayStyle::Json2) => {
+            log_total_json(stdout, parse_errors, lint_errors, lint_warnings)
+        }
+        _ => log_total_text(stdout, parse_errors, lint_errors, lint_warnings),
+    }
+}
+
+fn log_total_text(
+    mut stdout: StandardStream,
+    parse_errors: usize,
+    lint_errors: usize,
+    lint_warnings: usize,
+) -> io::Result<()> {
     writeln!(&mut stdout, "Results:")?;
 
     let mut stat = |number: usize, label: &str| -> io::Result<()> {
@@ -436,37 +455,41 @@ fn start(mut options: opts::Options) {
     // If we support selene.toml outside of current_dir, this can be changed
     let config_filename = PathBuf::from(options.config.as_deref().unwrap_or("selene.toml"));
 
-    let mut config: CheckerConfig<toml::value::Value> = match &options.config {
-        Some(config_file) => {
-            let config_contents = match fs::read_to_string(config_file) {
-                Ok(contents) => contents,
-                Err(error) => {
-                    error!("Couldn't read config file: {}", error);
-                    std::process::exit(1);
-                }
-            };
+    let (mut config, config_directory): (CheckerConfig<toml::value::Value>, Option<PathBuf>) =
+        match &options.config {
+            Some(config_file) => {
+                let config_contents = match fs::read_to_string(&config_file) {
+                    Ok(contents) => contents,
+                    Err(error) => {
+                        error!("Couldn't read config file: {}", error);
+                        std::process::exit(1);
+                    }
+                };
 
-            match toml::from_str(&config_contents) {
-                Ok(config) => config,
-                Err(error) => {
-                    error!("Config file not in correct format: {}", error);
-                    std::process::exit(1);
+                match toml::from_str(&config_contents) {
+                    Ok(config) => (
+                        config,
+                        Path::new(&config_file).parent().map(Path::to_path_buf),
+                    ),
+                    Err(error) => {
+                        error!("Config file not in correct format: {}", error);
+                        std::process::exit(1);
+                    }
                 }
             }
-        }
 
-        None => match fs::read_to_string("selene.toml") {
-            Ok(config_contents) => match toml::from_str(&config_contents) {
-                Ok(config) => config,
-                Err(error) => {
-                    error!("Config file not in correct format: {}", error);
-                    std::process::exit(1);
-                }
+            None => match fs::read_to_string("selene.toml") {
+                Ok(config_contents) => match toml::from_str(&config_contents) {
+                    Ok(config) => (config, None),
+                    Err(error) => {
+                        error!("Config file not in correct format: {}", error);
+                        std::process::exit(1);
+                    }
+                },
+
+                Err(_) => (CheckerConfig::default(), None),
             },
-
-            Err(_) => CheckerConfig::default(),
-        },
-    };
+        };
 
     if !config.plugins.is_empty() {
         let canon_filename = std::fs::canonicalize(config_filename)
@@ -477,45 +500,49 @@ fn start(mut options: opts::Options) {
 
     let current_dir = std::env::current_dir().unwrap();
 
-    let standard_library =
-        match standard_library::collect_standard_library(&config, config.std(), &current_dir) {
-            Ok(Some(library)) => library,
+    let standard_library = match standard_library::collect_standard_library(
+        &config,
+        config.std(),
+        &current_dir,
+        &config_directory,
+    ) {
+        Ok(Some(library)) => library,
 
-            Ok(None) => {
-                error!("Standard library was empty.");
-                std::process::exit(1);
-            }
+        Ok(None) => {
+            error!("Standard library was empty.");
+            std::process::exit(1);
+        }
 
-            Err(error) => {
-                let missing_files: Vec<_> = config
-                    .std()
-                    .split('+')
-                    .filter(|name| {
-                        !PathBuf::from(format!("{name}.yml")).exists()
-                            && !PathBuf::from(format!("{name}.yaml")).exists()
-                            && !PathBuf::from(format!("{name}.toml")).exists()
-                    })
-                    .filter(|name| !cfg!(feature = "roblox") || *name != "roblox")
-                    .collect();
+        Err(error) => {
+            let missing_files: Vec<_> = config
+                .std()
+                .split('+')
+                .filter(|name| {
+                    !PathBuf::from(format!("{name}.yml")).exists()
+                        && !PathBuf::from(format!("{name}.yaml")).exists()
+                        && !PathBuf::from(format!("{name}.toml")).exists()
+                })
+                .filter(|name| !cfg!(feature = "roblox") || *name != "roblox")
+                .collect();
 
-                if !missing_files.is_empty() {
-                    eprintln!(
-                        "`std = \"{}\"`, but some libraries could not be found:",
-                        config.std()
-                    );
+            if !missing_files.is_empty() {
+                eprintln!(
+                    "`std = \"{}\"`, but some libraries could not be found:",
+                    config.std()
+                );
 
-                    for library_name in missing_files {
-                        eprintln!("  `{library_name}`");
-                    }
-
-                    error!("Could not find all standard library files");
-                    std::process::exit(1);
+                for library_name in missing_files {
+                    eprintln!("  `{library_name}`");
                 }
 
-                error!("Could not collect standard library: {error}");
+                error!("Could not find all standard library files");
                 std::process::exit(1);
             }
-        };
+
+            error!("Could not collect standard library: {error}");
+            std::process::exit(1);
+        }
+    };
 
     let mut builder = globset::GlobSetBuilder::new();
     for pattern in &config.exclude {

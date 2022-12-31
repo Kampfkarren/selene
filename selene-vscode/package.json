@@ -13,7 +13,9 @@
     ],
     "activationEvents": [
         "onLanguage:lua",
-        "onCommand:selene.reinstall"
+        "onCommand:selene.reinstall",
+        "onCommand:selene.update-roblox-std",
+        "onCommand:selene.generate-roblox-std"
     ],
     "main": "./out/extension.js",
     "scripts": {
@@ -28,6 +30,16 @@
             {
                 "command": "selene.reinstall",
                 "title": "Reinstall Selene",
+                "category": "Selene"
+            },
+            {
+                "command": "selene.update-roblox-std",
+                "title": "Update installed Roblox standard library (update-roblox-std)",
+                "category": "Selene"
+            },
+            {
+                "command": "selene.generate-roblox-std",
+                "title": "Generate Roblox standard library as roblox.yml (generate-roblox-std)",
                 "category": "Selene"
             }
         ],
@@ -90,7 +102,7 @@
         "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-prettier": "^3.4.0",
         "glob": "^7.1.5",
-        "mocha": "^6.2.3",
+        "mocha": "^10.2.0",
         "prettier": "2.3.1",
         "tslint": "^5.20.0",
         "typescript": "^3.8.3",

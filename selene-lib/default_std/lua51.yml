@@ -582,6 +582,12 @@ globals:
       - type: function
     deprecated:
       message: use a for loop instead.
+  table.foreachi:
+    args:
+      - type: table
+      - type: function
+    deprecated:
+      message: use a for loop instead.
   table.getn:
     args:
       - type: table

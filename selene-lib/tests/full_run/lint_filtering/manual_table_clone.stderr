@@ -1,0 +1,11 @@
+warning[manual_table_clone]: manual implementation of table.clone
+   ┌─ manual_table_clone.lua:13:1
+   │  
+13 │ ╭ local other = {}
+14 │ │ for key, value in pairs(stuff) do
+15 │ │     other[key] = value
+16 │ │ end
+   │ ╰───^
+   │  
+   = try `local other = table.clone(stuff)`
+

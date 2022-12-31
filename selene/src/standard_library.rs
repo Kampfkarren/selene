@@ -1,4 +1,7 @@
-use std::{fs, path::Path};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 use color_eyre::eyre::Context;
 use selene_lib::{
@@ -10,11 +13,12 @@ pub fn collect_standard_library<V>(
     config: &CheckerConfig<V>,
     standard_library_name: &str,
     directory: &Path,
+    config_directory: &Option<PathBuf>,
 ) -> color_eyre::Result<Option<StandardLibrary>> {
     let mut standard_library: Option<StandardLibrary> = None;
 
     for segment in standard_library_name.split('+') {
-        let segment_library = match from_name(config, segment, directory)? {
+        let segment_library = match from_name(config, segment, directory, config_directory)? {
             Some(segment_library) => segment_library,
             None => {
                 if cfg!(feature = "roblox") && segment == "roblox" {
@@ -59,39 +63,55 @@ fn from_name<V>(
     config: &CheckerConfig<V>,
     standard_library_name: &str,
     directory: &Path,
+    config_directory: &Option<PathBuf>,
 ) -> color_eyre::Result<Option<StandardLibrary>> {
-    let mut library: StandardLibrary;
+    let mut library: Option<StandardLibrary> = None;
 
-    let toml_file = directory.join(format!("{standard_library_name}.toml"));
-    if toml_file.exists() {
-        let content = fs::read_to_string(&toml_file)?;
+    let mut directories = vec![directory];
+    if let Some(directory) = config_directory {
+        directories.push(directory);
+    };
 
-        let v1_library: v1::StandardLibrary = toml::from_str(&content)
-            .with_context(|| format!("failed to read {}", toml_file.display()))?;
+    for directory in directories {
+        let toml_file = directory.join(format!("{standard_library_name}.toml"));
+        if toml_file.exists() {
+            let content = fs::read_to_string(&toml_file)?;
 
-        library = v1_library.into();
-    } else {
-        let mut yaml_file = directory.join(format!("{standard_library_name}.yml"));
-        if !yaml_file.exists() {
-            yaml_file = directory.join(format!("{standard_library_name}.yaml"));
-        }
+            let v1_library: v1::StandardLibrary = toml::from_str(&content)
+                .with_context(|| format!("failed to read {}", toml_file.display()))?;
 
-        if yaml_file.exists() {
-            let content = fs::read_to_string(&yaml_file)
-                .with_context(|| format!("failed to read {}", yaml_file.display()))?;
-            library = serde_yaml::from_str(&content)?;
+            library = Some(v1_library.into());
+            break;
         } else {
-            return Ok(StandardLibrary::from_name(standard_library_name));
+            let mut yaml_file = directory.join(format!("{standard_library_name}.yml"));
+            if !yaml_file.exists() {
+                yaml_file = directory.join(format!("{standard_library_name}.yaml"));
+            }
+
+            if yaml_file.exists() {
+                let content = fs::read_to_string(&yaml_file)
+                    .with_context(|| format!("failed to read {}", yaml_file.display()))?;
+                library = Some(serde_yaml::from_str(&content)?);
+                break;
+            }
         }
     }
 
-    if let Some(base_name) = &library.base {
-        if let Some(base) = collect_standard_library(config, base_name, directory)
-            .with_context(|| format!("failed to collect base standard library `{base_name}`"))?
-        {
-            library.extend(base);
-        }
-    }
+    match library {
+        Some(mut library) => {
+            if let Some(base_name) = &library.base {
+                if let Some(base) =
+                    collect_standard_library(config, base_name, directory, config_directory)
+                        .with_context(|| {
+                            format!("failed to collect base standard library `{base_name}`")
+                        })?
+                {
+                    library.extend(base);
+                }
+            }
 
-    Ok(Some(library))
+            Ok(Some(library))
+        }
+        None => Ok(StandardLibrary::from_name(standard_library_name)),
+    }
 }

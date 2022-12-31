@@ -126,7 +126,7 @@ pub struct Variable {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum AssignedValue {
-    StaticTable,
+    StaticTable { has_fields: bool },
 }
 
 #[derive(Clone, Debug)]
@@ -240,8 +240,10 @@ fn get_name_path_from_call(call: &ast::FunctionCall) -> Option<Vec<String>> {
 
 fn get_assigned_value(expression: &ast::Expression) -> Option<AssignedValue> {
     if let ast::Expression::Value { value, .. } = expression {
-        if let ast::Value::TableConstructor(_) = **value {
-            return Some(AssignedValue::StaticTable);
+        if let ast::Value::TableConstructor(table_constructor) = &**value {
+            return Some(AssignedValue::StaticTable {
+                has_fields: !table_constructor.fields().is_empty(),
+            });
         }
     }
 
