@@ -10,7 +10,7 @@ jobs:
   build_windows:
     runs-on: windows-latest
     concurrency:
-      group: ${{ github.ref }}
+      group: build_windows-${{ github.ref }}
       cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
@@ -26,7 +26,7 @@ jobs:
   build_windows_light:
     runs-on: windows-latest
     concurrency:
-      group: ${{ github.ref }}
+      group: build_windows_light-${{ github.ref }}
       cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
@@ -42,7 +42,7 @@ jobs:
   build_mac:
     runs-on: macos-latest
     concurrency:
-      group: ${{ github.ref }}
+      group: build_mac-${{ github.ref }}
       cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
@@ -61,7 +61,7 @@ jobs:
   build_mac_light:
     runs-on: macos-latest
     concurrency:
-      group: ${{ github.ref }}
+      group: build_mac_light-${{ github.ref }}
       cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
@@ -80,7 +80,7 @@ jobs:
   build_linux:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.ref }}
+      group: build_linux-${{ github.ref }}
       cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
@@ -96,7 +96,7 @@ jobs:
   build_linux_light:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.ref }}
+      group: build_linux_light-${{ github.ref }}
       cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
@@ -112,7 +112,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.ref }}
+      group: release-${{ github.ref }}
       cancel-in-progress: true
     needs: ['build_windows_light', 'build_windows', 'build_mac', 'build_mac_light', 'build_linux', 'build_linux_light']
     if: contains(github.event.head_commit.message, '[release]')

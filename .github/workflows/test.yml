@@ -10,7 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.ref }}
+      group: test-${{ github.ref }}
       cancel-in-progress: true
     steps:
     - uses: actions/checkout@v3
@@ -30,7 +30,7 @@ jobs:
   test_exhaustive_checks:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.ref }}
+      group: test_exhaustive_checks-${{ github.ref }}
       cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
@@ -42,7 +42,7 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.ref }}
+      group: clippy-${{ github.ref }}
       cancel-in-progress: true
     steps:
     - uses: actions/checkout@v3
@@ -51,7 +51,7 @@ jobs:
   rustfmt:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.ref }}
+      group: rustfmt-${{ github.ref }}
       cancel-in-progress: true
     steps:
     - uses: actions/checkout@v3
@@ -60,7 +60,7 @@ jobs:
   integration_tests:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.ref }}
+      group: integration_tests-${{ github.ref }}
       cancel-in-progress: true
     steps:
     - uses: actions/checkout@v3
