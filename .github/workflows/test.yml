@@ -41,7 +41,6 @@ jobs:
       working-directory: selene-lib
   alternate_tests:
     runs-on: ubuntu-latest
-    continue-on-error: true
     concurrency:
       group: alternate_tests-${{ github.ref }}
       cancel-in-progress: true
@@ -49,8 +48,11 @@ jobs:
       - uses: actions/checkout@v3
       - name: Run clippy
         run: cargo clippy -- -D warnings
+        if: always()
       - name: Rustfmt
         run: cargo fmt -- --check
+        if: always()
       - name: Run integration tests
         run: chmod +x ./run_tests.sh; ./run_tests.sh
         working-directory: selene-integration-tests/
+        if: always()
