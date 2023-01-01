@@ -41,7 +41,7 @@ pub enum CheckerError {
         problem: Box<dyn Error>,
     },
 
-    InvalidPlugin(Box<dyn Error>),
+    InvalidPlugin(eyre::Error),
 
     LintNewError {
         name: &'static str,
@@ -58,7 +58,7 @@ impl fmt::Display for CheckerError {
             ),
 
             CheckerError::InvalidPlugin(error) => {
-                write!(formatter, "Couldn't load plugin: {error}")
+                write!(formatter, "Couldn't load plugin: {error:#}")
             }
 
             CheckerError::LintNewError { name, problem } => write!(formatter, "[{name}] {problem}"),
@@ -73,6 +73,7 @@ impl Error for CheckerError {}
 #[serde(rename_all = "kebab-case")]
 pub struct CheckerConfig<V> {
     pub config: HashMap<String, V>,
+    // PLUGIN TODO: Make sure we don't specify multiple of the same hub
     pub plugins: Vec<plugins::config::PluginConfig>,
     #[serde(alias = "rules")]
     pub lints: HashMap<String, LintVariation>,
@@ -382,15 +383,16 @@ macro_rules! use_lints {
     };
 }
 
+// PLUGIN TODO: Async to support multiple downloads at once?
 fn create_plugins_from_config<V>(
     config: &CheckerConfig<V>,
 ) -> Result<Vec<plugins::LuaPlugin>, CheckerError> {
     let mut plugins = Vec::new();
 
     for plugin_config in &config.plugins {
-        plugins.push(
-            plugins::LuaPlugin::new(plugin_config)
-                .map_err(|error| CheckerError::InvalidPlugin(error))?,
+        plugins.append(
+            &mut plugins::load_plugins_from_config(plugin_config)
+                .map_err(CheckerError::InvalidPlugin)?,
         );
     }
 

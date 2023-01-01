@@ -665,6 +665,7 @@ fn start(mut options: opts::Options) {
 
 fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
+    tracing_subscriber::fmt::init();
 
     #[cfg(feature = "tracy-profiling")]
     {

@@ -17,10 +17,11 @@ chrono = "0.4"
 codespan = { version = "0.9", features = ["serialization"] }
 codespan-reporting = { version = "0.9", features = ["serialization"] }
 color-eyre = "0.6.1"
-dirs = "4.0.0"
+dirs.workspace = true
 full_moon.workspace = true
 glob = "0.3"
 globset = "0.4.9"
+inquire = "0.4.0"
 lazy_static = "1.4"
 num_cpus = "1.10"
 profiling = { version = "1.0.6" }
@@ -30,11 +31,11 @@ serde_json = "1.0"
 serde_yaml = "0.8.24"
 structopt = "0.3"
 termcolor = "1.0"
-tracy-client = { version = "0.13.2", optional = true }
 threadpool = "1.7"
 toml = "0.5"
+tracing-subscriber = "0.3.16"
+tracy-client = { version = "0.13.2", optional = true }
 ureq = { version = "2.4.0", features = ["json"], optional = true }
-inquire = "0.4.0"
 
 [features]
 default = ["roblox"]

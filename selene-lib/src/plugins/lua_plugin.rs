@@ -1,18 +1,19 @@
 use std::{
-    error::Error,
+    path::{Path, PathBuf},
     sync::{
         atomic::{AtomicU32, Ordering},
         Arc, Mutex,
     },
 };
 
+use eyre::Context as EyreContext;
 use full_moon_lua_types::{AnyNode, AstToLua};
 use mlua::{FromLua, StdLib};
 use once_cell::unsync::OnceCell;
 
 use crate::{ast_util::purge_trivia, lints::*};
 
-use super::{config::PluginConfig, context::Contexts};
+use super::{config::PluginConfig, context::Contexts, lockfile::Lockfile};
 
 static LUA_PLUGIN_COUNT: AtomicU32 = AtomicU32::new(0);
 
@@ -38,18 +39,107 @@ struct LuaPluginInfo {
     registry_key: u32,
 }
 
+// Keeping this here so that when we do eventually support selene in different directories,
+// we can avoid giving ourselves too much work.
+fn root_dir() -> eyre::Result<PathBuf> {
+    std::env::current_dir().wrap_err("could not get current directory")
+}
+
+enum PluginSource {
+    FileSystem(PathBuf),
+    PluginHub { output: PathBuf, source: String },
+}
+
+fn resolve_plugin_source(source: &Path, lockfile: &mut Lockfile) -> eyre::Result<PluginSource> {
+    let source_plus_root = root_dir()?.join(source);
+    if source_plus_root.exists() {
+        return Ok(PluginSource::FileSystem(source_plus_root));
+    }
+
+    if source.starts_with("github.com") {
+        return Ok(PluginSource::PluginHub {
+            output: super::github::resolve_github_source(source, lockfile)?,
+            source: source.to_string_lossy().to_string(),
+        });
+    }
+
+    let Some(first_component) = source.components().next() else {
+        return Err(eyre::eyre!("plugin source is empty"));
+    };
+
+    let mut caveat = "";
+
+    let first_component_string = first_component.as_os_str().to_string_lossy();
+    if first_component_string.contains('.') {
+        caveat = "\nif this is a url, only github.com is supported";
+    }
+
+    Err(eyre::eyre!(
+        "could not find plugin source `{}`{caveat}",
+        source.display(),
+    ))
+}
+
+pub fn load_plugins_from_config(plugin_config: &PluginConfig) -> eyre::Result<Vec<LuaPlugin>> {
+    let mut plugins = Vec::new();
+
+    let mut lockfile = Lockfile::open(&root_dir()?)?;
+
+    let plugin_source = resolve_plugin_source(&plugin_config.source, &mut lockfile)?;
+
+    match plugin_source {
+        PluginSource::FileSystem(path) => {
+            let plugin = LuaPlugin::new(plugin_config, &path)?;
+            plugins.push(plugin);
+        }
+
+        PluginSource::PluginHub {
+            output: path,
+            source,
+        } => {
+            let lints_dir = path.join("lints");
+
+            if !lints_dir.exists() {
+                return Err(eyre::eyre!(
+                    "plugin hub source `{source}` does not contain a `lints` directory (extracted to `{}`)",
+                    path.display(),
+                ));
+            }
+
+            for entry in std::fs::read_dir(lints_dir)? {
+                let entry = entry?;
+                let path = entry.path();
+
+                let stem = match path.file_stem() {
+                    Some(stem) => stem.to_string_lossy().to_string(),
+                    None => continue,
+                };
+
+                if path.is_dir() || !stem.ends_with(".lint") {
+                    continue;
+                }
+
+                plugins.push(LuaPlugin::new(plugin_config, &path)?);
+            }
+        }
+    }
+
+    lockfile.save().wrap_err("couldn't write to lockfile")?;
+
+    Ok(plugins)
+}
+
 impl LuaPlugin {
-    // PLUGIN TODO: Make this eyre and kill the Box<dyn Error>
-    pub fn new(plugin_config: &PluginConfig) -> Result<Self, Box<dyn Error>> {
+    pub fn new(_plugin_config: &PluginConfig, resolved_source: &Path) -> eyre::Result<Self> {
+        let plugin_contents = std::fs::read_to_string(resolved_source)?;
+
         LUA.with(|lua| {
-            let lua = lua.get_or_try_init::<_, Box<dyn Error>>(|| {
+            let lua = lua.get_or_try_init::<_, eyre::Error>(|| {
                 let lua = mlua::Lua::new();
                 lua.sandbox(true)?;
                 lua.load_from_std_lib(StdLib::ALL_SAFE)?;
                 Ok(lua.into_static())
             })?;
-
-            let plugin_contents = std::fs::read_to_string(&plugin_config.source)?;
 
             Ok(LuaPlugin {
                 plugin_info: lua.load(&plugin_contents).eval()?,

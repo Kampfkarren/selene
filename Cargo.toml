@@ -10,6 +10,8 @@ license = "MPL-2.0"
 repository = "https://github.com/Kampfkarren/selene"
 
 [workspace.dependencies]
+dirs = "4.0.0"
+
 full_moon = { git = "https://github.com/Kampfkarren/full-moon", branch = "lua-types" }
 # full_moon = { path = "../full-moon/full-moon" }
 
