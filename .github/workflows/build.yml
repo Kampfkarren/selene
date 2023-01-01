@@ -9,6 +9,9 @@ on:
 jobs:
   build_windows:
     runs-on: windows-latest
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
     - name: Build (Default features)
@@ -22,6 +25,9 @@ jobs:
         path: ./target/release/selene.exe
   build_windows_light:
     runs-on: windows-latest
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
     - name: Build (Lightweight)
@@ -35,6 +41,9 @@ jobs:
         path: ./target/release/selene.exe
   build_mac:
     runs-on: macos-latest
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
     - name: Install Rust
@@ -51,6 +60,9 @@ jobs:
         path: ./target/release/selene
   build_mac_light:
     runs-on: macos-latest
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
     - name: Install Rust
@@ -67,6 +79,9 @@ jobs:
         path: ./target/release/selene
   build_linux:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
     - name: Build (Default features)
@@ -80,6 +95,9 @@ jobs:
         path: ./target/release/selene
   build_linux_light:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
     - name: Build (Lightweight)
@@ -93,6 +111,9 @@ jobs:
         path: ./target/release/selene
   release:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     needs: ['build_windows_light', 'build_windows', 'build_mac', 'build_mac_light', 'build_linux', 'build_linux_light']
     if: contains(github.event.head_commit.message, '[release]')
     steps:

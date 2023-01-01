@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     steps:
     - uses: actions/checkout@v3
     - name: Run tests (selene, all features)
@@ -26,6 +29,9 @@ jobs:
   # Remove this when non_exhaustive_omitted_patterns_lint is made stable in the next Rust version
   test_exhaustive_checks:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
     - name: Install nightly for exhaustive check tests
@@ -35,18 +41,27 @@ jobs:
       working-directory: selene-lib
   clippy:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     steps:
     - uses: actions/checkout@v3
     - name: Run clippy
       run: cargo clippy -- -D warnings
   rustfmt:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     steps:
     - uses: actions/checkout@v3
     - name: Rustfmt
       run: cargo fmt -- --check
   integration_tests:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     steps:
     - uses: actions/checkout@v3
     - name: Run integration tests
