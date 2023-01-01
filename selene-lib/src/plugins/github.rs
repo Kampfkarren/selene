@@ -131,8 +131,12 @@ pub fn resolve_github_source(source: &Path, lockfile: &mut Lockfile) -> eyre::Re
             downloaded_plugin_dir()?.join(format!("{author}-{repository}-{}", plugin_lock.commit));
 
         if extract_path.exists() {
-            // PLUGIN TODO: Validate hash
-            return Ok(extract_path);
+            let hash = hash_directory(&extract_path)?;
+            if hash == plugin_lock.sha512 {
+                return Ok(extract_path);
+            } else {
+                eyre::bail!("hash mismatch for plugin `{source_url}`. you can try deleting the selene.lock file.");
+            }
         }
 
         url = zip_url_with_commit(author, repository, &plugin_lock.commit);
