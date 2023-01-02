@@ -27,6 +27,7 @@ use selene_lib::standard_library::StandardLibrary;
 use crate::{json_output::log_total_json, opts::DisplayStyle};
 
 mod json_output;
+mod logger;
 mod opts;
 mod plugins;
 #[cfg(feature = "roblox")]
@@ -392,6 +393,10 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
 
 fn start(mut options: opts::Options) {
     *OPTIONS.write().unwrap() = Some(options.clone());
+
+    if let Some(logger) = crate::logger::get_logger(&options) {
+        selene_lib::logs::set_logger(logger);
+    }
 
     if options.pattern.is_empty() {
         options.pattern.push(String::from("**/*.lua"));

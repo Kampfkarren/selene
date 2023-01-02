@@ -4,6 +4,7 @@ use std::{
         atomic::{AtomicU32, Ordering},
         Arc, Mutex,
     },
+    time::Instant,
 };
 
 use eyre::Context as EyreContext;
@@ -13,7 +14,11 @@ use once_cell::unsync::OnceCell;
 
 use crate::{ast_util::purge_trivia, lints::*};
 
-use super::{config::PluginConfig, context::Contexts, lockfile::Lockfile};
+use super::{
+    config::PluginConfig,
+    context::Contexts,
+    lockfile::{Lockfile, PluginLock},
+};
 
 static LUA_PLUGIN_COUNT: AtomicU32 = AtomicU32::new(0);
 
@@ -50,7 +55,10 @@ enum PluginSource {
     PluginHub { output: PathBuf, source: String },
 }
 
-fn resolve_plugin_source(source: &Path, lockfile: &mut Lockfile) -> eyre::Result<PluginSource> {
+fn resolve_plugin_source(
+    source: &Path,
+    context: &mut PluginConfigContext,
+) -> eyre::Result<PluginSource> {
     let source_plus_root = root_dir()?.join(source);
     if source_plus_root.exists() {
         return Ok(PluginSource::FileSystem(source_plus_root));
@@ -58,7 +66,7 @@ fn resolve_plugin_source(source: &Path, lockfile: &mut Lockfile) -> eyre::Result
 
     if source.starts_with("github.com") {
         return Ok(PluginSource::PluginHub {
-            output: super::github::resolve_github_source(source, lockfile)?,
+            output: super::github::resolve_github_source(source, context)?,
             source: source.to_string_lossy().to_string(),
         });
     }
@@ -80,12 +88,85 @@ fn resolve_plugin_source(source: &Path, lockfile: &mut Lockfile) -> eyre::Result
     ))
 }
 
+#[derive(Debug)]
+pub struct PluginConfigContext {
+    downloading_tick: Option<u128>,
+    lockfile: Lockfile,
+}
+
+impl PluginConfigContext {
+    pub fn new() -> eyre::Result<Self> {
+        Ok(Self {
+            downloading_tick: None,
+            lockfile: Lockfile::open(&root_dir()?)?,
+        })
+    }
+
+    pub fn get_from_lockfile(&self, key: &str) -> Option<&PluginLock> {
+        self.lockfile.get(key)
+    }
+
+    pub fn add_to_lockfile(&mut self, key: String, plugin_lock: PluginLock) {
+        self.lockfile.add(key, plugin_lock);
+    }
+
+    pub fn start_download(&mut self) -> eyre::Result<()> {
+        if self.downloading_tick.is_none() {
+            let this_downloading_tick = Instant::now().elapsed().as_nanos();
+            self.downloading_tick = Some(this_downloading_tick);
+            let mut should_notice = true;
+
+            let semaphore_file = PluginConfigContext::download_semaphore_file()?;
+            while semaphore_file.exists() {
+                if should_notice {
+                    crate::logs::log(crate::logs::LogMessage::WaitingForPluginSemaphoreDownload {
+                        semaphore_file: semaphore_file.clone(),
+                    });
+
+                    should_notice = false;
+                }
+
+                std::thread::sleep(std::time::Duration::from_millis(500));
+            }
+
+            std::fs::create_dir_all(semaphore_file.parent().unwrap())?;
+
+            std::fs::write(&semaphore_file, this_downloading_tick.to_string())?;
+        }
+
+        Ok(())
+    }
+
+    pub fn close(self) -> eyre::Result<()> {
+        self.lockfile.save()?;
+
+        if let Some(downloading_tick) = self.downloading_tick {
+            let semaphore_file = PluginConfigContext::download_semaphore_file()?;
+            if semaphore_file.exists() {
+                let semaphore_contents = std::fs::read_to_string(&semaphore_file)?;
+                if semaphore_contents == downloading_tick.to_string() {
+                    std::fs::remove_file(&semaphore_file)?;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    fn download_semaphore_file() -> eyre::Result<PathBuf> {
+        Ok(dirs::cache_dir()
+            .ok_or_else(|| eyre::eyre!("your platform is not supported"))?
+            .join("selene")
+            .join("plugin_downloading_lock"))
+    }
+}
+
 pub fn load_plugins_from_config(plugin_config: &PluginConfig) -> eyre::Result<Vec<LuaPlugin>> {
     let mut plugins = Vec::new();
 
-    let mut lockfile = Lockfile::open(&root_dir()?)?;
+    let mut context = PluginConfigContext::new()?;
 
-    let plugin_source = resolve_plugin_source(&plugin_config.source, &mut lockfile)?;
+    let plugin_source = resolve_plugin_source(&plugin_config.source, &mut context)?;
 
     match plugin_source {
         PluginSource::FileSystem(path) => {
@@ -124,7 +205,7 @@ pub fn load_plugins_from_config(plugin_config: &PluginConfig) -> eyre::Result<Ve
         }
     }
 
-    lockfile.save().wrap_err("couldn't write to lockfile")?;
+    context.close()?;
 
     Ok(plugins)
 }

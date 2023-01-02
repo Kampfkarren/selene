@@ -3,7 +3,9 @@ use std::path::{Path, PathBuf};
 use eyre::Context;
 use sha2::Digest;
 
-use crate::plugins::lockfile::{Lockfile, PluginLock};
+use crate::plugins::lockfile::PluginLock;
+
+use super::lua_plugin::PluginConfigContext;
 
 // PLUGIN TODO: User specified branches
 fn zip_url(author: &str, repository: &str) -> String {
@@ -107,7 +109,10 @@ fn strip_directory(path: &Path) -> Option<&Path> {
 // If this becomes async, lockfile can become a RwLock.
 // PLUGIN TODO: Failing this (like not having internet) should not kill selene
 #[tracing::instrument]
-pub fn resolve_github_source(source: &Path, lockfile: &mut Lockfile) -> eyre::Result<PathBuf> {
+pub fn resolve_github_source(
+    source: &Path,
+    context: &mut PluginConfigContext,
+) -> eyre::Result<PathBuf> {
     let source_url = source.to_string_lossy().into_owned();
     let components = source_url.split('/').collect::<Vec<_>>();
     if components.len() != 3 {
@@ -122,27 +127,33 @@ pub fn resolve_github_source(source: &Path, lockfile: &mut Lockfile) -> eyre::Re
     let author = components[1];
     let repository = components[2];
 
-    let plugin_lock = lockfile.get(&source_url);
+    let (url, commit, should_lock) = match context.get_from_lockfile(&source_url) {
+        Some(plugin_lock) => {
+            let extract_path = downloaded_plugin_dir()?
+                .join(format!("{author}-{repository}-{}", plugin_lock.commit));
 
-    let url;
-
-    if let Some(plugin_lock) = plugin_lock {
-        let extract_path =
-            downloaded_plugin_dir()?.join(format!("{author}-{repository}-{}", plugin_lock.commit));
-
-        if extract_path.exists() {
-            let hash = hash_directory(&extract_path)?;
-            if hash == plugin_lock.sha512 {
-                return Ok(extract_path);
-            } else {
-                eyre::bail!("hash mismatch for plugin `{source_url}`. you can try deleting the selene.lock file.");
+            if extract_path.exists() {
+                let hash = hash_directory(&extract_path)?;
+                if hash == plugin_lock.sha512 {
+                    return Ok(extract_path);
+                } else {
+                    eyre::bail!("hash mismatch for plugin `{source_url}`. you can try deleting the selene.lock file.");
+                }
             }
+
+            (
+                zip_url_with_commit(author, repository, &plugin_lock.commit),
+                Some(plugin_lock.commit.clone()),
+                true,
+            )
         }
 
-        url = zip_url_with_commit(author, repository, &plugin_lock.commit);
-    } else {
-        url = zip_url(author, repository);
-    }
+        None => (zip_url(author, repository), None, false),
+    };
+
+    context
+        .start_download()
+        .context("error when trying to prepare for download")?;
 
     tracing::debug!("making request to {url}");
 
@@ -180,9 +191,8 @@ pub fn resolve_github_source(source: &Path, lockfile: &mut Lockfile) -> eyre::Re
         }
     };
 
-    let commit = match plugin_lock {
-        Some(plugin_lock) => plugin_lock.commit.clone(),
-
+    let commit = match commit {
+        Some(commit) => commit,
         None => match extract_commit(&zip_filename) {
             Some(commit) => commit,
             None => {
@@ -199,8 +209,8 @@ pub fn resolve_github_source(source: &Path, lockfile: &mut Lockfile) -> eyre::Re
     let extract_path = plugin_dir.join(format!("{author}-{repository}-{commit}"));
 
     if extract_path.exists() {
-        if plugin_lock.is_none() {
-            lockfile.add(
+        if should_lock {
+            context.add_to_lockfile(
                 source_url,
                 PluginLock {
                     commit,
@@ -289,7 +299,7 @@ pub fn resolve_github_source(source: &Path, lockfile: &mut Lockfile) -> eyre::Re
         })?;
     }
 
-    lockfile.add(
+    context.add_to_lockfile(
         source_url,
         PluginLock {
             sha512: hash_directory(&temporary_extract_path)

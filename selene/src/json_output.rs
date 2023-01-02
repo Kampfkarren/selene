@@ -11,12 +11,16 @@ use termcolor::StandardStream;
 #[serde(tag = "type")]
 pub enum JsonOutput {
     Diagnostic(JsonDiagnostic),
+
+    Summary(JsonSummary),
+
     // PLUGIN TODO: This should say what plugins with what permissions
     PluginsNotLoaded {
         authorization_path: PathBuf,
         canon_filename: PathBuf,
     },
-    Summary(JsonSummary),
+
+    LogMessage(selene_lib::logs::LogMessage),
 }
 
 #[derive(Serialize)]

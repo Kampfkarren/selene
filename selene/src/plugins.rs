@@ -83,7 +83,7 @@ pub fn authorize_plugins_prompt<V>(
             }
         }
 
-        Err(error) => (Vec::new(), Some(error.to_string())),
+        Err(error) => (Vec::new(), Some(format!("{:#}", error))),
     };
 
     if !atty::is(atty::Stream::Stdin) {

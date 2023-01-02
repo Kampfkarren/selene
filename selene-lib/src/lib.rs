@@ -20,6 +20,7 @@ use serde::{
 mod ast_util;
 mod lint_filtering;
 pub mod lints;
+pub mod logs;
 mod plugins;
 mod possible_std;
 pub mod standard_library;
