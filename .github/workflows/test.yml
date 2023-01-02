@@ -9,12 +9,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    concurrency:
+      group: test-${{ github.ref }}
+      cancel-in-progress: true
     steps:
-    - uses: actions/checkout@v1
-    - name: Run clippy
-      run: cargo clippy -- -D warnings
-    - name: Run Rustfmt
-      run: cargo fmt -- --check
+    - uses: actions/checkout@v3
     - name: Run tests (selene, all features)
       run: cargo test
       working-directory: selene
@@ -30,6 +29,9 @@ jobs:
   # Remove this when non_exhaustive_omitted_patterns_lint is made stable in the next Rust version
   test_exhaustive_checks:
     runs-on: ubuntu-latest
+    concurrency:
+      group: test_exhaustive_checks-${{ github.ref }}
+      cancel-in-progress: true
     steps:
     - uses: actions/checkout@v1
     - name: Install nightly for exhaustive check tests
@@ -37,3 +39,20 @@ jobs:
     - name: Run exhaustive check tests
       run: cargo check --features force_exhaustive_checks
       working-directory: selene-lib
+  alternate_tests:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: alternate_tests-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run clippy
+        run: cargo clippy -- -D warnings
+        if: always()
+      - name: Rustfmt
+        run: cargo fmt -- --check
+        if: always()
+      - name: Run integration tests
+        run: chmod +x ./run_tests.sh; ./run_tests.sh
+        working-directory: selene-integration-tests/
+        if: always()

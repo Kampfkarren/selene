@@ -1,0 +1,16 @@
+error[incorrect_standard_library_use]: standard library function `run` requires 0 parameters, 1 passed
+  ┌─ source/code.lua:1:1
+  │
+1 │ run(1)
+  │ ^^^^^^
+
+error[undefined_variable]: `ohNo` is not defined
+  ┌─ source/code.lua:2:1
+  │
+2 │ ohNo()
+  │ ^^^^
+
+Results:
+2 errors
+0 warnings
+0 parse errors

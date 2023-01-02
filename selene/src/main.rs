@@ -27,7 +27,9 @@ use selene_lib::standard_library::StandardLibrary;
 use crate::{json_output::log_total_json, opts::DisplayStyle};
 
 mod json_output;
+mod logger;
 mod opts;
+mod plugins;
 #[cfg(feature = "roblox")]
 mod roblox;
 mod standard_library;
@@ -389,16 +391,20 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     );
 }
 
-fn start(mut matches: opts::Options) {
-    *OPTIONS.write().unwrap() = Some(matches.clone());
+fn start(mut options: opts::Options) {
+    *OPTIONS.write().unwrap() = Some(options.clone());
 
-    if matches.pattern.is_empty() {
-        matches.pattern.push(String::from("**/*.lua"));
-        #[cfg(feature = "roblox")]
-        matches.pattern.push(String::from("**/*.luau"));
+    if let Some(logger) = crate::logger::get_logger(&options) {
+        selene_lib::logs::set_logger(logger);
     }
 
-    match matches.command {
+    if options.pattern.is_empty() {
+        options.pattern.push(String::from("**/*.lua"));
+        #[cfg(feature = "roblox")]
+        options.pattern.push(String::from("**/*.luau"));
+    }
+
+    match &options.command {
         #[cfg(feature = "roblox")]
         Some(opts::Command::GenerateRobloxStd) => {
             println!("Generating Roblox standard library...");
@@ -432,11 +438,30 @@ fn start(mut matches: opts::Options) {
             return;
         }
 
+        Some(opts::Command::InternalPath { internal_path }) => match internal_path {
+            opts::InternalPath::PluginAuthorization => {
+                print!("{}", plugins::plugin_authorization_path().display());
+                return;
+            }
+        },
+
+        Some(opts::Command::PluginAuthorization { path, block }) => {
+            if let Err(error) = plugins::allow_plugin_by_bool(path, !block) {
+                error!("{error}");
+                std::process::exit(1);
+            }
+
+            return;
+        }
+
         None => {}
     }
 
-    let (config, config_directory): (CheckerConfig<toml::value::Value>, Option<PathBuf>) =
-        match matches.config {
+    // If we support selene.toml outside of current_dir, this can be changed
+    let config_filename = PathBuf::from(options.config.as_deref().unwrap_or("selene.toml"));
+
+    let (mut config, config_directory): (CheckerConfig<toml::value::Value>, Option<PathBuf>) =
+        match &options.config {
             Some(config_file) => {
                 let config_contents = match fs::read_to_string(&config_file) {
                     Ok(contents) => contents,
@@ -470,6 +495,13 @@ fn start(mut matches: opts::Options) {
                 Err(_) => (CheckerConfig::default(), None),
             },
         };
+
+    if !config.plugins.is_empty() {
+        let canon_filename = std::fs::canonicalize(config_filename)
+            .expect("plugins weren't empty, but config_filename could not be canonicalized");
+
+        plugins::authorize_plugins_prompt(&options, &mut config, canon_filename);
+    }
 
     let current_dir = std::env::current_dir().unwrap();
 
@@ -544,9 +576,9 @@ fn start(mut matches: opts::Options) {
         }
     });
 
-    let pool = ThreadPool::new(matches.num_threads);
+    let pool = ThreadPool::new(options.num_threads);
 
-    for filename in &matches.files {
+    for filename in &options.files {
         if filename == "-" {
             let checker = Arc::clone(&checker);
             pool.execute(move || read(&checker, Path::new("-"), io::stdin().lock()));
@@ -561,7 +593,7 @@ fn start(mut matches: opts::Options) {
 
                     pool.execute(move || read_file(&checker, Path::new(&filename)));
                 } else if metadata.is_dir() {
-                    for pattern in &matches.pattern {
+                    for pattern in &options.pattern {
                         let glob = match glob::glob(&format!(
                             "{}/{}",
                             filename.to_string_lossy(),
@@ -621,7 +653,7 @@ fn start(mut matches: opts::Options) {
         LINT_WARNINGS.load(Ordering::SeqCst),
     );
 
-    if !matches.luacheck && !matches.no_summary {
+    if !options.luacheck && !options.no_summary {
         log_total(parse_errors, lint_errors, lint_warnings).ok();
     }
 
@@ -638,6 +670,7 @@ fn start(mut matches: opts::Options) {
 
 fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
+    tracing_subscriber::fmt::init();
 
     #[cfg(feature = "tracy-profiling")]
     {

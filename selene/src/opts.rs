@@ -52,6 +52,10 @@ pub struct Options {
     #[structopt(long)]
     pub allow_warnings: bool,
 
+    /// Whether or not to always allow plugins, skipping the prompt.
+    #[structopt(long)]
+    pub allow_plugins: bool,
+
     /// Whether to pretend to be luacheck for existing consumers
     #[structopt(long, hidden(true))]
     pub luacheck: bool,
@@ -68,6 +72,14 @@ pub struct Options {
 }
 
 impl Options {
+    pub fn display_style(&self) -> DisplayStyle {
+        match self.display_style {
+            Some(display_style) => display_style,
+            None if self.quiet => DisplayStyle::Quiet,
+            None => DisplayStyle::Rich,
+        }
+    }
+
     pub fn quiet(&self) -> bool {
         match self.display_style {
             Some(display_style) => display_style == DisplayStyle::Quiet,
@@ -78,9 +90,8 @@ impl Options {
 
 #[derive(Clone, Debug, PartialEq, Eq, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
-// I'm gonna add more than standard library stuff I swear
-#[allow(clippy::enum_variant_names)]
 pub enum Command {
+    // PLUGIN TODO: In a separate PR, doc comment these
     #[cfg(feature = "roblox")]
     GenerateRobloxStd,
 
@@ -90,6 +101,22 @@ pub enum Command {
     UpgradeStd {
         #[structopt(parse(from_os_str))]
         filename: PathBuf,
+    },
+
+    /// Outputs the full path of a given internal file
+    InternalPath {
+        #[structopt(
+            possible_values = &InternalPath::variants(),
+            case_insensitive = true,
+        )]
+        internal_path: InternalPath,
+    },
+
+    // PLUGIN TODO: Can we hide this? It's not useful for --help
+    PluginAuthorization {
+        path: PathBuf,
+        #[structopt(long)]
+        block: bool,
     },
 }
 
@@ -109,6 +136,13 @@ arg_enum! {
         Json2,
         Rich,
         Quiet,
+    }
+}
+
+arg_enum! {
+    #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+    pub enum InternalPath {
+        PluginAuthorization,
     }
 }
 

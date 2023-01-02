@@ -1,0 +1,10 @@
+warning[plugin_block_table_calls]: table calls are not allowed
+  ┌─ source/code.lua:1:7
+  │
+1 │ print { "hello world" }
+  │       ^^^^^^^^^^^^^^^^^
+
+Results:
+0 errors
+1 warnings
+0 parse errors

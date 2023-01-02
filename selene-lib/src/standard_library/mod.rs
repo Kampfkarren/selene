@@ -37,15 +37,16 @@ struct GlobalTreeNode {
 
 impl GlobalTreeNode {
     fn field<'a>(&self, names_to_fields: &'a BTreeMap<String, Field>) -> &'a Field {
-        static READ_ONLY_FIELD: Field =
-            Field::from_field_kind(FieldKind::Property(PropertyWritability::ReadOnly));
+        static READ_ONLY_FIELD: OnceCell<Field> = OnceCell::new();
 
         match &self.field {
             GlobalTreeField::Key(key) => names_to_fields
                 .get(key)
                 .unwrap_or_else(|| panic!("couldn't find {key} inside names_to_fields")),
 
-            GlobalTreeField::ReadOnlyField => &READ_ONLY_FIELD,
+            GlobalTreeField::ReadOnlyField => READ_ONLY_FIELD.get_or_init(|| {
+                Field::from_field_kind(FieldKind::Property(PropertyWritability::ReadOnly))
+            }),
         }
     }
 }
@@ -415,13 +416,18 @@ pub struct Field {
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deprecated: Option<Deprecated>,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_yaml::Value>,
 }
 
 impl Field {
-    pub const fn from_field_kind(field_kind: FieldKind) -> Self {
+    pub fn from_field_kind(field_kind: FieldKind) -> Self {
         Self {
             field_kind,
             deprecated: None,
+            extra: BTreeMap::new(),
         }
     }
 }

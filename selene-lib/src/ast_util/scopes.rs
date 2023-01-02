@@ -12,7 +12,7 @@ use super::expression_to_ident;
 
 type Range = (usize, usize);
 
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct ScopeManager {
     pub scopes: Arena<Scope>,
     pub references: Arena<Reference>,
@@ -33,6 +33,11 @@ impl ScopeManager {
             .map(|(_, reference)| reference)
     }
 
+    pub fn variable_at_byte(&self, byte: usize) -> Option<&Variable> {
+        self.variable_at_byte_with_id(byte)
+            .map(|(_, variable)| variable)
+    }
+
     fn reference_at_byte_mut(&mut self, byte: usize) -> Option<&mut Reference> {
         self.references
             .iter_mut()
@@ -44,6 +49,20 @@ impl ScopeManager {
         for (id, reference) in &self.references {
             if byte >= reference.identifier.0 && byte <= reference.identifier.1 {
                 return Some((id, reference));
+            }
+        }
+
+        None
+    }
+
+    pub fn variable_at_byte_with_id(&self, byte: usize) -> Option<(Id<Variable>, &Variable)> {
+        for (id, variable) in &self.variables {
+            if variable
+                .identifiers
+                .iter()
+                .any(|range| byte >= range.0 && byte <= range.1)
+            {
+                return Some((id, variable));
             }
         }
 
@@ -68,14 +87,14 @@ impl ScopeManager {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Scope {
     references: Vec<Id<Reference>>,
     variables: Vec<Id<Variable>>,
     blocked: Vec<Cow<'static, str>>,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Reference {
     pub identifier: Range,
     pub name: String,
@@ -88,13 +107,13 @@ pub struct Reference {
     pub within_function_stmt: Option<WithinFunctionStmt>,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct WithinFunctionStmt {
     pub function_call_stmt_id: Id<FunctionCallStmt>,
     pub argument_index: usize,
 }
 
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Variable {
     pub definitions: Vec<Range>,
     pub identifiers: Vec<Range>,
@@ -110,7 +129,7 @@ pub enum AssignedValue {
     StaticTable { has_fields: bool },
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct FunctionCallStmt {
     pub call_name_path: Vec<String>,
     pub initial_reference: Id<Reference>,

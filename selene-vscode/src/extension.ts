@@ -5,6 +5,7 @@ import * as util from "./util"
 import * as vscode from "vscode"
 import { Diagnostic, Severity, Label } from "./structures/diagnostic"
 import { Output } from "./structures/output"
+import { pluginsNotLoadedFor } from "./plugins"
 
 let trySelene: Promise<boolean>
 
@@ -56,6 +57,11 @@ function labelToRange(
         ),
     )
 }
+
+export let lint: (document: vscode.TextDocument) => Promise<void> =
+    async () => {
+        // Empty to be reassigned later
+    }
 
 export async function activate(
     context: vscode.ExtensionContext,
@@ -128,7 +134,7 @@ export async function activate(
 
     let hasWarnedAboutRoblox = false
 
-    async function lint(document: vscode.TextDocument) {
+    lint = async (document: vscode.TextDocument) => {
         if (document.languageId !== "lua") {
             return
         }
@@ -137,13 +143,18 @@ export async function activate(
             return
         }
 
-        const output = await selene.seleneCommand(
-            context.globalStorageUri,
-            "--display-style=json2 --no-summary -",
-            selene.Expectation.Stderr,
-            vscode.workspace.getWorkspaceFolder(document.uri),
-            document.getText(),
-        )
+        const output = await selene
+            .seleneCommand(
+                context.globalStorageUri,
+                "--display-style=json2 --no-summary -",
+                selene.Expectation.Stderr,
+                vscode.workspace.getWorkspaceFolder(document.uri),
+                document.getText(),
+            )
+            .catch((error) => {
+                console.error(error)
+                return Promise.reject(error)
+            })
 
         if (!output) {
             diagnosticsCollection.delete(document.uri)
@@ -155,10 +166,14 @@ export async function activate(
         const byteOffsets = new Set<number>()
 
         for (const line of output.split("\n")) {
+            if (!line) {
+                continue
+            }
+
             const output: Output = JSON.parse(line)
 
             switch (output.type) {
-                case "diagnostic":
+                case "Diagnostic":
                     dataToAdd.push(output)
                     byteOffsets.add(output.primary_label.span.start)
                     byteOffsets.add(output.primary_label.span.end)
@@ -166,6 +181,10 @@ export async function activate(
                         byteOffsets.add(label.span.start)
                         byteOffsets.add(label.span.end)
                     }
+                    break
+                case "PluginsNotLoaded":
+                    pluginsNotLoadedFor(context, output.canon_filename)
+
                     break
             }
         }
@@ -286,11 +305,17 @@ export async function activate(
             diagnosticsCollection.set(documentUri, [])
         }
     })
+
     vscode.window.onDidChangeActiveTextEditor((editor) => {
         if (editor !== undefined) {
             lint(editor.document)
         }
     })
+
+    // PLUGIN TODO: Document this change
+    for (const document of vscode.workspace.textDocuments) {
+        lint(document)
+    }
 }
 
 // this method is called when your extension is deactivated

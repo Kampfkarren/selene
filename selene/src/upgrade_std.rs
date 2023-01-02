@@ -1,6 +1,6 @@
-use std::path::PathBuf;
+use std::path::Path;
 
-pub fn upgrade_std(filename: PathBuf) -> Result<(), Box<dyn std::error::Error>> {
+pub fn upgrade_std(filename: &Path) -> Result<(), Box<dyn std::error::Error>> {
     let output_filename = filename.with_extension("yml");
 
     if output_filename.exists() {

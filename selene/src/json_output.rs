@@ -1,4 +1,5 @@
 use std::io::{self, Write};
+use std::path::PathBuf;
 
 use codespan_reporting::diagnostic::{
     Diagnostic as CodespanDiagnostic, Label as CodespanLabel, LabelStyle, Severity,
@@ -10,7 +11,16 @@ use termcolor::StandardStream;
 #[serde(tag = "type")]
 pub enum JsonOutput {
     Diagnostic(JsonDiagnostic),
+
     Summary(JsonSummary),
+
+    // PLUGIN TODO: This should say what plugins with what permissions
+    PluginsNotLoaded {
+        authorization_path: PathBuf,
+        canon_filename: PathBuf,
+    },
+
+    LogMessage(selene_lib::logs::LogMessage),
 }
 
 #[derive(Serialize)]
@@ -92,6 +102,13 @@ pub fn diagnostic_to_json(
             .map(|label| label_to_serializable(&filename, label, files))
             .collect(),
     }
+}
+
+pub fn print_json(output: JsonOutput) {
+    println!(
+        "{}",
+        serde_json::to_string(&output).expect("unable to serialize json output")
+    );
 }
 
 pub fn log_total_json(

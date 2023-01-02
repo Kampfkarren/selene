@@ -1,0 +1,7 @@
+- documentation of EVERYTHING
+- unit test errors
+- permissions
+- Document multithreading behavior (one lua per thread)
+- Document that values can't be saved across pass() calls
+- Error messages are inconsistent, should all be lowercase
+- In VSC extension, while downloading GitHub, give notice
