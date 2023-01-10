@@ -77,7 +77,7 @@ impl Lint for UnusedVariableLint {
                         return AnalyzedReference::PlainWrite;
                     }
 
-                    if variable.value != Some(AssignedValue::StaticTable) {
+                    if !matches!(variable.value, Some(AssignedValue::StaticTable { .. })) {
                         return AnalyzedReference::Read;
                     }
 

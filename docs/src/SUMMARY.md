@@ -24,6 +24,7 @@
   - [if_same_then_else](./lints/if_same_then_else.md)
   - [ifs_same_cond](./lints/ifs_same_cond.md)
   - [incorrect_standard_library_use](./lints/incorrect_standard_library_use.md)
+  - [manual_table_clone](./lints/manual_table_clone.md)
   - [mismatched_arg_count](./lints/mismatched_arg_count.md)
   - [multiple_statements](./lints/multiple_statements.md)
   - [must_use](./lints/must_use.md)

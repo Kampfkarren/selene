@@ -10,7 +10,7 @@ error[undefined_variable]: `Color3` is not defined
 1 │ local color = Color3.fromHex("FFFFFF")
   │               ^^^^^^
   │
-  = `Color3` was found in the roblox standard libary
+  = `Color3` was found in the roblox standard library
   = you can set the standard library by putting the following inside selene.toml:
     std = "roblox"
 
@@ -20,7 +20,7 @@ error[incorrect_standard_library_use]: standard library global `debug` does not 
 2 │ debug.profilebegin("roblox only")
   │ ^^^^^^^^^^^^^^^^^^
   │
-  = `debug.profilebegin` was found in the roblox standard libary
+  = `debug.profilebegin` was found in the roblox standard library
   = you can set the standard library by putting the following inside selene.toml:
     std = "roblox"
 

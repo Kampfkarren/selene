@@ -220,7 +220,9 @@ macro_rules! use_lints {
 
                     context: Context {
                         standard_library,
-                        standard_library_is_set: config.std.is_some(),
+                        user_set_standard_library: config.std.as_ref().map(|std_text| {
+                            std_text.split('+').map(ToOwned::to_owned).collect()
+                        }),
                     },
 
                     config,
@@ -307,6 +309,7 @@ use_lints! {
     ifs_same_cond: lints::ifs_same_cond::IfsSameCondLint,
     incorrect_standard_library_use: lints::standard_library::StandardLibraryLint,
     invalid_lint_filter: lints::invalid_lint_filter::InvalidLintFilterLint,
+    manual_table_clone: lints::manual_table_clone::ManualTableCloneLint,
     mismatched_arg_count: lints::mismatched_arg_count::MismatchedArgCountLint,
     multiple_statements: lints::multiple_statements::MultipleStatementsLint,
     must_use: lints::must_use::MustUseLint,

@@ -30,7 +30,7 @@ impl Lint for StandardLibraryLint {
             diagnostics: Vec::new(),
             scope_manager: &ast_context.scope_manager,
             standard_library: &context.standard_library,
-            standard_library_is_set: context.standard_library_is_set,
+            user_set_standard_library: &context.user_set_standard_library,
         };
 
         visitor.visit_ast(ast);
@@ -196,7 +196,7 @@ pub struct StandardLibraryVisitor<'std> {
     diagnostics: Vec<Diagnostic>,
     scope_manager: &'std ScopeManager,
     standard_library: &'std StandardLibrary,
-    standard_library_is_set: bool,
+    user_set_standard_library: &'std Option<Vec<String>>,
 }
 
 impl StandardLibraryVisitor<'_> {
@@ -249,7 +249,7 @@ impl StandardLibraryVisitor<'_> {
                 Label::new((range.0.bytes(), range.1.bytes())),
                 possible_standard_library_notes(
                     &name_path_with_field,
-                    self.standard_library_is_set,
+                    self.user_set_standard_library,
                 ),
                 Vec::new(),
             ));

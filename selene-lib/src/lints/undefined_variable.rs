@@ -45,7 +45,7 @@ impl Lint for UndefinedVariableLint {
                     Label::new(reference.identifier),
                     possible_standard_library_notes(
                         &[reference.name.as_str()],
-                        context.standard_library_is_set,
+                        &context.user_set_standard_library,
                     ),
                     Vec::new(),
                 ));

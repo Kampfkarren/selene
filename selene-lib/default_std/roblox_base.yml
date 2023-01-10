@@ -592,7 +592,7 @@ globals:
         type: number
   warn:
     args:
-      - type: string
+      - type: any
       - required: false
         type: "..."
 structs:
@@ -611,6 +611,10 @@ structs:
         message: "lowercase methods have been superceded by uppercase ones"
         replace:
           - "Connect(%1)"
+      args:
+        - type: function
+      method: true
+    Once:
       args:
         - type: function
       method: true
