@@ -61,6 +61,7 @@ impl Error for CheckerError {}
 #[derive(Deserialize)]
 #[serde(default)]
 #[serde(rename_all = "kebab-case")]
+#[serde(deny_unknown_fields)]
 pub struct CheckerConfig<V> {
     pub config: HashMap<String, V>,
     #[serde(alias = "rules")]
