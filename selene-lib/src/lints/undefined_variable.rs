@@ -128,4 +128,14 @@ mod tests {
             "varargs",
         );
     }
+
+    #[cfg(feature = "roblox")]
+    #[test]
+    fn test_string_interpolation() {
+        test_lint(
+            UndefinedVariableLint::new(()).unwrap(),
+            "undefined_variable",
+            "string_interpolation",
+        );
+    }
 }

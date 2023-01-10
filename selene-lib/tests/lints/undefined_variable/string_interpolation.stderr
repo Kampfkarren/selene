@@ -1,0 +1,6 @@
+error[undefined_variable]: `x` is not defined
+  ┌─ string_interpolation.lua:1:13
+  │
+1 │ print(`x = {x}`)
+  │             ^
+
