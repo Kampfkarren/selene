@@ -1,7 +1,9 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.23.0...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.24.0...HEAD)
+
+## [0.24.0](https://github.com/Kampfkarren/selene/releases/tag/0.24.0) - 2023-01-10
 ### Added
 - Added new [`manual_table_clone` lint](https://kampfkarren.github.io/selene/lints/manual_table_clone.html), which will catch manual re-implementations of `table.clone` in Luau.
 - Added `filename` field to diagnostic message labels in JSON output, indicating for which file the message was generated (#453)

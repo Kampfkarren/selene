@@ -3,7 +3,7 @@
 members = ["selene", "selene-lib"]
 
 [workspace.package]
-version = "0.23.1"
+version = "0.24.0"
 authors = ["Kampfkarren <kampfkarren@gmail.com>"]
 edition = "2021"
 homepage = "https://kampfkarren.github.io/selene/"
