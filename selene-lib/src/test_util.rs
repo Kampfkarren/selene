@@ -64,7 +64,7 @@ pub fn test_full_run_config_with_output(
     let mut diagnostics = checker.test_on(&ast);
 
     let mut files = codespan::Files::new();
-    let source_id = files.add(format!("{}.lua", test_name), lua_source);
+    let source_id = files.add(format!("{test_name}.lua"), lua_source);
 
     diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.primary_label.range);
 

@@ -75,7 +75,7 @@ pub fn error(text: &str) {
         .unwrap();
     write!(&mut stderr, "ERROR: ").unwrap();
     stderr.reset().unwrap();
-    writeln!(&mut stderr, "{}", text).unwrap();
+    writeln!(&mut stderr, "{text}").unwrap();
 }
 
 fn log_total(parse_errors: usize, lint_errors: usize, lint_warnings: usize) -> io::Result<()> {
@@ -108,9 +108,9 @@ fn log_total_text(
             stdout.reset()?;
         }
 
-        write!(&mut stdout, "{}", number)?;
+        write!(&mut stdout, "{number}")?;
         stdout.reset()?;
-        writeln!(&mut stdout, " {}", label)
+        writeln!(&mut stdout, " {label}")
     };
 
     stat(lint_errors, "errors")?;
@@ -214,7 +214,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                         &CodespanDiagnostic {
                             severity: CodespanSeverity::Error,
                             code: Some("parse_error".to_owned()),
-                            message: format!("unexpected token `{}`", token),
+                            message: format!("unexpected token `{token}`"),
                             labels: vec![CodespanLabel::primary(
                                 source_id,
                                 codespan::Span::new(
@@ -244,10 +244,10 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                                 full_moon::tokenizer::TokenizerErrorType::UnexpectedToken(
                                     character,
                                 ) => {
-                                    format!("unexpected character {}", character)
+                                    format!("unexpected character {character}")
                                 }
                                 full_moon::tokenizer::TokenizerErrorType::InvalidSymbol(symbol) => {
-                                    format!("invalid symbol {}", symbol)
+                                    format!("invalid symbol {symbol}")
                                 }
                             },
                             labels: vec![CodespanLabel::primary(
@@ -738,7 +738,7 @@ mod tests {
             }
 
             Err(err) => {
-                panic!("selene --luacheck --fail files returned Err: {:?}", err);
+                panic!("selene --luacheck --fail files returned Err: {err:?}");
             }
         }
 

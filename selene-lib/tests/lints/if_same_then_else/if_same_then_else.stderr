@@ -1,5 +1,5 @@
 error[if_same_then_else]: this has the same block as a previous if
-  ┌─ if_same_then_else.lua:2:5
+  ┌─ if_same_then_else.lua:4:5
   │
 2 │     print(1)
   │     -------- note: same as this
@@ -8,7 +8,7 @@ error[if_same_then_else]: this has the same block as a previous if
   │     ^^^^^^^^
 
 error[if_same_then_else]: this has the same block as a previous if
-  ┌─ if_same_then_else.lua:2:5
+  ┌─ if_same_then_else.lua:6:5
   │
 2 │     print(1)
   │     -------- note: same as this
@@ -17,7 +17,7 @@ error[if_same_then_else]: this has the same block as a previous if
   │     ^^^^^^^^
 
 error[if_same_then_else]: this has the same block as a previous if
-   ┌─ if_same_then_else.lua:12:5
+   ┌─ if_same_then_else.lua:14:5
    │
 12 │     print(2)
    │     -------- note: same as this

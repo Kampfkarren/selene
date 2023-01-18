@@ -28,10 +28,7 @@ error[empty_if]: empty elseif block
 13 │ │ 
 14 │ │ 
 15 │ │ 
-16 │ │ 
-17 │ │ 
-18 │ │ 
-19 │ │ 
+   · │
 20 │ │ 
 21 │ │ else
    │ ╰^

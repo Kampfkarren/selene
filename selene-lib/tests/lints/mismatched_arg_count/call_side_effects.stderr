@@ -1,5 +1,5 @@
 error[mismatched_arg_count]: this function takes 3 arguments but at least 4 arguments were supplied
-  ┌─ call_side_effects.lua:1:16
+  ┌─ call_side_effects.lua:7:1
   │
 1 │ local function foo(a, b, c)
   │                --- note: function defined here
@@ -8,7 +8,7 @@ error[mismatched_arg_count]: this function takes 3 arguments but at least 4 argu
   │ ^^^^^^^^^^^^^^^^^^^^ expected 3 arguments
 
 error[mismatched_arg_count]: this function takes 3 arguments but at least 4 arguments were supplied
-   ┌─ call_side_effects.lua:1:16
+   ┌─ call_side_effects.lua:10:2
    │
  1 │ local function foo(a, b, c)
    │                --- note: function defined here
