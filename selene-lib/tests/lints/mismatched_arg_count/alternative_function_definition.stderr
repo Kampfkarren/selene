@@ -1,5 +1,5 @@
 error[mismatched_arg_count]: this function takes 2 arguments but 3 arguments were supplied
-  ┌─ alternative_function_definition.lua:1:10
+  ┌─ alternative_function_definition.lua:6:1
   │
 1 │ function foo(a, b)
   │          --- note: function defined here

@@ -1,5 +1,5 @@
 error[mismatched_arg_count]: this function takes 2 arguments but 3 arguments were supplied
-   ┌─ reassigned_variables.lua:14:17
+   ┌─ reassigned_variables.lua:18:2
    │
 14 │     local function foo(l, m)
    │                    --- note: function defined here

@@ -29,13 +29,13 @@ error[unused_variable]: unusedButBad is assigned a value, but never used
    │           ^^^^^^^^^^^^
 
 error[invalid_lint_filter]: global filters must come before any code
-   ┌─ lint_filtering.lua:4:1
+   ┌─ lint_filtering.lua:50:1
    │  
  4 │ ╭ local function a(x, y)
  5 │ │     local unusedHereToo = true
  6 │ │ end
    │ ╰───' global filter must be before this
-   ·  
+   · │
 50 │   --# selene: allow(unused_variable)
    │   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -52,7 +52,7 @@ error[unused_variable]: doD is assigned a value, but never used
    │                       ^^^
 
 error[invalid_lint_filter]: filter conflicts with a previous one for the same code
-   ┌─ lint_filtering.lua:76:1
+   ┌─ lint_filtering.lua:77:1
    │
 76 │ -- selene: allow(unused_variable)
    │ ---------------------------------- conflicts with this

@@ -256,8 +256,8 @@ impl PassedArgumentCount {
 impl Display for PassedArgumentCount {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            PassedArgumentCount::Fixed(amount) => write!(f, "{} arguments", amount),
-            PassedArgumentCount::Variable(amount) => write!(f, "at least {} arguments", amount),
+            PassedArgumentCount::Fixed(amount) => write!(f, "{amount} arguments"),
+            PassedArgumentCount::Variable(amount) => write!(f, "at least {amount} arguments"),
         }
     }
 }

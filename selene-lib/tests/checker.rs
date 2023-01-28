@@ -40,7 +40,7 @@ fn errors_with_bad_config() {
             assert_eq!(error.name, "empty_if");
             match error.problem {
                 CheckerErrorProblem::ConfigDeserializeError(_) => {}
-                other => panic!("error was not ConfigDeserializeError: {:?}", other),
+                other => panic!("error was not ConfigDeserializeError: {other:?}"),
             }
         }
 

@@ -1,5 +1,5 @@
 error[mismatched_arg_count]: this function takes 1 argument but 2 arguments were supplied
-   ┌─ shadowing_variables.lua:11:16
+   ┌─ shadowing_variables.lua:15:1
    │
 11 │ local function bar(a)
    │                --- note: function defined here

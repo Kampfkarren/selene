@@ -317,7 +317,7 @@ impl<'de> Visitor<'de> for ArgumentTypeVisitor {
             "string" => Ok(ArgumentType::String),
             "table" => Ok(ArgumentType::Table),
             "..." => Ok(ArgumentType::Vararg),
-            other => Err(de::Error::custom(format!("unknown type {}", other))),
+            other => Err(de::Error::custom(format!("unknown type {other}"))),
         }
     }
 }
@@ -333,11 +333,11 @@ impl fmt::Display for ArgumentType {
                 // TODO: This gets pretty ugly with a lot of variants
                 options
                     .iter()
-                    .map(|string| format!("\"{}\"", string))
+                    .map(|string| format!("\"{string}\""))
                     .collect::<Vec<_>>()
                     .join(", ")
             ),
-            ArgumentType::Display(display) => write!(formatter, "{}", display),
+            ArgumentType::Display(display) => write!(formatter, "{display}"),
             ArgumentType::Function => write!(formatter, "function"),
             ArgumentType::Nil => write!(formatter, "nil"),
             ArgumentType::Number => write!(formatter, "number"),

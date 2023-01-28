@@ -73,7 +73,7 @@ pub fn test_lint_config_with_output<
     );
 
     let mut files = codespan::Files::new();
-    let source_id = files.add(format!("{}.lua", test_name), lua_source);
+    let source_id = files.add(format!("{test_name}.lua"), lua_source);
 
     diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.range);
 

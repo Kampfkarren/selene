@@ -1,5 +1,5 @@
 error[duplicate_keys]: key `a` is already declared
-  ┌─ duplicate_keys.lua:2:2
+  ┌─ duplicate_keys.lua:4:2
   │
 2 │     a = true,
   │     -------- `a` originally declared here
@@ -8,7 +8,7 @@ error[duplicate_keys]: key `a` is already declared
   │     ^^^^^^^^^
 
 error[duplicate_keys]: key `a` is already declared
-   ┌─ duplicate_keys.lua:8:2
+   ┌─ duplicate_keys.lua:10:2
    │
  8 │     a = true,
    │     -------- `a` originally declared here
@@ -17,7 +17,7 @@ error[duplicate_keys]: key `a` is already declared
    │     ^^^^^^^^^
 
 error[duplicate_keys]: key `a` is already declared
-   ┌─ duplicate_keys.lua:8:2
+   ┌─ duplicate_keys.lua:12:2
    │
  8 │     a = true,
    │     -------- `a` originally declared here
@@ -26,7 +26,7 @@ error[duplicate_keys]: key `a` is already declared
    │     ^^^^^^^^^
 
 error[duplicate_keys]: key `a` is already declared
-   ┌─ duplicate_keys.lua:16:2
+   ┌─ duplicate_keys.lua:18:2
    │
 16 │     a = true,
    │     -------- `a` originally declared here

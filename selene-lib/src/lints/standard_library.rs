@@ -343,7 +343,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
 
                         self.diagnostics.push(Diagnostic::new_complete(
                             "incorrect_standard_library_use",
-                            format!("standard library global `{}` is not overridable", name,),
+                            format!("standard library global `{name}` is not overridable",),
                             Label::new((range.0.bytes(), range.1.bytes())),
                             Vec::new(),
                             Vec::new(),
