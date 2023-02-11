@@ -1,6 +1,6 @@
-use std::path::PathBuf;
+use std::path::Path;
 
-pub fn upgrade_std(filename: PathBuf) -> Result<(), Box<dyn std::error::Error>> {
+pub fn upgrade_std(filename: &Path) -> Result<(), Box<dyn std::error::Error>> {
     let output_filename = filename.with_extension("yml");
 
     if output_filename.exists() {
@@ -12,7 +12,7 @@ pub fn upgrade_std(filename: PathBuf) -> Result<(), Box<dyn std::error::Error>> 
     }
 
     let v1_std: selene_lib::standard_library::v1::StandardLibrary =
-        toml::from_str(&std::fs::read_to_string(&filename)?)?;
+        toml::from_str(&std::fs::read_to_string(filename)?)?;
 
     let modern_std: selene_lib::standard_library::StandardLibrary = v1_std.into();
 

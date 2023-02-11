@@ -87,9 +87,12 @@ impl Options {
 
 #[derive(Clone, Debug, PartialEq, Eq, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
-#[allow(clippy::enum_variant_names)]
 pub enum Command {
-    ValidateConfig,
+    ValidateConfig {
+        /// If set, will read from stdin, rather than from the config file
+        #[structopt(long)]
+        stdin: bool,
+    },
 
     #[cfg(feature = "roblox")]
     GenerateRobloxStd,

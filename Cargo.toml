@@ -12,3 +12,4 @@ repository = "https://github.com/Kampfkarren/selene"
 
 [workspace.dependencies]
 full_moon = "0.17.0"
+toml = "0.7.2"

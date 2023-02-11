@@ -7,7 +7,7 @@ export async function lintConfig(
     context: vscode.ExtensionContext,
     document: vscode.TextDocument,
     diagnosticsCollection: vscode.DiagnosticCollection,
-) {
+): Promise<void> {
     // TODO: Check version of selene
     if (
         document.languageId === "toml" &&
@@ -18,12 +18,12 @@ export async function lintConfig(
 
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri)
 
-    // TODO: Use stdin
     const output = await selene.seleneCommand(
         context.globalStorageUri,
-        "validate-config --display-style=json2",
+        "validate-config --display-style=json2 --stdin",
         selene.Expectation.Stderr,
         workspaceFolder,
+        document.getText(),
     )
 
     if (output === null) {
@@ -58,12 +58,15 @@ export async function lintConfig(
 
         const relativePath = path.relative(workspacePath, document.uri.fsPath)
 
-        if (relativePath !== output.source) {
+        if (relativePath !== output.source && output.source !== "-") {
             continue
         }
 
-        const range = output.location
-            ? document.lineAt(output.location.line).range
+        const range = output.range
+            ? new vscode.Range(
+                  document.positionAt(output.range.start),
+                  document.positionAt(output.range.end),
+              )
             : new vscode.Range(
                   document.lineAt(0).range.start,
                   document.lineAt(document.lineCount - 1).range.end,

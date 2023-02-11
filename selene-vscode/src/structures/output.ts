@@ -8,5 +8,8 @@ export type Output =
           type: "InvalidConfig"
           error: string
           source: string
-          location?: { line: number }
+          range?: {
+              start: number
+              end: number
+          }
       }

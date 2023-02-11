@@ -22,7 +22,7 @@ profiling = "1.0.6"
 regex = "1.6.0"
 serde = "1.0.144"
 serde_yaml = "0.8.24"
-toml = "0.5.9"
+toml.workspace = true
 
 [dev-dependencies]
 serde_json = "1.0"

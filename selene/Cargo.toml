@@ -31,7 +31,7 @@ serde_yaml = "0.8.24"
 structopt = "0.3"
 termcolor = "1.0"
 threadpool = "1.7"
-toml = "0.5"
+toml.workspace = true
 tracy-client = { version = "0.13.2", optional = true }
 ureq = { version = "2.4.0", features = ["json"], optional = true }
 

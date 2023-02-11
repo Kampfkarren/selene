@@ -399,9 +399,32 @@ fn start(mut options: opts::Options) {
         options.pattern.push(String::from("**/*.luau"));
     }
 
-    match options.command {
-        Some(opts::Command::ValidateConfig) => {
-            if let Err(error) = validate_config::validate_config(Path::new("selene.toml")) {
+    match &options.command {
+        Some(opts::Command::ValidateConfig { stdin }) => {
+            let (config_contents, config_path) = if *stdin {
+                let mut config_contents = String::new();
+
+                if let Err(error) = io::stdin().read_to_string(&mut config_contents) {
+                    error!("Error reading from stdin: {error}");
+                    std::process::exit(1);
+                }
+
+                (config_contents, Path::new("-"))
+            } else {
+                let config_path = Path::new("selene.toml");
+
+                let config_contents = match fs::read_to_string(config_path) {
+                    Ok(contents) => contents,
+                    Err(error) => {
+                        error!("Error reading config file: {error}");
+                        std::process::exit(1);
+                    }
+                };
+
+                (config_contents, config_path)
+            };
+
+            if let Err(error) = validate_config::validate_config(config_path, &config_contents) {
                 match options.display_style() {
                     opts::DisplayStyle::Json2 => {
                         json_output::print_json(json_output::JsonOutput::InvalidConfig(error));

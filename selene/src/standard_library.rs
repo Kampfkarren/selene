@@ -4,7 +4,6 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use color_eyre::eyre::Context;
 use selene_lib::{
     standard_library::{v1, StandardLibrary},
     CheckerConfig,
