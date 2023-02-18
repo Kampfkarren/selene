@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.24.0...HEAD)
+### Fixed
+- "Legacy" Roblox enums (such as Enum.RaycastFilterType.Whitelist/Blacklist) are now automatically created and marked as deprecated in generated standard libraries.
 
 ## [0.24.0](https://github.com/Kampfkarren/selene/releases/tag/0.24.0) - 2023-01-10
 ### Added

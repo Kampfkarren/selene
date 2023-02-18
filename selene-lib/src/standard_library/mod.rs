@@ -424,6 +424,10 @@ impl Field {
             deprecated: None,
         }
     }
+
+    pub fn with_deprecated(self, deprecated: Option<Deprecated>) -> Self {
+        Self { deprecated, ..self }
+    }
 }
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]

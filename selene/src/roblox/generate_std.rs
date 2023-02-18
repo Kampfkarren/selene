@@ -226,6 +226,20 @@ impl RobloxGenerator {
                     format!("Enum.{}.{}", enuhm.name, item.name),
                     Field::from_field_kind(FieldKind::Struct("EnumItem".to_owned())),
                 );
+
+                for legacy_name in &item.legacy_names {
+                    self.std.globals.insert(
+                        format!("Enum.{}.{}", enuhm.name, legacy_name),
+                        Field::from_field_kind(FieldKind::Struct("EnumItem".to_owned()))
+                            .with_deprecated(Some(Deprecated {
+                                message: format!(
+                                    "Enum.{}.{} was replaced with Enum.{}.{}",
+                                    enuhm.name, legacy_name, enuhm.name, item.name
+                                ),
+                                replace: vec![format!("Enum.{}.{}", enuhm.name, item.name)],
+                            })),
+                    );
+                }
             }
         }
     }
