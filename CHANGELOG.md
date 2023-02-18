@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Added `CFrame.fromEulerAngles` to the Roblox standard library.
 
+### Fixed
+- "Legacy" Roblox enums (such as Enum.RaycastFilterType.Whitelist/Blacklist) are now automatically created and marked as deprecated in generated standard libraries.
+
 ## [0.24.0](https://github.com/Kampfkarren/selene/releases/tag/0.24.0) - 2023-01-10
 ### Added
 - Added new [`manual_table_clone` lint](https://kampfkarren.github.io/selene/lints/manual_table_clone.html), which will catch manual re-implementations of `table.clone` in Luau.
