@@ -248,12 +248,6 @@ globals:
       - required: false
         type: number
     must_use: true
-  Enum.Font.GothamSemibold:
-    deprecated:
-      message: "Enum.Font.GothamSemibold was replaced with Enum.Font.GothamMedium"
-      replace:
-        - "Enum.Font.GothamMedium"
-    property: read-only
   Enum.GetEnums:
     args: []
     method: true
