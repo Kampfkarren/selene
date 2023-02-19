@@ -1,12 +1,14 @@
 use std::{borrow::Cow, collections::HashSet};
 
 use full_moon::{
-    ast,
+    ast::{self, VarExpression},
     node::Node,
     tokenizer::{Symbol, TokenKind, TokenReference, TokenType},
     visitors::Visitor,
 };
 use id_arena::{Arena, Id};
+
+use crate::ast_util::extract_static_token;
 
 use super::expression_to_ident;
 
@@ -86,12 +88,49 @@ pub struct Reference {
     pub read: bool,
     pub write: Option<ReferenceWrite>,
     pub within_function_stmt: Option<WithinFunctionStmt>,
+
+    // x.y["z"] produces ["y", "z"]
+    // x.y.z().w is None currently, but could change if necessary.
+    // If that change is made, ensure unused_variable is adjusted for write_only.
+    pub indexing: Option<Vec<IndexEntry>>,
+}
+
+impl Reference {
+    // TODO: Does this fix the duping issue?
+    pub fn merge(&mut self, other_reference: Reference) {
+        assert_eq!(self.name, other_reference.name);
+        assert_eq!(self.identifier, other_reference.identifier);
+        assert_eq!(self.scope_id, other_reference.scope_id);
+
+        self.read |= other_reference.read;
+
+        if let Some(write) = other_reference.write {
+            assert!(self.write.is_none());
+            self.write = Some(write);
+        }
+
+        if let Some(indexing) = other_reference.indexing {
+            assert!(self.indexing.is_none());
+            self.indexing = Some(indexing);
+        }
+
+        if let Some(within_function_stmt) = other_reference.within_function_stmt {
+            assert!(self.within_function_stmt.is_none());
+            self.within_function_stmt = Some(within_function_stmt);
+        }
+    }
 }
 
 #[derive(Debug)]
 pub struct WithinFunctionStmt {
     pub function_call_stmt_id: Id<FunctionCallStmt>,
     pub argument_index: usize,
+}
+
+#[derive(Debug)]
+pub struct IndexEntry {
+    pub index: Range,
+    pub static_name: Option<TokenReference>,
 }
 
 #[derive(Debug, Default)]
@@ -414,6 +453,7 @@ impl ScopeVisitor {
                     write: None,
                     write_expr: None,
                     within_function_stmt: None,
+                    indexing: None,
                 },
             );
         }
@@ -452,6 +492,8 @@ impl ScopeVisitor {
         match var {
             ast::Var::Expression(var_expr) => {
                 self.read_prefix(var_expr.prefix());
+                self.adjust_indexing(var_expr);
+
                 for suffix in var_expr.suffixes() {
                     self.read_suffix(suffix);
                 }
@@ -485,6 +527,7 @@ impl ScopeVisitor {
                     write: Some(write),
                     write_expr,
                     within_function_stmt: None,
+                    indexing: None,
                 },
             );
         }
@@ -556,6 +599,23 @@ impl ScopeVisitor {
     }
 
     fn reference_variable(&mut self, name: &str, mut reference: Reference) {
+        {
+            let existing_reference =
+                self.scope_manager
+                    .references
+                    .iter_mut()
+                    .find(|(_, current_reference)| {
+                        current_reference.name == name
+                            && current_reference.identifier == reference.identifier
+                            && current_reference.scope_id == reference.scope_id
+                    });
+
+            if let Some((_, existing_reference)) = existing_reference {
+                existing_reference.merge(reference);
+                return;
+            }
+        }
+
         let reference_id = if let Some((variable, _)) = self.find_variable(name) {
             reference.resolved = Some(variable);
 
@@ -641,6 +701,50 @@ impl ScopeVisitor {
         }
     }
 
+    fn adjust_indexing(&mut self, var_expr: &VarExpression) {
+        let mut index_entries = Vec::new();
+
+        for suffix in var_expr.suffixes() {
+            #[cfg_attr(
+                feature = "force_exhaustive_checks",
+                deny(non_exhaustive_omitted_patterns)
+            )]
+            let static_name = match suffix {
+                ast::Suffix::Call(_) => {
+                    return;
+                }
+
+                ast::Suffix::Index(ast::Index::Brackets { expression, .. }) => {
+                    extract_static_token(expression)
+                }
+
+                ast::Suffix::Index(ast::Index::Dot { name, .. }) => Some(name),
+
+                _ => {
+                    return;
+                }
+            };
+
+            index_entries.push(IndexEntry {
+                index: range(suffix),
+                static_name: static_name.cloned(),
+            })
+        }
+
+        if index_entries.is_empty() {
+            return;
+        }
+
+        let Some(reference) = self.scope_manager.reference_at_byte_mut(range(var_expr).0) else {
+            return;
+        };
+
+        // TODO: If we can't do this, check first
+        // assert!(reference.indexing.is_none());
+
+        reference.indexing = Some(index_entries);
+    }
+
     fn open_scope<N: Node>(&mut self, node: N) {
         let scope = create_scope(node).unwrap_or_default();
         let scope_id = self.scope_manager.scopes.alloc(scope);
@@ -666,19 +770,21 @@ impl Visitor for ScopeVisitor {
                 self.read_expression(expression);
             }
 
+            // Only read the variable if it's not a simple name (a.b, but not a)
             #[cfg_attr(
                 feature = "force_exhaustive_checks",
                 deny(non_exhaustive_omitted_patterns)
             )]
             let name = match var {
                 ast::Var::Expression(var_expr) => match var_expr.prefix() {
-                    ast::Prefix::Expression(expression) => {
-                        self.read_expression(expression);
+                    ast::Prefix::Expression(_) => {
+                        self.read_var(var);
                         continue;
                     }
 
                     ast::Prefix::Name(name) => {
                         if var_expr.suffixes().next().is_some() {
+                            self.read_var(var);
                             self.read_name(name);
                         }
 
@@ -1002,5 +1108,44 @@ impl Visitor for ScopeVisitor {
         if let ast::types::TypeInfo::Module { module, .. } = type_info {
             self.read_name(module);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn scope_manager_from_code(code: &str) -> ScopeManager {
+        ScopeManager::new(&full_moon::parse(code).unwrap())
+    }
+
+    #[test]
+    fn indexing() {
+        fn test_indexing(code: &str, expected: &[Option<&str>]) {
+            fn test_equal(code: &str, byte: usize, expected: &[Option<&str>]) {
+                let scope_manager = scope_manager_from_code(code);
+
+                assert_eq!(
+                    expected
+                        .iter()
+                        .map(|x| x.map(|x| x.to_string()))
+                        .collect::<Vec<_>>(),
+                    scope_manager
+                        .reference_at_byte(byte)
+                        .unwrap()
+                        .indexing
+                        .as_ref()
+                        .expect("indexing was None")
+                        .iter()
+                        .map(|index| index.static_name.as_ref().map(|token| token.to_string()))
+                        .collect::<Vec<Option<String>>>()
+                );
+            }
+
+            test_equal(&format!("_={code}"), 2, expected);
+            test_equal(&format!("{code}=1"), 0, expected);
+        }
+
+        test_indexing("x.y.z", &[Some("y"), Some("z")]);
     }
 }
