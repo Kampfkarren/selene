@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 - "Legacy" Roblox enums (such as Enum.RaycastFilterType.Whitelist/Blacklist) are now automatically created and marked as deprecated in generated standard libraries.
+- Fixed a bug where `manual_table_clone` would incorrectly lint code in loops. ([#479](https://github.com/Kampfkarren/selene/issues/479))
 
 ## [0.24.0](https://github.com/Kampfkarren/selene/releases/tag/0.24.0) - 2023-01-10
 ### Added
