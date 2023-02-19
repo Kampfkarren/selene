@@ -73,11 +73,28 @@ impl Lint for UnusedVariableLint {
             // We need to make sure that references that are marked as "read" aren't only being read in an "observes: write" context.
             let analyzed_references = references
                 .map(|reference| {
+                    let is_static_table =
+                        matches!(variable.value, Some(AssignedValue::StaticTable { .. }));
+
                     if reference.write.is_some() {
-                        return AnalyzedReference::PlainWrite;
+                        if let Some(indexing) = &reference.indexing {
+                            if is_static_table
+                                && indexing.len() == 1 // This restriction can be lifted someday, but only once we can verify that the value has no side effects/is its own static table
+                                && indexing.iter().any(|index| index.static_name.is_some())
+                            {
+                                return AnalyzedReference::ObservedWrite(Label::new_with_message(
+                                    reference.identifier,
+                                    format!("`{}` is only getting written to", variable.name),
+                                ));
+                            }
+                        }
+
+                        if !reference.read {
+                            return AnalyzedReference::PlainWrite;
+                        }
                     }
 
-                    if !matches!(variable.value, Some(AssignedValue::StaticTable { .. })) {
+                    if !is_static_table {
                         return AnalyzedReference::Read;
                     }
 
@@ -274,15 +291,6 @@ mod tests {
     }
 
     #[test]
-    fn test_objects() {
-        test_lint(
-            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
-            "unused_variable",
-            "objects",
-        );
-    }
-
-    #[test]
     fn test_observes() {
         test_lint(
             UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
@@ -347,6 +355,15 @@ mod tests {
             UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "types",
+        );
+    }
+
+    #[test]
+    fn test_write_only() {
+        test_lint(
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
+            "unused_variable",
+            "write_only",
         );
     }
 }
