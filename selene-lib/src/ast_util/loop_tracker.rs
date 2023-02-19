@@ -56,11 +56,11 @@ struct LoopTrackerVisitor {
 
 impl LoopTrackerVisitor {
     fn add_loop_depth(&mut self, node: impl Node) {
+        self.depth += 1;
+
         let Some((start, _)) = node.range() else {
             return;
         };
-
-        self.depth += 1;
 
         self.loop_depths.push(LoopDepth {
             byte: start.bytes(),
@@ -69,11 +69,11 @@ impl LoopTrackerVisitor {
     }
 
     fn remove_loop_depth(&mut self, node: impl Node) {
+        self.depth -= 1;
+
         let Some((_, end)) = node.range() else {
             return;
         };
-
-        self.depth -= 1;
 
         self.loop_depths.push(LoopDepth {
             byte: end.bytes(),
