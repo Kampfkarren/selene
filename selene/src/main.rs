@@ -435,8 +435,11 @@ fn start(mut options: opts::Options) {
                     }
 
                     opts::DisplayStyle::Rich => {
-                        // eprintln!("{}", error.rich_output());
-                        todo!("Rich output for invalid config");
+                        let stdout = termcolor::StandardStream::stdout(get_color());
+                        let mut stdout = stdout.lock();
+                        error
+                            .write_rich_output(&mut stdout)
+                            .expect("can't write to stdout");
                     }
 
                     opts::DisplayStyle::Json | opts::DisplayStyle::Quiet => {}
