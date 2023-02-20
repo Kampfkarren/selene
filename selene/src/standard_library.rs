@@ -103,7 +103,6 @@ pub fn collect_standard_library<V>(
                     collect_roblox_standard_library(config, directory)
                         .map_err(StandardLibraryError::Roblox)?
                 } else {
-                    // TODO: Make sure this is equivalent to the old behavior
                     return Err(StandardLibraryError::NotFound {
                         name: segment.to_owned(),
                     });
