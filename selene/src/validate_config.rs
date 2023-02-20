@@ -224,6 +224,6 @@ mod tests {
             }
         }
 
-        assert!(tests_pass);
+        assert!(tests_pass, "validate_config tests failed: rerun with --nocapture to see output");
     }
 }
