@@ -1,0 +1,6 @@
+error: failed to collect base standard library `not_found`
+  ┌─ selene.toml:1:1
+  │
+1 │ std = "std"
+  │ ^^^^^^^^^^^
+

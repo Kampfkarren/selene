@@ -971,6 +971,7 @@ dependencies = [
  "globset",
  "lazy_static",
  "num_cpus",
+ "pretty_assertions",
  "profiling",
  "selene-lib",
  "serde",

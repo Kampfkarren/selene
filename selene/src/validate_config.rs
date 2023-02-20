@@ -10,9 +10,17 @@ use crate::standard_library::StandardLibraryError;
 
 #[derive(Debug, Serialize)]
 pub struct InvalidConfigError {
-    error: String,
+    #[serde(serialize_with = "serialize_standard_library_error_to_string")]
+    error: StandardLibraryError,
     source: PathBuf,
     range: Option<ErrorRange>,
+}
+
+fn serialize_standard_library_error_to_string<S: serde::Serializer>(
+    error: &StandardLibraryError,
+    serializer: S,
+) -> Result<S::Ok, S::Error> {
+    serializer.collect_str(&error.to_string())
 }
 
 #[derive(Debug, Serialize)]
@@ -22,8 +30,39 @@ pub struct ErrorRange {
 }
 
 impl InvalidConfigError {
-    pub fn rich_output(self) -> String {
-        todo!("rich output for InvalidConfigError")
+    pub fn write_rich_output(
+        &self,
+        writer: &mut impl termcolor::WriteColor,
+    ) -> std::io::Result<()> {
+        let codespan_files = codespan_reporting::files::SimpleFile::new(
+            self.source
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .to_string(),
+            std::fs::read_to_string(&self.source)?,
+        );
+
+        let mut diagnostic = codespan_reporting::diagnostic::Diagnostic::error()
+            .with_message(self.error.to_string());
+
+        if let Some(range) = &self.range {
+            diagnostic =
+                diagnostic.with_labels(vec![codespan_reporting::diagnostic::Label::primary(
+                    (),
+                    range.start..range.end,
+                )]);
+        }
+
+        codespan_reporting::term::emit(
+            writer,
+            &codespan_reporting::term::Config::default(),
+            &codespan_files,
+            &diagnostic,
+        )
+        .expect("todo: figure out the error type");
+
+        Ok(())
     }
 }
 
@@ -45,10 +84,10 @@ impl From<serde_yaml::Location> for ErrorRange {
     }
 }
 
-// TODO: Test
 pub fn validate_config(
     config_path: &Path,
     config_contents: &str,
+    directory: &Path,
 ) -> Result<(), InvalidConfigError> {
     let config_path_absolute = match config_path.canonicalize() {
         Ok(path) => path,
@@ -59,9 +98,12 @@ pub fn validate_config(
         Ok(config) => config,
         Err(error) => {
             return Err(InvalidConfigError {
-                error: error.to_string(),
                 source: config_path.to_path_buf(),
                 range: error.span().map(Into::into),
+                error: StandardLibraryError::Toml {
+                    source: error,
+                    path: config_path.to_path_buf(),
+                },
             });
         }
     };
@@ -75,49 +117,110 @@ pub fn validate_config(
         ErrorRange { start, end }
     });
 
-    match crate::standard_library::collect_standard_library(
-        &config,
-        config.std(),
-        &std::env::current_dir().unwrap(),
-        &None,
-    ) {
-        Ok(_) => Ok(()),
+    let Err(error) = crate::standard_library::collect_standard_library(&config, config.std(), directory, &None) else {
+        return Ok(());
+    };
 
-        Err(StandardLibraryError::BaseStd { source, .. }) => Err(InvalidConfigError {
-            error: source.to_string(),
+    match error {
+        StandardLibraryError::BaseStd { .. } => Err(InvalidConfigError {
+            error,
             source: config_path_absolute,
             range: std_range,
         }),
 
-        // TODO: This triggers for bad `base` too
-        Err(error @ StandardLibraryError::NotFound { .. }) => Err(InvalidConfigError {
-            error: error.to_string(),
+        StandardLibraryError::NotFound { .. } => Err(InvalidConfigError {
             source: config_path_absolute,
             range: std_range,
+            error,
         }),
 
-        Err(StandardLibraryError::Io { source, path }) => Err(InvalidConfigError {
-            error: source.to_string(),
-            source: path,
+        StandardLibraryError::Io { ref path, .. } => Err(InvalidConfigError {
+            source: path.clone(),
             range: None,
+            error,
         }),
 
-        Err(StandardLibraryError::Roblox(report)) => Err(InvalidConfigError {
-            error: report.to_string(),
+        StandardLibraryError::Roblox(..) => Err(InvalidConfigError {
             source: config_path_absolute,
             range: std_range,
+            error,
         }),
 
-        Err(StandardLibraryError::Toml { source, path }) => Err(InvalidConfigError {
-            error: source.to_string(),
-            source: path,
+        StandardLibraryError::Toml {
+            ref source,
+            ref path,
+        } => Err(InvalidConfigError {
+            source: path.clone(),
             range: source.span().map(Into::into),
+            error,
         }),
 
-        Err(StandardLibraryError::Yml { source, path }) => Err(InvalidConfigError {
-            error: source.to_string(),
-            source: path,
+        StandardLibraryError::Yml {
+            ref source,
+            ref path,
+        } => Err(InvalidConfigError {
+            source: path.clone(),
             range: source.location().map(Into::into),
+            error,
         }),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validate_config_tests() {
+        let mut tests_pass = true;
+
+        for validate_config_test in std::fs::read_dir("./tests/validate_config").unwrap() {
+            let validate_config_test = validate_config_test.unwrap();
+
+            let config_path = validate_config_test.path().join("selene.toml");
+            let config_contents = std::fs::read_to_string(&config_path).unwrap();
+
+            let Err(validate_result) =
+                validate_config(&config_path, &config_contents, &validate_config_test.path())
+                else {
+                    tests_pass = false;
+
+                    eprintln!(
+                        "{} did not error",
+                        validate_config_test.file_name().to_string_lossy()
+                    );
+
+                    continue;
+                };
+
+            let mut rich_output_buffer = termcolor::NoColor::new(Vec::new());
+            validate_result
+                .write_rich_output(&mut rich_output_buffer)
+                .unwrap();
+            let rich_output = String::from_utf8(rich_output_buffer.into_inner()).unwrap();
+
+            let expected_rich_output =
+                std::fs::read_to_string(validate_config_test.path().join("rich_output.txt"));
+
+            if let Ok(expected_rich_output) = expected_rich_output {
+                if rich_output != expected_rich_output {
+                    tests_pass = false;
+
+                    eprintln!(
+                        "validate_config test failed: {}\n{}",
+                        validate_config_test.file_name().to_string_lossy(),
+                        pretty_assertions::StrComparison::new(&rich_output, &expected_rich_output)
+                    );
+                }
+            } else {
+                std::fs::write(
+                    validate_config_test.path().join("rich_output.txt"),
+                    rich_output,
+                )
+                .unwrap();
+            }
+        }
+
+        assert!(tests_pass);
     }
 }

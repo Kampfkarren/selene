@@ -424,14 +424,19 @@ fn start(mut options: opts::Options) {
                 (config_contents, config_path)
             };
 
-            if let Err(error) = validate_config::validate_config(config_path, &config_contents) {
+            if let Err(error) = validate_config::validate_config(
+                config_path,
+                &config_contents,
+                &std::env::current_dir().unwrap(),
+            ) {
                 match options.display_style() {
                     opts::DisplayStyle::Json2 => {
                         json_output::print_json(json_output::JsonOutput::InvalidConfig(error));
                     }
 
                     opts::DisplayStyle::Rich => {
-                        eprintln!("{}", error.rich_output());
+                        // eprintln!("{}", error.rich_output());
+                        todo!("Rich output for invalid config");
                     }
 
                     opts::DisplayStyle::Json | opts::DisplayStyle::Quiet => {}

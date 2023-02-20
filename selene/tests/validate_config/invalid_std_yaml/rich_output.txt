@@ -1,0 +1,6 @@
+error: failed to find standard library: std
+  ┌─ selene.toml:1:1
+  │
+1 │ std = "std"
+  │ ^^^^^^^^^^^
+

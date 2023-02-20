@@ -71,8 +71,9 @@ impl Display for StandardLibraryError {
             StandardLibraryError::Toml { source, path } => {
                 write!(
                     formatter,
-                    "failed to parse toml file `{}`: {source}",
+                    "failed to parse toml file `{}`: {}",
                     path.display(),
+                    source.message(),
                 )
             }
 

@@ -1,0 +1,6 @@
+error: failed to parse toml file `./tests/validate_config/invalid_std_toml/std.toml`: invalid type: boolean `true`, expected struct FieldSerde
+  ┌─ std.toml:1:1
+  │
+1 │ what = true
+  │ ^^^^^^^^^^^
+
