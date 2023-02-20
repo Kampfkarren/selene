@@ -1,5 +1,5 @@
 error[mismatched_arg_count]: this function takes 1 argument but 2 arguments were supplied
-   ┌─ multiple_definition_locations.lua:1:1
+   ┌─ multiple_definition_locations.lua:11:1
    │
  1 │ local dispatch
    │ -------------- note: function defined here

@@ -48,10 +48,9 @@ impl fmt::Display for CheckerError {
         match &self.problem {
             ConfigDeserializeError(error) => write!(
                 formatter,
-                "Configuration was incorrectly formatted: {}",
-                error
+                "Configuration was incorrectly formatted: {error}"
             ),
-            LintNewError(error) => write!(formatter, "{}", error),
+            LintNewError(error) => write!(formatter, "{error}"),
         }
     }
 }

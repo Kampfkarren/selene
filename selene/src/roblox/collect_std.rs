@@ -29,7 +29,9 @@ pub fn collect_roblox_standard_library<V>(
                 ))?;
 
                 if (chrono::Local::now()
-                    - chrono::Local.timestamp(library.last_updated.unwrap_or(0), 0))
+                    - chrono::Local
+                        .timestamp_opt(library.last_updated.unwrap_or(0), 0)
+                        .unwrap())
                 .num_hours()
                     < HOUR_CACHE
                     && library.last_selene_version.as_deref() == Some(env!("CARGO_PKG_VERSION"))

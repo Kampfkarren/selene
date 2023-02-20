@@ -144,14 +144,14 @@ impl fmt::Display for StandardLibraryError {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         match self {
             StandardLibraryError::DeserializeTomlError(error) => {
-                write!(formatter, "deserialize toml error: {}", error)
+                write!(formatter, "deserialize toml error: {error}")
             }
 
             StandardLibraryError::DeserializeYamlError(error) => {
-                write!(formatter, "deserialize yaml error: {}", error)
+                write!(formatter, "deserialize yaml error: {error}")
             }
 
-            StandardLibraryError::IoError(error) => write!(formatter, "io error: {}", error),
+            StandardLibraryError::IoError(error) => write!(formatter, "io error: {error}"),
         }
     }
 }
@@ -423,6 +423,10 @@ impl Field {
             field_kind,
             deprecated: None,
         }
+    }
+
+    pub fn with_deprecated(self, deprecated: Option<Deprecated>) -> Self {
+        Self { deprecated, ..self }
     }
 }
 
@@ -698,7 +702,7 @@ impl<'de> Visitor<'de> for ArgumentTypeVisitor {
             "string" => Ok(ArgumentType::String),
             "table" => Ok(ArgumentType::Table),
             "..." => Ok(ArgumentType::Vararg),
-            other => Err(de::Error::custom(format!("unknown type {}", other))),
+            other => Err(de::Error::custom(format!("unknown type {other}"))),
         }
     }
 }
@@ -714,11 +718,11 @@ impl fmt::Display for ArgumentType {
                 // TODO: This gets pretty ugly with a lot of variants
                 options
                     .iter()
-                    .map(|string| format!("\"{}\"", string))
+                    .map(|string| format!("\"{string}\""))
                     .collect::<Vec<_>>()
                     .join(", ")
             ),
-            ArgumentType::Display(display) => write!(formatter, "{}", display),
+            ArgumentType::Display(display) => write!(formatter, "{display}"),
             ArgumentType::Function => write!(formatter, "function"),
             ArgumentType::Nil => write!(formatter, "nil"),
             ArgumentType::Number => write!(formatter, "number"),

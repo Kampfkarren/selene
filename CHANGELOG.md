@@ -1,13 +1,22 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.23.0...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.24.0...HEAD)
+### Added
+- Added `CFrame.fromEulerAngles` to the Roblox standard library.
+
+### Fixed
+- "Legacy" Roblox enums (such as Enum.RaycastFilterType.Whitelist/Blacklist) are now automatically created and marked as deprecated in generated standard libraries.
+- Fixed a bug where `manual_table_clone` would incorrectly lint code in loops. ([#479](https://github.com/Kampfkarren/selene/issues/479))
+
+## [0.24.0](https://github.com/Kampfkarren/selene/releases/tag/0.24.0) - 2023-01-10
 ### Added
 - Added new [`manual_table_clone` lint](https://kampfkarren.github.io/selene/lints/manual_table_clone.html), which will catch manual re-implementations of `table.clone` in Luau.
 - Added `filename` field to diagnostic message labels in JSON output, indicating for which file the message was generated (#453)
 
 ### Changed
 - Improved the error message for using a standard library that can be detected as outdated.
+- Updated internal parser, giving support for string interpolation for Luau and fixing some parsing bugs.
 
 ### Fixed
 - Fixed "library" being typo'd as "libary" in the error when finding a usage.

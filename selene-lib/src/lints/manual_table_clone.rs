@@ -3,7 +3,9 @@ use full_moon::{
     visitors::Visitor,
 };
 
-use crate::ast_util::{expression_to_ident, range, scopes::AssignedValue, strip_parentheses};
+use crate::ast_util::{
+    expression_to_ident, range, scopes::AssignedValue, strip_parentheses, LoopTracker,
+};
 
 use super::*;
 use std::convert::Infallible;
@@ -21,7 +23,6 @@ impl Lint for ManualTableCloneLint {
         Ok(ManualTableCloneLint)
     }
 
-    // TODO: Check if table.clone is available
     fn pass(&self, ast: &Ast, context: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
         if context
             .standard_library
@@ -33,6 +34,7 @@ impl Lint for ManualTableCloneLint {
 
         let mut visitor = ManualTableCloneVisitor {
             matches: Vec::new(),
+            loop_tracker: LoopTracker::new(ast),
             scope_manager: &ast_context.scope_manager,
             stmt_begins: Vec::new(),
         };
@@ -90,6 +92,7 @@ impl ManualTableCloneMatch {
 
 struct ManualTableCloneVisitor<'ast> {
     matches: Vec<ManualTableCloneMatch>,
+    loop_tracker: LoopTracker,
     scope_manager: &'ast ScopeManager,
     stmt_begins: Vec<usize>,
 }
@@ -371,6 +374,12 @@ impl Visitor for ManualTableCloneVisitor<'_> {
 
         let (position_start, position_end) = range(node);
 
+        if self.loop_tracker.depth_at_byte(position_start)
+            != self.loop_tracker.depth_at_byte(*definition_start)
+        {
+            return;
+        }
+
         let only_use_loop_range = self
             .statement_in_way_of_definition(*definition_end, position_start)
             || has_filter_comment(node);
@@ -425,5 +434,18 @@ mod tests {
             TestUtilConfig::default(),
             "no_table_clone.stderr",
         );
+    }
+
+    #[test]
+    fn test_false_positive() {
+        test_lint_config(
+            ManualTableCloneLint::new(()).unwrap(),
+            "manual_table_clone",
+            "false_positive",
+            TestUtilConfig {
+                standard_library: StandardLibrary::from_name("luau").unwrap(),
+                ..Default::default()
+            },
+        )
     }
 }

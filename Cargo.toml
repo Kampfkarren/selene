@@ -3,7 +3,7 @@
 members = ["selene", "selene-lib"]
 
 [workspace.package]
-version = "0.23.1"
+version = "0.24.0"
 authors = ["Kampfkarren <kampfkarren@gmail.com>"]
 edition = "2021"
 homepage = "https://kampfkarren.github.io/selene/"
@@ -13,3 +13,6 @@ repository = "https://github.com/Kampfkarren/selene"
 [workspace.dependencies]
 full_moon = "0.17.0"
 toml = "0.7.2"
+
+# Do not update this without confirming profiling uses the same version of tracy-client as selene
+profiling = "1.0.7"

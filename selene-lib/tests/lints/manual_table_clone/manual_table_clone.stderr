@@ -80,7 +80,7 @@ error[manual_table_clone]: manual implementation of table.clone
    = try `local new9 = table.clone(what(stuff))`
 
 error[manual_table_clone]: manual implementation of table.clone
-    ┌─ manual_table_clone.lua:105:1
+    ┌─ manual_table_clone.lua:108:1
     │  
 105 │   local new19 = {}
     │   ---------------- remove this definition

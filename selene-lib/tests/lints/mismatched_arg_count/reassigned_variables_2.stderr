@@ -1,5 +1,5 @@
 error[mismatched_arg_count]: this function takes 3 arguments but 4 arguments were supplied
-   ┌─ reassigned_variables_2.lua:1:16
+   ┌─ reassigned_variables_2.lua:11:1
    │
  1 │ local function foo(a, b, c)
    │                --- note: function defined here
@@ -11,7 +11,7 @@ error[mismatched_arg_count]: this function takes 3 arguments but 4 arguments wer
    │ ^^^^^^^^^^^^^^^ expected 3 arguments
 
 error[mismatched_arg_count]: this function takes 3 arguments but 4 arguments were supplied
-   ┌─ reassigned_variables_2.lua:1:16
+   ┌─ reassigned_variables_2.lua:13:1
    │
  1 │ local function foo(a, b, c)
    │                --- note: function defined here

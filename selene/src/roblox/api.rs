@@ -234,4 +234,7 @@ pub struct ApiEnum {
 #[serde(rename_all = "PascalCase")]
 pub struct ApiEnumItem {
     pub name: String,
+
+    #[serde(default)]
+    pub legacy_names: Vec<String>,
 }
