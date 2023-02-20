@@ -1,4 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+};
 
 use selene_lib::CheckerConfig;
 use serde::Serialize;
@@ -42,31 +45,17 @@ impl From<serde_yaml::Location> for ErrorRange {
     }
 }
 
-fn range_of_roblox(config_contents: &str) -> Option<ErrorRange> {
-    let mut offset = 0;
-
-    for line in config_contents.lines() {
-        if !line.contains("roblox") {
-            offset += line.len() + 1;
-            continue;
-        }
-
-        // this is stupid and ideally we would be ast aware (which toml crate VERY much allows)
-        return Some(ErrorRange {
-            start: offset,
-            end: offset + line.len(),
-        });
-    }
-
-    None
-}
-
 // TODO: Test
 pub fn validate_config(
     config_path: &Path,
     config_contents: &str,
 ) -> Result<(), InvalidConfigError> {
-    let config = match toml::from_str::<CheckerConfig<toml::Value>>(&config_contents) {
+    let config_path_absolute = match config_path.canonicalize() {
+        Ok(path) => path,
+        Err(_) => config_path.to_path_buf(),
+    };
+
+    let config = match toml::from_str::<CheckerConfig<toml::Value>>(config_contents) {
         Ok(config) => config,
         Err(error) => {
             return Err(InvalidConfigError {
@@ -76,6 +65,15 @@ pub fn validate_config(
             });
         }
     };
+
+    let spanned_config = toml::from_str::<HashMap<toml::Spanned<String>, toml::Spanned<toml::Value>>>(config_contents).expect("we should always be able to deserialize into a table if we can deserialize into a CheckerConfig");
+
+    let std_range = spanned_config.get_key_value("std").map(|(key, value)| {
+        let start = key.span().start;
+        let end = value.span().end;
+
+        ErrorRange { start, end }
+    });
 
     match crate::standard_library::collect_standard_library(
         &config,
@@ -87,8 +85,15 @@ pub fn validate_config(
 
         Err(StandardLibraryError::BaseStd { source, .. }) => Err(InvalidConfigError {
             error: source.to_string(),
-            source: config_path.to_path_buf(),
-            range: None,
+            source: config_path_absolute,
+            range: std_range,
+        }),
+
+        // TODO: This triggers for bad `base` too
+        Err(error @ StandardLibraryError::NotFound { .. }) => Err(InvalidConfigError {
+            error: error.to_string(),
+            source: config_path_absolute,
+            range: std_range,
         }),
 
         Err(StandardLibraryError::Io { source, path }) => Err(InvalidConfigError {
@@ -99,8 +104,8 @@ pub fn validate_config(
 
         Err(StandardLibraryError::Roblox(report)) => Err(InvalidConfigError {
             error: report.to_string(),
-            source: config_path.to_path_buf(),
-            range: range_of_roblox(config_contents),
+            source: config_path_absolute,
+            range: std_range,
         }),
 
         Err(StandardLibraryError::Toml { source, path }) => Err(InvalidConfigError {

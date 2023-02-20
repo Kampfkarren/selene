@@ -1,4 +1,3 @@
-import * as path from "path"
 import * as vscode from "vscode"
 import * as selene from "./selene"
 import { Output } from "./structures/output"
@@ -8,7 +7,7 @@ export async function lintConfig(
     document: vscode.TextDocument,
     diagnosticsCollection: vscode.DiagnosticCollection,
 ): Promise<void> {
-    // TODO: Check version of selene
+    // TODO: Check version of selene, to see if it supports it
     if (
         document.languageId === "toml" &&
         !document.uri.path.endsWith("selene.toml")
@@ -18,9 +17,11 @@ export async function lintConfig(
 
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri)
 
+    const tomlSource = document.languageId === "toml" ? "--stdin" : ""
+
     const output = await selene.seleneCommand(
         context.globalStorageUri,
-        "validate-config --display-style=json2 --stdin",
+        `validate-config --display-style=json2 ${tomlSource}`,
         selene.Expectation.Stderr,
         workspaceFolder,
         document.getText(),
@@ -51,14 +52,7 @@ export async function lintConfig(
             continue
         }
 
-        const workspacePath = workspaceFolder?.uri.fsPath
-        if (workspacePath === undefined) {
-            continue
-        }
-
-        const relativePath = path.relative(workspacePath, document.uri.fsPath)
-
-        if (relativePath !== output.source && output.source !== "-") {
+        if (document.uri.fsPath !== output.source && output.source !== "-") {
             continue
         }
 

@@ -21,6 +21,10 @@ pub enum StandardLibraryError {
         path: PathBuf,
     },
 
+    NotFound {
+        name: String,
+    },
+
     Roblox(color_eyre::eyre::Report),
 
     Toml {
@@ -50,6 +54,11 @@ impl Display for StandardLibraryError {
                     "failed to read file `{}`: {source}",
                     path.display(),
                 )
+            }
+
+            StandardLibraryError::NotFound { name } => {
+                // TODO: This is probably not equivalent
+                write!(formatter, "failed to find standard library: {name}")
             }
 
             StandardLibraryError::Roblox(report) => {
@@ -94,9 +103,10 @@ pub fn collect_standard_library<V>(
                     collect_roblox_standard_library(config, directory)
                         .map_err(StandardLibraryError::Roblox)?
                 } else {
-                    return Err(StandardLibraryError::Roblox(color_eyre::eyre::eyre!(
-                        "Could not find the standard library `{segment}`",
-                    )));
+                    // TODO: Make sure this is equivalent to the old behavior
+                    return Err(StandardLibraryError::NotFound {
+                        name: segment.to_owned(),
+                    });
                 }
             }
         };
