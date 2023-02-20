@@ -96,6 +96,7 @@
         "@types/node": "^12.12.37",
         "@types/request": "^2.48.4",
         "@types/request-promise-native": "^1.0.17",
+        "@types/semver": "^7.3.13",
         "@types/unzipper": "^0.10.3",
         "@types/vscode": "^1.54.0",
         "@typescript-eslint/eslint-plugin": "^4.27.0",
@@ -113,6 +114,7 @@
         "fs-write-stream-atomic": "^1.0.10",
         "request": "^2.88.2",
         "request-promise-native": "^1.0.8",
+        "semver": "^7.3.8",
         "unzipper": "^0.10.11"
     }
 }

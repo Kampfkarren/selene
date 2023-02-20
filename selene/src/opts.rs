@@ -104,6 +104,9 @@ pub enum Command {
         #[structopt(parse(from_os_str))]
         filename: PathBuf,
     },
+
+    /// Prints the capabilities of the current build
+    Capabilities,
 }
 
 arg_enum! {

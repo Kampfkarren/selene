@@ -9,6 +9,7 @@ use termcolor::StandardStream;
 #[derive(Serialize)]
 #[serde(tag = "type")]
 pub enum JsonOutput {
+    Capabilities(serde_json::Value),
     Diagnostic(JsonDiagnostic),
     InvalidConfig(crate::validate_config::InvalidConfigError),
     Summary(JsonSummary),

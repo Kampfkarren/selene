@@ -1,13 +1,18 @@
 import * as vscode from "vscode"
 import * as selene from "./selene"
+import { capability, Capabilities } from "./structures/capabilities"
 import { Output } from "./structures/output"
 
 export async function lintConfig(
+    capabilities: Capabilities,
     context: vscode.ExtensionContext,
     document: vscode.TextDocument,
     diagnosticsCollection: vscode.DiagnosticCollection,
 ): Promise<void> {
-    // TODO: Check version of selene, to see if it supports it
+    if (!capability(capabilities, "validateConfig", "1")) {
+        return
+    }
+
     if (
         document.languageId === "toml" &&
         !document.uri.path.endsWith("selene.toml")

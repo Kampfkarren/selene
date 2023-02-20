@@ -7,6 +7,7 @@ import { Diagnostic, Severity, Label } from "./structures/diagnostic"
 import { Output } from "./structures/output"
 import { lintConfig } from "./configLint"
 import { byteToCharMap } from "./byteToCharMap"
+import { Capabilities } from "./structures/capabilities"
 
 let trySelene: Promise<boolean>
 
@@ -37,8 +38,29 @@ export async function activate(
 ): Promise<void> {
     console.log("selene-vscode activated")
 
+    let capabilities: Capabilities = {}
+
     trySelene = util
         .ensureSeleneExists(context.globalStorageUri)
+        .then(() => {
+            selene
+                .seleneCommand(
+                    context.globalStorageUri,
+                    "capabilities --display-style=json2",
+                    selene.Expectation.Stdout,
+                )
+                .then((output) => {
+                    if (output === null) {
+                        return
+                    }
+
+                    capabilities = JSON.parse(output.toString())
+                })
+                .catch(() => {
+                    // selene version is too old
+                    return
+                })
+        })
         .then(() => {
             return true
         })
@@ -104,19 +126,24 @@ export async function activate(
     let hasWarnedAboutRoblox = false
 
     async function lint(document: vscode.TextDocument) {
+        if (!(await trySelene)) {
+            return
+        }
+
         switch (document.languageId) {
             case "lua":
                 break
             case "toml":
             case "yaml":
-                await lintConfig(context, document, diagnosticsCollection)
+                await lintConfig(
+                    capabilities,
+                    context,
+                    document,
+                    diagnosticsCollection,
+                )
                 return
             default:
                 return
-        }
-
-        if (!(await trySelene)) {
-            return
         }
 
         const output = await selene.seleneCommand(
@@ -161,8 +188,6 @@ export async function activate(
                     }
                     break
                 case "InvalidConfig":
-                    console.log(document.fileName, output.source)
-
                     break
             }
         }

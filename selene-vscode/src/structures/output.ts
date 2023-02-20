@@ -1,4 +1,5 @@
-import { Diagnostic } from "./diagnostic"
+import { type Capabilities } from "./capabilities"
+import { type Diagnostic } from "./diagnostic"
 
 export type Output =
     | ({
@@ -13,3 +14,6 @@ export type Output =
               end: number
           }
       }
+    | ({
+          type: "Capabilities"
+      } & Capabilities)

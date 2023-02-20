@@ -26,6 +26,7 @@ use selene_lib::standard_library::StandardLibrary;
 
 use crate::{json_output::log_total_json, opts::DisplayStyle};
 
+mod capabilities;
 mod json_output;
 mod opts;
 #[cfg(feature = "roblox")]
@@ -480,6 +481,12 @@ fn start(mut options: opts::Options) {
                 error!("Couldn't upgrade standard library: {error}");
                 std::process::exit(1);
             }
+
+            return;
+        }
+
+        Some(opts::Command::Capabilities) => {
+            crate::capabilities::print_capabilities(options.display_style());
 
             return;
         }
