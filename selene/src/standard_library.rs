@@ -57,7 +57,6 @@ impl Display for StandardLibraryError {
             }
 
             StandardLibraryError::NotFound { name } => {
-                // TODO: This is probably not equivalent
                 write!(formatter, "failed to find standard library: {name}")
             }
 
