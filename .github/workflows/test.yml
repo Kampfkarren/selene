@@ -19,7 +19,7 @@ jobs:
       run: cargo test -- --nocapture
       working-directory: selene
     - name: Run tests (selene, no features)
-      run: cargo test -- --no-default-features --nocapture
+      run: cargo test --no-default-features -- --nocapture
       working-directory: selene
     - name: Run tests (selene-lib, all features)
       run: cargo test
