@@ -54,13 +54,16 @@ impl InvalidConfigError {
                 )]);
         }
 
-        codespan_reporting::term::emit(
+        match codespan_reporting::term::emit(
             writer,
             &codespan_reporting::term::Config::default(),
             &codespan_files,
             &diagnostic,
-        )
-        .expect("todo: figure out the error type");
+        ) {
+            Ok(_) => {}
+            Err(codespan_reporting::files::Error::Io(io_error)) => return Err(io_error),
+            Err(error) => unreachable!("unexpected codespan error: {error:#?}"),
+        }
 
         Ok(())
     }
