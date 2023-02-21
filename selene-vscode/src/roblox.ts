@@ -47,11 +47,18 @@ export function processDiagnostic(
                         configFilename,
                     )
                 } catch (error) {
-                    if (error.code === "FileNotFound") {
+                    if (
+                        error instanceof vscode.FileSystemError &&
+                        error.code === "FileNotFound"
+                    ) {
                         configContents = new Uint8Array()
                     } else {
                         vscode.window.showErrorMessage(
-                            `Couldn't read existing config, if there was one.\n\n${error.toString()}`,
+                            `Couldn't read existing config, if there was one.\n\n${
+                                typeof error === "object" && error !== null
+                                    ? error.toString()
+                                    : error
+                            }`,
                         )
 
                         return

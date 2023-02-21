@@ -16,10 +16,10 @@ jobs:
     - name: Run Rustfmt
       run: cargo fmt -- --check
     - name: Run tests (selene, all features)
-      run: cargo test
+      run: cargo test -- --nocapture
       working-directory: selene
     - name: Run tests (selene, no features)
-      run: cargo test --no-default-features
+      run: cargo test --no-default-features -- --nocapture
       working-directory: selene
     - name: Run tests (selene-lib, all features)
       run: cargo test

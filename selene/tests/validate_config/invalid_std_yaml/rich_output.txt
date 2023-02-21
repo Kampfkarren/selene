@@ -1,0 +1,6 @@
+error: failed to parse yml file `./tests/validate_config/invalid_std_yaml/std.yml`: unknown field `bad`, expected one of `base`, `name`, `globals`, `structs`, `last_updated`, `last_selene_version`, `roblox_classes`
+  ┌─ std.yml:1:1
+  │
+1 │ bad: true
+  │ ^
+

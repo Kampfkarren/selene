@@ -5,6 +5,9 @@ import * as util from "./util"
 import * as vscode from "vscode"
 import { Diagnostic, Severity, Label } from "./structures/diagnostic"
 import { Output } from "./structures/output"
+import { lintConfig } from "./configLint"
+import { byteToCharMap } from "./byteToCharMap"
+import { Capabilities } from "./structures/capabilities"
 
 let trySelene: Promise<boolean>
 
@@ -13,33 +16,6 @@ enum RunType {
     OnType = "onType",
     OnNewLine = "onNewLine",
     OnIdle = "onIdle",
-}
-
-function byteToCharMap(
-    document: vscode.TextDocument,
-    byteOffsets: Set<number>,
-) {
-    const text = document.getText()
-    const byteOffsetMap = new Map<number, number>()
-    let currentOffset = 0
-
-    // Iterate through each character in the string
-    for (let charOffset = 0; charOffset < text.length; charOffset++) {
-        // Calculate the current byte offset we have reached so far
-        currentOffset += Buffer.byteLength(text[charOffset], "utf-8")
-        for (const offset of byteOffsets) {
-            if (currentOffset >= offset) {
-                byteOffsetMap.set(offset, charOffset + 1)
-                byteOffsets.delete(offset)
-
-                if (byteOffsets.size === 0) {
-                    return byteOffsetMap
-                }
-            }
-        }
-    }
-
-    return byteOffsetMap
 }
 
 function labelToRange(
@@ -62,8 +38,29 @@ export async function activate(
 ): Promise<void> {
     console.log("selene-vscode activated")
 
+    let capabilities: Capabilities = {}
+
     trySelene = util
         .ensureSeleneExists(context.globalStorageUri)
+        .then(() => {
+            selene
+                .seleneCommand(
+                    context.globalStorageUri,
+                    "capabilities --display-style=json2",
+                    selene.Expectation.Stdout,
+                )
+                .then((output) => {
+                    if (output === null) {
+                        return
+                    }
+
+                    capabilities = JSON.parse(output.toString())
+                })
+                .catch(() => {
+                    // selene version is too old
+                    return
+                })
+        })
         .then(() => {
             return true
         })
@@ -129,12 +126,24 @@ export async function activate(
     let hasWarnedAboutRoblox = false
 
     async function lint(document: vscode.TextDocument) {
-        if (document.languageId !== "lua") {
+        if (!(await trySelene)) {
             return
         }
 
-        if (!(await trySelene)) {
-            return
+        switch (document.languageId) {
+            case "lua":
+                break
+            case "toml":
+            case "yaml":
+                await lintConfig(
+                    capabilities,
+                    context,
+                    document,
+                    diagnosticsCollection,
+                )
+                return
+            default:
+                return
         }
 
         const output = await selene.seleneCommand(
@@ -155,10 +164,21 @@ export async function activate(
         const byteOffsets = new Set<number>()
 
         for (const line of output.split("\n")) {
-            const output: Output = JSON.parse(line)
+            if (!line) {
+                continue
+            }
+
+            let output: Output
+
+            try {
+                output = JSON.parse(line)
+            } catch {
+                console.error(`Couldn't parse output: ${line}`)
+                continue
+            }
 
             switch (output.type) {
-                case "diagnostic":
+                case "Diagnostic":
                     dataToAdd.push(output)
                     byteOffsets.add(output.primary_label.span.start)
                     byteOffsets.add(output.primary_label.span.end)
@@ -166,6 +186,8 @@ export async function activate(
                         byteOffsets.add(label.span.start)
                         byteOffsets.add(label.span.end)
                     }
+                    break
+                case "InvalidConfig":
                     break
             }
         }

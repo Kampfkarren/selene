@@ -1,0 +1,6 @@
+error: failed to parse toml file `./tests/validate_config/unknown_fields/selene.toml`: unknown field `what`, expected one of `config`, `lints`, `std`, `exclude`, `roblox-std-source`
+  ┌─ selene.toml:1:1
+  │
+1 │ what = true
+  │ ^^^^
+

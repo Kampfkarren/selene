@@ -99,6 +99,7 @@ fn extract_into_tree(
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct StandardLibrary {
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]

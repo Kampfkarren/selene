@@ -26,12 +26,14 @@ use selene_lib::standard_library::StandardLibrary;
 
 use crate::{json_output::log_total_json, opts::DisplayStyle};
 
+mod capabilities;
 mod json_output;
 mod opts;
 #[cfg(feature = "roblox")]
 mod roblox;
 mod standard_library;
 mod upgrade_std;
+mod validate_config;
 
 macro_rules! error {
     ($fmt:expr) => {
@@ -389,16 +391,67 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     );
 }
 
-fn start(mut matches: opts::Options) {
-    *OPTIONS.write().unwrap() = Some(matches.clone());
+fn start(mut options: opts::Options) {
+    *OPTIONS.write().unwrap() = Some(options.clone());
 
-    if matches.pattern.is_empty() {
-        matches.pattern.push(String::from("**/*.lua"));
+    if options.pattern.is_empty() {
+        options.pattern.push(String::from("**/*.lua"));
         #[cfg(feature = "roblox")]
-        matches.pattern.push(String::from("**/*.luau"));
+        options.pattern.push(String::from("**/*.luau"));
     }
 
-    match matches.command {
+    match &options.command {
+        Some(opts::Command::ValidateConfig { stdin }) => {
+            let (config_contents, config_path) = if *stdin {
+                let mut config_contents = String::new();
+
+                if let Err(error) = io::stdin().read_to_string(&mut config_contents) {
+                    error!("Error reading from stdin: {error}");
+                    std::process::exit(1);
+                }
+
+                (config_contents, Path::new("-"))
+            } else {
+                let config_path = Path::new("selene.toml");
+
+                let config_contents = match fs::read_to_string(config_path) {
+                    Ok(contents) => contents,
+                    Err(error) => {
+                        error!("Error reading config file: {error}");
+                        std::process::exit(1);
+                    }
+                };
+
+                (config_contents, config_path)
+            };
+
+            if let Err(error) = validate_config::validate_config(
+                config_path,
+                &config_contents,
+                &std::env::current_dir().unwrap(),
+            ) {
+                match options.display_style() {
+                    opts::DisplayStyle::Json2 => {
+                        json_output::print_json(json_output::JsonOutput::InvalidConfig(error));
+                    }
+
+                    opts::DisplayStyle::Rich => {
+                        let stdout = termcolor::StandardStream::stdout(get_color());
+                        let mut stdout = stdout.lock();
+                        error
+                            .write_rich_output(&mut stdout)
+                            .expect("can't write to stdout");
+                    }
+
+                    opts::DisplayStyle::Json | opts::DisplayStyle::Quiet => {}
+                }
+
+                std::process::exit(1);
+            }
+
+            return;
+        }
+
         #[cfg(feature = "roblox")]
         Some(opts::Command::GenerateRobloxStd) => {
             println!("Generating Roblox standard library...");
@@ -432,11 +485,17 @@ fn start(mut matches: opts::Options) {
             return;
         }
 
+        Some(opts::Command::Capabilities) => {
+            crate::capabilities::print_capabilities(options.display_style());
+
+            return;
+        }
+
         None => {}
     }
 
     let (config, config_directory): (CheckerConfig<toml::value::Value>, Option<PathBuf>) =
-        match matches.config {
+        match options.config {
             Some(config_file) => {
                 let config_contents = match fs::read_to_string(&config_file) {
                     Ok(contents) => contents,
@@ -544,9 +603,9 @@ fn start(mut matches: opts::Options) {
         }
     });
 
-    let pool = ThreadPool::new(matches.num_threads);
+    let pool = ThreadPool::new(options.num_threads);
 
-    for filename in &matches.files {
+    for filename in &options.files {
         if filename == "-" {
             let checker = Arc::clone(&checker);
             pool.execute(move || read(&checker, Path::new("-"), io::stdin().lock()));
@@ -561,7 +620,7 @@ fn start(mut matches: opts::Options) {
 
                     pool.execute(move || read_file(&checker, Path::new(&filename)));
                 } else if metadata.is_dir() {
-                    for pattern in &matches.pattern {
+                    for pattern in &options.pattern {
                         let glob = match glob::glob(&format!(
                             "{}/{}",
                             filename.to_string_lossy(),
@@ -621,7 +680,7 @@ fn start(mut matches: opts::Options) {
         LINT_WARNINGS.load(Ordering::SeqCst),
     );
 
-    if !matches.luacheck && !matches.no_summary {
+    if !options.luacheck && !options.no_summary {
         log_total(parse_errors, lint_errors, lint_warnings).ok();
     }
 

@@ -1,0 +1,6 @@
+error: failed to find standard library: i_dont_exist
+  ┌─ selene.toml:1:1
+  │
+1 │ std = "i_dont_exist"
+  │ ^^^^^^^^^^^^^^^^^^^^
+

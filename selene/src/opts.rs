@@ -28,6 +28,7 @@ pub struct Options {
         possible_values = &DisplayStyle::variants(),
         case_insensitive = true,
         conflicts_with = "quiet",
+        global = true,
     )]
     pub display_style: Option<DisplayStyle>,
 
@@ -68,6 +69,14 @@ pub struct Options {
 }
 
 impl Options {
+    pub fn display_style(&self) -> DisplayStyle {
+        match self.display_style {
+            Some(display_style) => display_style,
+            None if self.quiet => DisplayStyle::Quiet,
+            None => DisplayStyle::Rich,
+        }
+    }
+
     pub fn quiet(&self) -> bool {
         match self.display_style {
             Some(display_style) => display_style == DisplayStyle::Quiet,
@@ -78,9 +87,13 @@ impl Options {
 
 #[derive(Clone, Debug, PartialEq, Eq, StructOpt)]
 #[structopt(rename_all = "kebab-case")]
-// I'm gonna add more than standard library stuff I swear
-#[allow(clippy::enum_variant_names)]
 pub enum Command {
+    ValidateConfig {
+        /// If set, will read from stdin, rather than from the config file
+        #[structopt(long)]
+        stdin: bool,
+    },
+
     #[cfg(feature = "roblox")]
     GenerateRobloxStd,
 
@@ -91,6 +104,9 @@ pub enum Command {
         #[structopt(parse(from_os_str))]
         filename: PathBuf,
     },
+
+    /// Prints the capabilities of the current build
+    Capabilities,
 }
 
 arg_enum! {

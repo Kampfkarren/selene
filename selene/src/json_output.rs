@@ -9,7 +9,9 @@ use termcolor::StandardStream;
 #[derive(Serialize)]
 #[serde(tag = "type")]
 pub enum JsonOutput {
+    Capabilities(serde_json::Value),
     Diagnostic(JsonDiagnostic),
+    InvalidConfig(crate::validate_config::InvalidConfigError),
     Summary(JsonSummary),
 }
 
@@ -111,4 +113,11 @@ pub fn log_total_json(
     )?;
 
     Ok(())
+}
+
+pub fn print_json(output: JsonOutput) {
+    println!(
+        "{}",
+        serde_json::to_string(&output).expect("unable to serialize json output")
+    );
 }
