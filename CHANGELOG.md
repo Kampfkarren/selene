@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.24.0...HEAD)
 ### Added
 - Added `CFrame.fromEulerAngles` to the Roblox standard library.
+- Added `validate-config` command, which will report any errors in your configuration.
+- Added `capabilities` command, which will report the feature set of the selene installation. This is useful for consumers like the VS Code extension.
+
+### Changed
+- Unknown keys in configuration files are accepted less often now.
 
 ### Fixed
 - "Legacy" Roblox enums (such as Enum.RaycastFilterType.Whitelist/Blacklist) are now automatically created and marked as deprecated in generated standard libraries.

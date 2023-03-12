@@ -6,6 +6,7 @@ If you want to stay up to date with selene itself, you can find the changelog in
 
 ## [Unreleased]
 - Added `update-roblox-std` and `generate-roblox-std` subcommands to vscode command palette
+- Added error reporting for configuration files, both for selene.toml and for YML standard libraries.
 
 ## [1.2.0]
 - Temporary paths, such as Git diff previews, will now use your current workspace folder for configuration.
