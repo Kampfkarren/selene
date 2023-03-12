@@ -1,7 +1,9 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.24.0...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.25.0...HEAD)
+
+## [0.25.0](https://github.com/Kampfkarren/selene/releases/tag/0.25.0) - 2023-03-12
 ### Added
 - Added `CFrame.fromEulerAngles` to the Roblox standard library.
 - Added `validate-config` command, which will report any errors in your configuration.
@@ -9,6 +11,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 - Unknown keys in configuration files are accepted less often now.
+- Updated internal parser, supporting Chinese characters better.
 
 ### Fixed
 - "Legacy" Roblox enums (such as Enum.RaycastFilterType.Whitelist/Blacklist) are now automatically created and marked as deprecated in generated standard libraries.

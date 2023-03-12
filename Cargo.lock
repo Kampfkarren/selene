@@ -112,9 +112,9 @@ checksum = "0d261e256854913907f67ed06efbc3338dfe6179796deefc1ff763fc1aee5535"
 
 [[package]]
 name = "bytecount"
-version = "0.5.1"
+version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be0fdd54b507df8f22012890aadd099979befdba27713c767993f8380112ca7c"
+checksum = "2c676a478f63e9fa2dd5368a42f28bba0d6c560b775f38583c8bbaa7fcd67c9c"
 
 [[package]]
 name = "cc"
@@ -357,16 +357,16 @@ dependencies = [
 
 [[package]]
 name = "full_moon"
-version = "0.17.0"
+version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3d58cb343df2e63e8a496de3e344e5f2b97f010bc1359e994be38a99586888f5"
+checksum = "97743bd3cf799444b6fa793fe7787e0ca1d838b0c9b27ebecb54495d37a4e840"
 dependencies = [
  "bytecount",
  "cfg-if",
  "derive_more",
  "full_moon_derive",
  "logos",
- "paste 0.1.18",
+ "paste",
  "serde",
  "smol_str",
 ]
@@ -718,28 +718,9 @@ checksum = "c1b04fb49957986fdce4d6ee7a65027d55d4b6d2265e5848bbb507b58ccfdb6f"
 
 [[package]]
 name = "paste"
-version = "0.1.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "45ca20c77d80be666aef2b45486da86238fabe33e38306bd3118fe4af33fa880"
-dependencies = [
- "paste-impl",
- "proc-macro-hack",
-]
-
-[[package]]
-name = "paste"
 version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d01a5bd0424d00070b0098dd17ebca6f961a959dead1dbcbbbc1d1cd8d3deeba"
-
-[[package]]
-name = "paste-impl"
-version = "0.1.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d95a7db200b97ef370c8e6de0088252f7e0dfff7d047a28528e47456c0fc98b6"
-dependencies = [
- "proc-macro-hack",
-]
 
 [[package]]
 name = "percent-encoding"
@@ -788,12 +769,6 @@ dependencies = [
  "quote",
  "version_check",
 ]
-
-[[package]]
-name = "proc-macro-hack"
-version = "0.5.20+deprecated"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc375e1527247fe1a97d8b7156678dfe7c1af2fc075c9a4db3690ecd2a148068"
 
 [[package]]
 name = "proc-macro2"
@@ -957,7 +932,7 @@ dependencies = [
 
 [[package]]
 name = "selene"
-version = "0.24.0"
+version = "0.25.0"
 dependencies = [
  "atty",
  "cfg-if",
@@ -987,7 +962,7 @@ dependencies = [
 
 [[package]]
 name = "selene-lib"
-version = "0.24.0"
+version = "0.25.0"
 dependencies = [
  "codespan",
  "codespan-reporting",
@@ -996,7 +971,7 @@ dependencies = [
  "if_chain",
  "lazy_static",
  "once_cell",
- "paste 1.0.11",
+ "paste",
  "pretty_assertions",
  "profiling",
  "regex",
