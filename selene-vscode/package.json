@@ -2,11 +2,11 @@
     "name": "selene-vscode",
     "displayName": "Selene",
     "description": "A blazing-fast modern Lua linter written in Rust",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "publisher": "Kampfkarren",
     "repository": "https://github.com/Kampfkarren/selene",
     "engines": {
-        "vscode": "^1.54.0"
+        "vscode": "^1.63.0"
     },
     "categories": [
         "Linters"
