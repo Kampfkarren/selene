@@ -4,7 +4,9 @@ All notable changes to the "selene-vscode" extension will be documented in this 
 
 If you want to stay up to date with selene itself, you can find the changelog in [selene's CHANGELOG.md](https://github.com/Kampfkarren/selene/blob/master/CHANGELOG.md).
 
-## [Unreleased]
+## Unreleased
+
+## [1.3.0]
 - Added `update-roblox-std` and `generate-roblox-std` subcommands to vscode command palette
 - Added error reporting for configuration files, both for selene.toml and for YML standard libraries.
 
