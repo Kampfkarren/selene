@@ -309,9 +309,12 @@ globals:
     must_use: true
   Instance.new:
     args:
-      - type: string
-    # This is only must_use because we don't allow the second parameter
-    must_use: true
+      - required: true
+        type:
+          display: string
+      - required: false
+        type:
+          display: Instance
   NumberRange.new:
     args:
       - type: number
