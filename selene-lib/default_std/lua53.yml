@@ -1,11 +1,6 @@
 ---
 base: lua52
 globals:
-  math.log:
-    args:
-      - type: number
-      - required: false
-        type: number
   string.pack:
     args:
       - type: string
