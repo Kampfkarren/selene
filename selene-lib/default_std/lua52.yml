@@ -5,6 +5,19 @@ globals:
     removed: true
   setfenv:
     removed: true
+  rawlen:
+    args:
+      - type: table
+    must_use: true
+  math.log:
+    args:
+      - type: number
+      - required: false
+        type: number
+  table.pack:
+    args:
+      - type: "..."
+    must_use: true
   table.unpack:
     args:
       - type: table
@@ -12,3 +25,65 @@ globals:
         type: number
       - required: false
         type: number
+ bit32.arshift:
+    args:
+      - type: number
+      - type: number
+    must_use: true
+  bit32.band:
+    args:
+      - type: "..."
+    must_use: true
+  bit32.bnot:
+    args:
+      - type: number
+    must_use: true
+  bit32.bor:
+    args:
+      - type: "..."
+    must_use: true
+  bit32.btest:
+    args:
+      - type: "..."
+    must_use: true
+  bit32.bxor:
+    args:
+      - type: "..."
+    must_use: true
+  bit32.extract:
+    args:
+      - type: number
+      - type: number
+      - required: false
+        type: number
+    must_use: true
+  bit32.lrotate:
+    args:
+      - type: number
+      - type: number
+    must_use: true
+  bit32.lshift:
+    args:
+      - type: number
+      - type: number
+    must_use: true
+  bit32.replace:
+    args:
+      - type: number
+      - type: number
+      - type: number
+      - required: false
+        type: number
+    must_use: true
+  bit32.rrotate:
+    args:
+      - type: number
+      - type: number
+    must_use: true
+  bit32.rshift:
+    args:
+      - type: number
+      - type: number
+    must_use: true
+  package.config:
+    property: read-only
