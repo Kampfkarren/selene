@@ -4,6 +4,7 @@ globals:
   string.pack:
     args:
       - type: string
+      - type: ...
     must_use: true
   string.packsize:
     args:
@@ -12,6 +13,7 @@ globals:
   string.unpack:
     args:
       - type: string
+      - type: ...
     must_use: true
   table.move:
     args:
