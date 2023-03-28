@@ -1,30 +1,6 @@
 ---
 base: lua51
 globals:
-  getfenv:
-    removed: true
-  setfenv:
-    removed: true
-  rawlen:
-    args:
-      - type: table
-    must_use: true
-  math.log:
-    args:
-      - type: number
-      - required: false
-        type: number
-  table.pack:
-    args:
-      - type: "..."
-    must_use: true
-  table.unpack:
-    args:
-      - type: table
-      - required: false
-        type: number
-      - required: false
-        type: number
  bit32.arshift:
     args:
       - type: number
@@ -85,5 +61,29 @@ globals:
       - type: number
       - type: number
     must_use: true
+  getfenv:
+    removed: true
+  math.log:
+    args:
+      - type: number
+      - required: false
+        type: number
   package.config:
     property: read-only
+  rawlen:
+    args:
+      - type: table
+    must_use: true
+  setfenv:
+    removed: true
+  table.pack:
+    args:
+      - type: "..."
+    must_use: true
+  table.unpack:
+    args:
+      - type: table
+      - required: false
+        type: number
+      - required: false
+        type: number
