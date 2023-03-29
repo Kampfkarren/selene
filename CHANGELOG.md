@@ -2,12 +2,14 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.25.0...HEAD)
-### Fixed
-- `string.pack` and `string.unpack` now have proper function signatures in the Lua 5.3 standard library.
-- Moved `math.log` second argument addition from Lua 5.3 std lib to 5.2 std lib
+### Added
 - Added `table.move`to Lua 5.3 standard library
 - Added `bit32.*` functions to Lua 5.2 standard library
 - Added `table.pack`, `rawlen` and `package.config` to Lua 5.2 standard library
+
+### Fixed
+- `string.pack` and `string.unpack` now have proper function signatures in the Lua 5.3 standard library.
+- Moved `math.log` second argument addition from Lua 5.3 std lib to 5.2 std lib
 
 ## [0.25.0](https://github.com/Kampfkarren/selene/releases/tag/0.25.0) - 2023-03-12
 ### Added
