@@ -1,11 +1,6 @@
 ---
 base: lua52
 globals:
-  math.log:
-    args:
-      - type: number
-      - required: false
-        type: number
   string.pack:
     args:
       - type: string
@@ -20,6 +15,14 @@ globals:
       - type: string
       - type: ...
     must_use: true
+  table.move:
+    args:
+      - type: table
+      - type: number
+      - type: number
+      - type: number
+      - required: false
+        type: table
   utf8.char:
     args:
       - required: utf8.char should be used with an argument despite it not throwing
