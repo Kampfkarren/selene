@@ -1,0 +1,6 @@
+UDim2.new(1)
+UDim2.new(1, 1)
+UDim2.new(1, 1, 1)
+UDim2.new(1, 1, 1, 1)
+UDim2.fromOffset(1, 1)
+UDim2.fromScale(1, 1)
