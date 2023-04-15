@@ -31,6 +31,7 @@
   - [parenthese_conditions](./lints/parenthese_conditions.md)
   - [roblox_incorrect_color3_new_bounds](./lints/roblox_incorrect_color3_new_bounds.md)
   - [roblox_incorrect_roact_usage](./lints/roblox_incorrect_roact_usage.md)
+  - [roblox_mismatched_udim2_new_arg_count](./lints/roblox_mismatched_udim2_new_arg_count.md)
   - [shadowing](./lints/shadowing.md)
   - [suspicious_reverse_loop](./lints/suspicious_reverse_loop.md)
   - [type_check_inside_call](./lints/type_check_inside_call.md)
