@@ -14,3 +14,6 @@ UDim2.new(1, 1) -- error, UDim2.new takes 4 numbers, but 2 were provided.
 
 ## Remarks
 This lint is only active if you are using the Roblox standard library.
+
+This lint does not warn if passing in exactly 2 arguments and none of those are number literals to prevent false positives
+with `UDim2.new(UDim.new(a, b), UDim.new(c, d))`
