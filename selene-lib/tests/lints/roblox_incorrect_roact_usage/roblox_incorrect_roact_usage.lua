@@ -25,3 +25,11 @@ e(Components.FooComponent, {
 call("foo", {})
 
 e("ThisDoesntExist")
+
+e("Frame", {
+    Name = "Should not be passed",
+})
+
+e(Components.FooComponent, {
+    Name = "Can be passed",
+})

@@ -28,3 +28,9 @@ error[roblox_incorrect_roact_usage]: `ThisDoesntExist` is not a valid class
 27 │ e("ThisDoesntExist")
    │   ^^^^^^^^^^^^^^^^^
 
+error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for host components
+   ┌─ roblox_incorrect_roact_usage.lua:30:5
+   │
+30 │     Name = "Should not be passed",
+   │     ^^^^
+

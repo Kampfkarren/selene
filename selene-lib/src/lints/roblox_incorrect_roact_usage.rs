@@ -65,14 +65,28 @@ impl Lint for IncorrectRoactUsageLint {
         }
 
         for invalid_property in visitor.invalid_properties {
-            diagnostics.push(Diagnostic::new(
-                "roblox_incorrect_roact_usage",
-                format!(
-                    "`{}` is not a property of `{}`",
-                    invalid_property.property_name, invalid_property.class_name
-                ),
-                Label::new(invalid_property.range),
-            ));
+            match invalid_property.property_name.as_str() {
+                "Name" => {
+                    diagnostics.push(Diagnostic::new(
+                        "roblox_incorrect_roact_usage",
+                        format!(
+                            "`{}` is assigned through the element's key for host components",
+                            invalid_property.property_name
+                        ),
+                        Label::new(invalid_property.range),
+                    ));
+                }
+                _ => {
+                    diagnostics.push(Diagnostic::new(
+                        "roblox_incorrect_roact_usage",
+                        format!(
+                            "`{}` is not a property of `{}`",
+                            invalid_property.property_name, invalid_property.class_name
+                        ),
+                        Label::new(invalid_property.range),
+                    ));
+                }
+            }
         }
 
         for unknown_class in visitor.unknown_class {
@@ -211,7 +225,9 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
             match field {
                 ast::Field::NameKey { key, .. } => {
                     let property_name = key.token().to_string();
-                    if !class.has_property(self.roblox_classes, &property_name) {
+                    if !class.has_property(self.roblox_classes, &property_name)
+                        || property_name == "Name"
+                    {
                         self.invalid_properties.push(InvalidProperty {
                             class_name: name.clone(),
                             property_name,
