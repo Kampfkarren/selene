@@ -38,7 +38,7 @@ pub mod unused_variable;
 pub mod roblox_incorrect_color3_new_bounds;
 
 #[cfg(feature = "roblox")]
-pub mod roblox_mismatched_udim2_new_arg_count;
+pub mod roblox_suspicious_udim2_new;
 
 #[cfg(feature = "roblox")]
 pub mod roblox_incorrect_roact_usage;

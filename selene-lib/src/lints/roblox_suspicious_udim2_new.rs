@@ -13,7 +13,7 @@ impl Lint for UDim2ArgCountLint {
     type Config = ();
     type Error = Infallible;
 
-    const SEVERITY: Severity = Severity::Error;
+    const SEVERITY: Severity = Severity::Warning;
     const LINT_TYPE: LintType = LintType::Correctness;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
@@ -34,10 +34,10 @@ impl Lint for UDim2ArgCountLint {
             .iter()
             .map(|mismatch| {
                 Diagnostic::new_complete(
-                    "roblox_mismatched_udim2_new_arg_count",
+                    "roblox_suspicious_udim2_new",
                     format!(
                         "UDim2.new takes 4 numbers, but {} were provided.",
-                        mismatch.num_provided
+                        mismatch.args_provided
                     )
                     .to_owned(),
                     Label::new(mismatch.call_range),
@@ -58,7 +58,7 @@ struct UDim2CountVisitor {
 }
 
 struct MismatchedArgCount {
-    num_provided: usize,
+    args_provided: usize,
     call_range: (usize, usize),
 }
 
@@ -81,10 +81,21 @@ impl Visitor for UDim2CountVisitor {
             )) = call_suffix;
 
             then {
-                let num_provided = arguments.len();
-                if num_provided != 4 {
+                let args_provided = arguments.len();
+                let numbers_passed = arguments.iter().filter(|expression| {
+                    match expression {
+                        ast::Expression::Value { value, .. } => matches!(&**value, ast::Value::Number(_)),
+                        _ => false,
+                    }
+                }).count();
+
+                if args_provided == 2 && numbers_passed != 2 {
+                    return;
+                };
+
+                if args_provided < 4 {
                     self.args.push(MismatchedArgCount {
-                        num_provided,
+                        args_provided,
                         call_range: range(call),
                     });
                 }
@@ -98,11 +109,11 @@ mod tests {
     use super::{super::test_util::test_lint, *};
 
     #[test]
-    fn test_roblox_mismatched_udim2_new_arg_count() {
+    fn test_roblox_suspicious_udim2_new() {
         test_lint(
             UDim2ArgCountLint::new(()).unwrap(),
-            "roblox_mismatched_udim2_new_arg_count",
-            "roblox_mismatched_udim2_new_arg_count",
+            "roblox_suspicious_udim2_new",
+            "roblox_suspicious_udim2_new",
         );
     }
 }
