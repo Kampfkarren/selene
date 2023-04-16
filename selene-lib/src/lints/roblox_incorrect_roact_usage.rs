@@ -67,13 +67,19 @@ impl Lint for IncorrectRoactUsageLint {
         for invalid_property in visitor.invalid_properties {
             match invalid_property.property_name.as_str() {
                 "Name" => {
-                    diagnostics.push(Diagnostic::new(
+                    diagnostics.push(Diagnostic::new_complete(
                         "roblox_incorrect_roact_usage",
                         format!(
-                            "`{}` is assigned through the element's key for host components",
+                            "`{}` is assigned through the element's key for Roblox instances",
                             invalid_property.property_name
                         ),
                         Label::new(invalid_property.range),
+                        vec![format!(
+                            "try: [{}] = {}(...)",
+                            invalid_property.property_value,
+                            invalid_property.create_element_expression,
+                        )],
+                        Vec::new(),
                     ));
                 }
                 _ => {
@@ -136,6 +142,8 @@ struct InvalidEvent {
 struct InvalidProperty {
     class_name: String,
     property_name: String,
+    property_value: Box<ast::Expression>,
+    create_element_expression: String,
     range: (usize, usize),
 }
 
@@ -175,6 +183,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
         let call_suffix = suffixes.pop();
 
         let mut check = false;
+        let mut create_element_expression = String::new();
 
         if suffixes.is_empty() {
             // Call is foo(), not foo.bar()
@@ -185,12 +194,17 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
                     .contains(&name.token().to_string())
                 {
                     check = true;
+                    create_element_expression = name.token().to_string();
                 }
             }
         } else if suffixes.len() == 1 {
             // Call is foo.bar()
             // Check if foo.bar is Roact.createElement
             check = is_roact_create_element(call.prefix(), &suffixes);
+
+            if let ast::Prefix::Name(name) = call.prefix() {
+                create_element_expression = format!("{}{}", name.token(), suffixes[0]);
+            }
         }
 
         if !check {
@@ -223,7 +237,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
 
         for field in arguments.fields() {
             match field {
-                ast::Field::NameKey { key, .. } => {
+                ast::Field::NameKey { key, value, .. } => {
                     let property_name = key.token().to_string();
                     if !class.has_property(self.roblox_classes, &property_name)
                         || property_name == "Name"
@@ -231,6 +245,8 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
                         self.invalid_properties.push(InvalidProperty {
                             class_name: name.clone(),
                             property_name,
+                            property_value: Box::new(value.clone()),
+                            create_element_expression: create_element_expression.clone().to_owned(),
                             range: range(key),
                         });
                     }

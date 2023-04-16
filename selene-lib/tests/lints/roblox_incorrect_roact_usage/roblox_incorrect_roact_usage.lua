@@ -26,10 +26,14 @@ call("foo", {})
 
 e("ThisDoesntExist")
 
+e(Components.FooComponent, {
+    Name = "Can be passed",
+})
+
 e("Frame", {
     Name = "Should not be passed",
 })
 
-e(Components.FooComponent, {
-    Name = "Can be passed",
+Roact.createElement("Frame", {
+    Name = a,
 })
