@@ -36,14 +36,25 @@ impl Lint for UDim2ArgCountLint {
                 Diagnostic::new_complete(
                     "roblox_suspicious_udim2_new",
                     format!(
-                        "UDim2.new takes 4 numbers, but {} were provided.",
-                        mismatch.args_provided
+                        "UDim2.new takes 4 numbers, but {} {} provided.",
+                        mismatch.args_provided,
+                        if mismatch.args_provided == 1 {
+                            "was"
+                        } else {
+                            "were"
+                        }
                     )
                     .to_owned(),
                     Label::new(mismatch.call_range),
                     vec![
-                        "help: did you mean to use UDim2.fromScale or UDim2.fromOffset instead?"
-                            .to_owned(),
+                        if mismatch.args_provided > 2 || !mismatch.args_are_numbers {
+                            ""
+                        } else if mismatch.args_are_between_0_and_1 {
+                            "did you mean to use UDim2.fromScale instead?"
+                        } else {
+                            "did you mean to use UDim2.fromOffset instead?"
+                        }
+                        .to_owned(),
                     ],
                     Vec::new(),
                 )
@@ -60,6 +71,8 @@ struct UDim2CountVisitor {
 struct MismatchedArgCount {
     args_provided: usize,
     call_range: (usize, usize),
+    args_are_between_0_and_1: bool,
+    args_are_numbers: bool,
 }
 
 impl Visitor for UDim2CountVisitor {
@@ -95,8 +108,15 @@ impl Visitor for UDim2CountVisitor {
 
                 if args_provided < 4 {
                     self.args.push(MismatchedArgCount {
-                        args_provided,
                         call_range: range(call),
+                        args_provided,
+                        args_are_between_0_and_1: arguments.iter().all(|argument| {
+                            match argument.to_string().parse::<f32>() {
+                                Ok(number) => (0.0..=1.0).contains(&number),
+                                Err(_) => false,
+                            }
+                        }),
+                        args_are_numbers: numbers_passed == args_provided,
                     });
                 }
             }
