@@ -85,7 +85,7 @@ impl Visitor for UDim2CountVisitor {
                 if num_provided != 4 {
                     self.args.push(MismatchedArgCount {
                         num_provided,
-                        call_range: range(call)
+                        call_range: range(call),
                     });
                 }
             }
