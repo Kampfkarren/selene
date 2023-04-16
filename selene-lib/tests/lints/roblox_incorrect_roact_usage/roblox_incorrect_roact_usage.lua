@@ -30,6 +30,10 @@ e(Components.FooComponent, {
     Name = "Can be passed",
 })
 
+Roact.createElement(Components.FooComponent, {
+    Name = "Can be passed",
+})
+
 e("Frame", {
     Name = "Should not be passed",
 })
