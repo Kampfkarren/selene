@@ -43,8 +43,7 @@ impl Lint for UDim2ArgCountLint {
                         } else {
                             "were"
                         }
-                    )
-                    .to_owned(),
+                    ),
                     Label::new(mismatch.call_range),
                     vec![
                         if mismatch.args_provided > 2 || !mismatch.args_are_numbers {
