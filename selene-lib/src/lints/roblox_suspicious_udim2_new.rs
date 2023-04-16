@@ -102,7 +102,7 @@ impl Visitor for UDim2CountVisitor {
                     }
                 }).count();
 
-                if args_provided == 2 && numbers_passed != 2 {
+                if args_provided == 2 && numbers_passed == 0 {
                     return;
                 };
 
