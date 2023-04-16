@@ -142,7 +142,7 @@ struct InvalidEvent {
 struct InvalidProperty {
     class_name: String,
     property_name: String,
-    property_value: Box<ast::Expression>,
+    property_value: ast::Expression,
     create_element_expression: String,
     range: (usize, usize),
 }
@@ -245,7 +245,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
                         self.invalid_properties.push(InvalidProperty {
                             class_name: name.clone(),
                             property_name,
-                            property_value: Box::new(value.clone()),
+                            property_value: value.clone(),
                             create_element_expression: create_element_expression.clone().to_owned(),
                             range: range(key),
                         });
