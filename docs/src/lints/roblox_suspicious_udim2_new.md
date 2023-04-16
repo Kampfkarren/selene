@@ -5,7 +5,7 @@ Checks for too little arguments passed to `UDim2.new()`.
 ## Why this is bad
 Passing in an incorrect number of arguments can indicate that the user meant to use `UDim2.fromScale` or `UDim2.fromOffset`.
 Even if the user really only needed to pass in a fewer number of arguments to `UDim2.new`, this lowers readability
-as it calls into question whether it's a bug or if the user truly meant it to use `UDim2.new`.
+as it calls into question whether it's a bug or if the user truly meant to use `UDim2.new`.
 
 ## Example
 ```lua
