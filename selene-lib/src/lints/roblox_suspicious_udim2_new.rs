@@ -9,6 +9,37 @@ use full_moon::{
 
 pub struct UDim2ArgCountLint;
 
+fn create_diagnostic(mismatch: &MismatchedArgCount) -> Diagnostic {
+    let code = "roblox_suspicious_udim2_new";
+    let message = format!(
+        "UDim2.new takes 4 numbers, but {} {} provided.",
+        mismatch.args_provided,
+        if mismatch.args_provided == 1 {
+            "was"
+        } else {
+            "were"
+        }
+    );
+    let primary_label = Label::new(mismatch.call_range);
+
+    if mismatch.args_provided <= 2 && mismatch.args_are_numbers {
+        Diagnostic::new_complete(
+            code,
+            message,
+            primary_label,
+            vec![if mismatch.args_are_between_0_and_1 {
+                "did you mean to use UDim2.fromScale instead?"
+            } else {
+                "did you mean to use UDim2.fromOffset instead?"
+            }
+            .to_owned()],
+            Vec::new(),
+        )
+    } else {
+        Diagnostic::new(code, message, primary_label)
+    }
+}
+
 impl Lint for UDim2ArgCountLint {
     type Config = ();
     type Error = Infallible;
@@ -32,32 +63,7 @@ impl Lint for UDim2ArgCountLint {
         visitor
             .args
             .iter()
-            .map(|mismatch| {
-                Diagnostic::new_complete(
-                    "roblox_suspicious_udim2_new",
-                    format!(
-                        "UDim2.new takes 4 numbers, but {} {} provided.",
-                        mismatch.args_provided,
-                        if mismatch.args_provided == 1 {
-                            "was"
-                        } else {
-                            "were"
-                        }
-                    ),
-                    Label::new(mismatch.call_range),
-                    vec![
-                        if mismatch.args_provided > 2 || !mismatch.args_are_numbers {
-                            ""
-                        } else if mismatch.args_are_between_0_and_1 {
-                            "did you mean to use UDim2.fromScale instead?"
-                        } else {
-                            "did you mean to use UDim2.fromOffset instead?"
-                        }
-                        .to_owned(),
-                    ],
-                    Vec::new(),
-                )
-            })
+            .map(|mismatch| create_diagnostic(&mismatch))
             .collect()
     }
 }
@@ -94,6 +100,11 @@ impl Visitor for UDim2CountVisitor {
 
             then {
                 let args_provided = arguments.len();
+
+                if args_provided >= 4 {
+                    return;
+                }
+
                 let numbers_passed = arguments.iter().filter(|expression| {
                     match expression {
                         ast::Expression::Value { value, .. } => matches!(&**value, ast::Value::Number(_)),
@@ -101,23 +112,22 @@ impl Visitor for UDim2CountVisitor {
                     }
                 }).count();
 
+                // Prevents false positives for UDim2.new(UDim.new(), UDim.new())
                 if args_provided == 2 && numbers_passed == 0 {
                     return;
                 };
 
-                if args_provided < 4 {
-                    self.args.push(MismatchedArgCount {
-                        call_range: range(call),
-                        args_provided,
-                        args_are_between_0_and_1: arguments.iter().all(|argument| {
-                            match argument.to_string().parse::<f32>() {
-                                Ok(number) => (0.0..=1.0).contains(&number),
-                                Err(_) => false,
-                            }
-                        }),
-                        args_are_numbers: numbers_passed == args_provided,
-                    });
-                }
+                self.args.push(MismatchedArgCount {
+                    call_range: range(call),
+                    args_provided,
+                    args_are_between_0_and_1: arguments.iter().all(|argument| {
+                        match argument.to_string().parse::<f32>() {
+                            Ok(number) => (0.0..=1.0).contains(&number),
+                            Err(_) => false,
+                        }
+                    }),
+                    args_are_numbers: numbers_passed == args_provided,
+                });
             }
         }
     }

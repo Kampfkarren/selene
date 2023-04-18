@@ -35,7 +35,6 @@ error[roblox_suspicious_udim2_new]: UDim2.new takes 4 numbers, but 1 was provide
   │
 5 │ UDim2.new(a)
   │ ^^^^^^^^^^^^
-  │
 
 error[roblox_suspicious_udim2_new]: UDim2.new takes 4 numbers, but 2 were provided.
   ┌─ roblox_suspicious_udim2_new.lua:6:1
@@ -58,19 +57,16 @@ error[roblox_suspicious_udim2_new]: UDim2.new takes 4 numbers, but 2 were provid
   │
 9 │ UDim2.new(1, a)
   │ ^^^^^^^^^^^^^^^
-  │
 
 error[roblox_suspicious_udim2_new]: UDim2.new takes 4 numbers, but 3 were provided.
    ┌─ roblox_suspicious_udim2_new.lua:10:1
    │
 10 │ UDim2.new(1, 1, 1)
    │ ^^^^^^^^^^^^^^^^^^
-   │
 
 error[roblox_suspicious_udim2_new]: UDim2.new takes 4 numbers, but 3 were provided.
    ┌─ roblox_suspicious_udim2_new.lua:11:1
    │
 11 │ UDim2.new(a, b, c)
    │ ^^^^^^^^^^^^^^^^^^
-   │
 
