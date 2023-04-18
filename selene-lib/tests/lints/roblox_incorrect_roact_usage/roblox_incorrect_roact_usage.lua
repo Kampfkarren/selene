@@ -42,6 +42,10 @@ e("Frame", {
     Name = "ShouldNotBePassed",
 })
 
+e("Frame", {
+    Name = "Should.not.be.passed",
+})
+
 Roact.createElement("Frame", {
     Name = a,
 })
