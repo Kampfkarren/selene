@@ -17,6 +17,23 @@ use if_chain::if_chain;
 
 pub struct IncorrectRoactUsageLint;
 
+fn get_lua_table_key_format(expression: &ast::Expression) -> String {
+    match expression {
+        ast::Expression::Value { value, .. } => match &**value {
+            ast::Value::String(token) => {
+                let string = token.to_string();
+                if string.contains(" ") {
+                    format!("[{}]", string)
+                } else {
+                    string[1..string.len() - 1].to_string()
+                }
+            }
+            _ => format!("[{}]", expression.to_string()),
+        },
+        _ => format!("[{}]", expression.to_string()),
+    }
+}
+
 impl Lint for IncorrectRoactUsageLint {
     type Config = ();
     type Error = Infallible;
@@ -75,8 +92,8 @@ impl Lint for IncorrectRoactUsageLint {
                         ),
                         Label::new(invalid_property.range),
                         vec![format!(
-                            "try: [{}] = {}(...)",
-                            invalid_property.property_value,
+                            "try: {} = {}(...)",
+                            get_lua_table_key_format(&invalid_property.property_value),
                             invalid_property.create_element_expression,
                         )],
                         Vec::new(),
