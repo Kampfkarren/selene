@@ -43,6 +43,18 @@ e("Frame", {
 })
 
 e("Frame", {
+    Name = "0Should0not0be0passed",
+})
+
+e("Frame", {
+    Name = "Should0not0be0passed",
+})
+
+e("Frame", {
+    Name = "_Should_not_be_passed",
+})
+
+e("Frame", {
     Name = "ShouldNotBePassed",
 })
 

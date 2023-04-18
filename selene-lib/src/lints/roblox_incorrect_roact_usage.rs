@@ -17,18 +17,30 @@ use if_chain::if_chain;
 
 pub struct IncorrectRoactUsageLint;
 
+// Assumes string includes quotes at start and end
+fn is_lua_valid_table_key_identifier(string: &String) -> bool {
+    // Valid identifier cannot start with numbers
+    let first_char = string.chars().nth(1).unwrap();
+    if !first_char.is_alphabetic() && first_char != '_' {
+        return false;
+    }
+
+    string
+        .chars()
+        .skip(1)
+        .take(string.len() - 2)
+        .all(|c| c.is_alphanumeric() || c == '_')
+}
+
 fn get_lua_table_key_format(expression: &ast::Expression) -> String {
     match expression {
         ast::Expression::Value { value, .. } => match &**value {
             ast::Value::String(token) => {
                 let string = token.to_string();
-                if string
-                    .char_indices()
-                    .any(|(i, c)| i != 0 && i != string.len() - 1 && !c.is_alphabetic())
-                {
-                    format!("[{}]", string)
-                } else {
+                if is_lua_valid_table_key_identifier(&string) {
                     string[1..string.len() - 1].to_string()
+                } else {
+                    format!("[{}]", string)
                 }
             }
             _ => format!("[{}]", expression.to_string()),
