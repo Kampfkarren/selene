@@ -39,11 +39,11 @@ e("Frame", {
 })
 
 e("Frame", {
-    Name = "ShouldNotBePassed",
+    Name = "Should.not.be.passed",
 })
 
 e("Frame", {
-    Name = "Should.not.be.passed",
+    Name = "ShouldNotBePassed",
 })
 
 Roact.createElement("Frame", {

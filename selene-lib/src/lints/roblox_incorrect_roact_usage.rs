@@ -22,7 +22,10 @@ fn get_lua_table_key_format(expression: &ast::Expression) -> String {
         ast::Expression::Value { value, .. } => match &**value {
             ast::Value::String(token) => {
                 let string = token.to_string();
-                if string.contains(" ") || string.contains(".") {
+                if string
+                    .char_indices()
+                    .any(|(i, c)| i != 0 && i != string.len() - 1 && !c.is_alphabetic())
+                {
                     format!("[{}]", string)
                 } else {
                     string[1..string.len() - 1].to_string()

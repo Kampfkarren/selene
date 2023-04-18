@@ -39,18 +39,18 @@ error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's ke
 error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
    ┌─ roblox_incorrect_roact_usage.lua:42:5
    │
-42 │     Name = "ShouldNotBePassed",
+42 │     Name = "Should.not.be.passed",
    │     ^^^^
    │
-   = try: ShouldNotBePassed = e(...)
+   = try: ["Should.not.be.passed"] = e(...)
 
 error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
    ┌─ roblox_incorrect_roact_usage.lua:46:5
    │
-46 │     Name = "Should.not.be.passed",
+46 │     Name = "ShouldNotBePassed",
    │     ^^^^
    │
-   = try: ["Should.not.be.passed"] = e(...)
+   = try: ShouldNotBePassed = e(...)
 
 error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
    ┌─ roblox_incorrect_roact_usage.lua:50:5
