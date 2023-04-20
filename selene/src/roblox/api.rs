@@ -210,17 +210,12 @@ pub struct ApiPropertySecurity {
     write: ApiPropertySecurityContext,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Deserialize)]
+#[derive(Clone, Copy, Default, PartialEq, Eq, Deserialize)]
 pub enum ApiPropertySecurityContext {
+    #[default]
     None,
     #[serde(other)]
     Secure,
-}
-
-impl Default for ApiPropertySecurityContext {
-    fn default() -> Self {
-        ApiPropertySecurityContext::None
-    }
 }
 
 #[derive(Deserialize)]
