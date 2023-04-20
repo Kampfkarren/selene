@@ -60,11 +60,7 @@ impl Lint for UDim2ArgCountLint {
 
         visitor.visit_ast(ast);
 
-        visitor
-            .args
-            .iter()
-            .map(create_diagnostic)
-            .collect()
+        visitor.args.iter().map(create_diagnostic).collect()
     }
 }
 
