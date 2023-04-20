@@ -63,7 +63,7 @@ impl Lint for UDim2ArgCountLint {
         visitor
             .args
             .iter()
-            .map(|mismatch| create_diagnostic(&mismatch))
+            .map(create_diagnostic)
             .collect()
     }
 }
