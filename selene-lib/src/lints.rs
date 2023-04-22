@@ -95,7 +95,6 @@ pub struct Diagnostic {
 
 impl Diagnostic {
     pub fn new(code: &'static str, message: String, primary_label: Label) -> Self {
-        let _ = 1_2_3_45_6789_0;
         Self {
             code,
             message,
