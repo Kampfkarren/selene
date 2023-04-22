@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `table.move`to Lua 5.3 standard library
 - Added `bit32.*` functions to Lua 5.2 standard library
 - Added `table.pack`, `rawlen` and `package.config` to Lua 5.2 standard library
+- Added new [`empty_loop` lint](https://kampfkarren.github.io/selene/lints/empty_loop.html), which will check for empty loop blocks.
 - Added new [`roblox_suspicious_udim2_new` lint](https://kampfkarren.github.io/selene/lints/roblox_suspicious_udim2_new.html), which will warn when you pass in too few number of arguments to `UDim2.new`.
 
 ### Fixed

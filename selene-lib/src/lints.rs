@@ -15,6 +15,7 @@ pub mod deprecated;
 pub mod divide_by_zero;
 pub mod duplicate_keys;
 pub mod empty_if;
+pub mod empty_loop;
 pub mod global_usage;
 pub mod high_cyclomatic_complexity;
 pub mod if_same_then_else;
