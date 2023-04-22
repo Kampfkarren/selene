@@ -1168,6 +1168,7 @@ while x do
 <h2 id="example-17"><a class="header" href="#example-17">Example</a></h2>
 <pre><code class="language-lua">Roact.createElement(&quot;Frame&quot;, {
     ThisPropertyDoesntExist = true,
+    Name = &quot;This property should not be passed in&quot;,
 
     [Roact.Event.ThisEventDoesntExist] = function() end,
 })

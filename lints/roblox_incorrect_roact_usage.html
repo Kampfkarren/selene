@@ -152,6 +152,7 @@
 <h2 id="example"><a class="header" href="#example">Example</a></h2>
 <pre><code class="language-lua">Roact.createElement(&quot;Frame&quot;, {
     ThisPropertyDoesntExist = true,
+    Name = &quot;This property should not be passed in&quot;,
 
     [Roact.Event.ThisEventDoesntExist] = function() end,
 })
