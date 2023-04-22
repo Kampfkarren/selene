@@ -28,3 +28,59 @@ error[roblox_incorrect_roact_usage]: `ThisDoesntExist` is not a valid class
 27 │ e("ThisDoesntExist")
    │   ^^^^^^^^^^^^^^^^^
 
+error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ roblox_incorrect_roact_usage.lua:38:5
+   │
+38 │     Name = "Should not be passed",
+   │     ^^^^
+   │
+   = try: ["Should not be passed"] = e(...)
+
+error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ roblox_incorrect_roact_usage.lua:42:5
+   │
+42 │     Name = "Should.not.be.passed",
+   │     ^^^^
+   │
+   = try: ["Should.not.be.passed"] = e(...)
+
+error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ roblox_incorrect_roact_usage.lua:46:5
+   │
+46 │     Name = "0Should0not0be0passed",
+   │     ^^^^
+   │
+   = try: ["0Should0not0be0passed"] = e(...)
+
+error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ roblox_incorrect_roact_usage.lua:50:5
+   │
+50 │     Name = "Should0not0be0passed",
+   │     ^^^^
+   │
+   = try: Should0not0be0passed = e(...)
+
+error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ roblox_incorrect_roact_usage.lua:54:5
+   │
+54 │     Name = "_Should_not_be_passed",
+   │     ^^^^
+   │
+   = try: _Should_not_be_passed = e(...)
+
+error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ roblox_incorrect_roact_usage.lua:58:5
+   │
+58 │     Name = "ShouldNotBePassed",
+   │     ^^^^
+   │
+   = try: ShouldNotBePassed = e(...)
+
+error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ roblox_incorrect_roact_usage.lua:62:5
+   │
+62 │     Name = a,
+   │     ^^^^
+   │
+   = try: [a] = Roact.createElement(...)
+
