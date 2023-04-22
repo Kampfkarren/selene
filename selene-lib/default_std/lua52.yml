@@ -1,7 +1,7 @@
 ---
 base: lua51
 globals:
- bit32.arshift:
+  bit32.arshift:
     args:
       - type: number
       - type: number
