@@ -43,9 +43,9 @@ fn get_lua_table_key_format(expression: &ast::Expression) -> String {
                     format!("[{}]", string)
                 }
             }
-            _ => format!("[{}]", expression.to_string()),
+            _ => format!("[{}]", expression),
         },
-        _ => format!("[{}]", expression.to_string()),
+        _ => format!("[{}]", expression),
     }
 }
 
