@@ -41,6 +41,9 @@ pub mod roblox_incorrect_color3_new_bounds;
 #[cfg(feature = "roblox")]
 pub mod roblox_incorrect_roact_usage;
 
+#[cfg(feature = "roblox")]
+pub mod roblox_suspicious_udim2_new;
+
 #[cfg(test)]
 mod test_util;
 
