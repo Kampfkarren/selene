@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `bit32.*` functions to Lua 5.2 standard library
 - Added `table.pack`, `rawlen` and `package.config` to Lua 5.2 standard library
 - Added new [`empty_loop` lint](https://kampfkarren.github.io/selene/lints/empty_loop.html), which will check for empty loop blocks.
+- `roblox_incorrect_roact_usage` now lints for illegal `Name` property
 
 ### Fixed
 - `string.pack` and `string.unpack` now have proper function signatures in the Lua 5.3 standard library.

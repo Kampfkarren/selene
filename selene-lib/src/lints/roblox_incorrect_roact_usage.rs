@@ -17,6 +17,38 @@ use if_chain::if_chain;
 
 pub struct IncorrectRoactUsageLint;
 
+// Assumes string includes quotes at start and end
+fn is_lua_valid_table_key_identifier(string: &String) -> bool {
+    // Valid identifier cannot start with numbers
+    let first_char = string.chars().nth(1).unwrap();
+    if !first_char.is_alphabetic() && first_char != '_' {
+        return false;
+    }
+
+    string
+        .chars()
+        .skip(1)
+        .take(string.len() - 2)
+        .all(|c| c.is_alphanumeric() || c == '_')
+}
+
+fn get_lua_table_key_format(expression: &ast::Expression) -> String {
+    match expression {
+        ast::Expression::Value { value, .. } => match &**value {
+            ast::Value::String(token) => {
+                let string = token.to_string();
+                if is_lua_valid_table_key_identifier(&string) {
+                    string[1..string.len() - 1].to_string()
+                } else {
+                    format!("[{}]", string)
+                }
+            }
+            _ => format!("[{}]", expression),
+        },
+        _ => format!("[{}]", expression),
+    }
+}
+
 impl Lint for IncorrectRoactUsageLint {
     type Config = ();
     type Error = Infallible;
@@ -65,14 +97,34 @@ impl Lint for IncorrectRoactUsageLint {
         }
 
         for invalid_property in visitor.invalid_properties {
-            diagnostics.push(Diagnostic::new(
-                "roblox_incorrect_roact_usage",
-                format!(
-                    "`{}` is not a property of `{}`",
-                    invalid_property.property_name, invalid_property.class_name
-                ),
-                Label::new(invalid_property.range),
-            ));
+            match invalid_property.property_name.as_str() {
+                "Name" => {
+                    diagnostics.push(Diagnostic::new_complete(
+                        "roblox_incorrect_roact_usage",
+                        format!(
+                            "`{}` is assigned through the element's key for Roblox instances",
+                            invalid_property.property_name
+                        ),
+                        Label::new(invalid_property.range),
+                        vec![format!(
+                            "try: {} = {}(...)",
+                            get_lua_table_key_format(&invalid_property.property_value),
+                            invalid_property.create_element_expression,
+                        )],
+                        Vec::new(),
+                    ));
+                }
+                _ => {
+                    diagnostics.push(Diagnostic::new(
+                        "roblox_incorrect_roact_usage",
+                        format!(
+                            "`{}` is not a property of `{}`",
+                            invalid_property.property_name, invalid_property.class_name
+                        ),
+                        Label::new(invalid_property.range),
+                    ));
+                }
+            }
         }
 
         for unknown_class in visitor.unknown_class {
@@ -122,6 +174,8 @@ struct InvalidEvent {
 struct InvalidProperty {
     class_name: String,
     property_name: String,
+    property_value: ast::Expression,
+    create_element_expression: String,
     range: (usize, usize),
 }
 
@@ -161,6 +215,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
         let call_suffix = suffixes.pop();
 
         let mut check = false;
+        let mut create_element_expression = String::new();
 
         if suffixes.is_empty() {
             // Call is foo(), not foo.bar()
@@ -171,12 +226,17 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
                     .contains(&name.token().to_string())
                 {
                     check = true;
+                    create_element_expression = name.token().to_string();
                 }
             }
         } else if suffixes.len() == 1 {
             // Call is foo.bar()
             // Check if foo.bar is Roact.createElement
             check = is_roact_create_element(call.prefix(), &suffixes);
+
+            if let ast::Prefix::Name(name) = call.prefix() {
+                create_element_expression = format!("{}{}", name.token(), suffixes[0]);
+            }
         }
 
         if !check {
@@ -209,12 +269,16 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
 
         for field in arguments.fields() {
             match field {
-                ast::Field::NameKey { key, .. } => {
+                ast::Field::NameKey { key, value, .. } => {
                     let property_name = key.token().to_string();
-                    if !class.has_property(self.roblox_classes, &property_name) {
+                    if !class.has_property(self.roblox_classes, &property_name)
+                        || property_name == "Name"
+                    {
                         self.invalid_properties.push(InvalidProperty {
                             class_name: name.clone(),
                             property_name,
+                            property_value: value.clone(),
+                            create_element_expression: create_element_expression.clone().to_owned(),
                             range: range(key),
                         });
                     }
