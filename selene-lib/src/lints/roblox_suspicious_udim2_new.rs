@@ -7,7 +7,7 @@ use full_moon::{
     visitors::Visitor,
 };
 
-pub struct UDim2ArgCountLint;
+pub struct SuspiciousUdim2NewLint;
 
 fn create_diagnostic(mismatch: &MismatchedArgCount) -> Diagnostic {
     let code = "roblox_suspicious_udim2_new";
@@ -40,7 +40,7 @@ fn create_diagnostic(mismatch: &MismatchedArgCount) -> Diagnostic {
     }
 }
 
-impl Lint for UDim2ArgCountLint {
+impl Lint for SuspiciousUdim2NewLint {
     type Config = ();
     type Error = Infallible;
 
@@ -48,7 +48,7 @@ impl Lint for UDim2ArgCountLint {
     const LINT_TYPE: LintType = LintType::Correctness;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
-        Ok(UDim2ArgCountLint)
+        Ok(SuspiciousUdim2NewLint)
     }
 
     fn pass(&self, ast: &Ast, context: &Context, _: &AstContext) -> Vec<Diagnostic> {
@@ -136,7 +136,7 @@ mod tests {
     #[test]
     fn test_roblox_suspicious_udim2_new() {
         test_lint(
-            UDim2ArgCountLint::new(()).unwrap(),
+            SuspiciousUdim2NewLint::new(()).unwrap(),
             "roblox_suspicious_udim2_new",
             "roblox_suspicious_udim2_new",
         );
