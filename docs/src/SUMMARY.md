@@ -19,6 +19,7 @@
   - [divide_by_zero](./lints/divide_by_zero.md)
   - [duplicate_keys](./lints/duplicate_keys.md)
   - [empty_if](./lints/empty_if.md)
+  - [empty_loop](./lints/empty_loop.md)
   - [global_usage](./lints/global_usage.md)
   - [high_cyclomatic_complexity](./lints/high_cyclomatic_complexity.md)
   - [if_same_then_else](./lints/if_same_then_else.md)
