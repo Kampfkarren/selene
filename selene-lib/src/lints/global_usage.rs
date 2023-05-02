@@ -60,7 +60,7 @@ impl Lint for GlobalLint {
                         // Trim whitespace at the end as `_G.a  = 1` yields `a  `
                         Some(name) => self
                             .ignore_pattern
-                            .is_match(&name.to_string().trim_end_matches(char::is_whitespace)),
+                            .is_match(name.to_string().trim_end_matches(char::is_whitespace)),
                         None => false,
                     };
 
