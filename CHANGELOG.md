@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Fixed
 - `string.pack` and `string.unpack` now have proper function signatures in the Lua 5.3 standard library.
 - Moved `math.log` second argument addition from Lua 5.3 std lib to 5.2 std lib
+- `undefined_variable` now correctly errors when defining multiple methods in undefined tables
 
 ## [0.25.0](https://github.com/Kampfkarren/selene/releases/tag/0.25.0) - 2023-03-12
 ### Added

@@ -4,3 +4,27 @@ error[undefined_variable]: `global` is not defined
 1 │ function global.name() end
   │          ^^^^^^
 
+error[undefined_variable]: `a` is not defined
+  ┌─ function_overriding.lua:3:10
+  │
+3 │ function a.b() end
+  │          ^
+
+error[undefined_variable]: `a` is not defined
+  ┌─ function_overriding.lua:4:10
+  │
+4 │ function a.c() end
+  │          ^
+
+error[undefined_variable]: `d` is not defined
+  ┌─ function_overriding.lua:6:10
+  │
+6 │ function d:e() end
+  │          ^
+
+error[undefined_variable]: `d` is not defined
+  ┌─ function_overriding.lua:7:10
+  │
+7 │ function d:f() end
+  │          ^
+
