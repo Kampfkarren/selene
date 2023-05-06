@@ -9,22 +9,14 @@ fn is_global(name: &str, roblox: bool) -> bool {
     (roblox && name == "shared") || name == "_G"
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Default, Deserialize)]
 #[serde(default)]
 pub struct GlobalConfig {
-    ignore_pattern: String,
-}
-
-impl Default for GlobalConfig {
-    fn default() -> Self {
-        Self {
-            ignore_pattern: ".^".to_owned(),
-        }
-    }
+    ignore_pattern: Option<String>,
 }
 
 pub struct GlobalLint {
-    ignore_pattern: Regex,
+    ignore_pattern: Option<Regex>,
 }
 
 impl Lint for GlobalLint {
@@ -36,7 +28,9 @@ impl Lint for GlobalLint {
 
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
         Ok(GlobalLint {
-            ignore_pattern: Regex::new(&config.ignore_pattern)?,
+            ignore_pattern: config
+                .ignore_pattern
+                .and_then(|ignore_pattern| Regex::new(&ignore_pattern).ok()),
         })
     }
 
@@ -51,16 +45,18 @@ impl Lint for GlobalLint {
                 if !checked.contains(&reference.identifier) {
                     checked.insert(reference.identifier);
 
-                    let matches_ignore_pattern = match reference
-                        .indexing
-                        .as_ref()
-                        .and_then(|indexing| indexing.first())
-                        .and_then(|index_entry| index_entry.static_name.as_ref())
-                    {
-                        // Trim whitespace at the end as `_G.a  = 1` yields `a  `
-                        Some(name) => self
-                            .ignore_pattern
-                            .is_match(name.to_string().trim_end_matches(char::is_whitespace)),
+                    let matches_ignore_pattern = match &self.ignore_pattern {
+                        Some(ignore_pattern) => match reference
+                            .indexing
+                            .as_ref()
+                            .and_then(|indexing| indexing.first())
+                            .and_then(|index_entry| index_entry.static_name.as_ref())
+                        {
+                            // Trim whitespace at the end as `_G.a  = 1` yields `a  `
+                            Some(name) => ignore_pattern
+                                .is_match(name.to_string().trim_end_matches(char::is_whitespace)),
+                            None => false,
+                        },
                         None => false,
                     };
 
@@ -102,7 +98,7 @@ mod tests {
     fn test_global_usage_ignore() {
         test_lint(
             GlobalLint::new(GlobalConfig {
-                ignore_pattern: "^_.*_$".to_owned(),
+                ignore_pattern: Some("^_.*_$".to_owned()),
             })
             .unwrap(),
             "global_usage",
