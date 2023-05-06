@@ -30,7 +30,8 @@ impl Lint for GlobalLint {
         Ok(GlobalLint {
             ignore_pattern: config
                 .ignore_pattern
-                .and_then(|ignore_pattern| Regex::new(&ignore_pattern).ok()),
+                .map(|ignore_pattern| Regex::new(&ignore_pattern))
+                .transpose()?,
         })
     }
 
@@ -92,6 +93,14 @@ mod tests {
             "global_usage",
             "global_usage",
         );
+    }
+
+    #[test]
+    fn test_invalid_regex() {
+        assert!(GlobalLint::new(GlobalConfig {
+            ignore_pattern: Some("(".to_owned()),
+        })
+        .is_err());
     }
 
     #[test]
