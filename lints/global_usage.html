@@ -149,6 +149,8 @@
 <p>Prohibits use of <code>_G</code>.</p>
 <h2 id="why-this-is-bad"><a class="header" href="#why-this-is-bad">Why this is bad</a></h2>
 <p><code>_G</code> is global mutable state, which is heavily regarded as harmful. You should instead refactor your code to be more modular in nature.</p>
+<h2 id="configuration"><a class="header" href="#configuration">Configuration</a></h2>
+<p><code>ignore_pattern</code> - A <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a> for variables that are allowed to be global variables. The default disallows all global variables regardless of their name.</p>
 <h2 id="remarks"><a class="header" href="#remarks">Remarks</a></h2>
 <p>If you are using the Roblox standard library, use of <code>shared</code> is prohibited under this lint.</p>
 <h2 id="example"><a class="header" href="#example">Example</a></h2>
