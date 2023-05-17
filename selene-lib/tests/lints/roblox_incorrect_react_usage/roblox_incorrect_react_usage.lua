@@ -1,6 +1,6 @@
 React.createElement("Frame", {
     key = "Exists",
-    children = {},
+    children = props.children,
     ref = function() end,
     ThisPropertyDoesntExist = true,
     Size = UDim2.new(1, 0, 1, 0),

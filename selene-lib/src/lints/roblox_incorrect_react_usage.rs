@@ -114,6 +114,19 @@ impl Lint for IncorrectReactUsageLint {
                         Vec::new(),
                     ));
                 }
+                "children" => {
+                    diagnostics.push(Diagnostic::new_complete(
+                        "roblox_incorrect_react_usage",
+                        "Children should be passed as additional arguments to `createElement`, not as a prop.".to_owned(),
+                        Label::new(invalid_property.range),
+                        vec![format!(
+                            "try: {}(..., ..., {})",
+                            invalid_property.create_element_expression,
+                            invalid_property.property_value,
+                        )],
+                        Vec::new(),
+                    ));
+                }
                 _ => {
                     diagnostics.push(Diagnostic::new(
                         "roblox_incorrect_react_usage",
@@ -272,10 +285,7 @@ impl<'a> Visitor for IncorrectReactUsageVisitor<'a> {
                 ast::Field::NameKey { key, value, .. } => {
                     let property_name = key.token().to_string();
 
-                    if property_name == "ref"
-                        || property_name == "key"
-                        || property_name == "children"
-                    {
+                    if property_name == "ref" || property_name == "key" {
                         continue;
                     }
 

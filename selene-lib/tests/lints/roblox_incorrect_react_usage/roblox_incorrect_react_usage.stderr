@@ -1,3 +1,11 @@
+error[roblox_incorrect_react_usage]: Children should be passed as additional arguments to `createElement`, not as a prop.
+  ┌─ roblox_incorrect_react_usage.lua:3:5
+  │
+3 │     children = props.children,
+  │     ^^^^^^^^
+  │
+  = try: React.createElement(..., ..., props.children)
+
 error[roblox_incorrect_react_usage]: `ThisPropertyDoesntExist` is not a property of `Frame`
   ┌─ roblox_incorrect_react_usage.lua:5:5
   │
