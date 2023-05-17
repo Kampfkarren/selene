@@ -1,0 +1,86 @@
+error[roblox_incorrect_react_usage]: `ThisPropertyDoesntExist` is not a property of `Frame`
+  ┌─ roblox_incorrect_react_usage.lua:5:5
+  │
+5 │     ThisPropertyDoesntExist = true,
+  │     ^^^^^^^^^^^^^^^^^^^^^^^
+
+error[roblox_incorrect_react_usage]: `ThisEventDoesntExist` is not a valid event for `Frame`
+   ┌─ roblox_incorrect_react_usage.lua:10:5
+   │
+10 │     [React.Event.ThisEventDoesntExist] = function() end,
+   │     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[roblox_incorrect_react_usage]: `ThisPropertyDoesntExist` is not a property of `Frame`
+   ┌─ roblox_incorrect_react_usage.lua:17:5
+   │
+17 │     ThisPropertyDoesntExist = true,
+   │     ^^^^^^^^^^^^^^^^^^^^^^^
+
+error[roblox_incorrect_react_usage]: `ThisDoesntExist` is not a valid class
+   ┌─ roblox_incorrect_react_usage.lua:20:3
+   │
+20 │ e("ThisDoesntExist", {})
+   │   ^^^^^^^^^^^^^^^^^
+
+error[roblox_incorrect_react_usage]: `ThisDoesntExist` is not a valid class
+   ┌─ roblox_incorrect_react_usage.lua:28:3
+   │
+28 │ e("ThisDoesntExist")
+   │   ^^^^^^^^^^^^^^^^^
+
+error[roblox_incorrect_react_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ roblox_incorrect_react_usage.lua:39:5
+   │
+39 │     Name = "Should not be passed",
+   │     ^^^^
+   │
+   = try: ["Should not be passed"] = e(...)
+
+error[roblox_incorrect_react_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ roblox_incorrect_react_usage.lua:43:5
+   │
+43 │     Name = "Should.not.be.passed",
+   │     ^^^^
+   │
+   = try: ["Should.not.be.passed"] = e(...)
+
+error[roblox_incorrect_react_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ roblox_incorrect_react_usage.lua:47:5
+   │
+47 │     Name = "0Should0not0be0passed",
+   │     ^^^^
+   │
+   = try: ["0Should0not0be0passed"] = e(...)
+
+error[roblox_incorrect_react_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ roblox_incorrect_react_usage.lua:51:5
+   │
+51 │     Name = "Should0not0be0passed",
+   │     ^^^^
+   │
+   = try: Should0not0be0passed = e(...)
+
+error[roblox_incorrect_react_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ roblox_incorrect_react_usage.lua:55:5
+   │
+55 │     Name = "_Should_not_be_passed",
+   │     ^^^^
+   │
+   = try: _Should_not_be_passed = e(...)
+
+error[roblox_incorrect_react_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ roblox_incorrect_react_usage.lua:59:5
+   │
+59 │     Name = "ShouldNotBePassed",
+   │     ^^^^
+   │
+   = try: ShouldNotBePassed = e(...)
+
+error[roblox_incorrect_react_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ roblox_incorrect_react_usage.lua:63:5
+   │
+63 │     Name = a,
+   │     ^^^^
+   │
+   = try: [a] = React.createElement(...)
+
