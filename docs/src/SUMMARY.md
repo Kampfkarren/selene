@@ -31,6 +31,7 @@
   - [must_use](./lints/must_use.md)
   - [parenthese_conditions](./lints/parenthese_conditions.md)
   - [roblox_incorrect_color3_new_bounds](./lints/roblox_incorrect_color3_new_bounds.md)
+  - [roblox_incorrect_react_usage](./lints/roblox_incorrect_react_usage.md)
   - [roblox_incorrect_roact_usage](./lints/roblox_incorrect_roact_usage.md)
   - [roblox_suspicious_udim2_new](./lints/roblox_suspicious_udim2_new.md)
   - [shadowing](./lints/shadowing.md)
