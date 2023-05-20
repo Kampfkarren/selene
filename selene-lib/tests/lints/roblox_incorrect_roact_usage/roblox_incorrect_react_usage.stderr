@@ -1,53 +1,35 @@
 error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Frame`
-  ┌─ roblox_incorrect_roact_usage.lua:2:5
+  ┌─ roblox_incorrect_react_usage.lua:2:5
   │
 2 │     ThisPropertyDoesntExist = true,
   │     ^^^^^^^^^^^^^^^^^^^^^^^
 
-error[roblox_incorrect_roact_usage]: `ref` is not a property of `Frame`
-  ┌─ roblox_incorrect_roact_usage.lua:4:5
-  │
-4 │     ref = true,
-  │     ^^^
-
-error[roblox_incorrect_roact_usage]: `children` is not a property of `Frame`
-  ┌─ roblox_incorrect_roact_usage.lua:5:5
-  │
-5 │     children = true,
-  │     ^^^^^^^^
-
-error[roblox_incorrect_roact_usage]: `key` is not a property of `Frame`
-  ┌─ roblox_incorrect_roact_usage.lua:6:5
-  │
-6 │     key = true,
-  │     ^^^
-
 error[roblox_incorrect_roact_usage]: `ThisEventDoesntExist` is not a valid event for `Frame`
-   ┌─ roblox_incorrect_roact_usage.lua:11:5
+   ┌─ roblox_incorrect_react_usage.lua:11:5
    │
-11 │     [Roact.Event.ThisEventDoesntExist] = function()
+11 │     [React.Event.ThisEventDoesntExist] = function()
    │     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Frame`
-   ┌─ roblox_incorrect_roact_usage.lua:19:5
+   ┌─ roblox_incorrect_react_usage.lua:19:5
    │
 19 │     ThisPropertyDoesntExist = true,
    │     ^^^^^^^^^^^^^^^^^^^^^^^
 
 error[roblox_incorrect_roact_usage]: `ThisDoesntExist` is not a valid class
-   ┌─ roblox_incorrect_roact_usage.lua:22:3
+   ┌─ roblox_incorrect_react_usage.lua:22:3
    │
 22 │ e("ThisDoesntExist", {})
    │   ^^^^^^^^^^^^^^^^^
 
 error[roblox_incorrect_roact_usage]: `ThisDoesntExist` is not a valid class
-   ┌─ roblox_incorrect_roact_usage.lua:30:3
+   ┌─ roblox_incorrect_react_usage.lua:30:3
    │
 30 │ e("ThisDoesntExist")
    │   ^^^^^^^^^^^^^^^^^
 
 error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
-   ┌─ roblox_incorrect_roact_usage.lua:41:5
+   ┌─ roblox_incorrect_react_usage.lua:41:5
    │
 41 │     Name = "Should not be passed",
    │     ^^^^
@@ -55,7 +37,7 @@ error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's ke
    = try: ["Should not be passed"] = e(...)
 
 error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
-   ┌─ roblox_incorrect_roact_usage.lua:45:5
+   ┌─ roblox_incorrect_react_usage.lua:45:5
    │
 45 │     Name = "Should.not.be.passed",
    │     ^^^^
@@ -63,7 +45,7 @@ error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's ke
    = try: ["Should.not.be.passed"] = e(...)
 
 error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
-   ┌─ roblox_incorrect_roact_usage.lua:49:5
+   ┌─ roblox_incorrect_react_usage.lua:49:5
    │
 49 │     Name = "0Should0not0be0passed",
    │     ^^^^
@@ -71,7 +53,7 @@ error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's ke
    = try: ["0Should0not0be0passed"] = e(...)
 
 error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
-   ┌─ roblox_incorrect_roact_usage.lua:53:5
+   ┌─ roblox_incorrect_react_usage.lua:53:5
    │
 53 │     Name = "Should0not0be0passed",
    │     ^^^^
@@ -79,7 +61,7 @@ error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's ke
    = try: Should0not0be0passed = e(...)
 
 error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
-   ┌─ roblox_incorrect_roact_usage.lua:57:5
+   ┌─ roblox_incorrect_react_usage.lua:57:5
    │
 57 │     Name = "_Should_not_be_passed",
    │     ^^^^
@@ -87,7 +69,7 @@ error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's ke
    = try: _Should_not_be_passed = e(...)
 
 error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
-   ┌─ roblox_incorrect_roact_usage.lua:61:5
+   ┌─ roblox_incorrect_react_usage.lua:61:5
    │
 61 │     Name = "ShouldNotBePassed",
    │     ^^^^
@@ -95,10 +77,10 @@ error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's ke
    = try: ShouldNotBePassed = e(...)
 
 error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
-   ┌─ roblox_incorrect_roact_usage.lua:65:5
+   ┌─ roblox_incorrect_react_usage.lua:65:5
    │
 65 │     Name = a,
    │     ^^^^
    │
-   = try: [a] = Roact.createElement(...)
+   = try: [a] = React.createElement(...)
 

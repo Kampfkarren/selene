@@ -1,6 +1,9 @@
 Roact.createElement("Frame", {
     ThisPropertyDoesntExist = true,
     Size = UDim2.new(1, 0, 1, 0),
+    ref = true,
+    children = true,
+    key = true,
 
     [Roact.Event.InputBegan] = function()
     end,

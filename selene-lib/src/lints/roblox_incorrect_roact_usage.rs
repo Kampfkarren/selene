@@ -4,7 +4,7 @@ use crate::{
     standard_library::RobloxClass,
 };
 use std::{
-    collections::{BTreeMap, HashSet},
+    collections::{BTreeMap, HashMap},
     convert::Infallible,
 };
 
@@ -73,7 +73,7 @@ impl Lint for IncorrectRoactUsageLint {
         }
 
         let mut visitor = IncorrectRoactUsageVisitor {
-            definitions_of_create_element: HashSet::new(),
+            definitions_of_create_element: HashMap::new(),
             invalid_events: Vec::new(),
             invalid_properties: Vec::new(),
             unknown_class: Vec::new(),
@@ -139,23 +139,29 @@ impl Lint for IncorrectRoactUsageLint {
     }
 }
 
-fn is_roact_create_element(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]) -> bool {
+fn is_roact_or_react_create_element(
+    prefix: &ast::Prefix,
+    suffixes: &[&ast::Suffix],
+) -> Option<String> {
     if_chain! {
         if let ast::Prefix::Name(prefix_token) = prefix;
-        if prefix_token.token().to_string() == "Roact";
+        if ["Roact", "React"].contains(&prefix_token.token().to_string().as_str());
         if suffixes.len() == 1;
         if let ast::Suffix::Index(ast::Index::Dot { name, .. }) = suffixes[0];
+        if name.token().to_string() == "createElement";
         then {
-            name.token().to_string() == "createElement"
+            Some(prefix_token.token().to_string())
         } else {
-            false
+            None
         }
     }
 }
 
 #[derive(Debug)]
 struct IncorrectRoactUsageVisitor<'a> {
-    definitions_of_create_element: HashSet<String>,
+    // Variable name -> library name (e.g., Roact, React)
+    definitions_of_create_element: HashMap<String, String>,
+
     invalid_events: Vec<InvalidEvent>,
     invalid_properties: Vec<InvalidProperty>,
     unknown_class: Vec<UnknownClass>,
@@ -214,34 +220,35 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
         let mut suffixes = call.suffixes().collect::<Vec<_>>();
         let call_suffix = suffixes.pop();
 
-        let mut check = false;
-        let mut create_element_expression = String::new();
+        let mut roact_or_react = None;
+        let mut create_element_expression: String = String::new();
 
         if suffixes.is_empty() {
             // Call is foo(), not foo.bar()
             // Check if foo is a variable for Roact.createElement
             if let ast::Prefix::Name(name) = call.prefix() {
-                if self
+                if let Some(react_name) = self
                     .definitions_of_create_element
-                    .contains(&name.token().to_string())
+                    .get(&name.token().to_string())
                 {
-                    check = true;
+                    roact_or_react = Some(react_name.to_owned());
                     create_element_expression = name.token().to_string();
                 }
             }
         } else if suffixes.len() == 1 {
             // Call is foo.bar()
             // Check if foo.bar is Roact.createElement
-            check = is_roact_create_element(call.prefix(), &suffixes);
+            roact_or_react = is_roact_or_react_create_element(call.prefix(), &suffixes);
 
             if let ast::Prefix::Name(name) = call.prefix() {
                 create_element_expression = format!("{}{}", name.token(), suffixes[0]);
             }
         }
 
-        if !check {
-            return;
-        }
+        let react_name = match roact_or_react {
+            Some(name) => name,
+            None => return,
+        };
 
         let ((name, class), arguments) = if_chain! {
             if let Some(ast::Suffix::Call(ast::Call::AnonymousCall(
@@ -271,6 +278,13 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
             match field {
                 ast::Field::NameKey { key, value, .. } => {
                     let property_name = key.token().to_string();
+
+                    if react_name == "React"
+                        && ["ref", "key", "children"].contains(&property_name.as_str())
+                    {
+                        continue;
+                    }
+
                     if !class.has_property(self.roblox_classes, &property_name)
                         || property_name == "Name"
                     {
@@ -292,7 +306,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
                         if let ast::Value::Var(ast::Var::Expression(var_expression)) = &**value;
 
                         if let ast::Prefix::Name(constant_roact_name) = var_expression.prefix();
-                        if constant_roact_name.token().to_string() == "Roact";
+                        if ["Roact", "React"].contains(&constant_roact_name.token().to_string().as_str());
 
                         let mut suffixes = var_expression.suffixes();
                         if let Some(ast::Suffix::Index(ast::Index::Dot { name: constant_event_name, .. })) = suffixes.next();
@@ -322,9 +336,9 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
             if_chain! {
                 if let ast::Expression::Value { value, .. } = expr;
                 if let ast::Value::Var(ast::Var::Expression(var_expr)) = &**value;
-                if is_roact_create_element(var_expr.prefix(), &var_expr.suffixes().collect::<Vec<_>>());
+                if let Some(roact_or_react) = is_roact_or_react_create_element(var_expr.prefix(), &var_expr.suffixes().collect::<Vec<_>>());
                 then {
-                    self.definitions_of_create_element.insert(name.token().to_string());
+                    self.definitions_of_create_element.insert(name.token().to_string(), roact_or_react);
                 }
             };
         }
@@ -336,11 +350,29 @@ mod tests {
     use super::{super::test_util::test_lint, *};
 
     #[test]
+    fn test_mixed_roact_react_usage() {
+        test_lint(
+            IncorrectRoactUsageLint::new(()).unwrap(),
+            "roblox_incorrect_roact_usage",
+            "mixed_roact_react_usage",
+        );
+    }
+
+    #[test]
     fn test_old_roblox_std() {
         test_lint(
             IncorrectRoactUsageLint::new(()).unwrap(),
             "roblox_incorrect_roact_usage",
             "old_roblox_std",
+        );
+    }
+
+    #[test]
+    fn test_roblox_incorrect_react_usage() {
+        test_lint(
+            IncorrectRoactUsageLint::new(()).unwrap(),
+            "roblox_incorrect_roact_usage",
+            "roblox_incorrect_react_usage",
         );
     }
 

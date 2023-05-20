@@ -1,13 +1,15 @@
 React.createElement("Frame", {
-    key = "Exists",
-    children = props.children,
-    ref = function() end,
     ThisPropertyDoesntExist = true,
     Size = UDim2.new(1, 0, 1, 0),
+    ref = true,
+    children = true,
+    key = true,
 
-    [React.Event.InputBegan] = function() end,
+    [React.Event.InputBegan] = function()
+    end,
 
-    [React.Event.ThisEventDoesntExist] = function() end,
+    [React.Event.ThisEventDoesntExist] = function()
+    end,
 })
 
 local e = React.createElement

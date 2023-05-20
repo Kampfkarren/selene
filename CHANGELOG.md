@@ -10,7 +10,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added new [`roblox_suspicious_udim2_new` lint](https://kampfkarren.github.io/selene/lints/roblox_suspicious_udim2_new.html), which will warn when you pass in too few number of arguments to `UDim2.new`.
 - `roblox_incorrect_roact_usage` now lints for illegal `Name` property
 - Added `ignore_pattern` config to `global_usage`, which will ignore any global variables with names that match the pattern
-- Added new [`roblox_incorrect_react_usage` lint](https://kampfkarren.github.io/selene/lints/roblox_incorrect_react_usage.html), which will warn against incorrect react usage
+- `roblox_incorrect_roact_usage` now supports react-lua
 
 ### Fixed
 - `string.pack` and `string.unpack` now have proper function signatures in the Lua 5.3 standard library.
