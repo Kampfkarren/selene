@@ -221,7 +221,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
         let call_suffix = suffixes.pop();
 
         let mut roact_or_react = None;
-        let mut create_element_expression: String = String::new();
+        let mut create_element_expression = String::new();
 
         if suffixes.is_empty() {
             // Call is foo(), not foo.bar()
