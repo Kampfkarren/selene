@@ -228,7 +228,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
         let mut suffixes = call.suffixes().collect::<Vec<_>>();
         let call_suffix = suffixes.pop();
 
-        let mut roact_or_react: Option<LibraryName> = None;
+        let mut library_name: Option<LibraryName> = None;
         let mut create_element_expression = String::new();
 
         if suffixes.is_empty() {
@@ -239,21 +239,21 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
                     .definitions_of_create_element
                     .get(&name.token().to_string())
                 {
-                    roact_or_react = Some(*react_name);
+                    library_name = Some(*react_name);
                     create_element_expression = name.token().to_string();
                 }
             }
         } else if suffixes.len() == 1 {
             // Call is foo.bar()
             // Check if foo.bar is Roact.createElement
-            roact_or_react = is_roact_or_react_create_element(call.prefix(), &suffixes);
+            library_name = is_roact_or_react_create_element(call.prefix(), &suffixes);
 
             if let ast::Prefix::Name(name) = call.prefix() {
                 create_element_expression = format!("{}{}", name.token(), suffixes[0]);
             }
         }
 
-        let react_name = match roact_or_react {
+        let react_name = match library_name {
             Some(name) => name,
             None => return,
         };
