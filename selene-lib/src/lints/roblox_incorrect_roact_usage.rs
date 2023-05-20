@@ -142,26 +142,34 @@ impl Lint for IncorrectRoactUsageLint {
 fn is_roact_or_react_create_element(
     prefix: &ast::Prefix,
     suffixes: &[&ast::Suffix],
-) -> Option<String> {
+) -> Option<LibraryName> {
     if_chain! {
         if let ast::Prefix::Name(prefix_token) = prefix;
-        if ["Roact", "React"].contains(&prefix_token.token().to_string().as_str());
+        if let Some(library_name) = match prefix_token.token().to_string().as_str() {
+            "Roact" => Some(LibraryName::Roact),
+            "React" => Some(LibraryName::React),
+            _ => None,
+        };
         if suffixes.len() == 1;
         if let ast::Suffix::Index(ast::Index::Dot { name, .. }) = suffixes[0];
         if name.token().to_string() == "createElement";
         then {
-            Some(prefix_token.token().to_string())
+            Some(library_name)
         } else {
             None
         }
     }
 }
 
+#[derive(Debug, PartialEq, Clone, Copy)]
+enum LibraryName {
+    Roact,
+    React,
+}
+
 #[derive(Debug)]
 struct IncorrectRoactUsageVisitor<'a> {
-    // Variable name -> library name (e.g., Roact, React)
-    definitions_of_create_element: HashMap<String, String>,
-
+    definitions_of_create_element: HashMap<String, LibraryName>,
     invalid_events: Vec<InvalidEvent>,
     invalid_properties: Vec<InvalidProperty>,
     unknown_class: Vec<UnknownClass>,
@@ -220,7 +228,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
         let mut suffixes = call.suffixes().collect::<Vec<_>>();
         let call_suffix = suffixes.pop();
 
-        let mut roact_or_react = None;
+        let mut roact_or_react: Option<LibraryName> = None;
         let mut create_element_expression = String::new();
 
         if suffixes.is_empty() {
@@ -231,7 +239,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
                     .definitions_of_create_element
                     .get(&name.token().to_string())
                 {
-                    roact_or_react = Some(react_name.to_owned());
+                    roact_or_react = Some(*react_name);
                     create_element_expression = name.token().to_string();
                 }
             }
@@ -279,7 +287,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
                 ast::Field::NameKey { key, value, .. } => {
                     let property_name = key.token().to_string();
 
-                    if react_name == "React"
+                    if react_name == LibraryName::React
                         && ["ref", "key", "children"].contains(&property_name.as_str())
                     {
                         continue;
