@@ -228,7 +228,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
         let mut suffixes = call.suffixes().collect::<Vec<_>>();
         let call_suffix = suffixes.pop();
 
-        let mut library_name: Option<LibraryName> = None;
+        let mut library_name = None;
         let mut create_element_expression = String::new();
 
         if suffixes.is_empty() {
