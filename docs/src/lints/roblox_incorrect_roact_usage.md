@@ -7,7 +7,7 @@ This is guaranteed to fail once it is rendered. Furthermore, the createElement i
 
 ## Example
 ```lua
--- Using react-lua
+-- Using Roact17
 React.createElement("Frame", {
     key = "Valid property for React",
 })
@@ -31,7 +31,7 @@ This lint is naive and makes several assumptions about the way you write your co
 2. It assumes if you are using a local variable, you're not reassigning it.
 3. It assumes either Roact or React is defined. [`undefined_variable`](./undefined_variable.md) will still lint, however.
 
-This lint assumes legacy Roact if the library name is Roact and react-lua if the library name is React.
+This lint assumes legacy Roact if the variable name is `Roact` and Roact17 if the variable name is named `React`.
 
 This lint does not verify if the value you are giving is correct, so `Text = UDim2.new()` will be treated as correct. This lint, right now, only checks property and class names.
 
