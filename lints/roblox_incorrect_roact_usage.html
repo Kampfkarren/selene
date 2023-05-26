@@ -146,11 +146,18 @@
                     <main>
                         <h1 id="roblox_incorrect_roact_usage"><a class="header" href="#roblox_incorrect_roact_usage">roblox_incorrect_roact_usage</a></h1>
 <h2 id="what-it-does"><a class="header" href="#what-it-does">What it does</a></h2>
-<p>Checks for valid uses of Roact.createElement. Verifies that class name given is valid and that the properties passed for it are valid for that class.</p>
+<p>Checks for valid uses of createElement. Verifies that class name given is valid and that the properties passed for it are valid for that class.</p>
 <h2 id="why-this-is-bad"><a class="header" href="#why-this-is-bad">Why this is bad</a></h2>
-<p>This is guaranteed to fail once it is rendered. Furthermore, the createElement itself will not error--only once its mounted will it error.</p>
+<p>This is guaranteed to fail once it is rendered. Furthermore, the createElement itself will not error--only once it's mounted will it error.</p>
 <h2 id="example"><a class="header" href="#example">Example</a></h2>
-<pre><code class="language-lua">Roact.createElement(&quot;Frame&quot;, {
+<pre><code class="language-lua">-- Using Roact17
+React.createElement(&quot;Frame&quot;, {
+    key = &quot;Valid property for React&quot;,
+})
+
+-- Using legacy Roact
+Roact.createElement(&quot;Frame&quot;, {
+    key = &quot;Invalid property for Roact&quot;,
     ThisPropertyDoesntExist = true,
     Name = &quot;This property should not be passed in&quot;,
 
@@ -162,10 +169,11 @@ Roact.createElement(&quot;BadClass&quot;, {})
 <h2 id="remarks"><a class="header" href="#remarks">Remarks</a></h2>
 <p>This lint is naive and makes several assumptions about the way you write your code. The assumptions are based on idiomatic Roact.</p>
 <ol>
-<li>It assumes you are either calling <code>Roact.createElement</code> directly or creating a local variable that's assigned to <code>Roact.createElement</code>.</li>
+<li>It assumes you are either calling <code>createElement</code> directly or creating a local variable that's assigned to <code>[Roact/React].createElement</code>.</li>
 <li>It assumes if you are using a local variable, you're not reassigning it.</li>
-<li>It assumes Roact is defined. <a href="./undefined_variable.html"><code>undefined_variable</code></a> will still lint, however.</li>
+<li>It assumes either Roact or React is defined. <a href="./undefined_variable.html"><code>undefined_variable</code></a> will still lint, however.</li>
 </ol>
+<p>This lint assumes legacy Roact if the variable name is <code>Roact</code> and Roact17 if the variable name is named <code>React</code>.</p>
 <p>This lint does not verify if the value you are giving is correct, so <code>Text = UDim2.new()</code> will be treated as correct. This lint, right now, only checks property and class names.</p>
 <p>This lint is only active if you are using the Roblox standard library.</p>
 
