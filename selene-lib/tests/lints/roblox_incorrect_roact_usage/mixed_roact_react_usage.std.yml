@@ -1,0 +1,13 @@
+---
+name: roblox
+roblox_classes:
+  Frame:
+    superclass: GuiObject
+    properties: []
+    events: []
+  GuiObject:
+    superclass: Instance
+    properties:
+      - Size
+    events:
+      - InputBegan
