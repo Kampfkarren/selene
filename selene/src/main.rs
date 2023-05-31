@@ -618,10 +618,8 @@ fn start(mut options: opts::Options) {
                     let checker = Arc::clone(&checker);
                     let filename = filename.to_owned();
 
-                    if options.force_exclude {
-                        if exclude_set.is_match(&filename) {
-                            continue;
-                        }
+                    if options.force_exclude && exclude_set.is_match(&filename) {
+                        continue;
                     }
 
                     pool.execute(move || read_file(&checker, Path::new(&filename)));
