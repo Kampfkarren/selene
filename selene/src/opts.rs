@@ -66,6 +66,12 @@ pub struct Options {
 
     #[structopt(subcommand)]
     pub command: Option<Command>,
+
+    // Force exclude files. This means that if a file matches a glob in `exclude`, it'll ignore it
+    // even if the command was called on the file only.
+    // This is useful for the vscode extension.
+    #[structopt(long)]
+    pub force_exclude: bool,
 }
 
 impl Options {
