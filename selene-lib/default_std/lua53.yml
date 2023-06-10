@@ -1,6 +1,10 @@
 ---
 base: lua52
 globals:
+  math.tointeger:
+    args:
+      - type: number
+    must_use: true
   string.pack:
     args:
       - type: string
