@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - `roblox_incorrect_roact_usage` now lints for illegal `Name` property
 - Added `ignore_pattern` config to `global_usage`, which will ignore any global variables with names that match the pattern
 - `roblox_incorrect_roact_usage` now checks for incorrect Roact17's `createElement` usage on variables named `React`. For Roact17 only, `key`, `children`, and `ref` are valid properties to Roblox instances.
+- Added new [`roblox_roact_dangling_connection`](https://kampfkarren.github.io/selene/lints/roblox_roact_dangling_connection.html), which will check for connections made in components without getting cleaned up.
 
 ### Fixed
 - `string.pack` and `string.unpack` now have proper function signatures in the Lua 5.3 standard library.
