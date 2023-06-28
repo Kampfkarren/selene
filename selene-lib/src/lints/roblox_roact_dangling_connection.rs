@@ -1,10 +1,9 @@
 use super::*;
 use crate::ast_util::range;
-use std::{collections::HashMap, convert::Infallible};
+use std::{collections::HashSet, convert::Infallible};
 
 use full_moon::{
-    ast::{self, Ast, Expression},
-    tokenizer::TokenReference,
+    ast::{self, Ast},
     visitors::Visitor,
 };
 
@@ -18,18 +17,45 @@ impl Lint for RoactDanglingConnectionLint {
     const LINT_TYPE: LintType = LintType::Correctness;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
-        Ok(RoactDanglingConnectionLint)
+        Ok(Self)
     }
 
-    fn pass(&self, ast: &Ast, context: &Context, _: &AstContext) -> Vec<Diagnostic> {
+    fn pass(
+        &self,
+        ast: &Ast,
+        context: &Context,
+        AstContext { scope_manager, .. }: &AstContext,
+    ) -> Vec<Diagnostic> {
         if !context.is_roblox() {
+            return Vec::new();
+        }
+
+        if scope_manager.variables.iter().all(|(_, variable)| {
+            !["Roact", "React"].contains(&variable.name.trim_end_matches(char::is_whitespace))
+        }) {
             return Vec::new();
         }
 
         let mut visitor = RoactDanglingConnectionVisitor {
             dangling_connections: Vec::new(),
-            has_roact_in_file: false,
-            assignments: HashMap::new(),
+            dangling_connection_start_ranges: scope_manager
+                .function_calls
+                .iter()
+                .filter_map(|(_, function_call_stmt)| {
+                    function_call_stmt
+                        .call_name_path
+                        .last()
+                        .and_then(|last_name| {
+                            if ["Connect", "connect", "ConnectParallel", "Once"]
+                                .contains(&last_name.as_str())
+                            {
+                                Some(function_call_stmt.call_prefix_range.0)
+                            } else {
+                                None
+                            }
+                        })
+                })
+                .collect(),
             function_contexts: Vec::new(),
         };
 
@@ -90,7 +116,7 @@ fn get_last_function_call_suffix(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]
             }
             _ => "".to_string(),
         })
-        .unwrap_or_else(|| "".to_owned())
+        .unwrap_or_default()
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -108,8 +134,7 @@ enum ConnectionContextType {
 #[derive(Debug)]
 struct RoactDanglingConnectionVisitor {
     dangling_connections: Vec<DanglingConnection>,
-    has_roact_in_file: bool,
-    assignments: HashMap<(usize, usize), String>,
+    dangling_connection_start_ranges: HashSet<usize>,
     function_contexts: Vec<(ConnectionContextType, ConnectionContext)>,
 }
 
@@ -132,50 +157,23 @@ fn get_last_known_context(
     }
 }
 
-impl RoactDanglingConnectionVisitor {
-    fn process_assignment(&mut self, name: &TokenReference, expression: &Expression) {
-        if ["Roact", "React"].contains(
-            &name
-                .token()
-                .to_string()
-                .trim_end_matches(char::is_whitespace),
-        ) {
-            self.has_roact_in_file = true;
-        }
-
-        if let ast::Expression::Value { value, .. } = expression {
-            if let ast::Value::FunctionCall(_) = &**value {
-                self.assignments
-                    .insert(range(value), name.token().to_string());
-            }
-        }
-    }
-}
-
 impl Visitor for RoactDanglingConnectionVisitor {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         let last_suffix =
             get_last_function_call_suffix(call.prefix(), &call.suffixes().collect::<Vec<_>>());
 
-        // Ignore cases like a(b:Connect()) where connection is passed as an argument
-        let is_immediately_in_function_call =
-            self.function_contexts.last().map_or(false, |context| {
-                context.0 == ConnectionContextType::FunctionCall
-            });
-
-        let is_call_assigned_to_variable = self.assignments.contains_key(&range(call));
-
-        if self.has_roact_in_file
-            && !is_immediately_in_function_call
-            && !is_call_assigned_to_variable
-            // Ignore connections on the top level as they are not in a Roact component
-            && !self.function_contexts.is_empty()
-            && ["Connect", "connect", "ConnectParallel", "Once"].contains(&last_suffix.as_str())
-        {
-            self.dangling_connections.push(DanglingConnection {
-                range: range(call),
-                function_context: get_last_known_context(&self.function_contexts),
-            });
+        if !self.function_contexts.is_empty() {
+            if let Some(call_range) = call.range() {
+                if self
+                    .dangling_connection_start_ranges
+                    .contains(&call_range.0.bytes())
+                {
+                    self.dangling_connections.push(DanglingConnection {
+                        range: range(call),
+                        function_context: get_last_known_context(&self.function_contexts),
+                    });
+                }
+            }
         }
 
         self.function_contexts.push((
@@ -187,36 +185,18 @@ impl Visitor for RoactDanglingConnectionVisitor {
         ));
     }
 
-    fn visit_function_call_end(&mut self, _node: &ast::FunctionCall) {
+    fn visit_function_call_end(&mut self, _: &ast::FunctionCall) {
         self.function_contexts.pop();
     }
 
-    fn visit_assignment(&mut self, assignment: &ast::Assignment) {
-        for (var, expression) in assignment
-            .variables()
-            .iter()
-            .zip(assignment.expressions().iter())
-        {
-            if let ast::Var::Name(name) = var {
-                self.process_assignment(name, expression);
-            }
-        }
-    }
-
-    fn visit_local_assignment(&mut self, node: &ast::LocalAssignment) {
-        for (name, expression) in node.names().iter().zip(node.expressions().iter()) {
-            self.process_assignment(name, expression)
-        }
-    }
-
-    fn visit_function_body(&mut self, _node: &ast::FunctionBody) {
+    fn visit_function_body(&mut self, _: &ast::FunctionBody) {
         self.function_contexts.push((
             ConnectionContextType::FunctionBody,
             ConnectionContext::Unknown,
         ));
     }
 
-    fn visit_function_body_end(&mut self, _node: &ast::FunctionBody) {
+    fn visit_function_body_end(&mut self, _: &ast::FunctionBody) {
         self.function_contexts.pop();
     }
 }
