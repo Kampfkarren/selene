@@ -10,6 +10,7 @@
   - [Configuration](./usage/configuration.md)
   - [Filtering](./usage/filtering.md)
   - [Standard Library Format](./usage/std.md)
+  - [Git Hook](./usage/git-hook.md)
 - [Roblox Guide](./roblox.md)
 - [Contributing](./contributing.md)
 - [Lints](./lints/index.md)
