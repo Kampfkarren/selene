@@ -568,7 +568,17 @@ impl Visitor for StandardLibraryVisitor<'_> {
         if (arguments_length < expected_args && !maybe_more_arguments)
             || (!vararg && arguments_length > max_args)
         {
-            self.diagnostics.push(Diagnostic::new(
+            let required_param_message = function
+                .arguments
+                .get(arguments_length)
+                .into_iter()
+                .filter_map(|arg| match &arg.required {
+                    Required::Required(Some(message)) => Some(message.clone()),
+                    _ => None,
+                })
+                .collect();
+
+            self.diagnostics.push(Diagnostic::new_complete(
                 "incorrect_standard_library_use",
                 format!(
                     "standard library function `{}` requires {} parameters, {} passed",
@@ -577,6 +587,8 @@ impl Visitor for StandardLibraryVisitor<'_> {
                     argument_types.len(),
                 ),
                 Label::from_node(call, None),
+                required_param_message,
+                Vec::new(),
             ));
         }
 
