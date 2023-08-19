@@ -64,21 +64,18 @@ impl Lint for RoactDanglingConnectionLint {
         let mut diagnostics = Vec::new();
 
         for invalid_event in visitor.dangling_connections {
-            match invalid_event.function_context {
-                ConnectionContext::UseEffect => {
-                    diagnostics.push(Diagnostic::new(
-                        "roblox_roact_dangling_connection",
-                        "disconnect the connection in the useEffect cleanup function".to_owned(),
-                        Label::new(invalid_event.range),
-                    ));
-                }
-                _ => {
-                    diagnostics.push(Diagnostic::new(
-                        "roblox_roact_dangling_connection",
-                        "disconnect the connection where appropriate".to_owned(),
-                        Label::new(invalid_event.range),
-                    ));
-                }
+            if let ConnectionContext::UseEffect = invalid_event.function_context {
+                diagnostics.push(Diagnostic::new(
+                    "roblox_roact_dangling_connection",
+                    "disconnect the connection in the useEffect cleanup function".to_owned(),
+                    Label::new(invalid_event.range),
+                ));
+            } else {
+                diagnostics.push(Diagnostic::new(
+                    "roblox_roact_dangling_connection",
+                    "disconnect the connection where appropriate".to_owned(),
+                    Label::new(invalid_event.range),
+                ));
             }
         }
 
