@@ -1,7 +1,7 @@
 local React
 
 local function Component1()
-    useEffect(function()
+    React.useEffect(function()
         local allowed = a.b.c
 
         local disallowed = d + e
@@ -11,13 +11,21 @@ local function Component1()
 end
 
 local function Component2()
-    useEffect(function()
+    React.useEffect(function()
         notallowed(a, `{b}`)
     end, {})
 end
 
 local function Component3()
-    useEffect(function()
+    React.useEffect(function()
         a(b(c(d)))
+    end, {})
+end
+
+local function Component4()
+    local _, setState = React.useState()
+
+    React.useEffect(function()
+        setState()
     end, {})
 end
