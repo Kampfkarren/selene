@@ -1,0 +1,18 @@
+error[roblox_roact_exhaustive_deps]: React hook useEffect has missing dependencies: 'd' and 'e'. Either include them or remove the dependency array.
+   ┌─ roblox_roact_exhaustive_deps.lua:10:10
+   │
+10 │     end, { a.b, c })
+   │          ^^^^^^^^^^
+
+error[roblox_roact_exhaustive_deps]: React hook useEffect has missing dependencies: 'a', 'b', and 'notallowed'. Either include them or remove the dependency array.
+   ┌─ roblox_roact_exhaustive_deps.lua:16:10
+   │
+16 │     end, {})
+   │          ^^
+
+error[roblox_roact_exhaustive_deps]: React hook useEffect has missing dependencies: 'd', 'c', 'b', and 'a'. Either include them or remove the dependency array.
+   ┌─ roblox_roact_exhaustive_deps.lua:22:10
+   │
+22 │     end, {})
+   │          ^^
+
