@@ -61,7 +61,7 @@ impl Lint for RoactExhaustiveDepsLint {
                 })
                 .collect::<Vec<_>>();
 
-            if missing_dependencies.len() > 0 {
+            if !missing_dependencies.is_empty() {
                 diagnostics.push(Diagnostic::new(
                     "roblox_roact_exhaustive_deps",
                     get_formatted_error_message(&missing_dependencies),
@@ -158,11 +158,11 @@ fn get_token_identifier(token: &TokenReference) -> String {
 fn add_referenced_vars(
     referenced_vars: &mut Vec<Upvalue>,
     fn_defined_vars: &HashSet<String>,
-    new_vars: &Vec<Upvalue>,
+    new_vars: &[Upvalue],
 ) {
     referenced_vars.extend(
         new_vars
-            .into_iter()
+            .iter()
             // Filter out variables defined in the function so far as they are no longer upvalues
             .filter(|var| !fn_defined_vars.contains(var.identifier.as_str()))
             .cloned()
@@ -240,16 +240,8 @@ fn get_referenced_upvalues(expression_type: &NodeType) -> Vec<Upvalue> {
                                 add_referenced_vars(
                                     &mut referenced_vars,
                                     &fn_defined_vars,
-                                    &get_referenced_upvalues(&&NodeType::FunctionCall(call)),
+                                    &get_referenced_upvalues(&NodeType::FunctionCall(call)),
                                 );
-                            } else if let ast::Stmt::Assignment(assignment) = stmt {
-                                for expr in assignment.expressions() {
-                                    add_referenced_vars(
-                                        &mut referenced_vars,
-                                        &fn_defined_vars,
-                                        &get_referenced_upvalues(&NodeType::Expression(expr)),
-                                    );
-                                }
                             }
                         }
                     }
@@ -257,7 +249,7 @@ fn get_referenced_upvalues(expression_type: &NodeType) -> Vec<Upvalue> {
                         add_referenced_vars(
                             &mut referenced_vars,
                             &fn_defined_vars,
-                            &get_referenced_upvalues(&&NodeType::FunctionCall(call)),
+                            &get_referenced_upvalues(&NodeType::FunctionCall(call)),
                         );
                     }
                     ast::Value::InterpolatedString(interpolated_string) => {
@@ -302,19 +294,20 @@ fn get_referenced_upvalues(expression_type: &NodeType) -> Vec<Upvalue> {
         }
         NodeType::FunctionCall(call) => {
             for suffix in call.suffixes() {
-                if let ast::Suffix::Call(ast::Call::AnonymousCall(args)) = suffix {
-                    if let ast::FunctionArgs::Parentheses { arguments, .. } = args {
-                        for arg in arguments.pairs() {
-                            let expr = match arg {
-                                ast::punctuated::Pair::Punctuated(expr, _)
-                                | ast::punctuated::Pair::End(expr) => expr,
-                            };
-                            add_referenced_vars(
-                                &mut referenced_vars,
-                                &fn_defined_vars,
-                                &get_referenced_upvalues(&NodeType::Expression(expr)),
-                            );
-                        }
+                if let ast::Suffix::Call(ast::Call::AnonymousCall(
+                    ast::FunctionArgs::Parentheses { arguments, .. },
+                )) = suffix
+                {
+                    for arg in arguments.pairs() {
+                        let expr = match arg {
+                            ast::punctuated::Pair::Punctuated(expr, _)
+                            | ast::punctuated::Pair::End(expr) => expr,
+                        };
+                        add_referenced_vars(
+                            &mut referenced_vars,
+                            &fn_defined_vars,
+                            &get_referenced_upvalues(&NodeType::Expression(expr)),
+                        );
                     }
                 }
             }
@@ -323,7 +316,7 @@ fn get_referenced_upvalues(expression_type: &NodeType) -> Vec<Upvalue> {
                 add_referenced_vars(
                     &mut referenced_vars,
                     &fn_defined_vars,
-                    &vec![Upvalue {
+                    &[Upvalue {
                         identifier: get_token_identifier(prefix),
                     }],
                 );
@@ -334,7 +327,6 @@ fn get_referenced_upvalues(expression_type: &NodeType) -> Vec<Upvalue> {
                 ast::Prefix::Expression(expr) => {
                     referenced_vars.extend(
                         expr.tokens()
-                            .into_iter()
                             .map(|token| Upvalue {
                                 identifier: get_token_identifier(token),
                             })
@@ -350,19 +342,16 @@ fn get_referenced_upvalues(expression_type: &NodeType) -> Vec<Upvalue> {
             };
 
             for suffix in expression.suffixes() {
-                match suffix {
-                    ast::Suffix::Index(index) => {
-                        if let ast::Index::Dot { name, .. } = index {
-                            referenced_vars.push(Upvalue {
-                                identifier: get_token_identifier(name),
-                            });
-                        } else if let ast::Index::Brackets { expression, .. } = index {
-                            referenced_vars.push(Upvalue {
-                                identifier: expression.to_string(),
-                            });
-                        }
+                if let ast::Suffix::Index(index) = suffix {
+                    if let ast::Index::Dot { name, .. } = index {
+                        referenced_vars.push(Upvalue {
+                            identifier: get_token_identifier(name),
+                        });
+                    } else if let ast::Index::Brackets { expression, .. } = index {
+                        referenced_vars.push(Upvalue {
+                            identifier: expression.to_string(),
+                        });
                     }
-                    _ => {}
                 }
             }
         }
@@ -399,45 +388,39 @@ impl Visitor for RoactMissingDependencyVisitor {
             _ => return,
         };
 
-        match last_suffix.as_str() {
-            "useEffect" => {
-                if let ast::FunctionArgs::Parentheses { arguments, .. } = function_args {
-                    let referenced_upvalues =
-                        if let Some(ast::punctuated::Pair::Punctuated(expression, ..)) =
-                            arguments.first()
-                        {
-                            get_referenced_upvalues(&NodeType::Expression(expression))
-                        } else {
-                            return;
-                        };
-
-                    if let Some(dependency_array_expr) = arguments.iter().nth(1) {
-                        let dependencies_list: HashMap<String, Upvalue> =
-                            get_referenced_upvalues(&NodeType::Expression(dependency_array_expr))
-                                .into_iter()
-                                .map(|upvalue| (upvalue.identifier.clone(), upvalue))
-                                .collect();
-
-                        let missing_dependencies: Vec<_> = referenced_upvalues
-                            .iter()
-                            .filter(|upvalue| {
-                                return !dependencies_list.contains_key(&upvalue.identifier);
-                            })
-                            .cloned()
-                            .collect();
-
-                        if missing_dependencies.len() > 0 {
-                            self.missing_dependencies.push(MissingDependency {
-                                missing_dependencies,
-                                range: range(dependency_array_expr),
-                            });
-                        }
+        if last_suffix.as_str() == "useEffect" {
+            if let ast::FunctionArgs::Parentheses { arguments, .. } = function_args {
+                let referenced_upvalues =
+                    if let Some(ast::punctuated::Pair::Punctuated(expression, ..)) =
+                        arguments.first()
+                    {
+                        get_referenced_upvalues(&NodeType::Expression(expression))
                     } else {
                         return;
+                    };
+
+                if let Some(dependency_array_expr) = arguments.iter().nth(1) {
+                    let dependencies_list: HashMap<String, Upvalue> =
+                        get_referenced_upvalues(&NodeType::Expression(dependency_array_expr))
+                            .into_iter()
+                            .map(|upvalue| (upvalue.identifier.clone(), upvalue))
+                            .collect();
+
+                    let missing_dependencies: Vec<_> = referenced_upvalues
+                        .iter()
+                        .filter(|upvalue| !dependencies_list.contains_key(&upvalue.identifier))
+                        .cloned()
+                        .collect();
+
+                    if !missing_dependencies.is_empty() {
+                        self.missing_dependencies.push(MissingDependency {
+                            missing_dependencies,
+                            range: range(dependency_array_expr),
+                        });
                     }
+                } else {
                 }
             }
-            _ => return,
         }
     }
 
