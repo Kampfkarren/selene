@@ -6,10 +6,11 @@ use std::{
 };
 
 use full_moon::{
-    ast::{self, Ast, Call, FunctionCall, Index, Suffix},
+    ast::{self, Ast, FunctionCall},
     tokenizer::{TokenReference, TokenType},
     visitors::Visitor,
 };
+use if_chain::if_chain;
 
 pub struct RoactExhaustiveDepsLint;
 
@@ -447,27 +448,29 @@ impl Visitor for RoactMissingDependencyVisitor {
     }
 
     fn visit_local_assignment(&mut self, assignment: &ast::LocalAssignment) {
-        if let Some(ast::punctuated::Pair::End(expression)) = assignment.expressions().first() {
-            if let ast::Expression::Value { value, .. } = expression {
-                if let ast::Value::FunctionCall(call) = &**value {
-                    if is_roact_function(call) {
-                        let function_suffix = get_last_function_call_suffix(
-                            call.prefix(),
-                            &call.suffixes().collect::<Vec<_>>(),
-                        );
+        if_chain! {
+            if let Some(ast::punctuated::Pair::End(expression)) = assignment.expressions().first();
+            if let ast::Expression::Value { value, .. } = expression;
+            if let ast::Value::FunctionCall(call) = &**value;
+            if is_roact_function(call);
+            then {
+                let function_suffix = get_last_function_call_suffix(
+                    call.prefix(),
+                    &call.suffixes().collect::<Vec<_>>(),
+                );
 
-                        if function_suffix == "useState" {
-                            if let Some(second_var) = assignment.names().iter().nth(1) {
-                                self.non_reactive_upvalues
-                                    .insert(get_token_identifier(second_var));
-                            }
-                        }
+                if function_suffix == "useState" {
+                    if let Some(second_var) = assignment.names().iter().nth(1) {
+                        self.non_reactive_upvalues
+                            .insert(get_token_identifier(second_var));
                     }
                 }
             }
         }
 
-        for expression in assignment.expressions() {}
+        for _expression in assignment.expressions() {
+            // TODO: Add assignments to literals to non-reactive upvalues
+        }
     }
 }
 
