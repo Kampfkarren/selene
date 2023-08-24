@@ -1,18 +1,50 @@
-error[roblox_roact_exhaustive_deps]: React hook useEffect has missing dependencies: 'reactive1' and 'reactive2'. Either include them or remove the dependency array.
+error[roblox_roact_exhaustive_deps]: hook useEffect has missing dependencies: 'reactive1' and 'reactive2'
    ┌─ roblox_roact_exhaustive_deps.lua:13:10
    │
 13 │     end, {})
    │          ^^
+   │
+   = help: either include them or remove the dependency array
 
-error[roblox_roact_exhaustive_deps]: React hook useEffect has a missing dependency: 'reactive2'. Either include it or remove the dependency array.
+error[roblox_roact_exhaustive_deps]: hook useEffect has missing dependency: 'reactive2'
    ┌─ roblox_roact_exhaustive_deps.lua:30:10
    │
 30 │     end, depArray(reactive1))
    │          ^^^^^^^^^^^^^^^^^^^
+   │
+   = help: either include it or remove the dependency array
 
-error[roblox_roact_exhaustive_deps]: React hook useEffect has a missing dependency: 'reactive1'. Either include it or remove the dependency array.
+error[roblox_roact_exhaustive_deps]: hook useEffect has missing dependency: 'reactive1'
    ┌─ roblox_roact_exhaustive_deps.lua:51:10
    │
 51 │     end, {})
    │          ^^
+   │
+   = help: either include it or remove the dependency array
+
+error[roblox_roact_exhaustive_deps]: hook useEffect has unnecessary dependencies: 'error' and 'notreactive1'
+   ┌─ roblox_roact_exhaustive_deps.lua:55:37
+   │
+55 │     React.useEffect(function() end, { error, notreactive1 })
+   │                                     ^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = help: either exclude them or remove the dependency array
+   = outer scope variables like 'error' aren't valid dependencies because mutating them doesn't re-render the component
+
+error[roblox_roact_exhaustive_deps]: hook useEffect has missing dependency: 'reactive1'
+   ┌─ roblox_roact_exhaustive_deps.lua:63:10
+   │
+63 │     end, { notreactive1 })
+   │          ^^^^^^^^^^^^^^^^
+   │
+   = help: either include it or remove the dependency array
+
+error[roblox_roact_exhaustive_deps]: hook useEffect has unnecessary dependency: 'notreactive1'
+   ┌─ roblox_roact_exhaustive_deps.lua:63:10
+   │
+63 │     end, { notreactive1 })
+   │          ^^^^^^^^^^^^^^^^
+   │
+   = help: either exclude it or remove the dependency array
+   = outer scope variables like 'notreactive1' aren't valid dependencies because mutating them doesn't re-render the component
 

@@ -47,6 +47,7 @@ impl Lint for RoactExhaustiveDepsLint {
             scope_manager,
             depth_tracker: DepthTracker::new(ast),
             missing_dependencies: Vec::new(),
+            unnecessary_dependencies: Vec::new(),
             non_reactive_upvalue_starts: HashSet::new(),
         };
 
@@ -55,16 +56,47 @@ impl Lint for RoactExhaustiveDepsLint {
         let mut diagnostics = Vec::new();
 
         for invalid_event in visitor.missing_dependencies {
-            let missing_dependencies = invalid_event
-                .missing_dependencies
-                .iter()
-                .collect::<Vec<_>>();
-
-            if !missing_dependencies.is_empty() {
-                diagnostics.push(Diagnostic::new(
+            if !invalid_event.missing_dependencies.is_empty() {
+                diagnostics.push(Diagnostic::new_complete(
                     "roblox_roact_exhaustive_deps",
-                    get_formatted_error_message(&missing_dependencies),
+                    get_formatted_error_message(&invalid_event.missing_dependencies, "missing"),
                     Label::new(invalid_event.range),
+                    vec![format!(
+                        "help: either include {} or remove the dependency array",
+                        if invalid_event.missing_dependencies.len() == 1 {
+                            "it"
+                        } else {
+                            "them"
+                        },
+                    )],
+                    Vec::new(),
+                ));
+            }
+        }
+
+        for invalid_event in visitor.unnecessary_dependencies {
+            if let Some(first_unnecessary_dependency) =
+                invalid_event.unnecessary_dependencies.first()
+            {
+                diagnostics.push(Diagnostic::new_complete(
+                    "roblox_roact_exhaustive_deps",
+                    get_formatted_error_message(
+                        &invalid_event.unnecessary_dependencies,
+                        "unnecessary",
+                    ),
+                    Label::new(invalid_event.range),
+                    vec![format!(
+                        "help: either exclude {} or remove the dependency array",
+                        if invalid_event.unnecessary_dependencies.len() == 1 {
+                            "it"
+                        } else {
+                            "them"
+                        },
+                    ), format!(
+                        "outer scope variables like '{}' aren't valid dependencies because mutating them doesn't re-render the component",
+                        first_unnecessary_dependency.name,
+                    )],
+                    Vec::new(),
                 ));
             }
         }
@@ -73,13 +105,16 @@ impl Lint for RoactExhaustiveDepsLint {
     }
 }
 
-fn get_formatted_error_message(missing_dependencies: &Vec<&Upvalue>) -> String {
+fn get_formatted_error_message(
+    missing_dependencies: &Vec<Upvalue>,
+    missing_or_unnecessary: &str,
+) -> String {
     format!(
-        "React hook useEffect has {}: {}. Either include {} or remove the dependency array.",
+        "hook useEffect has {}: {}",
         if missing_dependencies.len() == 1 {
-            "a missing dependency"
+            format!("{} dependency", missing_or_unnecessary)
         } else {
-            "missing dependencies"
+            format!("{} dependencies", missing_or_unnecessary)
         },
         match missing_dependencies.len() {
             1 => format!("'{}'", missing_dependencies[0].name),
@@ -99,12 +134,7 @@ fn get_formatted_error_message(missing_dependencies: &Vec<&Upvalue>) -> String {
                     missing_dependencies.last().unwrap().name
                 )
             }
-        },
-        if missing_dependencies.len() == 1 {
-            "it"
-        } else {
-            "them"
-        },
+        }
     )
 }
 
@@ -154,6 +184,7 @@ fn is_roact_function(call: &FunctionCall) -> bool {
 struct RoactMissingDependencyVisitor<'a> {
     scope_manager: &'a ScopeManager,
     missing_dependencies: Vec<MissingDependency>,
+    unnecessary_dependencies: Vec<UnnecessaryDependency>,
     depth_tracker: DepthTracker,
 
     // Some variables are safe to omit from the dependency array, such as setState
@@ -163,7 +194,6 @@ struct RoactMissingDependencyVisitor<'a> {
 #[derive(Clone, Debug, Eq)]
 struct Upvalue {
     name: String,
-    identifier_start_range: usize,
 
     // Knowing where referenced variable was initialized lets us narrow down whether it's a reactive variable
     resolved_start_range: Option<usize>,
@@ -185,6 +215,12 @@ impl PartialEq for Upvalue {
 #[derive(Debug)]
 struct MissingDependency {
     missing_dependencies: Vec<Upvalue>,
+    range: (usize, usize),
+}
+
+#[derive(Debug)]
+struct UnnecessaryDependency {
+    unnecessary_dependencies: Vec<Upvalue>,
     range: (usize, usize),
 }
 
@@ -212,7 +248,6 @@ impl RoactMissingDependencyVisitor<'_> {
 
                     Some(Upvalue {
                         name: reference.name.clone(),
-                        identifier_start_range: reference.identifier.0,
                         resolved_start_range,
                     })
                 } else {
@@ -253,7 +288,7 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
 
                     let use_effect_depth = self.depth_tracker.depth_at_byte(range(call).0);
 
-                    let mut missing_dependencies: Vec<_> = referenced_upvalues
+                    let mut missing_dependencies = referenced_upvalues
                         .iter()
                         .filter(|upvalue| {
                             // Assume referenced variables but not initialized are globals and therefore not reactive
@@ -272,13 +307,44 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                             !dependencies.contains_key(&upvalue.name) && !is_non_reactive
                         })
                         .cloned()
-                        .collect();
+                        .collect::<Vec<_>>();
 
                     if !missing_dependencies.is_empty() {
-                        missing_dependencies.sort_by_key(|upvalue| upvalue.identifier_start_range);
+                        missing_dependencies.sort_by_key(|upvalue| upvalue.name.to_string());
 
                         self.missing_dependencies.push(MissingDependency {
                             missing_dependencies,
+                            range: range(dependency_array_expr),
+                        });
+                    }
+
+                    // Non-reactive variables should not be put in the dependency array
+                    let mut unnecessary_dependencies: Vec<Upvalue> = dependencies
+                        .iter()
+                        .filter_map(|(_, dependency)| {
+                            if let Some(start_range) = dependency.resolved_start_range {
+                                let depth_at_byte = self.depth_tracker.depth_at_byte(start_range);
+
+                                // Variables declared outside the component are not reactive
+                                if use_effect_depth != depth_at_byte
+                                    || self.non_reactive_upvalue_starts.contains(&start_range)
+                                {
+                                    Some(dependency.clone())
+                                } else {
+                                    None
+                                }
+                            } else {
+                                // Assume referenced variables but not initialized are globals and therefore not reactive
+                                Some(dependency.clone())
+                            }
+                        })
+                        .collect();
+
+                    if !unnecessary_dependencies.is_empty() {
+                        unnecessary_dependencies.sort_by_key(|upvalue| upvalue.name.to_string());
+
+                        self.unnecessary_dependencies.push(UnnecessaryDependency {
+                            unnecessary_dependencies,
                             range: range(dependency_array_expr),
                         });
                     }

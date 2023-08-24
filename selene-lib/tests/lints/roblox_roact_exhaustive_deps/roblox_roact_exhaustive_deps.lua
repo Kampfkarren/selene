@@ -51,6 +51,18 @@ local function Component5()
     end, {})
 end
 
+local function Component6()
+    React.useEffect(function() end, { error, notreactive1 })
+end
+
+local function Component7()
+    local reactive1 = {}
+
+    React.useEffect(function()
+        print(reactive1)
+    end, { notreactive1 })
+end
+
 local function MakeComponent()
     local notreactive = {}
 
