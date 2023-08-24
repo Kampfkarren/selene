@@ -12,6 +12,8 @@ use full_moon::{
 };
 use if_chain::if_chain;
 
+use crate::ast_util::DepthTracker;
+
 pub struct RoactExhaustiveDepsLint;
 
 impl Lint for RoactExhaustiveDepsLint {
@@ -43,6 +45,7 @@ impl Lint for RoactExhaustiveDepsLint {
 
         let mut visitor = RoactMissingDependencyVisitor {
             scope_manager,
+            depth_tracker: DepthTracker::new(ast),
             missing_dependencies: Vec::new(),
             non_reactive_upvalue_starts: HashSet::new(),
         };
@@ -55,7 +58,6 @@ impl Lint for RoactExhaustiveDepsLint {
             let missing_dependencies = invalid_event
                 .missing_dependencies
                 .iter()
-                .filter(|upvalue| !context.standard_library.global_has_fields(&upvalue.name))
                 .collect::<Vec<_>>();
 
             if !missing_dependencies.is_empty() {
@@ -152,6 +154,7 @@ fn is_roact_function(call: &FunctionCall) -> bool {
 struct RoactMissingDependencyVisitor<'a> {
     scope_manager: &'a ScopeManager,
     missing_dependencies: Vec<MissingDependency>,
+    depth_tracker: DepthTracker,
 
     // Some variables are safe to omit from the dependency array, such as setState
     non_reactive_upvalue_starts: HashSet<usize>,
@@ -248,11 +251,21 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                         .map(|upvalue| (upvalue.name.clone(), upvalue))
                         .collect::<HashMap<_, _>>();
 
+                    let use_effect_depth = self.depth_tracker.depth_at_byte(range(call).0);
+
                     let mut missing_dependencies: Vec<_> = referenced_upvalues
                         .iter()
                         .filter(|upvalue| {
+                            // Assume referenced variables but not initialized are globals and therefore not reactive
                             let is_non_reactive =
-                                upvalue.resolved_start_range.map_or(false, |start_range| {
+                                upvalue.resolved_start_range.map_or(true, |start_range| {
+                                    // Variables declared outside the component are not reactive
+                                    if use_effect_depth
+                                        != self.depth_tracker.depth_at_byte(start_range)
+                                    {
+                                        return true;
+                                    }
+
                                     self.non_reactive_upvalue_starts.contains(&start_range)
                                 });
 
@@ -301,15 +314,6 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
 #[cfg(test)]
 mod tests {
     use super::{super::test_util::test_lint, *};
-
-    #[test]
-    fn test_ignore_globals() {
-        test_lint(
-            RoactExhaustiveDepsLint::new(()).unwrap(),
-            "roblox_roact_exhaustive_deps",
-            "ignore_globals",
-        );
-    }
 
     #[test]
     fn test_no_roact() {

@@ -1,7 +1,0 @@
----
-name: roblox
-globals:
-  print:
-    args:
-      - required: false
-        type: "..."

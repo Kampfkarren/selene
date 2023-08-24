@@ -1,18 +1,18 @@
-error[roblox_roact_exhaustive_deps]: React hook useEffect has missing dependencies: 'd' and 'e'. Either include them or remove the dependency array.
-   ┌─ roblox_roact_exhaustive_deps.lua:10:10
+error[roblox_roact_exhaustive_deps]: React hook useEffect has missing dependencies: 'reactive1' and 'reactive2'. Either include them or remove the dependency array.
+   ┌─ roblox_roact_exhaustive_deps.lua:13:10
    │
-10 │     end, { a.b, c })
-   │          ^^^^^^^^^^
-
-error[roblox_roact_exhaustive_deps]: React hook useEffect has missing dependencies: 'notallowed', 'a', and 'b'. Either include them or remove the dependency array.
-   ┌─ roblox_roact_exhaustive_deps.lua:16:10
-   │
-16 │     end, {})
+13 │     end, {})
    │          ^^
 
-error[roblox_roact_exhaustive_deps]: React hook useEffect has missing dependencies: 'a', 'b', 'c', and 'd'. Either include them or remove the dependency array.
-   ┌─ roblox_roact_exhaustive_deps.lua:22:10
+error[roblox_roact_exhaustive_deps]: React hook useEffect has a missing dependency: 'reactive2'. Either include it or remove the dependency array.
+   ┌─ roblox_roact_exhaustive_deps.lua:30:10
    │
-22 │     end, {})
+30 │     end, depArray(reactive1))
+   │          ^^^^^^^^^^^^^^^^^^^
+
+error[roblox_roact_exhaustive_deps]: React hook useEffect has a missing dependency: 'reactive1'. Either include it or remove the dependency array.
+   ┌─ roblox_roact_exhaustive_deps.lua:51:10
+   │
+51 │     end, {})
    │          ^^
 
