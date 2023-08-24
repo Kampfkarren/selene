@@ -3,11 +3,11 @@ use crate::ast_util::range;
 use std::{
     collections::{HashMap, HashSet},
     convert::Infallible,
+    hash::Hash,
 };
 
 use full_moon::{
     ast::{self, Ast, FunctionCall},
-    tokenizer::{TokenReference, TokenType},
     visitors::Visitor,
 };
 use if_chain::if_chain;
@@ -42,8 +42,9 @@ impl Lint for RoactExhaustiveDepsLint {
         }
 
         let mut visitor = RoactMissingDependencyVisitor {
+            scope_manager,
             missing_dependencies: Vec::new(),
-            non_reactive_upvalues: HashSet::new(),
+            non_reactive_upvalue_starts: HashSet::new(),
         };
 
         visitor.visit_ast(ast);
@@ -54,11 +55,7 @@ impl Lint for RoactExhaustiveDepsLint {
             let missing_dependencies = invalid_event
                 .missing_dependencies
                 .iter()
-                .filter(|upvalue| {
-                    !context
-                        .standard_library
-                        .global_has_fields(&upvalue.identifier)
-                })
+                .filter(|upvalue| !context.standard_library.global_has_fields(&upvalue.name))
                 .collect::<Vec<_>>();
 
             if !missing_dependencies.is_empty() {
@@ -83,21 +80,21 @@ fn get_formatted_error_message(missing_dependencies: &Vec<&Upvalue>) -> String {
             "missing dependencies"
         },
         match missing_dependencies.len() {
-            1 => format!("'{}'", missing_dependencies[0].identifier),
+            1 => format!("'{}'", missing_dependencies[0].name),
             2 => format!(
                 "'{}' and '{}'",
-                missing_dependencies[0].identifier, missing_dependencies[1].identifier
+                missing_dependencies[0].name, missing_dependencies[1].name
             ),
             _ => {
                 let all_but_last = missing_dependencies[..missing_dependencies.len() - 1]
                     .iter()
-                    .map(|upvalue| format!("'{}'", &upvalue.identifier))
+                    .map(|upvalue| format!("'{}'", &upvalue.name))
                     .collect::<Vec<String>>()
                     .join(", ");
                 format!(
                     "{}, and '{}'",
                     all_but_last,
-                    missing_dependencies.last().unwrap().identifier
+                    missing_dependencies.last().unwrap().name
                 )
             }
         },
@@ -142,237 +139,6 @@ fn get_last_function_call_suffix(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]
         .unwrap_or_default()
 }
 
-enum NodeType<'a> {
-    Expression(&'a ast::Expression),
-    FunctionCall(&'a ast::FunctionCall),
-    VarExpression(&'a ast::VarExpression),
-}
-
-fn get_token_identifier(token: &TokenReference) -> String {
-    match token.token_type() {
-        TokenType::Identifier { identifier } => identifier.to_string(),
-        _ => "".to_string(),
-    }
-}
-
-impl RoactMissingDependencyVisitor {
-    fn add_referenced_vars(
-        &self,
-        referenced_vars: &mut Vec<Upvalue>,
-        fn_defined_vars: &HashSet<String>,
-        new_vars: &[Upvalue],
-    ) {
-        referenced_vars.extend(
-            new_vars
-                .iter()
-                // Filter out variables defined in the function so far as they are no longer upvalues
-                // Also filter out non-reactive upvalues as they can be omitted from the dependency array
-                .filter(|var| {
-                    !fn_defined_vars.contains(var.identifier.as_str())
-                        && !self.non_reactive_upvalues.contains(var.identifier.as_str())
-                })
-                .cloned()
-                .collect::<Vec<_>>(),
-        );
-    }
-
-    // local a = b + c -> [b, c]
-    // d = e(f) -> [e, f]
-    // { g, h.i, j[k], l["m"] } -> [g, [h, i], [j, k], l]
-    fn get_referenced_upvalues(&self, expression_type: &NodeType) -> Vec<Upvalue> {
-        let mut referenced_vars = Vec::new();
-        let mut fn_defined_vars: HashSet<String> = HashSet::new();
-
-        match expression_type {
-            NodeType::Expression(expression) => {
-                match expression {
-                    ast::Expression::Value { value, .. } => match &**value {
-                        ast::Value::Var(var) => {
-                            if let ast::Var::Name(token) = var {
-                                referenced_vars.push(Upvalue {
-                                    identifier: get_token_identifier(token),
-                                });
-                            } else if let ast::Var::Expression(value) = var {
-                                self.add_referenced_vars(
-                                    &mut referenced_vars,
-                                    &fn_defined_vars,
-                                    &self.get_referenced_upvalues(&NodeType::VarExpression(value)),
-                                );
-                            }
-                        }
-                        ast::Value::TableConstructor(table) => {
-                            for field in table.fields() {
-                                if let ast::Field::NoKey(value) = field {
-                                    // TODO: Store this somewhere else so we know which are from one dependency
-                                    self.add_referenced_vars(
-                                        &mut referenced_vars,
-                                        &fn_defined_vars,
-                                        &self.get_referenced_upvalues(&NodeType::Expression(value)),
-                                    );
-                                }
-                            }
-                        }
-                        ast::Value::Function((_, function_body)) => {
-                            for stmt in function_body.block().stmts() {
-                                if let ast::Stmt::Assignment(assignment) = stmt {
-                                    for variable in assignment.variables() {
-                                        if let ast::Var::Name(name) = variable {
-                                            // FIXME: this works well with assigning single variables,
-                                            // but would false positive with `a.b = c; d = a.b.somethingelse`
-                                            fn_defined_vars.insert(get_token_identifier(name));
-                                        }
-                                    }
-
-                                    for expr in assignment.expressions() {
-                                        self.add_referenced_vars(
-                                            &mut referenced_vars,
-                                            &fn_defined_vars,
-                                            &self.get_referenced_upvalues(&NodeType::Expression(
-                                                expr,
-                                            )),
-                                        );
-                                    }
-                                } else if let ast::Stmt::LocalAssignment(assignment) = stmt {
-                                    for variable in assignment.names() {
-                                        fn_defined_vars.insert(get_token_identifier(variable));
-                                    }
-
-                                    for expr in assignment.expressions() {
-                                        self.add_referenced_vars(
-                                            &mut referenced_vars,
-                                            &fn_defined_vars,
-                                            &self.get_referenced_upvalues(&NodeType::Expression(
-                                                expr,
-                                            )),
-                                        );
-                                    }
-                                } else if let ast::Stmt::FunctionCall(call) = stmt {
-                                    self.add_referenced_vars(
-                                        &mut referenced_vars,
-                                        &fn_defined_vars,
-                                        &self
-                                            .get_referenced_upvalues(&NodeType::FunctionCall(call)),
-                                    );
-                                }
-                            }
-                        }
-                        ast::Value::FunctionCall(call) => {
-                            self.add_referenced_vars(
-                                &mut referenced_vars,
-                                &fn_defined_vars,
-                                &self.get_referenced_upvalues(&NodeType::FunctionCall(call)),
-                            );
-                        }
-                        ast::Value::InterpolatedString(interpolated_string) => {
-                            for expression in interpolated_string.expressions() {
-                                self.add_referenced_vars(
-                                    &mut referenced_vars,
-                                    &fn_defined_vars,
-                                    &self
-                                        .get_referenced_upvalues(&NodeType::Expression(expression)),
-                                );
-                            }
-                        }
-                        _ => {}
-                    },
-                    ast::Expression::BinaryOperator { lhs, rhs, .. } => {
-                        self.add_referenced_vars(
-                            &mut referenced_vars,
-                            &fn_defined_vars,
-                            &self.get_referenced_upvalues(&NodeType::Expression(lhs)),
-                        );
-                        self.add_referenced_vars(
-                            &mut referenced_vars,
-                            &fn_defined_vars,
-                            &self.get_referenced_upvalues(&NodeType::Expression(rhs)),
-                        );
-                    }
-                    ast::Expression::UnaryOperator { expression, .. } => {
-                        self.add_referenced_vars(
-                            &mut referenced_vars,
-                            &fn_defined_vars,
-                            &self.get_referenced_upvalues(&NodeType::Expression(expression)),
-                        );
-                    }
-                    ast::Expression::Parentheses { expression, .. } => {
-                        self.add_referenced_vars(
-                            &mut referenced_vars,
-                            &fn_defined_vars,
-                            &self.get_referenced_upvalues(&NodeType::Expression(expression)),
-                        );
-                    }
-                    _ => {}
-                }
-            }
-            NodeType::FunctionCall(call) => {
-                for suffix in call.suffixes() {
-                    if let ast::Suffix::Call(ast::Call::AnonymousCall(
-                        ast::FunctionArgs::Parentheses { arguments, .. },
-                    )) = suffix
-                    {
-                        for arg in arguments.pairs() {
-                            let expr = match arg {
-                                ast::punctuated::Pair::Punctuated(expr, _)
-                                | ast::punctuated::Pair::End(expr) => expr,
-                            };
-                            self.add_referenced_vars(
-                                &mut referenced_vars,
-                                &fn_defined_vars,
-                                &self.get_referenced_upvalues(&NodeType::Expression(expr)),
-                            );
-                        }
-                    }
-                }
-
-                if let ast::Prefix::Name(prefix) = call.prefix() {
-                    self.add_referenced_vars(
-                        &mut referenced_vars,
-                        &fn_defined_vars,
-                        &[Upvalue {
-                            identifier: get_token_identifier(prefix),
-                        }],
-                    );
-                }
-            }
-            NodeType::VarExpression(expression) => {
-                match &expression.prefix() {
-                    ast::Prefix::Expression(expr) => {
-                        referenced_vars.extend(
-                            expr.tokens()
-                                .map(|token| Upvalue {
-                                    identifier: get_token_identifier(token),
-                                })
-                                .collect::<Vec<_>>(),
-                        );
-                    }
-                    ast::Prefix::Name(token) => {
-                        referenced_vars.push(Upvalue {
-                            identifier: get_token_identifier(token),
-                        });
-                    }
-                    _ => {}
-                };
-
-                for suffix in expression.suffixes() {
-                    if let ast::Suffix::Index(index) = suffix {
-                        if let ast::Index::Dot { name, .. } = index {
-                            referenced_vars.push(Upvalue {
-                                identifier: get_token_identifier(name),
-                            });
-                        } else if let ast::Index::Brackets { expression, .. } = index {
-                            referenced_vars.push(Upvalue {
-                                identifier: expression.to_string(),
-                            });
-                        }
-                    }
-                }
-            }
-        }
-
-        referenced_vars
-    }
-}
-
 fn is_roact_function(call: &FunctionCall) -> bool {
     if let ast::Prefix::Name(name) = call.prefix() {
         return name.token().to_string() == "Roact"
@@ -383,16 +149,34 @@ fn is_roact_function(call: &FunctionCall) -> bool {
 }
 
 #[derive(Debug)]
-struct RoactMissingDependencyVisitor {
+struct RoactMissingDependencyVisitor<'a> {
+    scope_manager: &'a ScopeManager,
     missing_dependencies: Vec<MissingDependency>,
 
-    /// Some variables are safe to omit from the dependency array, such as setState
-    non_reactive_upvalues: HashSet<String>,
+    // Some variables are safe to omit from the dependency array, such as setState
+    non_reactive_upvalue_starts: HashSet<usize>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq)]
 struct Upvalue {
-    identifier: String,
+    name: String,
+    identifier_start_range: usize,
+
+    // Knowing where referenced variable was initialized lets us narrow down whether it's a reactive variable
+    resolved_start_range: Option<usize>,
+}
+
+// Ensures we don't report a variable more than once if it's used multiple times in an effect
+impl Hash for Upvalue {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+    }
+}
+
+impl PartialEq for Upvalue {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+    }
 }
 
 #[derive(Debug)]
@@ -401,7 +185,7 @@ struct MissingDependency {
     range: (usize, usize),
 }
 
-impl Visitor for RoactMissingDependencyVisitor {
+impl Visitor for RoactMissingDependencyVisitor<'_> {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         let last_suffix =
             get_last_function_call_suffix(call.prefix(), &call.suffixes().collect::<Vec<_>>());
@@ -413,29 +197,86 @@ impl Visitor for RoactMissingDependencyVisitor {
 
         if last_suffix.as_str() == "useEffect" && is_roact_function(call) {
             if let ast::FunctionArgs::Parentheses { arguments, .. } = function_args {
-                let referenced_upvalues =
-                    if let Some(ast::punctuated::Pair::Punctuated(expression, ..)) =
-                        arguments.first()
-                    {
-                        self.get_referenced_upvalues(&NodeType::Expression(expression))
-                    } else {
-                        return;
-                    };
-
                 if let Some(dependency_array_expr) = arguments.iter().nth(1) {
-                    let dependencies_list: HashMap<String, Upvalue> = self
-                        .get_referenced_upvalues(&NodeType::Expression(dependency_array_expr))
-                        .into_iter()
-                        .map(|upvalue| (upvalue.identifier.clone(), upvalue))
-                        .collect();
+                    let referenced_upvalues =
+                        if let Some(ast::punctuated::Pair::Punctuated(effect_callback, ..)) =
+                            arguments.first()
+                        {
+                            self.scope_manager
+                                .references
+                                .iter()
+                                .filter_map(|(_, reference)| {
+                                    if reference.identifier.0 > range(effect_callback).0
+                                        && reference.identifier.1 < range(effect_callback).1
+                                        && reference.read
+                                    {
+                                        let resolved_start_range = if let Some(resolved) =
+                                            reference.resolved
+                                        {
+                                            let variable = &self.scope_manager.variables[resolved];
 
-                    let missing_dependencies: Vec<_> = referenced_upvalues
+                                            // FIXME: We need the start range where the variable was last set. Otherwise
+                                            // a variable can be first set outside but set again inside a component, and it
+                                            // identifies as non-reactive. However, this seems to only capture when user
+                                            // does `local` again. Is there an alternative to also capture var = without local?
+                                            // This is low priority as this only matters if user does something weird, like
+                                            // writing to an outside variable within a component
+                                            variable.identifiers.last().map(|(start, _)| *start)
+                                        } else {
+                                            None
+                                        };
+
+                                        Some(Upvalue {
+                                            name: reference.name.clone(),
+                                            identifier_start_range: reference.identifier.0,
+                                            resolved_start_range,
+                                        })
+                                    } else {
+                                        None
+                                    }
+                                })
+                                .collect::<HashSet<_>>()
+                        } else {
+                            return;
+                        };
+
+                    let dependencies_list = self
+                        .scope_manager
+                        .references
                         .iter()
-                        .filter(|upvalue| !dependencies_list.contains_key(&upvalue.identifier))
+                        .filter_map(|(_, reference)| {
+                            if reference.identifier.0 > range(dependency_array_expr).0
+                                && reference.identifier.1 < range(dependency_array_expr).1
+                                && reference.read
+                            {
+                                let upvalue = Upvalue {
+                                    name: reference.name.clone(),
+                                    identifier_start_range: reference.identifier.0,
+                                    resolved_start_range: None,
+                                };
+                                Some((upvalue.name.clone(), upvalue))
+                            } else {
+                                None
+                            }
+                        })
+                        .collect::<HashMap<_, _>>();
+
+                    let mut missing_dependencies: Vec<_> = referenced_upvalues
+                        .iter()
+                        .filter(|upvalue| {
+                            let is_non_reactive =
+                                upvalue.resolved_start_range.map_or(false, |start_range| {
+                                    self.non_reactive_upvalue_starts.contains(&start_range)
+                                });
+
+                            !dependencies_list.contains_key(&upvalue.name) && !is_non_reactive
+                        })
                         .cloned()
                         .collect();
 
                     if !missing_dependencies.is_empty() {
+                        missing_dependencies.sort_by_key(|upvalue| upvalue.identifier_start_range);
+
                         self.missing_dependencies.push(MissingDependency {
                             missing_dependencies,
                             range: range(dependency_array_expr),
@@ -459,17 +300,14 @@ impl Visitor for RoactMissingDependencyVisitor {
                     &call.suffixes().collect::<Vec<_>>(),
                 );
 
-                if function_suffix == "useState" {
+                // Setter functions are stable and can be omitted from dependency array
+                if function_suffix == "useState" || function_suffix == "useBinding" {
                     if let Some(second_var) = assignment.names().iter().nth(1) {
-                        self.non_reactive_upvalues
-                            .insert(get_token_identifier(second_var));
+                        self.non_reactive_upvalue_starts
+                            .insert(range(second_var).0);
                     }
                 }
             }
-        }
-
-        for _expression in assignment.expressions() {
-            // TODO: Add assignments to literals to non-reactive upvalues
         }
     }
 }
