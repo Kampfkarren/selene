@@ -7,7 +7,7 @@ use std::{
 };
 
 use full_moon::{
-    ast::{self, Ast, FunctionCall},
+    ast::{self, Ast, Expression, FunctionCall},
     visitors::Visitor,
 };
 use if_chain::if_chain;
@@ -185,6 +185,41 @@ struct MissingDependency {
     range: (usize, usize),
 }
 
+impl RoactMissingDependencyVisitor<'_> {
+    fn get_upvalues_in_expression(&self, expression: &Expression) -> HashSet<Upvalue> {
+        self.scope_manager
+            .references
+            .iter()
+            .filter_map(|(_, reference)| {
+                if reference.identifier.0 > range(expression).0
+                    && reference.identifier.1 < range(expression).1
+                    && reference.read
+                {
+                    let resolved_start_range = reference.resolved.and_then(|resolved| {
+                        let variable = &self.scope_manager.variables[resolved];
+
+                        // FIXME: We need the start range where the variable was last set. Otherwise
+                        // a variable can be first set outside but set again inside a component, and it
+                        // identifies as non-reactive. However, this seems to only capture when user
+                        // does `local` again. Is there an alternative to also capture var = without local?
+                        // This is low priority as this only matters if user does something weird, like
+                        // writing to an outside variable within a component
+                        variable.identifiers.last().map(|(start, _)| *start)
+                    });
+
+                    Some(Upvalue {
+                        name: reference.name.clone(),
+                        identifier_start_range: reference.identifier.0,
+                        resolved_start_range,
+                    })
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
+}
+
 impl Visitor for RoactMissingDependencyVisitor<'_> {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         let last_suffix =
@@ -202,63 +237,15 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                         if let Some(ast::punctuated::Pair::Punctuated(effect_callback, ..)) =
                             arguments.first()
                         {
-                            self.scope_manager
-                                .references
-                                .iter()
-                                .filter_map(|(_, reference)| {
-                                    if reference.identifier.0 > range(effect_callback).0
-                                        && reference.identifier.1 < range(effect_callback).1
-                                        && reference.read
-                                    {
-                                        let resolved_start_range = if let Some(resolved) =
-                                            reference.resolved
-                                        {
-                                            let variable = &self.scope_manager.variables[resolved];
-
-                                            // FIXME: We need the start range where the variable was last set. Otherwise
-                                            // a variable can be first set outside but set again inside a component, and it
-                                            // identifies as non-reactive. However, this seems to only capture when user
-                                            // does `local` again. Is there an alternative to also capture var = without local?
-                                            // This is low priority as this only matters if user does something weird, like
-                                            // writing to an outside variable within a component
-                                            variable.identifiers.last().map(|(start, _)| *start)
-                                        } else {
-                                            None
-                                        };
-
-                                        Some(Upvalue {
-                                            name: reference.name.clone(),
-                                            identifier_start_range: reference.identifier.0,
-                                            resolved_start_range,
-                                        })
-                                    } else {
-                                        None
-                                    }
-                                })
-                                .collect::<HashSet<_>>()
+                            self.get_upvalues_in_expression(effect_callback)
                         } else {
                             return;
                         };
 
-                    let dependencies_list = self
-                        .scope_manager
-                        .references
-                        .iter()
-                        .filter_map(|(_, reference)| {
-                            if reference.identifier.0 > range(dependency_array_expr).0
-                                && reference.identifier.1 < range(dependency_array_expr).1
-                                && reference.read
-                            {
-                                let upvalue = Upvalue {
-                                    name: reference.name.clone(),
-                                    identifier_start_range: reference.identifier.0,
-                                    resolved_start_range: None,
-                                };
-                                Some((upvalue.name.clone(), upvalue))
-                            } else {
-                                None
-                            }
-                        })
+                    let dependencies = self
+                        .get_upvalues_in_expression(dependency_array_expr)
+                        .into_iter()
+                        .map(|upvalue| (upvalue.name.clone(), upvalue))
                         .collect::<HashMap<_, _>>();
 
                     let mut missing_dependencies: Vec<_> = referenced_upvalues
@@ -269,7 +256,7 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                                     self.non_reactive_upvalue_starts.contains(&start_range)
                                 });
 
-                            !dependencies_list.contains_key(&upvalue.name) && !is_non_reactive
+                            !dependencies.contains_key(&upvalue.name) && !is_non_reactive
                         })
                         .cloned()
                         .collect();
@@ -282,7 +269,6 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                             range: range(dependency_array_expr),
                         });
                     }
-                } else {
                 }
             }
         }
