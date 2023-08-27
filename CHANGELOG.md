@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - `roblox_incorrect_roact_usage` now lints for illegal `Name` property
 - Added `ignore_pattern` config to `global_usage`, which will ignore any global variables with names that match the pattern
 - `roblox_incorrect_roact_usage` now checks for incorrect Roact17's `createElement` usage on variables named `React`. For Roact17 only, `key`, `children`, and `ref` are valid properties to Roblox instances.
+- Excludes are now respected for single files.
+- Added `no-exclude` cli flag to disable excludes.
 - When given in standard library format, additional information now shows up in `incorrect_standard_library_use` missing required parameter errors.
 - Added new [`roblox_roact_dangling_connection`](https://kampfkarren.github.io/selene/lints/roblox_roact_dangling_connection.html), which will check for connections made in components without getting cleaned up.
 
@@ -18,6 +20,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - `string.pack` and `string.unpack` now have proper function signatures in the Lua 5.3 standard library.
 - Moved `math.log` second argument addition from Lua 5.3 std lib to 5.2 std lib
 - `undefined_variable` now correctly errors when defining multiple methods in undefined tables
+- Corrected `os.exit` definition in Lua 5.2 standard library
 
 ## [0.25.0](https://github.com/Kampfkarren/selene/releases/tag/0.25.0) - 2023-03-12
 ### Added
