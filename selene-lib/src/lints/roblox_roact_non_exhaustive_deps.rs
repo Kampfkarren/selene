@@ -14,9 +14,9 @@ use if_chain::if_chain;
 
 use crate::ast_util::DepthTracker;
 
-pub struct RoactExhaustiveDepsLint;
+pub struct RoactNonExhaustiveDepsLint;
 
-impl Lint for RoactExhaustiveDepsLint {
+impl Lint for RoactNonExhaustiveDepsLint {
     type Config = ();
     type Error = Infallible;
 
@@ -58,7 +58,7 @@ impl Lint for RoactExhaustiveDepsLint {
         for invalid_event in visitor.missing_dependencies {
             if !invalid_event.missing_dependencies.is_empty() {
                 diagnostics.push(Diagnostic::new_complete(
-                    "roblox_roact_exhaustive_deps",
+                    "roblox_roact_non_exhaustive_deps",
                     get_formatted_error_message(&invalid_event.missing_dependencies, "missing"),
                     Label::new(invalid_event.range),
                     vec![format!(
@@ -79,7 +79,7 @@ impl Lint for RoactExhaustiveDepsLint {
                 invalid_event.unnecessary_dependencies.first()
             {
                 diagnostics.push(Diagnostic::new_complete(
-                    "roblox_roact_exhaustive_deps",
+                    "roblox_roact_non_exhaustive_deps",
                     get_formatted_error_message(
                         &invalid_event.unnecessary_dependencies,
                         "unnecessary",
@@ -384,8 +384,8 @@ mod tests {
     #[test]
     fn test_no_roact() {
         test_lint(
-            RoactExhaustiveDepsLint::new(()).unwrap(),
-            "roblox_roact_exhaustive_deps",
+            RoactNonExhaustiveDepsLint::new(()).unwrap(),
+            "roblox_roact_non_exhaustive_deps",
             "no_roact",
         );
     }
@@ -393,9 +393,9 @@ mod tests {
     #[test]
     fn test_roblox_roact_dangling_connection() {
         test_lint(
-            RoactExhaustiveDepsLint::new(()).unwrap(),
-            "roblox_roact_exhaustive_deps",
-            "roblox_roact_exhaustive_deps",
+            RoactNonExhaustiveDepsLint::new(()).unwrap(),
+            "roblox_roact_non_exhaustive_deps",
+            "roblox_roact_non_exhaustive_deps",
         );
     }
 }

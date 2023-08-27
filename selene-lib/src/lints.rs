@@ -42,7 +42,7 @@ pub mod roblox_incorrect_color3_new_bounds;
 pub mod roblox_incorrect_roact_usage;
 
 #[cfg(feature = "roblox")]
-pub mod roblox_roact_exhaustive_deps;
+pub mod roblox_roact_non_exhaustive_deps;
 
 #[cfg(feature = "roblox")]
 pub mod roblox_suspicious_udim2_new;
