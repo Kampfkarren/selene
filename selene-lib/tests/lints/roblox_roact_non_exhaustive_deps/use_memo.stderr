@@ -1,0 +1,8 @@
+error[roblox_roact_non_exhaustive_deps]: react hook useEffect has missing dependency: 'props'
+  ┌─ use_memo.lua:6:10
+  │
+6 │     end, {})
+  │          ^^
+  │
+  = help: either include it or remove the dependency array
+

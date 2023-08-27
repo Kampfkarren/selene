@@ -12,8 +12,6 @@ use full_moon::{
 };
 use if_chain::if_chain;
 
-use crate::ast_util::DepthTracker;
-
 pub struct RoactNonExhaustiveDepsLint;
 
 impl Lint for RoactNonExhaustiveDepsLint {
@@ -45,7 +43,7 @@ impl Lint for RoactNonExhaustiveDepsLint {
 
         let mut visitor = RoactMissingDependencyVisitor {
             scope_manager,
-            depth_tracker: DepthTracker::new(ast),
+            fn_declaration_starts_stack: Vec::new(),
             missing_dependencies: Vec::new(),
             unnecessary_dependencies: Vec::new(),
             non_reactive_upvalue_starts: HashSet::new(),
@@ -59,7 +57,11 @@ impl Lint for RoactNonExhaustiveDepsLint {
             if !invalid_event.missing_dependencies.is_empty() {
                 diagnostics.push(Diagnostic::new_complete(
                     "roblox_roact_non_exhaustive_deps",
-                    get_formatted_error_message(&invalid_event.missing_dependencies, "missing"),
+                    get_formatted_error_message(
+                        &invalid_event.hook_name,
+                        &invalid_event.missing_dependencies,
+                        "missing",
+                    ),
                     Label::new(invalid_event.range),
                     vec![format!(
                         "help: either include {} or remove the dependency array",
@@ -81,6 +83,7 @@ impl Lint for RoactNonExhaustiveDepsLint {
                 diagnostics.push(Diagnostic::new_complete(
                     "roblox_roact_non_exhaustive_deps",
                     get_formatted_error_message(
+                        &invalid_event.hook_name,
                         &invalid_event.unnecessary_dependencies,
                         "unnecessary",
                     ),
@@ -106,11 +109,13 @@ impl Lint for RoactNonExhaustiveDepsLint {
 }
 
 fn get_formatted_error_message(
+    hook_name: &String,
     missing_dependencies: &Vec<Upvalue>,
     missing_or_unnecessary: &str,
 ) -> String {
     format!(
-        "hook useEffect has {}: {}",
+        "react hook {} has {}: {}",
+        hook_name,
         if missing_dependencies.len() == 1 {
             format!("{} dependency", missing_or_unnecessary)
         } else {
@@ -185,7 +190,7 @@ struct RoactMissingDependencyVisitor<'a> {
     scope_manager: &'a ScopeManager,
     missing_dependencies: Vec<MissingDependency>,
     unnecessary_dependencies: Vec<UnnecessaryDependency>,
-    depth_tracker: DepthTracker,
+    fn_declaration_starts_stack: Vec<usize>,
 
     // Some variables are safe to omit from the dependency array, such as setState
     non_reactive_upvalue_starts: HashSet<usize>,
@@ -216,12 +221,14 @@ impl PartialEq for Upvalue {
 struct MissingDependency {
     missing_dependencies: Vec<Upvalue>,
     range: (usize, usize),
+    hook_name: String,
 }
 
 #[derive(Debug)]
 struct UnnecessaryDependency {
     unnecessary_dependencies: Vec<Upvalue>,
     range: (usize, usize),
+    hook_name: String,
 }
 
 impl RoactMissingDependencyVisitor<'_> {
@@ -256,6 +263,25 @@ impl RoactMissingDependencyVisitor<'_> {
             })
             .collect()
     }
+
+    ///  Useful for determining whether a byte is outside the component when called from the context of a hook
+    /// ```lua
+    ///  local var1
+    ///  local function component()
+    ///      local var2
+    ///      -- Called with var1 - TRUE
+    ///      -- Called with var2 - FALSE
+    ///      useEffect(function()
+    ///         -- Called with var1 - TRUE
+    ///         -- Called with var2 - FALSE
+    ///      end)
+    ///  end
+    /// ```
+    fn is_byte_outside_enclosing_named_fn(&self, byte: usize) -> bool {
+        self.fn_declaration_starts_stack
+            .last()
+            .map_or(false, |&last_fn_start| byte < last_fn_start)
+    }
 }
 
 impl Visitor for RoactMissingDependencyVisitor<'_> {
@@ -268,7 +294,7 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
             _ => return,
         };
 
-        if last_suffix.as_str() == "useEffect" && is_roact_function(call) {
+        if ["useEffect", "useMemo"].contains(&last_suffix.as_str()) && is_roact_function(call) {
             if let ast::FunctionArgs::Parentheses { arguments, .. } = function_args {
                 if let Some(dependency_array_expr) = arguments.iter().nth(1) {
                     let referenced_upvalues =
@@ -286,25 +312,28 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                         .map(|upvalue| (upvalue.name.clone(), upvalue))
                         .collect::<HashMap<_, _>>();
 
-                    let use_effect_depth = self.depth_tracker.depth_at_byte(range(call).0);
-
                     let mut missing_dependencies = referenced_upvalues
                         .iter()
                         .filter(|upvalue| {
-                            // Assume referenced variables but not initialized are globals and therefore not reactive
-                            let is_non_reactive =
-                                upvalue.resolved_start_range.map_or(true, |start_range| {
-                                    // Variables declared outside the component are not reactive
-                                    if use_effect_depth
-                                        != self.depth_tracker.depth_at_byte(start_range)
-                                    {
-                                        return true;
+                            if dependencies.contains_key(&upvalue.name) {
+                                return false;
+                            }
+
+                            upvalue
+                                .resolved_start_range
+                                // Treat unresolved variables as globals, which are not reactive
+                                .map_or(false, |resolved_start| {
+                                    // Ignore variables declared inside the hook callback
+                                    if upvalue.resolved_start_range >= range(call).0 {
+                                        return false;
                                     }
 
-                                    self.non_reactive_upvalue_starts.contains(&start_range)
-                                });
+                                    if self.is_byte_outside_enclosing_named_fn(resolved_start) {
+                                        return false;
+                                    }
 
-                            !dependencies.contains_key(&upvalue.name) && !is_non_reactive
+                                    !self.non_reactive_upvalue_starts.contains(&resolved_start)
+                                })
                         })
                         .cloned()
                         .collect::<Vec<_>>();
@@ -315,6 +344,7 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                         self.missing_dependencies.push(MissingDependency {
                             missing_dependencies,
                             range: range(dependency_array_expr),
+                            hook_name: last_suffix.to_string(),
                         });
                     }
 
@@ -322,19 +352,14 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                     let mut unnecessary_dependencies: Vec<Upvalue> = dependencies
                         .iter()
                         .filter_map(|(_, dependency)| {
-                            if let Some(start_range) = dependency.resolved_start_range {
-                                let depth_at_byte = self.depth_tracker.depth_at_byte(start_range);
-
-                                // Variables declared outside the component are not reactive
-                                if use_effect_depth != depth_at_byte
-                                    || self.non_reactive_upvalue_starts.contains(&start_range)
-                                {
+                            if let Some(resolved_start) = dependency.resolved_start_range {
+                                if self.is_byte_outside_enclosing_named_fn(resolved_start) {
                                     Some(dependency.clone())
                                 } else {
                                     None
                                 }
                             } else {
-                                // Assume referenced variables but not initialized are globals and therefore not reactive
+                                // Assume unresolved variables are globals and should not be included in deps
                                 Some(dependency.clone())
                             }
                         })
@@ -346,6 +371,7 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                         self.unnecessary_dependencies.push(UnnecessaryDependency {
                             unnecessary_dependencies,
                             range: range(dependency_array_expr),
+                            hook_name: last_suffix.to_string(),
                         });
                     }
                 }
@@ -365,8 +391,28 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                     &call.suffixes().collect::<Vec<_>>(),
                 );
 
-                // Setter functions are stable and can be omitted from dependency array
-                if function_suffix == "useState" || function_suffix == "useBinding" {
+                // State setter functions are stable and can be omitted from dependency array
+                if function_suffix == "useState" {
+                    if let Some(second_var) = assignment.names().iter().nth(1) {
+                        self.non_reactive_upvalue_starts
+                            .insert(range(second_var).0);
+                    }
+                }
+
+                if function_suffix == "useRef" {
+                    if let Some(first_var) = assignment.names().first() {
+                        self.non_reactive_upvalue_starts
+                            .insert(range(first_var).0);
+                    }
+                }
+
+                // Bindings and setters are both stable
+                if function_suffix == "useBinding" {
+                    if let Some(first_var) = assignment.names().first() {
+                        self.non_reactive_upvalue_starts
+                            .insert(range(first_var).0);
+                    }
+
                     if let Some(second_var) = assignment.names().iter().nth(1) {
                         self.non_reactive_upvalue_starts
                             .insert(range(second_var).0);
@@ -375,11 +421,38 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
             }
         }
     }
+
+    fn visit_function_declaration(&mut self, function_declaration: &ast::FunctionDeclaration) {
+        self.fn_declaration_starts_stack
+            .push(range(function_declaration).0);
+    }
+
+    fn visit_function_declaration_end(&mut self, _: &ast::FunctionDeclaration) {
+        self.fn_declaration_starts_stack.pop();
+    }
+
+    fn visit_local_function(&mut self, local_function: &ast::LocalFunction) {
+        self.fn_declaration_starts_stack
+            .push(range(local_function).0);
+    }
+
+    fn visit_local_function_end(&mut self, _: &ast::LocalFunction) {
+        self.fn_declaration_starts_stack.pop();
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::{super::test_util::test_lint, *};
+
+    #[test]
+    fn test_known_stable_vars() {
+        test_lint(
+            RoactNonExhaustiveDepsLint::new(()).unwrap(),
+            "roblox_roact_non_exhaustive_deps",
+            "known_stable_vars",
+        );
+    }
 
     #[test]
     fn test_no_roact() {
@@ -391,11 +464,20 @@ mod tests {
     }
 
     #[test]
-    fn test_roblox_roact_dangling_connection() {
+    fn test_roblox_roact_non_exhaustive_deps() {
         test_lint(
             RoactNonExhaustiveDepsLint::new(()).unwrap(),
             "roblox_roact_non_exhaustive_deps",
             "roblox_roact_non_exhaustive_deps",
+        );
+    }
+
+    #[test]
+    fn test_use_memo() {
+        test_lint(
+            RoactNonExhaustiveDepsLint::new(()).unwrap(),
+            "roblox_roact_non_exhaustive_deps",
+            "use_memo",
         );
     }
 }

@@ -6,7 +6,6 @@ use full_moon::{
     tokenizer::{self, Position, TokenReference},
 };
 
-mod depth_tracker;
 mod extract_static_token;
 mod loop_tracker;
 pub mod name_paths;
@@ -16,7 +15,6 @@ mod side_effects;
 mod strip_parentheses;
 pub mod visit_nodes;
 
-pub use depth_tracker::DepthTracker;
 pub use extract_static_token::extract_static_token;
 pub use loop_tracker::LoopTracker;
 pub use purge_trivia::purge_trivia;

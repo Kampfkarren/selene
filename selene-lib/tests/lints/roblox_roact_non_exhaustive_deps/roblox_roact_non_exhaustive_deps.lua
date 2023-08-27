@@ -30,14 +30,6 @@ local function Component3()
     end, depArray(reactive1))
 end
 
-local function Component4()
-    local _, setState = React.useState()
-
-    React.useEffect(function()
-        setState()
-    end, {})
-end
-
 local function Component5()
     local reactive1 = {}
 
