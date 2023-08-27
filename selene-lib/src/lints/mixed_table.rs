@@ -56,25 +56,22 @@ impl Visitor for MixedTableVisitor {
         let mut last_no_key_field_starting_range = 0;
 
         for field in node.fields() {
-            match field {
-                ast::Field::NoKey(_) => {
-                    if last_key_field_starting_range > 0 {
-                        self.mixed_tables.push(MixedTable {
-                            range: (last_key_field_starting_range, range(field).1),
-                        });
-                        return;
-                    }
-                    last_no_key_field_starting_range = range(field).0;
+            if let ast::Field::NoKey(_) = field {
+                if last_key_field_starting_range > 0 {
+                    self.mixed_tables.push(MixedTable {
+                        range: (last_key_field_starting_range, range(field).1),
+                    });
+                    return;
                 }
-                _ => {
-                    if last_no_key_field_starting_range > 0 {
-                        self.mixed_tables.push(MixedTable {
-                            range: (last_no_key_field_starting_range, range(field).1),
-                        });
-                        return;
-                    }
-                    last_key_field_starting_range = range(field).0;
+                last_no_key_field_starting_range = range(field).0;
+            } else {
+                if last_no_key_field_starting_range > 0 {
+                    self.mixed_tables.push(MixedTable {
+                        range: (last_no_key_field_starting_range, range(field).1),
+                    });
+                    return;
                 }
+                last_key_field_starting_range = range(field).0;
             }
         }
     }
