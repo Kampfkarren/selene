@@ -68,6 +68,12 @@ globals:
       - type: number
       - required: false
         type: number
+  os.exit:
+    args:
+      - required: false
+        type: number
+      - required: false
+        type: bool
   package.config:
     property: read-only
   rawlen:
