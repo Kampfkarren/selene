@@ -3,6 +3,8 @@ error[incorrect_standard_library_use]: standard library function `assert` requir
   │
 6 │ assert(true)
   │ ^^^^^^^^^^^^
+  │
+  = A failed assertion without a message is unhelpful to users.
 
 error[incorrect_standard_library_use]: standard library function `assert` requires 2 parameters, 3 passed
   ┌─ assert.lua:7:1
@@ -15,4 +17,10 @@ error[incorrect_standard_library_use]: standard library function `assert` requir
   │
 8 │ assert(true, "message", ...)
   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[incorrect_standard_library_use]: standard library function `assert` requires 2 parameters, 0 passed
+  ┌─ assert.lua:9:1
+  │
+9 │ assert()
+  │ ^^^^^^^^
 
