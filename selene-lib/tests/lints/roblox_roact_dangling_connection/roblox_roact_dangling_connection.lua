@@ -1,4 +1,5 @@
-local React = a
+local React
+local useEffect = React.useEffect
 
 a:connect()
 
@@ -13,6 +14,7 @@ local function c()
     a.ConnectParallel()
     a.Once()
 
+    -- Ignore since `a` might take ownership of connections
     a(b:Connect())
     a(function() end, b:Connect())
 

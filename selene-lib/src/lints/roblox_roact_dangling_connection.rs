@@ -6,6 +6,7 @@ use full_moon::{
     ast::{self, Ast},
     visitors::Visitor,
 };
+use if_chain::if_chain;
 
 pub struct RoactDanglingConnectionLint;
 
@@ -57,6 +58,7 @@ impl Lint for RoactDanglingConnectionLint {
                 })
                 .collect(),
             function_contexts: Vec::new(),
+            definitions_of_roact_functions: HashSet::new(),
         };
 
         visitor.visit_ast(ast);
@@ -133,6 +135,7 @@ struct RoactDanglingConnectionVisitor {
     dangling_connections: Vec<DanglingConnection>,
     dangling_connection_start_ranges: HashSet<usize>,
     function_contexts: Vec<(ConnectionContextType, ConnectionContext)>,
+    definitions_of_roact_functions: HashSet<String>,
 }
 
 #[derive(Debug)]
@@ -151,6 +154,15 @@ fn get_last_known_context(
     {
         Some(context) => context.1,
         None => ConnectionContext::Unknown,
+    }
+}
+
+fn is_roact_function(prefix: &ast::Prefix) -> bool {
+    if let ast::Prefix::Name(prefix_token) = prefix {
+        ["roact", "react", "hooks"]
+            .contains(&prefix_token.token().to_string().to_lowercase().as_str())
+    } else {
+        false
     }
 }
 
@@ -173,10 +185,29 @@ impl Visitor for RoactDanglingConnectionVisitor {
             }
         }
 
+        // Check if caller is Roact.<function> or a variable defined to it
+        let mut suffixes = call.suffixes().collect::<Vec<_>>();
+        suffixes.pop();
+
+        let mut is_this_roact_function = false;
+
+        if suffixes.is_empty() {
+            // Call is foo(), not foo.bar()
+            if let ast::Prefix::Name(name) = call.prefix() {
+                is_this_roact_function = self
+                    .definitions_of_roact_functions
+                    .get(&name.token().to_string())
+                    .is_some();
+            }
+        } else if suffixes.len() == 1 {
+            // Call is foo.bar()
+            is_this_roact_function = is_roact_function(call.prefix());
+        }
+
         self.function_contexts.push((
             ConnectionContextType::FunctionCall,
             match last_suffix.as_str() {
-                "useEffect" => ConnectionContext::UseEffect,
+                "useEffect" if is_this_roact_function => ConnectionContext::UseEffect,
                 _ => ConnectionContext::Unknown,
             },
         ));
@@ -195,6 +226,19 @@ impl Visitor for RoactDanglingConnectionVisitor {
 
     fn visit_function_body_end(&mut self, _: &ast::FunctionBody) {
         self.function_contexts.pop();
+    }
+
+    fn visit_local_assignment(&mut self, node: &ast::LocalAssignment) {
+        for (name, expr) in node.names().iter().zip(node.expressions().iter()) {
+            if_chain! {
+                if let ast::Expression::Value { value, .. } = expr;
+                if let ast::Value::Var(ast::Var::Expression(var_expr)) = &**value;
+                if is_roact_function(var_expr.prefix());
+                then {
+                    self.definitions_of_roact_functions.insert(name.token().to_string());
+                }
+            };
+        }
     }
 }
 
