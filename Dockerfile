@@ -1,20 +1,22 @@
-FROM rust:bullseye AS selene-builder
+ARG RUST_VERSION="1"
+
+FROM rust:${RUST_VERSION}-bullseye AS selene-builder
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install g++ && \
     cargo install --branch main --git https://github.com/Kampfkarren/selene selene
 
-FROM rust:bullseye AS selene-light-builder
+FROM rust:${RUST_VERSION}-bullseye AS selene-light-builder
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install g++ && \
     cargo install --no-default-features --branch main --git https://github.com/Kampfkarren/selene selene
 
-FROM rust:alpine AS selene-musl-builder
+FROM rust:${RUST_VERSION}-alpine AS selene-musl-builder
 RUN apk add g++ && \
     cargo install --branch main --git https://github.com/Kampfkarren/selene selene
 
-FROM rust:alpine AS selene-light-musl-builder
+FROM rust:${RUST_VERSION}-alpine AS selene-light-musl-builder
 RUN apk add g++ && \
     cargo install --no-default-features --branch main --git https://github.com/Kampfkarren/selene selene
 
