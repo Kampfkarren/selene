@@ -8,6 +8,7 @@ use std::{
 
 use full_moon::{
     ast::{self, Ast, Expression, FunctionCall},
+    tokenizer::TokenType,
     visitors::Visitor,
 };
 use if_chain::if_chain;
@@ -97,7 +98,7 @@ impl Lint for RoactNonExhaustiveDepsLint {
                         },
                     ), format!(
                         "outer scope variables like '{}' aren't valid dependencies because mutating them doesn't re-render the component",
-                        first_unnecessary_dependency.name,
+                        first_unnecessary_dependency.prefix,
                     )],
                     Vec::new(),
                 ));
@@ -122,21 +123,25 @@ fn get_formatted_error_message(
             format!("{} dependencies", missing_or_unnecessary)
         },
         match missing_dependencies.len() {
-            1 => format!("'{}'", missing_dependencies[0].name),
+            1 => format!("'{}'", missing_dependencies[0].indexing_expression_name()),
             2 => format!(
                 "'{}' and '{}'",
-                missing_dependencies[0].name, missing_dependencies[1].name
+                missing_dependencies[0].indexing_expression_name(),
+                missing_dependencies[1].indexing_expression_name()
             ),
             _ => {
                 let all_but_last = missing_dependencies[..missing_dependencies.len() - 1]
                     .iter()
-                    .map(|upvalue| format!("'{}'", &upvalue.name))
+                    .map(|upvalue| format!("'{}'", &upvalue.indexing_expression_name()))
                     .collect::<Vec<String>>()
                     .join(", ");
                 format!(
                     "{}, and '{}'",
                     all_but_last,
-                    missing_dependencies.last().unwrap().name
+                    missing_dependencies
+                        .last()
+                        .unwrap()
+                        .indexing_expression_name()
                 )
             }
         }
@@ -198,22 +203,50 @@ struct RoactMissingDependencyVisitor<'a> {
 
 #[derive(Clone, Debug, Eq)]
 struct Upvalue {
-    name: String,
+    /// `a.b` yields `a`
+    prefix: String,
 
-    // Knowing where referenced variable was initialized lets us narrow down whether it's a reactive variable
+    /// `a.b["c"].d`, `a.b.[c].d`, and `a.b.c().d` yield `["a", "b"]`
+    indexing_identifiers: Vec<String>,
+
+    /// Knowing where referenced variable was initialized lets us narrow down whether it's a reactive variable
     resolved_start_range: Option<usize>,
 }
 
-// Ensures we don't report a variable more than once if it's used multiple times in an effect
+impl Upvalue {
+    /// `a.b["c"].d`, `a.b.[c].d`, and `a.b.c().d` yield `a.b`
+    /// `a` just yields `a`
+    fn indexing_expression_name(&self) -> String {
+        let mut current_name = self.prefix.clone();
+        for index_name in &self.indexing_identifiers {
+            current_name.push('.');
+            current_name.push_str(index_name);
+        }
+        current_name
+    }
+
+    /// `a.b.c` yields `["a", "a.b", "a.b.c"]`
+    fn indexing_prefixes(&self) -> Vec<String> {
+        let mut prefixes = vec![self.prefix.clone()];
+        let mut current_name = self.prefix.clone();
+        for index_name in &self.indexing_identifiers {
+            current_name.push('.');
+            current_name.push_str(index_name);
+            prefixes.push(current_name.clone());
+        }
+        prefixes
+    }
+}
+
 impl Hash for Upvalue {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.name.hash(state);
+        self.indexing_expression_name().hash(state);
     }
 }
 
 impl PartialEq for Upvalue {
     fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
+        self.prefix == other.prefix
     }
 }
 
@@ -253,8 +286,27 @@ impl RoactMissingDependencyVisitor<'_> {
                         variable.identifiers.last().map(|(start, _)| *start)
                     });
 
+                    let indexing_identifiers = reference
+                        .indexing
+                        .as_ref()
+                        .unwrap_or(&vec![])
+                        .iter()
+                        .filter_map(|index_entry| {
+                            index_entry.static_name.as_ref().and_then(|static_name| {
+                                if let TokenType::Identifier { identifier } =
+                                    static_name.token().token_type()
+                                {
+                                    Some(identifier.to_string())
+                                } else {
+                                    None
+                                }
+                            })
+                        })
+                        .collect::<Vec<_>>();
+
                     Some(Upvalue {
-                        name: reference.name.clone(),
+                        prefix: reference.name.clone(),
+                        indexing_identifiers,
                         resolved_start_range,
                     })
                 } else {
@@ -264,7 +316,9 @@ impl RoactMissingDependencyVisitor<'_> {
             .collect()
     }
 
-    ///  Useful for determining whether a byte is outside the component when called from the context of a hook
+    /// Useful for determining whether a byte is outside the component when called from the context of a hook
+    ///
+    /// Uses current position of AST traversal. Calling this at different points will yield different results
     /// ```lua
     ///  local var1
     ///  local function component()
@@ -309,14 +363,17 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                     let dependencies = self
                         .get_upvalues_in_expression(dependency_array_expr)
                         .into_iter()
-                        .map(|upvalue| (upvalue.name.clone(), upvalue))
+                        .map(|upvalue| (upvalue.indexing_expression_name(), upvalue))
                         .collect::<HashMap<_, _>>();
 
                     let mut missing_dependencies = referenced_upvalues
                         .iter()
                         .filter(|upvalue| {
-                            if dependencies.contains_key(&upvalue.name) {
-                                return false;
+                            // A reference of `a.b.c` can have a dep of either `a`, `a.b`, or `a.b.c` to satisfy
+                            for indexing_prefix in upvalue.indexing_prefixes() {
+                                if dependencies.contains_key(&indexing_prefix) {
+                                    return false;
+                                }
                             }
 
                             upvalue
@@ -339,7 +396,26 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                         .collect::<Vec<_>>();
 
                     if !missing_dependencies.is_empty() {
-                        missing_dependencies.sort_by_key(|upvalue| upvalue.name.to_string());
+                        missing_dependencies
+                            .sort_by_key(|upvalue| upvalue.indexing_expression_name());
+
+                        let mut reported_indexing_prefixes = HashSet::new();
+
+                        // If `a` is already reported missing, no need to report `a.b` as well
+                        // This only works because this is sorted, so `a` will always come before `a.<anything>`
+                        missing_dependencies.retain(|upvalue| {
+                            let already_reported =
+                                upvalue.indexing_prefixes().iter().any(|indexing_prefix| {
+                                    reported_indexing_prefixes.contains(indexing_prefix)
+                                });
+
+                            if !already_reported {
+                                reported_indexing_prefixes
+                                    .insert(upvalue.indexing_expression_name());
+                            }
+
+                            !already_reported
+                        });
 
                         self.missing_dependencies.push(MissingDependency {
                             missing_dependencies,
@@ -366,7 +442,7 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                         .collect();
 
                     if !unnecessary_dependencies.is_empty() {
-                        unnecessary_dependencies.sort_by_key(|upvalue| upvalue.name.to_string());
+                        unnecessary_dependencies.sort_by_key(|upvalue| upvalue.prefix.to_string());
 
                         self.unnecessary_dependencies.push(UnnecessaryDependency {
                             unnecessary_dependencies,
@@ -444,6 +520,15 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
 #[cfg(test)]
 mod tests {
     use super::{super::test_util::test_lint, *};
+
+    #[test]
+    fn test_complex_deps() {
+        test_lint(
+            RoactNonExhaustiveDepsLint::new(()).unwrap(),
+            "roblox_roact_non_exhaustive_deps",
+            "complex_deps",
+        );
+    }
 
     #[test]
     fn test_known_stable_vars() {

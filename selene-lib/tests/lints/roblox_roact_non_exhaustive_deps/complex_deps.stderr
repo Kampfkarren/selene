@@ -1,0 +1,24 @@
+error[roblox_roact_non_exhaustive_deps]: react hook useEffect has missing dependency: 'a'
+   ┌─ complex_deps.lua:19:10
+   │
+19 │     end, { a.b })
+   │          ^^^^^^^
+   │
+   = help: either include it or remove the dependency array
+
+error[roblox_roact_non_exhaustive_deps]: react hook useEffect has missing dependency: 'a'
+   ┌─ complex_deps.lua:30:10
+   │
+30 │     end, { a.b.c })
+   │          ^^^^^^^^^
+   │
+   = help: either include it or remove the dependency array
+
+error[roblox_roact_non_exhaustive_deps]: react hook useEffect has missing dependency: 'a.b'
+   ┌─ complex_deps.lua:39:10
+   │
+39 │     end, { a.b.c.d })
+   │          ^^^^^^^^^^^
+   │
+   = help: either include it or remove the dependency array
+
