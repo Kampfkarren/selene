@@ -348,110 +348,116 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
             _ => return,
         };
 
-        if ["useEffect", "useMemo"].contains(&last_suffix.as_str()) && is_roact_function(call) {
-            if let ast::FunctionArgs::Parentheses { arguments, .. } = function_args {
-                if let Some(dependency_array_expr) = arguments.iter().nth(1) {
-                    let referenced_upvalues =
-                        if let Some(ast::punctuated::Pair::Punctuated(effect_callback, ..)) =
-                            arguments.first()
-                        {
-                            self.get_upvalues_in_expression(effect_callback)
-                        } else {
-                            return;
-                        };
+        if !["useEffect", "useMemo"].contains(&last_suffix.as_str()) || !is_roact_function(call) {
+            return;
+        }
 
-                    let dependencies = self
-                        .get_upvalues_in_expression(dependency_array_expr)
-                        .into_iter()
-                        .map(|upvalue| (upvalue.indexing_expression_name(), upvalue))
-                        .collect::<HashMap<_, _>>();
+        let arguments = match function_args {
+            ast::FunctionArgs::Parentheses { arguments, .. } => arguments,
+            _ => return,
+        };
 
-                    let mut missing_dependencies = referenced_upvalues
-                        .iter()
-                        .filter(|upvalue| {
-                            // A reference of `a.b.c` can have a dep of either `a`, `a.b`, or `a.b.c` to satisfy
-                            for indexing_prefix in upvalue.indexing_prefixes() {
-                                if dependencies.contains_key(&indexing_prefix) {
-                                    return false;
-                                }
-                            }
+        let dependency_array_expr = match arguments.iter().nth(1) {
+            Some(expr) => expr,
+            _ => return,
+        };
 
-                            upvalue
-                                .resolved_start_range
-                                // Treat unresolved variables as globals, which are not reactive
-                                .map_or(false, |resolved_start| {
-                                    // Ignore variables declared inside the hook callback
-                                    if upvalue.resolved_start_range >= range(call).0 {
-                                        return false;
-                                    }
+        let referenced_upvalues = match arguments.first() {
+            Some(ast::punctuated::Pair::Punctuated(effect_callback, ..)) => {
+                self.get_upvalues_in_expression(effect_callback)
+            }
+            _ => return,
+        };
 
-                                    if self.is_byte_outside_enclosing_named_fn(resolved_start) {
-                                        return false;
-                                    }
+        let dependencies = self
+            .get_upvalues_in_expression(dependency_array_expr)
+            .into_iter()
+            .map(|upvalue| (upvalue.indexing_expression_name(), upvalue))
+            .collect::<HashMap<_, _>>();
 
-                                    !self.non_reactive_upvalue_starts.contains(&resolved_start)
-                                })
-                        })
-                        .cloned()
-                        .collect::<Vec<_>>();
-
-                    if !missing_dependencies.is_empty() {
-                        missing_dependencies
-                            .sort_by_key(|upvalue| upvalue.indexing_expression_name());
-
-                        let mut reported_indexing_prefixes = HashSet::new();
-
-                        // If `a` is already reported missing, no need to report `a.b` as well
-                        // This only works because this is sorted, so `a` will always come before `a.<anything>`
-                        missing_dependencies.retain(|upvalue| {
-                            let already_reported =
-                                upvalue.indexing_prefixes().iter().any(|indexing_prefix| {
-                                    reported_indexing_prefixes.contains(indexing_prefix)
-                                });
-
-                            if !already_reported {
-                                reported_indexing_prefixes
-                                    .insert(upvalue.indexing_expression_name());
-                            }
-
-                            !already_reported
-                        });
-
-                        self.missing_dependencies.push(MissingDependency {
-                            missing_dependencies,
-                            range: range(dependency_array_expr),
-                            hook_name: last_suffix.to_string(),
-                        });
-                    }
-
-                    // Non-reactive variables should not be put in the dependency array
-                    let mut unnecessary_dependencies: Vec<Upvalue> = dependencies
-                        .iter()
-                        .filter_map(|(_, dependency)| {
-                            if let Some(resolved_start) = dependency.resolved_start_range {
-                                if self.is_byte_outside_enclosing_named_fn(resolved_start) {
-                                    Some(dependency.clone())
-                                } else {
-                                    None
-                                }
-                            } else {
-                                // Assume unresolved variables are globals and should not be included in deps
-                                Some(dependency.clone())
-                            }
-                        })
-                        .collect();
-
-                    if !unnecessary_dependencies.is_empty() {
-                        unnecessary_dependencies.sort_by_key(|upvalue| upvalue.prefix.to_string());
-
-                        self.unnecessary_dependencies.push(UnnecessaryDependency {
-                            unnecessary_dependencies,
-                            range: range(dependency_array_expr),
-                            hook_name: last_suffix.to_string(),
-                        });
+        let mut missing_dependencies = referenced_upvalues
+            .iter()
+            .filter(|upvalue| {
+                // A reference of `a.b.c` can have a dep of either `a`, `a.b`, or `a.b.c` to satisfy
+                for indexing_prefix in upvalue.indexing_prefixes() {
+                    if dependencies.contains_key(&indexing_prefix) {
+                        return false;
                     }
                 }
-            }
+
+                upvalue
+                    .resolved_start_range
+                    // Treat unresolved variables as globals, which are not reactive
+                    .map_or(false, |resolved_start| {
+                        // Ignore variables declared inside the hook callback
+                        if upvalue.resolved_start_range >= range(call).0 {
+                            return false;
+                        }
+
+                        if self.is_byte_outside_enclosing_named_fn(resolved_start) {
+                            return false;
+                        }
+
+                        !self.non_reactive_upvalue_starts.contains(&resolved_start)
+                    })
+            })
+            .cloned()
+            .collect::<Vec<_>>();
+
+        if !missing_dependencies.is_empty() {
+            // Without sorting, error message will be non-deterministic
+            missing_dependencies.sort_by_key(|upvalue| upvalue.indexing_expression_name());
+
+            let mut reported_indexing_prefixes = HashSet::new();
+
+            // If `a` is already reported missing, no need to report `a.b` as well
+            // This algorithm only works because this is sorted, so `a` will always come before `a.<anything>`
+            missing_dependencies.retain(|upvalue| {
+                let already_reported = upvalue
+                    .indexing_prefixes()
+                    .iter()
+                    .any(|indexing_prefix| reported_indexing_prefixes.contains(indexing_prefix));
+
+                if !already_reported {
+                    reported_indexing_prefixes.insert(upvalue.indexing_expression_name());
+                }
+
+                !already_reported
+            });
+
+            self.missing_dependencies.push(MissingDependency {
+                missing_dependencies,
+                range: range(dependency_array_expr),
+                hook_name: last_suffix.to_string(),
+            });
+        }
+
+        // Non-reactive variables should not be put in the dependency array
+        let mut unnecessary_dependencies: Vec<Upvalue> = dependencies
+            .iter()
+            .filter_map(|(_, dependency)| {
+                if let Some(resolved_start) = dependency.resolved_start_range {
+                    if self.is_byte_outside_enclosing_named_fn(resolved_start) {
+                        Some(dependency.clone())
+                    } else {
+                        None
+                    }
+                } else {
+                    // Assume unresolved variables are globals and should not be included in deps
+                    Some(dependency.clone())
+                }
+            })
+            .collect();
+
+        if !unnecessary_dependencies.is_empty() {
+            // Without sorting, error message will be non-deterministic
+            unnecessary_dependencies.sort_by_key(|upvalue| upvalue.prefix.to_string());
+
+            self.unnecessary_dependencies.push(UnnecessaryDependency {
+                unnecessary_dependencies,
+                range: range(dependency_array_expr),
+                hook_name: last_suffix.to_string(),
+            });
         }
     }
 
