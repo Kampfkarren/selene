@@ -598,6 +598,42 @@ globals:
       - type: any
       - required: false
         type: "..."
+  SharedTable.new:
+    args:
+      - required: false
+        type: table
+  SharedTable.clear:
+    args:
+      - type:
+          display: SharedTable
+  SharedTable.clone:
+    args:
+      - type:
+          display: SharedTable
+      - required: false
+        type: boolean
+  SharedTable.cloneAndFreeze:
+    args:
+      - type:
+          display: SharedTable
+      - required: false
+        type: boolean
+  SharedTable.increment:
+    args:
+      - type: "string | number"
+      - type: number
+  SharedTable.isFrozen:
+    args:
+      - type:
+          display: SharedTable
+  SharedTable.size:
+    args:
+      - type:
+          display: SharedTable
+  SharedTable.increment:
+    args:
+      - type: "string | number"
+      - type: function
 structs:
   EnumItem:
     Name:
