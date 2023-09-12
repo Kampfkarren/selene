@@ -620,7 +620,7 @@ globals:
         type: boolean
   SharedTable.increment:
     args:
-      - type: "string | number"
+      - type: "any"
       - type: number
   SharedTable.isFrozen:
     args:
@@ -632,7 +632,7 @@ globals:
           display: SharedTable
   SharedTable.increment:
     args:
-      - type: "string | number"
+      - type: "any"
       - type: function
 structs:
   EnumItem:
