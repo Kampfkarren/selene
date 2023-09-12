@@ -1,0 +1,54 @@
+error[mixed_table]: mixed tables are not allowed
+  ┌─ mixed_table.lua:2:5
+  │  
+2 │ ╭     "",
+3 │ │     a = b,
+  │ ╰─────────^
+  │  
+  = help: change this table to either an array or dictionary
+
+error[mixed_table]: mixed tables are not allowed
+  ┌─ mixed_table.lua:7:5
+  │  
+7 │ ╭     {},
+8 │ │     [a] = b,
+  │ ╰───────────^
+  │  
+  = help: change this table to either an array or dictionary
+
+error[mixed_table]: mixed tables are not allowed
+   ┌─ mixed_table.lua:12:5
+   │  
+12 │ ╭     a,
+13 │ │     [""] = b,
+   │ ╰────────────^
+   │  
+   = help: change this table to either an array or dictionary
+
+error[mixed_table]: mixed tables are not allowed
+   ┌─ mixed_table.lua:19:5
+   │  
+19 │ ╭     1,
+20 │ │     [2] = b,
+   │ ╰───────────^
+   │  
+   = help: change this table to either an array or dictionary
+
+error[mixed_table]: mixed tables are not allowed
+   ┌─ mixed_table.lua:25:5
+   │  
+25 │ ╭     [c] = d,
+26 │ │     "",
+   │ ╰──────^
+   │  
+   = help: change this table to either an array or dictionary
+
+error[mixed_table]: mixed tables are not allowed
+   ┌─ mixed_table.lua:30:5
+   │  
+30 │ ╭     a = b,
+31 │ │     "",
+   │ ╰──────^
+   │  
+   = help: change this table to either an array or dictionary
+
