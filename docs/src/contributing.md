@@ -130,7 +130,7 @@ The first `"cool_lint"` is the name of the folder we created. The second `"cool_
 
 Now, just run `cargo test`, and a `.stderr` file will be automatically generated! You can manipulate it however you see fit as well as modifying your lint, and so long as the file is there, selene will make sure that its accurate.
 
-Optionally, you can add a `.std.toml` with the same name as the test next to the lua file, where you can specify a custom [standard library](./usage/std.html) to use. If you do not, the Lua 5.1 standard library will be used.
+Optionally, you can add a `.std.toml` with the same name as the test next to the lua file, where you can specify a custom [standard library](./usage/std.md) to use. If you do not, the Lua 5.1 standard library will be used.
 
 ### Documenting it
 
