@@ -312,6 +312,7 @@ use_lints! {
     invalid_lint_filter: lints::invalid_lint_filter::InvalidLintFilterLint,
     manual_table_clone: lints::manual_table_clone::ManualTableCloneLint,
     mismatched_arg_count: lints::mismatched_arg_count::MismatchedArgCountLint,
+    mixed_table: lints::mixed_table::MixedTableLint,
     multiple_statements: lints::multiple_statements::MultipleStatementsLint,
     must_use: lints::must_use::MustUseLint,
     parenthese_conditions: lints::parenthese_conditions::ParentheseConditionsLint,
