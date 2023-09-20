@@ -19,7 +19,7 @@ local function Component2()
     end, { a.b })
 end
 
-local function Component3()
+local function Component()
     local a = {}
     React.useEffect(function()
         print(a) -- Bad
@@ -30,11 +30,21 @@ local function Component3()
     end, { a.b.c })
 end
 
-local function Component3()
+local function Component()
     local a = {}
     React.useEffect(function()
         print(a.b) -- Bad
         print(a.b.c) -- Bad, but already reported with `a.b`
         print(a.b.c.d)
     end, { a.b.c.d })
+end
+
+local function Component()
+    local a = {}
+    local d = {}
+    React.useEffect(function()
+        print(a.b.c()) -- Bad
+        print(a.b.d()) -- Bad, but already reported
+        print(d.e.f.g()) -- Good
+    end, { a.b.c, d.e.f })
 end

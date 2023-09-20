@@ -22,3 +22,11 @@ error[roblox_roact_non_exhaustive_deps]: react hook useEffect has missing depend
    │
    = help: either include it or remove the dependency array
 
+error[roblox_roact_non_exhaustive_deps]: react hook useEffect has missing dependency: 'a.b'
+   ┌─ complex_deps.lua:49:10
+   │
+49 │     end, { a.b.c, d.e.f })
+   │          ^^^^^^^^^^^^^^^^
+   │
+   = help: either include it or remove the dependency array
+

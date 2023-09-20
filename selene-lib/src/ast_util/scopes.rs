@@ -1,7 +1,7 @@
 use std::{borrow::Cow, collections::HashSet};
 
 use full_moon::{
-    ast::{self, VarExpression},
+    ast::{self},
     node::Node,
     tokenizer::{Symbol, TokenKind, TokenReference, TokenType},
     visitors::Visitor,
@@ -90,8 +90,7 @@ pub struct Reference {
     pub within_function_stmt: Option<WithinFunctionStmt>,
 
     // x.y["z"] produces ["y", "z"]
-    // x.y.z().w is None currently, but could change if necessary.
-    // If that change is made, ensure unused_variable is adjusted for write_only.
+    // x.y.z().w produce ["y", "z", "w"]
     pub indexing: Option<Vec<IndexEntry>>,
 }
 
@@ -131,6 +130,7 @@ pub struct WithinFunctionStmt {
 pub struct IndexEntry {
     pub index: Range,
     pub static_name: Option<TokenReference>,
+    pub is_function_call: bool,
 }
 
 #[derive(Debug, Default)]
@@ -349,6 +349,8 @@ impl ScopeVisitor {
 
                 ast::Value::FunctionCall(call) => {
                     self.read_prefix(call.prefix());
+                    self.adjust_indexing(call.suffixes(), range(call));
+
                     for suffix in call.suffixes() {
                         self.read_suffix(suffix);
                     }
@@ -492,7 +494,7 @@ impl ScopeVisitor {
         match var {
             ast::Var::Expression(var_expr) => {
                 self.read_prefix(var_expr.prefix());
-                self.adjust_indexing(var_expr);
+                self.adjust_indexing(var_expr.suffixes(), range(var_expr));
 
                 for suffix in var_expr.suffixes() {
                     self.read_suffix(suffix);
@@ -701,17 +703,24 @@ impl ScopeVisitor {
         }
     }
 
-    fn adjust_indexing(&mut self, var_expr: &VarExpression) {
-        let mut index_entries = Vec::new();
+    fn adjust_indexing<'a, I: Iterator<Item = &'a ast::Suffix>>(
+        &mut self,
+        suffixes: I,
+        expr_range: (usize, usize),
+    ) {
+        let mut index_entries: Vec<IndexEntry> = Vec::new();
 
-        for suffix in var_expr.suffixes() {
+        for suffix in suffixes {
             #[cfg_attr(
                 feature = "force_exhaustive_checks",
                 deny(non_exhaustive_omitted_patterns)
             )]
             let static_name = match suffix {
                 ast::Suffix::Call(_) => {
-                    return;
+                    if let Some(last_entry) = index_entries.last_mut() {
+                        last_entry.is_function_call = true;
+                    }
+                    continue;
                 }
 
                 ast::Suffix::Index(ast::Index::Brackets { expression, .. }) => {
@@ -728,6 +737,7 @@ impl ScopeVisitor {
             index_entries.push(IndexEntry {
                 index: range(suffix),
                 static_name: static_name.cloned(),
+                is_function_call: false,
             })
         }
 
@@ -735,7 +745,7 @@ impl ScopeVisitor {
             return;
         }
 
-        let Some(reference) = self.scope_manager.reference_at_byte_mut(range(var_expr).0) else {
+        let Some(reference) = self.scope_manager.reference_at_byte_mut(expr_range.0) else {
             return;
         };
 
@@ -1137,7 +1147,13 @@ mod tests {
                         .as_ref()
                         .expect("indexing was None")
                         .iter()
-                        .map(|index| index.static_name.as_ref().map(|token| token.to_string()))
+                        .map(|index| index.static_name.as_ref().map(|token| {
+                            if index.is_function_call {
+                                format!("{}()", token)
+                            } else {
+                                token.to_string()
+                            }
+                        }))
                         .collect::<Vec<Option<String>>>()
                 );
             }
@@ -1147,5 +1163,6 @@ mod tests {
         }
 
         test_indexing("x.y.z", &[Some("y"), Some("z")]);
+        test_indexing("a.b.c().d", &[Some("b"), Some("c()"), Some("d")]);
     }
 }

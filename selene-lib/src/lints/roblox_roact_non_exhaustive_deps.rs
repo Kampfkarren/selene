@@ -1,5 +1,5 @@
 use super::*;
-use crate::ast_util::range;
+use crate::ast_util::{range, scopes::Reference};
 use std::{
     collections::{HashMap, HashSet},
     convert::Infallible,
@@ -214,6 +214,34 @@ struct Upvalue {
 }
 
 impl Upvalue {
+    fn new(reference: &Reference, resolved_start_range: &Option<usize>) -> Self {
+        let indexing_identifiers = reference
+            .indexing
+            .as_ref()
+            .unwrap_or(&vec![])
+            .iter()
+            .map_while(|index_entry| {
+                if index_entry.is_function_call {
+                    return None;
+                }
+
+                index_entry.static_name.as_ref().and_then(|static_name| {
+                    if let TokenType::Identifier { identifier } = static_name.token().token_type() {
+                        Some(identifier.to_string())
+                    } else {
+                        None
+                    }
+                })
+            })
+            .collect::<Vec<_>>();
+
+        Upvalue {
+            prefix: reference.name.clone(),
+            indexing_identifiers,
+            resolved_start_range: *resolved_start_range,
+        }
+    }
+
     /// `a.b["c"].d`, `a.b.[c].d`, and `a.b.c().d` yield `a.b`
     /// `a` just yields `a`
     fn indexing_expression_name(&self) -> String {
@@ -286,29 +314,7 @@ impl RoactMissingDependencyVisitor<'_> {
                         variable.identifiers.last().map(|(start, _)| *start)
                     });
 
-                    let indexing_identifiers = reference
-                        .indexing
-                        .as_ref()
-                        .unwrap_or(&vec![])
-                        .iter()
-                        .filter_map(|index_entry| {
-                            index_entry.static_name.as_ref().and_then(|static_name| {
-                                if let TokenType::Identifier { identifier } =
-                                    static_name.token().token_type()
-                                {
-                                    Some(identifier.to_string())
-                                } else {
-                                    None
-                                }
-                            })
-                        })
-                        .collect::<Vec<_>>();
-
-                    Some(Upvalue {
-                        prefix: reference.name.clone(),
-                        indexing_identifiers,
-                        resolved_start_range,
-                    })
+                    Some(Upvalue::new(reference, &resolved_start_range))
                 } else {
                     None
                 }
