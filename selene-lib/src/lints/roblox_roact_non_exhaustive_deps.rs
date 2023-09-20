@@ -507,7 +507,7 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
         }
 
         // Non-reactive variables should not be put in the dependency array
-        let mut unnecessary_dependencies: Vec<Upvalue> = dependencies
+        let mut unnecessary_dependencies = dependencies
             .iter()
             .filter_map(|(_, dependency)| {
                 if let Some(resolved_start) = dependency.resolved_start_range {
@@ -521,7 +521,7 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                     Some(dependency.clone())
                 }
             })
-            .collect();
+            .collect::<Vec<Upvalue>>();
 
         if !unnecessary_dependencies.is_empty() {
             // Without sorting, error message will be non-deterministic
@@ -547,28 +547,14 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
                     &call.suffixes().collect::<Vec<_>>(),
                 );
 
-                // State setter functions are stable and can be omitted from dependency array
-                if function_suffix == "useState" {
-                    if let Some(second_var) = assignment.names().iter().nth(1) {
-                        self.non_reactive_upvalue_starts
-                            .insert(range(second_var).0);
-                    }
-                }
-
-                if function_suffix == "useRef" {
+                if ["useRef", "useBinding"].contains(&function_suffix.as_str()) {
                     if let Some(first_var) = assignment.names().first() {
                         self.non_reactive_upvalue_starts
                             .insert(range(first_var).0);
                     }
                 }
 
-                // Bindings and setters are both stable
-                if function_suffix == "useBinding" {
-                    if let Some(first_var) = assignment.names().first() {
-                        self.non_reactive_upvalue_starts
-                            .insert(range(first_var).0);
-                    }
-
+                if ["useState", "useBinding", "useDispatch", "useTransition"].contains(&function_suffix.as_str()) {
                     if let Some(second_var) = assignment.names().iter().nth(1) {
                         self.non_reactive_upvalue_starts
                             .insert(range(second_var).0);
