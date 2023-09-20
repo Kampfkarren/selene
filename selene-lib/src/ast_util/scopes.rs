@@ -90,7 +90,9 @@ pub struct Reference {
     pub within_function_stmt: Option<WithinFunctionStmt>,
 
     // x.y["z"] produces ["y", "z"]
-    // x.y.z().w produce ["y", "z", "w"]
+    // x.y.z().w produces ["y", "z", "w"]
+    // x.y[z].w produces ["y", None, "w"]. If this changes, ensure `roact_non_exhaustive_deps` is updated
+    // to detect dynamic indexing.
     pub indexing: Option<Vec<IndexEntry>>,
 }
 
@@ -1164,5 +1166,6 @@ mod tests {
 
         test_indexing("x.y.z", &[Some("y"), Some("z")]);
         test_indexing("a.b.c().d", &[Some("b"), Some("c()"), Some("d")]);
+        test_indexing("a[b].c().d", &[None, Some("c()"), Some("d")]);
     }
 }

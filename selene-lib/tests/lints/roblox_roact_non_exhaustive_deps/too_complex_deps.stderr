@@ -1,0 +1,32 @@
+error[roblox_roact_non_exhaustive_deps]: react hook useEffect has a complex expression in the dependency array
+  ┌─ too_complex_deps.lua:7:10
+  │
+7 │     end, { a[b] })
+  │          ^^^^^^^^
+  │
+  = help: extract it to a separate variable so it can be statically checked
+
+error[roblox_roact_non_exhaustive_deps]: react hook useEffect has a complex expression in the dependency array
+   ┌─ too_complex_deps.lua:14:10
+   │
+14 │     end, { a.b["c"]() })
+   │          ^^^^^^^^^^^^^^
+   │
+   = help: extract it to a separate variable so it can be statically checked
+
+error[roblox_roact_non_exhaustive_deps]: react hook useEffect has a complex expression in the dependency array
+   ┌─ too_complex_deps.lua:34:10
+   │
+34 │     end, a.b(a.b()))
+   │          ^^^^^^^^^^
+   │
+   = help: extract it to a separate variable so it can be statically checked
+
+error[roblox_roact_non_exhaustive_deps]: react hook useEffect has a complex expression in the dependency array
+   ┌─ too_complex_deps.lua:38:10
+   │
+38 │     end, { a.b() })
+   │          ^^^^^^^^^
+   │
+   = help: extract it to a separate variable so it can be statically checked
+

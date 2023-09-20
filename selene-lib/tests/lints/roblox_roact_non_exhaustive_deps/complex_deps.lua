@@ -43,8 +43,29 @@ local function Component()
     local a = {}
     local d = {}
     React.useEffect(function()
-        print(a.b.c()) -- Bad
-        print(a.b.d()) -- Bad, but already reported
+        print(a.b.c()) -- Good
+        print(a.b.d()) -- Bad
         print(d.e.f.g()) -- Good
     end, { a.b.c, d.e.f })
+end
+
+local function Component()
+    local a = {}
+    React.useEffect(function()
+        print(a.b["c d"]["e"])
+    end, {})
+end
+
+local function Component()
+    local a = {}
+    React.useEffect(function()
+        print(a["b c"]["d"])
+    end, { a["b c"]["d"] })
+end
+
+local function Component()
+    local a = {}
+    React.useEffect(function()
+        local _ = a["b c"]()
+    end, {})
 end

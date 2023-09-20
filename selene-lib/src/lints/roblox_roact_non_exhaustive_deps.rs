@@ -4,6 +4,7 @@ use std::{
     collections::{HashMap, HashSet},
     convert::Infallible,
     hash::Hash,
+    vec,
 };
 
 use full_moon::{
@@ -47,6 +48,7 @@ impl Lint for RoactNonExhaustiveDepsLint {
             fn_declaration_starts_stack: Vec::new(),
             missing_dependencies: Vec::new(),
             unnecessary_dependencies: Vec::new(),
+            complex_dependencies: Vec::new(),
             non_reactive_upvalue_starts: HashSet::new(),
         };
 
@@ -105,6 +107,22 @@ impl Lint for RoactNonExhaustiveDepsLint {
             }
         }
 
+        for invalid_event in visitor.complex_dependencies {
+            diagnostics.push(Diagnostic::new_complete(
+                "roblox_roact_non_exhaustive_deps",
+                format!(
+                    "react hook {} has a complex expression in the dependency array",
+                    invalid_event.hook_name
+                ),
+                Label::new(invalid_event.range),
+                vec![
+                    "help: extract it to a separate variable so it can be statically checked"
+                        .to_string(),
+                ],
+                Vec::new(),
+            ));
+        }
+
         diagnostics
     }
 }
@@ -146,6 +164,16 @@ fn get_formatted_error_message(
             }
         }
     )
+}
+
+fn is_lua_valid_identifier(string: &str) -> bool {
+    // Valid identifier cannot start with numbers
+    let first_char = string.chars().next().unwrap();
+    if !first_char.is_alphabetic() && first_char != '_' {
+        return false;
+    }
+
+    string.chars().all(|c| c.is_alphanumeric() || c == '_')
 }
 
 fn get_last_function_call_suffix(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]) -> String {
@@ -195,6 +223,7 @@ struct RoactMissingDependencyVisitor<'a> {
     scope_manager: &'a ScopeManager,
     missing_dependencies: Vec<MissingDependency>,
     unnecessary_dependencies: Vec<UnnecessaryDependency>,
+    complex_dependencies: Vec<ComplexDependency>,
     fn_declaration_starts_stack: Vec<usize>,
 
     // Some variables are safe to omit from the dependency array, such as setState
@@ -206,8 +235,18 @@ struct Upvalue {
     /// `a.b` yields `a`
     prefix: String,
 
-    /// `a.b["c"].d`, `a.b.[c].d`, and `a.b.c().d` yield `["a", "b"]`
+    /// `a.b["c d"].e` yields ["a", "b", "c d", "e"]`
+    ///
+    /// `a.b.[c].d` yields `["a", "b"]`
+    ///
+    /// `a.b.c().d` yields `["a", "b", "c"]`
+    // eslint requires passing in `a.b` for `a.b.c()` since js implicitly passes `a.b`
+    // as `this` to `c`. Lua doesn't do this, so we can allow `a.b.c` as deps
     indexing_identifiers: Vec<String>,
+
+    /// True if there's any dynamic indexing or function calls such as `a[b]` or `a.b()`
+    /// FIXME: This false negatives for function calls without indexing such as `a()`
+    is_complex_expression: bool,
 
     /// Knowing where referenced variable was initialized lets us narrow down whether it's a reactive variable
     resolved_start_range: Option<usize>,
@@ -215,42 +254,49 @@ struct Upvalue {
 
 impl Upvalue {
     fn new(reference: &Reference, resolved_start_range: &Option<usize>) -> Self {
-        let indexing_identifiers = reference
-            .indexing
-            .as_ref()
-            .unwrap_or(&vec![])
+        let default_indexing = Vec::new();
+        let indexing = reference.indexing.as_ref().unwrap_or(&default_indexing);
+
+        let indexing_identifiers = indexing
             .iter()
-            .map_while(|index_entry| {
-                if index_entry.is_function_call {
+            .enumerate()
+            .map_while(|(i, index_entry)| {
+                if i > 0 && indexing[i - 1].is_function_call {
                     return None;
                 }
 
                 index_entry.static_name.as_ref().and_then(|static_name| {
-                    if let TokenType::Identifier { identifier } = static_name.token().token_type() {
-                        Some(identifier.to_string())
-                    } else {
-                        None
+                    match static_name.token().token_type() {
+                        TokenType::Identifier { identifier } => Some(identifier.to_string()),
+                        TokenType::StringLiteral { literal, .. } => Some(literal.to_string()),
+                        _ => None,
                     }
                 })
             })
             .collect::<Vec<_>>();
 
+        let is_complex_expression = indexing
+            .iter()
+            .any(|index_entry| index_entry.static_name.is_none() || index_entry.is_function_call);
+
         Upvalue {
             prefix: reference.name.clone(),
             indexing_identifiers,
+            is_complex_expression,
             resolved_start_range: *resolved_start_range,
         }
     }
 
-    /// `a.b["c"].d`, `a.b.[c].d`, and `a.b.c().d` yield `a.b`
+    /// `a.b["c"]["d e"]` yields `a.b.c["d e"]`
+    ///
+    /// `a.b.c().d` yields `a.b.c`
+    ///
     /// `a` just yields `a`
     fn indexing_expression_name(&self) -> String {
-        let mut current_name = self.prefix.clone();
-        for index_name in &self.indexing_identifiers {
-            current_name.push('.');
-            current_name.push_str(index_name);
-        }
-        current_name
+        self.indexing_prefixes()
+            .last()
+            .unwrap_or(&"".to_string())
+            .to_string()
     }
 
     /// `a.b.c` yields `["a", "a.b", "a.b.c"]`
@@ -258,8 +304,11 @@ impl Upvalue {
         let mut prefixes = vec![self.prefix.clone()];
         let mut current_name = self.prefix.clone();
         for index_name in &self.indexing_identifiers {
-            current_name.push('.');
-            current_name.push_str(index_name);
+            if is_lua_valid_identifier(index_name) {
+                current_name.push_str(format!(".{}", index_name).as_str());
+            } else {
+                current_name.push_str(format!("[\"{}\"]", index_name).as_str());
+            }
             prefixes.push(current_name.clone());
         }
         prefixes
@@ -292,6 +341,12 @@ struct UnnecessaryDependency {
     hook_name: String,
 }
 
+#[derive(Debug)]
+struct ComplexDependency {
+    range: (usize, usize),
+    hook_name: String,
+}
+
 impl RoactMissingDependencyVisitor<'_> {
     fn get_upvalues_in_expression(&self, expression: &Expression) -> HashSet<Upvalue> {
         self.scope_manager
@@ -308,9 +363,8 @@ impl RoactMissingDependencyVisitor<'_> {
                         // FIXME: We need the start range where the variable was last set. Otherwise
                         // a variable can be first set outside but set again inside a component, and it
                         // identifies as non-reactive. However, this seems to only capture when user
-                        // does `local` again. Is there an alternative to also capture var = without local?
-                        // This is low priority as this only matters if user does something weird, like
-                        // writing to an outside variable within a component
+                        // does `local` again. This is low priority as this only matters if user does something
+                        // weird like writing to an outside variable within a component, which breaks a different rule
                         variable.identifiers.last().map(|(start, _)| *start)
                     });
 
@@ -380,6 +434,17 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
             .into_iter()
             .map(|upvalue| (upvalue.indexing_expression_name(), upvalue))
             .collect::<HashMap<_, _>>();
+
+        if dependencies
+            .iter()
+            .any(|(_, dependency)| dependency.is_complex_expression)
+        {
+            self.complex_dependencies.push(ComplexDependency {
+                range: range(dependency_array_expr),
+                hook_name: last_suffix.to_string(),
+            });
+            return;
+        }
 
         let mut missing_dependencies = referenced_upvalues
             .iter()
@@ -566,6 +631,15 @@ mod tests {
             RoactNonExhaustiveDepsLint::new(()).unwrap(),
             "roblox_roact_non_exhaustive_deps",
             "roblox_roact_non_exhaustive_deps",
+        );
+    }
+
+    #[test]
+    fn test_too_complex_deps() {
+        test_lint(
+            RoactNonExhaustiveDepsLint::new(()).unwrap(),
+            "roblox_roact_non_exhaustive_deps",
+            "too_complex_deps",
         );
     }
 
