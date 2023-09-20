@@ -408,7 +408,10 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
             _ => return,
         };
 
-        if !["useEffect", "useMemo"].contains(&last_suffix.as_str()) || !is_roact_function(call) {
+        if !["useEffect", "useMemo", "useCallback", "useLayoutEffect"]
+            .contains(&last_suffix.as_str())
+            || !is_roact_function(call)
+        {
             return;
         }
 
@@ -613,6 +616,15 @@ mod tests {
             RoactNonExhaustiveDepsLint::new(()).unwrap(),
             "roblox_roact_non_exhaustive_deps",
             "known_stable_vars",
+        );
+    }
+
+    #[test]
+    fn test_no_deps() {
+        test_lint(
+            RoactNonExhaustiveDepsLint::new(()).unwrap(),
+            "roblox_roact_non_exhaustive_deps",
+            "no_deps",
         );
     }
 

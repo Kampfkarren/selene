@@ -2,13 +2,14 @@ local React
 
 local notreactive1 = {}
 
-local function Component1()
+local function Component1(props)
     local reactive1 = {}
     local reactive2 = {}
 
     React.useEffect(function()
         local allowed = notreactive1
         local notallowed = reactive1
+        local notallowed = props
         print(reactive2)
     end, {})
 end
