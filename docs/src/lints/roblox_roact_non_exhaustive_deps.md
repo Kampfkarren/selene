@@ -55,6 +55,7 @@ end
 4. This lint does not take effect if nothing is passed to the second argument of the hook.
 5. This lint is only active if you are using the Roblox standard library.
 6. This lint warns against complex dependency expressions like function calls and dynamic indexing. This currently false negatives with function calls without any indexing, such as `{ a() }`. 
+7. This lint will ignore upvalues that are not reactive. Some examples of this are variables defined outside the component and variables that are known to be stable such as setter functions to `useState`.
 
 ## Deviations from [eslint-plugin-react-hooks/exhaustive-deps](https://www.npmjs.com/package/eslint-plugin-react-hooks)
 1. ESLint requires passing in `a` for `a.b()` since js can implicitly pass `a` as `this` to `a.b`. Lua doesn't do this, so we allow `a.b` as dependencies.
