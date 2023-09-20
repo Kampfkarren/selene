@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Excludes are now respected for single files.
 - Added `no-exclude` cli flag to disable excludes.
 - When given in standard library format, additional information now shows up in `incorrect_standard_library_use` missing required parameter errors.
+- Added new [`mixed_table` lint](https://kampfkarren.github.io/selene/lints/mixed_table.html), which will warn against mixed tables.
 - Added new [`roblox_roact_dangling_connection`](https://kampfkarren.github.io/selene/lints/roblox_roact_dangling_connection.html), which will check for connections made in components without getting cleaned up.
 
 ### Fixed
