@@ -188,6 +188,7 @@ end
 <li>Any usage of the output variable in between the definition and the loop (as determined by position in code).</li>
 <li>If the input variable is not a plain locally initialized variable. For example, <code>self.state[key] = value</code> will not lint.</li>
 <li>If the input variable is not defined as a completely empty table.</li>
+<li>If the loop and input variable are defined at different depths.</li>
 </ul>
 <hr />
 <p>The detected looping patterns are <code>pairs(t)</code>, <code>ipairs(t)</code>, <code>next, t</code>, and <code>t</code> (Luau generalized iteration). If <code>ipairs</code> is used, <code>table.clone</code> is not an exact match if the table is not exclusively an array. For example:</p>
