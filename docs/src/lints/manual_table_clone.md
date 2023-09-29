@@ -27,6 +27,7 @@ Very little outside this exact pattern is matched. This is the list of circumsta
 - Any usage of the output variable in between the definition and the loop (as determined by position in code).
 - If the input variable is not a plain locally initialized variable. For example, `self.state[key] = value` will not lint.
 - If the input variable is not defined as a completely empty table.
+- If the loop and input variable are defined at different depths.
 
 ---
 
