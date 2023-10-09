@@ -58,5 +58,5 @@ end
 7. This lint will ignore upvalues that are not reactive. Some examples of this are variables defined outside the component and variables that are known to be stable such as setter functions to `useState`.
 
 ## Deviations from [eslint-plugin-react-hooks/exhaustive-deps](https://www.npmjs.com/package/eslint-plugin-react-hooks)
-1. ESLint requires passing in `a` for `a.b()` since js can implicitly pass `a` as `this` to `a.b`. Lua doesn't do this, so we allow `a.b` as dependencies.
-2. ESLint complains about brackets in dependencies like `a["b"]` as being too complex. If string literals are inside the brackets and not a variable like `a[b]`, we recognize that and treat it the same as `a.b`.
+1. ESLint requires passing in `a` for `a.b()` since js can implicitly pass `a` as `this` to `a.b`. Lua doesn't do this, so Selene allows `a.b` as dependencies.
+2. ESLint complains about brackets in dependencies like `a["b"]` as being too complex. If string literals are inside the brackets and not a variable like `a[b]`, Selene recognizes that and treat it the same as `a.b`.
