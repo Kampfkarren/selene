@@ -150,7 +150,7 @@ globals:
       - type: table
       - type: number
     deprecated:
-      message: "`table.getn` has been superceded by #."
+      message: "`table.getn` has been superseded by #."
       replace:
         - "#%1"
 ```

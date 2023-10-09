@@ -22,6 +22,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Moved `math.log` second argument addition from Lua 5.3 std lib to 5.2 std lib
 - `undefined_variable` now correctly errors when defining multiple methods in undefined tables
 - Corrected `os.exit` definition in Lua 5.2 standard library
+- Fixed `manual_table_clone` incorrectly warning when loop and table are defined at different depths
 
 ## [0.25.0](https://github.com/Kampfkarren/selene/releases/tag/0.25.0) - 2023-03-12
 ### Added

@@ -1,3 +1,6 @@
+// Remove this once loop_tracker is used again
+#![allow(dead_code)]
+
 use full_moon::{ast, node::Node, visitors::Visitor};
 
 #[derive(Debug, Clone, Copy)]
