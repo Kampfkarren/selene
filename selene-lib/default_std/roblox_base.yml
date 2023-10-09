@@ -611,7 +611,7 @@ structs:
       method: true
     connect:
       deprecated:
-        message: "lowercase methods have been superceded by uppercase ones"
+        message: "lowercase methods have been superseded by uppercase ones"
         replace:
           - "Connect(%1)"
       args:
@@ -626,7 +626,7 @@ structs:
       method: true
     wait:
       deprecated:
-        message: "lowercase methods have been superceded by uppercase ones"
+        message: "lowercase methods have been superseded by uppercase ones"
         replace:
           - "Wait(%1)"
       args:

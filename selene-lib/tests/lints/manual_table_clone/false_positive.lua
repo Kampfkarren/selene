@@ -39,6 +39,34 @@ local function falsePositive3(t)
 	return result
 end
 
+local result4 = {}
+local function falsePositive4(t)
+    for key, value in t do
+        result3[key] = value
+    end
+end
+
+local result5 = {}
+local function falsePositive5(t)
+	local function f() end
+
+    for key, value in t do
+        result4[key] = value
+    end
+end
+
+local function falsePositive6(t)
+    local result = {}
+
+	if b then return end
+
+    if a then
+        for key, value in t do
+            result4[key] = value
+        end
+    end
+end
+
 local function notFalsePositive1(t)
 	local result = {}
 
