@@ -1,15 +1,11 @@
 use crate::{
-    ast_util::{range, scopes::AssignedValue},
+    ast_util::scopes::AssignedValue,
     standard_library::{Field, FieldKind, Observes},
 };
 
 use super::*;
 
-use full_moon::{
-    ast::Ast,
-    node::Node,
-    tokenizer::{Symbol, TokenType},
-};
+use full_moon::ast::Ast;
 use regex::Regex;
 use serde::Deserialize;
 
@@ -55,7 +51,7 @@ impl Lint for UnusedVariableLint {
         })
     }
 
-    fn pass(&self, ast: &Ast, context: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
+    fn pass(&self, _: &Ast, context: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
         let mut diagnostics = Vec::new();
 
         for (_, variable) in ast_context
@@ -161,8 +157,7 @@ impl Lint for UnusedVariableLint {
             {
                 let mut notes = Vec::new();
 
-                let mut variable_range = variable.identifiers[0];
-                let mut fixed_code = format!("_{}", variable.name);
+                let mut fixed_code = Some(format!("_{}", variable.name));
 
                 if variable.is_self {
                     if self.allow_unused_self {
@@ -173,24 +168,8 @@ impl Lint for UnusedVariableLint {
                     notes
                         .push("if you don't need it, consider using `.` instead of `:`".to_owned());
 
-                    // This is a very hacky and fragile way to get the colon in the function call. Can we do better?
-                    // We can't just use variable start - 1 due to cases like `function a: b() end`
-                    let mut last_colon_start = 0;
-                    for token in ast.tokens() {
-                        let start_position: usize = range(token).0;
-                        if start_position >= variable_range.0 {
-                            break;
-                        }
-
-                        if let TokenType::Symbol { symbol } = token.token().token_type() {
-                            if *symbol == Symbol::Colon {
-                                last_colon_start = range(token).0;
-                            }
-                        }
-                    }
-
-                    variable_range = (last_colon_start, last_colon_start + 1);
-                    fixed_code = ".".to_string();
+                    // Applying fix by changing `:` to `.` would break any existing methods calls
+                    fixed_code = None;
                 }
 
                 let write_only = !analyzed_references.is_empty();
@@ -202,7 +181,7 @@ impl Lint for UnusedVariableLint {
                     } else {
                         format!("{} is defined, but never used", variable.name)
                     },
-                    Label::new(variable_range),
+                    Label::new(variable.identifiers[0]),
                     notes,
                     analyzed_references
                         .into_iter()
@@ -214,7 +193,7 @@ impl Lint for UnusedVariableLint {
                             }
                         })
                         .collect(),
-                    Some(fixed_code),
+                    fixed_code,
                 ));
             };
         }

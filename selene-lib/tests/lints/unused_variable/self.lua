@@ -1,7 +1,6 @@
 local Foo = {}
 
 function Foo:A() end
-function Foo   :   B() end
-function Foo.C() end
+function Foo.B() end
 
 return Foo
