@@ -9,6 +9,7 @@ USAGE:
 FLAGS:
         --allow-warnings    Pass when only warnings occur
         --no-exclude        Ignore excludes defined in config
+        --fix               Automatically applies some lint suggestions
     -h, --help              Prints help information
     -n, --no-summary        Suppress summary information
     -q, --quiet             Display only the necessary information. Equivalent to --display-style="quiet"

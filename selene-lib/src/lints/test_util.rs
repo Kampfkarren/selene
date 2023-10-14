@@ -44,7 +44,7 @@ fn replace_code_range(code: &str, start: usize, end: usize, replacement: &str) -
 }
 
 // Assumes diagnostics is sorted by starting ranges and that there are no overlapping ranges
-fn apply_diagnostics_fixes(code: &str, diagnostics: &Vec<Diagnostic>) -> String {
+fn apply_diagnostics_fixes(code: &str, diagnostics: &Vec<&Diagnostic>) -> String {
     let mut bytes_offset = 0;
 
     let new_code = diagnostics
@@ -131,7 +131,7 @@ pub fn test_lint_config_with_output<
 
     let mut output = termcolor::NoColor::new(Vec::new());
 
-    let fixed_lua_code = apply_diagnostics_fixes(&lua_source, &diagnostics);
+    let fixed_lua_code = apply_diagnostics_fixes(&lua_source, &diagnostics.iter().collect());
     let fixed_diff = generate_diff(&lua_source, &fixed_lua_code);
     let diff_output_path = path_base.with_extension("fixed.diff");
 

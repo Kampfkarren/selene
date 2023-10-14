@@ -69,6 +69,9 @@ pub struct Options {
 
     #[structopt(long)]
     pub no_exclude: bool,
+
+    #[structopt(long)]
+    pub fix: bool,
 }
 
 impl Options {

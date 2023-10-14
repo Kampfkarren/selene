@@ -11,11 +11,15 @@ use std::{
 
 use codespan_reporting::{
     diagnostic::{
-        Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
+        self, Diagnostic as CodespanDiagnostic, Label as CodespanLabel,
+        Severity as CodespanSeverity,
     },
     term::DisplayStyle as CodespanDisplayStyle,
 };
-use selene_lib::{lints::Severity, *};
+use selene_lib::{
+    lints::{Diagnostic, Severity},
+    *,
+};
 use structopt::{clap, StructOpt};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
@@ -178,7 +182,50 @@ fn emit_codespan_locked(
     emit_codespan(&mut stdout, files, diagnostic);
 }
 
-fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut reader: R) {
+fn replace_code_range(code: &str, start: usize, end: usize, replacement: &str) -> String {
+    if start > end || end > code.len() {
+        return code.to_string();
+    }
+
+    return format!("{}{}{}", &code[..start], replacement, &code[end..]);
+}
+
+// Assumes diagnostics is sorted by starting ranges and that there are no overlapping ranges
+// This is just copied from `test_util`. Can we get a better abstraction?
+// FIXME: handle the overlapping ranges
+fn apply_diagnostics_fixes(code: &str, diagnostics: &Vec<&Diagnostic>) -> String {
+    let mut bytes_offset = 0;
+
+    let new_code = diagnostics
+        .iter()
+        .fold(code.to_string(), |code, diagnostic| {
+            if let Some(fixed) = &diagnostic.fixed_code {
+                let (start, end) = diagnostic.primary_label.range;
+                let new_code = replace_code_range(
+                    code.as_str(),
+                    (start as isize + bytes_offset as isize) as usize,
+                    (end as isize + bytes_offset as isize) as usize,
+                    &fixed.as_str(),
+                );
+
+                bytes_offset += fixed.len() as isize - (end - start) as isize;
+                new_code
+            } else {
+                code
+            }
+        });
+
+    full_moon::parse(&new_code).expect("Failed to parse fixed code");
+
+    new_code
+}
+
+fn read<R: Read>(
+    checker: &Checker<toml::value::Value>,
+    filename: &Path,
+    mut reader: R,
+    is_fix: bool,
+) {
     let mut buffer = Vec::new();
     if let Err(error) = reader.read_to_end(&mut buffer) {
         error!(
@@ -288,6 +335,17 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
     let stdout = termcolor::StandardStream::stdout(get_color());
     let mut stdout = stdout.lock();
 
+    if is_fix {
+        let fixed_code = apply_diagnostics_fixes(
+            contents.as_ref(),
+            &diagnostics
+                .iter()
+                .map(|diagnostic| &diagnostic.diagnostic)
+                .collect(),
+        );
+        let _ = fs::write(filename, fixed_code);
+    }
+
     for diagnostic in diagnostics {
         if opts.luacheck {
             // Existing Luacheck consumers presumably use --formatter plain
@@ -376,7 +434,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
     }
 }
 
-fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
+fn read_file(checker: &Checker<toml::value::Value>, filename: &Path, is_fix: bool) {
     read(
         checker,
         filename,
@@ -388,6 +446,7 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
                 return;
             }
         },
+        is_fix,
     );
 }
 
@@ -608,7 +667,7 @@ fn start(mut options: opts::Options) {
     for filename in &options.files {
         if filename == "-" {
             let checker = Arc::clone(&checker);
-            pool.execute(move || read(&checker, Path::new("-"), io::stdin().lock()));
+            pool.execute(move || read(&checker, Path::new("-"), io::stdin().lock(), options.fix));
             continue;
         }
 
@@ -622,7 +681,7 @@ fn start(mut options: opts::Options) {
                         continue;
                     }
 
-                    pool.execute(move || read_file(&checker, Path::new(&filename)));
+                    pool.execute(move || read_file(&checker, Path::new(&filename), options.fix));
                 } else if metadata.is_dir() {
                     for pattern in &options.pattern {
                         let glob = match glob::glob(&format!(
@@ -646,7 +705,7 @@ fn start(mut options: opts::Options) {
 
                                     let checker = Arc::clone(&checker);
 
-                                    pool.execute(move || read_file(&checker, &path));
+                                    pool.execute(move || read_file(&checker, &path, options.fix));
                                 }
 
                                 Err(error) => {
