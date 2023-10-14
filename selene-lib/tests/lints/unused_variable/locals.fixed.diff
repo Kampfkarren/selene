@@ -7,8 +7,7 @@
  print(localC)
  
  -- Mutated, but never read
--local localD = 1
-+local _localD = 1
+ local localD = 1
  localD = 2
  localD = 3
  
@@ -29,5 +28,4 @@
  
  -- Put into a table
  local localH = 1
--local localI = { localH }
-+local _localI = { localH }
+ local localI = { localH }

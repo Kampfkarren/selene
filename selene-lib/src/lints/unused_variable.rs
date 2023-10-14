@@ -172,6 +172,13 @@ impl Lint for UnusedVariableLint {
                     fixed_code = None;
                 }
 
+                // Applying fix would cause references to reference the old variable. It's possible to also rename those
+                // references as well, but we'd need to check each of their scopes for potentially colliding variables.
+                // Cargo just doesn't apply a fix in these cases.
+                if !variable.references.is_empty() {
+                    fixed_code = None;
+                }
+
                 let write_only = !analyzed_references.is_empty();
 
                 diagnostics.push(Diagnostic::new_complete(

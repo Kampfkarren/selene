@@ -1,5 +1,4 @@
--local bad1 = {}
-+local _bad1 = {}
+ local bad1 = {}
  bad1.x = 1
  bad1.y = 2
  bad1["z"] = 1

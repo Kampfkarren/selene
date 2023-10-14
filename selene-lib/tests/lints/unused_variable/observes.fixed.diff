@@ -1,5 +1,4 @@
--local writtenOnlyA = {}
-+local _writtenOnlyA = {}
+ local writtenOnlyA = {}
  table.insert(writtenOnlyA, 3)
  
  local readA = {}
@@ -7,8 +6,7 @@
  
  -- Make sure doing it inside other statements doesn't trigger false negatives
  print(function()
--	local writtenOnlyB = {}
-+	local _writtenOnlyB = {}
+ 	local writtenOnlyB = {}
  	table.insert(writtenOnlyB, 1)
  
  	local readB = {}
@@ -16,8 +14,7 @@
  end)
  
  if true then
--	local writtenOnlyC = {}
-+	local _writtenOnlyC = {}
+ 	local writtenOnlyC = {}
  	table.insert(writtenOnlyC, 1)
  
  	local readC = {}
