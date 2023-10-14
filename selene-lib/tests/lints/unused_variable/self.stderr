@@ -7,3 +7,12 @@ error[unused_variable]: self is defined, but never used
   = `self` is implicitly defined when defining a method
   = if you don't need it, consider using `.` instead of `:`
 
+error[unused_variable]: self is defined, but never used
+  ┌─ self.lua:4:16
+  │
+4 │ function Foo   :   B() end
+  │                ^
+  │
+  = `self` is implicitly defined when defining a method
+  = if you don't need it, consider using `.` instead of `:`
+

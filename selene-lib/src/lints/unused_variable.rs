@@ -1,11 +1,15 @@
 use crate::{
-    ast_util::scopes::AssignedValue,
+    ast_util::{range, scopes::AssignedValue},
     standard_library::{Field, FieldKind, Observes},
 };
 
 use super::*;
 
-use full_moon::ast::Ast;
+use full_moon::{
+    ast::Ast,
+    node::Node,
+    tokenizer::{Symbol, TokenType},
+};
 use regex::Regex;
 use serde::Deserialize;
 
@@ -51,7 +55,7 @@ impl Lint for UnusedVariableLint {
         })
     }
 
-    fn pass(&self, _: &Ast, context: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, context: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
         let mut diagnostics = Vec::new();
 
         for (_, variable) in ast_context
@@ -169,7 +173,23 @@ impl Lint for UnusedVariableLint {
                     notes
                         .push("if you don't need it, consider using `.` instead of `:`".to_owned());
 
-                    variable_range = (variable_range.0 - 1, variable_range.0);
+                    // This is a very hacky and fragile way to get the colon in the function call. Can we do better?
+                    // We can't just use variable start - 1 due to cases like `function a: b() end`
+                    let mut last_colon_start = 0;
+                    for token in ast.tokens() {
+                        let start_position: usize = range(token).0;
+                        if start_position >= variable_range.0 {
+                            break;
+                        }
+
+                        if let TokenType::Symbol { symbol } = token.token().token_type() {
+                            if *symbol == Symbol::Colon {
+                                last_colon_start = range(token).0;
+                            }
+                        }
+                    }
+
+                    variable_range = (last_colon_start, last_colon_start + 1);
                     fixed_code = ".".to_string();
                 }
 
