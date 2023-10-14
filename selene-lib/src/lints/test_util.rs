@@ -1,4 +1,4 @@
-use super::{AstContext, Context, Lint};
+use super::{AstContext, Context, Diagnostic, Lint};
 use crate::{
     test_util::{get_standard_library, PrettyString},
     StandardLibrary,
@@ -32,6 +32,58 @@ impl Default for TestUtilConfig {
             __non_exhaustive: (),
         }
     }
+}
+
+fn replace_code_range(code: &str, start: usize, end: usize, replacement: &str) -> String {
+    if start > end || end > code.len() {
+        return code.to_string();
+    }
+
+    return format!("{}{}{}", &code[..start], replacement, &code[end..]);
+}
+
+// Assumes diagnostics is sorted by starting ranges and that there are no overlapping ranges
+fn apply_diagnostics_fixes(code: &str, diagnostics: &Vec<Diagnostic>) -> String {
+    let mut bytes_offset = 0;
+
+    let new_code = diagnostics
+        .iter()
+        .fold(code.to_string(), |code, diagnostic| {
+            if diagnostic.fixed_code.is_some() {
+                let new_code = replace_code_range(
+                    code.as_str(),
+                    (diagnostic.primary_label.range.0 as isize + bytes_offset as isize) as usize,
+                    (diagnostic.primary_label.range.1 as isize + bytes_offset as isize) as usize,
+                    &diagnostic.fixed_code.clone().unwrap().as_str(),
+                );
+
+                bytes_offset += diagnostic.fixed_code.as_ref().unwrap().len() as isize
+                    - (diagnostic.primary_label.range.1 - diagnostic.primary_label.range.0)
+                        as isize;
+
+                new_code
+            } else {
+                code
+            }
+        });
+
+    full_moon::parse(&new_code).expect("Failed to parse fixed code");
+
+    new_code
+}
+
+fn generate_diff(source1: &str, source2: &str) -> String {
+    let mut result = String::new();
+
+    for line in diff::lines(source1, source2) {
+        match line {
+            diff::Result::Left(l) => result.push_str(&format!("-{}\n", l)),
+            diff::Result::Both(l, _) => result.push_str(&format!(" {}\n", l)),
+            diff::Result::Right(r) => result.push_str(&format!("+{}\n", r)),
+        }
+    }
+
+    result
 }
 
 pub fn test_lint_config_with_output<
@@ -73,11 +125,19 @@ pub fn test_lint_config_with_output<
     );
 
     let mut files = codespan::Files::new();
-    let source_id = files.add(format!("{test_name}.lua"), lua_source);
+    let source_id = files.add(format!("{test_name}.lua"), lua_source.clone());
 
     diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.range);
 
     let mut output = termcolor::NoColor::new(Vec::new());
+
+    let fixed_lua_code = apply_diagnostics_fixes(&lua_source, &diagnostics);
+    if let Err(e) = fs::write(
+        &path_base.with_file_name(format!("{}.fixed.diff", test_name)),
+        generate_diff(lua_source.as_str(), fixed_lua_code.as_str()),
+    ) {
+        eprintln!("Failed to write to file: {}", e);
+    }
 
     for diagnostic in diagnostics
         .into_iter()

@@ -966,6 +966,7 @@ version = "0.25.0"
 dependencies = [
  "codespan",
  "codespan-reporting",
+ "diff",
  "full_moon",
  "id-arena",
  "if_chain",
