@@ -187,7 +187,7 @@ fn replace_code_range(code: &str, start: usize, end: usize, replacement: &str) -
         return code.to_string();
     }
 
-    return format!("{}{}{}", &code[..start], replacement, &code[end..]);
+    format!("{}{}{}", &code[..start], replacement, &code[end..])
 }
 
 /// Assumes diagnostics is sorted by starting positions
@@ -226,9 +226,9 @@ fn apply_diagnostics_fixes(code: &str, diagnostics: &Vec<&Diagnostic>) -> String
                 let (start, end) = diagnostic.primary_label.range;
                 let new_code = replace_code_range(
                     code.as_str(),
-                    (start as isize + bytes_offset as isize) as usize,
-                    (end as isize + bytes_offset as isize) as usize,
-                    &fixed.as_str(),
+                    (start as isize + bytes_offset) as usize,
+                    (end as isize + bytes_offset) as usize,
+                    fixed.as_str(),
                 );
 
                 bytes_offset += fixed.len() as isize - (end - start) as isize;
@@ -591,15 +591,16 @@ fn start(mut options: opts::Options) {
         None => {}
     }
 
-    if options.fix && !options.allow_dirty {
-        if has_unstaged_changes() || (!options.allow_staged && has_staged_changes()) {
-            error(
-                "the working directory of this package has uncommitted changes, and `selene --fix` can potentially \
-                perform destructive changes; if you'd like to suppress this error pass `--allow-dirty`, `--allow-staged`, \
-                or commit the changes"
-            );
-            std::process::exit(1);
-        }
+    if options.fix
+        && !options.allow_dirty
+        && (has_unstaged_changes() || (!options.allow_staged && has_staged_changes()))
+    {
+        error(
+            "the working directory of this package has uncommitted changes, and `selene --fix` can potentially \
+            perform destructive changes; if you'd like to suppress this error pass `--allow-dirty`, `--allow-staged`, \
+            or commit the changes"
+        );
+        std::process::exit(1);
     }
 
     let (config, config_directory): (CheckerConfig<toml::value::Value>, Option<PathBuf>) =
@@ -900,7 +901,7 @@ fn has_staged_changes() -> bool {
 
     let stdout = String::from_utf8(output.stdout).expect("Failed to convert git output to string");
 
-    stdout.lines().any(|line| line.chars().nth(0) != Some(' '))
+    stdout.lines().any(|line| !line.starts_with(' '))
 }
 
 #[cfg(feature = "roblox")]
