@@ -169,7 +169,7 @@ impl Lint for UnusedVariableLint {
 
                 let write_only = !analyzed_references.is_empty();
 
-                diagnostics.push(Diagnostic::new_complete(
+                diagnostics.push(Diagnostic::new_complete_fix(
                     "unused_variable",
                     if write_only {
                         format!("{} is assigned a value, but never used", variable.name)
@@ -188,6 +188,7 @@ impl Lint for UnusedVariableLint {
                             }
                         })
                         .collect(),
+                    format!("_{}", variable.name),
                 ));
             };
         }

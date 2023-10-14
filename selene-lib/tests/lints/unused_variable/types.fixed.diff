@@ -1,0 +1,4 @@
+ local types = require(script.types)
+ 
+-local value: types.something
++local _value: types.something

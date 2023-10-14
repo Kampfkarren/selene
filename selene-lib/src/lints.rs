@@ -146,6 +146,24 @@ impl Diagnostic {
         }
     }
 
+    pub fn new_complete_fix(
+        code: &'static str,
+        message: String,
+        primary_label: Label,
+        notes: Vec<String>,
+        secondary_labels: Vec<Label>,
+        fixed_code: String,
+    ) -> Self {
+        Self {
+            code,
+            message,
+            notes,
+            primary_label,
+            secondary_labels,
+            fixed_code: Some(fixed_code),
+        }
+    }
+
     pub fn into_codespan_diagnostic(
         self,
         file_id: codespan::FileId,

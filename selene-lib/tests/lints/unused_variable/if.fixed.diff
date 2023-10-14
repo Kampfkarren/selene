@@ -1,0 +1,18 @@
+ if 1 then
+-    local localA
++    local _localA
+ elseif 2 then
+-    local localB
++    local _localB
+     print(localA)
+ elseif 3 then
+-    local localC
++    local _localC
+     print(localB)
+ else
+-    local localD
++    local _localD
+     print(localC)
+ end
+ 
+ print(localA, localB, localC, localD)

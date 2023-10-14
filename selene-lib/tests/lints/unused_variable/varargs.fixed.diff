@@ -1,0 +1,10 @@
+ local function foo(...)
+     call(...)
+ end
+ 
+-local function bar(...)
++local function _bar(...)
+     call(...)
+ end
+ 
+ foo()
