@@ -17,11 +17,11 @@
  end
  
 -for _ = 1, 10 do
- 
- 
 -
+-
+ 
 -end
--
+ 
  for _ in pairs({}) do
      return "Should not warn"
  end
@@ -70,4 +70,3 @@
 -until true
 +
  -- comment here shouldn't break anything
- 

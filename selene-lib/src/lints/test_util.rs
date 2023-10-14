@@ -3,6 +3,7 @@ use crate::{
     test_util::{get_standard_library, PrettyString},
     StandardLibrary,
 };
+use similar::{ChangeTag, TextDiff};
 use std::{
     fs,
     io::Write,
@@ -75,12 +76,13 @@ fn apply_diagnostics_fixes(code: &str, diagnostics: &Vec<Diagnostic>) -> String 
 fn generate_diff(source1: &str, source2: &str) -> String {
     let mut result = String::new();
 
-    for line in diff::lines(source1, source2) {
-        match line {
-            diff::Result::Left(l) => result.push_str(&format!("-{}\n", l)),
-            diff::Result::Both(l, _) => result.push_str(&format!(" {}\n", l)),
-            diff::Result::Right(r) => result.push_str(&format!("+{}\n", r)),
-        }
+    for change in TextDiff::from_lines(source1, source2).iter_all_changes() {
+        let sign = match change.tag() {
+            ChangeTag::Delete => "-",
+            ChangeTag::Insert => "+",
+            ChangeTag::Equal => " ",
+        };
+        result.push_str(&format!("{}{}", sign, change.value()));
     }
 
     result
@@ -132,11 +134,17 @@ pub fn test_lint_config_with_output<
     let mut output = termcolor::NoColor::new(Vec::new());
 
     let fixed_lua_code = apply_diagnostics_fixes(&lua_source, &diagnostics);
-    if let Err(e) = fs::write(
-        &path_base.with_file_name(format!("{}.fixed.diff", test_name)),
-        generate_diff(lua_source.as_str(), fixed_lua_code.as_str()),
-    ) {
-        eprintln!("Failed to write to file: {}", e);
+    let fixed_diff = generate_diff(&lua_source, &fixed_lua_code);
+    let diff_output_path = path_base.with_extension("fixed.diff");
+
+    if let Ok(expected) = fs::read_to_string(&diff_output_path) {
+        pretty_assertions::assert_eq!(PrettyString(&expected), PrettyString(&fixed_diff));
+    } else {
+        let mut output_file =
+            fs::File::create(diff_output_path).expect("couldn't create fixed.diff output file");
+        output_file
+            .write_all(fixed_diff.as_bytes())
+            .expect("couldn't write fixed.diff to output file");
     }
 
     for diagnostic in diagnostics

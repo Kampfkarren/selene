@@ -12,7 +12,6 @@ edition.workspace = true
 [dependencies]
 codespan = "0.11"
 codespan-reporting = "0.11"
-diff = "0.1.13"
 full_moon.workspace = true
 id-arena = "2.2"
 if_chain = "1.0.2"
@@ -23,6 +22,7 @@ profiling.workspace = true
 regex = "1.7.1"
 serde = "1.0.152"
 serde_yaml = "0.9.16"
+similar = "2.3.0"
 toml.workspace = true
 
 [dev-dependencies]
