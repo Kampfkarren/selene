@@ -1,0 +1,5 @@
+ table.foreach({}, function(k, v) end)
+-print(table.getn(x))
++print(#x)
+ 
+ table.foreach({}, 3)

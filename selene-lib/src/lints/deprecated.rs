@@ -115,8 +115,11 @@ impl<'a> DeprecatedVisitor<'a> {
 
             let mut notes = vec![deprecated.message.to_owned()];
 
+            let mut fixed_code = None;
+
             if let Some(replace_with) = deprecated.try_instead(parameters) {
                 notes.push(format!("try: {replace_with}"));
+                fixed_code = Some(replace_with);
             }
 
             self.diagnostics.push(Diagnostic::new_complete(
@@ -128,7 +131,7 @@ impl<'a> DeprecatedVisitor<'a> {
                 Label::from_node(node, None),
                 notes,
                 Vec::new(),
-                None,
+                fixed_code,
             ));
         }
     }
