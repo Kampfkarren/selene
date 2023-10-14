@@ -43,11 +43,34 @@ fn replace_code_range(code: &str, start: usize, end: usize, replacement: &str) -
     return format!("{}{}{}", &code[..start], replacement, &code[end..]);
 }
 
-// Assumes diagnostics is sorted by starting ranges and that there are no overlapping ranges
+/// Assumes diagnostics is sorted by starting positions
+///
+/// 1. Applies all disjoint fixes
+/// 1. If a fix is completely contained inside another fix, uses the inner one and discard the outer one
+/// 2. If fixes partially overlap, chooses the fix that starts first and discard the other one
 fn apply_diagnostics_fixes(code: &str, diagnostics: &Vec<&Diagnostic>) -> String {
+    let mut chosen_diagnostics = Vec::new();
+
+    let mut candidate = diagnostics[0];
+    for diagnostic in diagnostics.iter().skip(1) {
+        let this_range = diagnostic.primary_label.range;
+
+        if this_range.1 <= candidate.primary_label.range.1 {
+            // Completely contained inside
+            candidate = diagnostic;
+        } else if this_range.0 <= candidate.primary_label.range.1 {
+            // Partially overlapping
+            continue;
+        } else {
+            chosen_diagnostics.push(candidate);
+            candidate = diagnostic;
+        }
+    }
+    chosen_diagnostics.push(candidate);
+
     let mut bytes_offset = 0;
 
-    let new_code = diagnostics
+    let new_code = chosen_diagnostics
         .iter()
         .fold(code.to_string(), |code, diagnostic| {
             if let Some(fixed) = &diagnostic.fixed_code {
@@ -65,8 +88,6 @@ fn apply_diagnostics_fixes(code: &str, diagnostics: &Vec<&Diagnostic>) -> String
                 code
             }
         });
-
-    full_moon::parse(&new_code).expect("Failed to parse fixed code");
 
     new_code
 }
@@ -111,28 +132,38 @@ pub fn test_lint_config_with_output<
         fs::read_to_string(path_base.with_extension("lua")).expect("Cannot find lua file");
 
     let ast = full_moon::parse(&lua_source).expect("Cannot parse lua file");
-    let mut diagnostics = lint.pass(
-        &ast,
-        &Context {
-            standard_library: config.standard_library,
-            user_set_standard_library: if standard_library_is_set {
-                Some(vec!["test-set".to_owned()])
-            } else {
-                None
-            },
+
+    let context = Context {
+        standard_library: config.standard_library,
+        user_set_standard_library: if standard_library_is_set {
+            Some(vec!["test-set".to_owned()])
+        } else {
+            None
         },
-        &AstContext::from_ast(&ast),
-    );
+    };
 
-    let mut files = codespan::Files::new();
-    let source_id = files.add(format!("{test_name}.lua"), lua_source.clone());
-
+    let mut diagnostics = lint.pass(&ast, &context, &AstContext::from_ast(&ast));
     diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.range);
 
-    let mut output = termcolor::NoColor::new(Vec::new());
+    let mut fixed_code = lua_source.to_string();
+    let mut fixed_diagnostics = diagnostics.iter().collect::<Vec<_>>();
+    let mut lint_results;
 
-    let fixed_lua_code = apply_diagnostics_fixes(&lua_source, &diagnostics.iter().collect());
-    let fixed_diff = generate_diff(&lua_source, &fixed_lua_code);
+    // To handle potential conflicts with different lint suggestions, we apply conflicting fixes one at a time.
+    // Then we re-evaluate the lints with the new code until there are no more fixes to apply
+    while fixed_diagnostics
+        .iter()
+        .any(|diagnostic| diagnostic.fixed_code.is_some())
+    {
+        fixed_code = apply_diagnostics_fixes(fixed_code.as_str(), &fixed_diagnostics);
+
+        let fixed_ast = full_moon::parse(&fixed_code).expect("Fix generated invalid code");
+        lint_results = lint.pass(&fixed_ast, &context, &AstContext::from_ast(&fixed_ast));
+        fixed_diagnostics = lint_results.iter().collect::<Vec<_>>();
+        fixed_diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.range);
+    }
+
+    let fixed_diff = generate_diff(&lua_source, &fixed_code);
     let diff_output_path = path_base.with_extension("fixed.diff");
 
     if let Ok(expected) = fs::read_to_string(&diff_output_path) {
@@ -144,6 +175,11 @@ pub fn test_lint_config_with_output<
             .write_all(fixed_diff.as_bytes())
             .expect("couldn't write fixed.diff to output file");
     }
+
+    let mut files = codespan::Files::new();
+    let source_id = files.add(format!("{test_name}.lua"), lua_source.clone());
+
+    let mut output = termcolor::NoColor::new(Vec::new());
 
     for diagnostic in diagnostics
         .into_iter()

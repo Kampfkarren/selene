@@ -12,8 +12,7 @@ use std::{
 
 use codespan_reporting::{
     diagnostic::{
-        self, Diagnostic as CodespanDiagnostic, Label as CodespanLabel,
-        Severity as CodespanSeverity,
+        Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
     },
     term::DisplayStyle as CodespanDisplayStyle,
 };
@@ -191,13 +190,36 @@ fn replace_code_range(code: &str, start: usize, end: usize, replacement: &str) -
     return format!("{}{}{}", &code[..start], replacement, &code[end..]);
 }
 
-// Assumes diagnostics is sorted by starting ranges and that there are no overlapping ranges
+/// Assumes diagnostics is sorted by starting positions
+///
+/// 1. Applies all disjoint fixes
+/// 1. If a fix is completely contained inside another fix, uses the inner one and discard the outer one
+/// 2. If fixes partially overlap, chooses the fix that starts first and discard the other one
+///
 // This is just copied from `test_util`. Can we get a better abstraction?
-// FIXME: handle the overlapping ranges
 fn apply_diagnostics_fixes(code: &str, diagnostics: &Vec<&Diagnostic>) -> String {
+    let mut chosen_diagnostics = Vec::new();
+
+    let mut candidate = diagnostics[0];
+    for diagnostic in diagnostics.iter().skip(1) {
+        let this_range = diagnostic.primary_label.range;
+
+        if this_range.1 <= candidate.primary_label.range.1 {
+            // Completely contained inside
+            candidate = diagnostic;
+        } else if this_range.0 <= candidate.primary_label.range.1 {
+            // Partially overlapping
+            continue;
+        } else {
+            chosen_diagnostics.push(candidate);
+            candidate = diagnostic;
+        }
+    }
+    chosen_diagnostics.push(candidate);
+
     let mut bytes_offset = 0;
 
-    let new_code = diagnostics
+    let new_code = chosen_diagnostics
         .iter()
         .fold(code.to_string(), |code, diagnostic| {
             if let Some(fixed) = &diagnostic.fixed_code {
@@ -215,8 +237,6 @@ fn apply_diagnostics_fixes(code: &str, diagnostics: &Vec<&Diagnostic>) -> String
                 code
             }
         });
-
-    full_moon::parse(&new_code).expect("Failed to parse fixed code");
 
     new_code
 }
@@ -321,6 +341,34 @@ fn read<R: Read>(
     let mut diagnostics = checker.test_on(&ast);
     diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.start_position());
 
+    if is_fix {
+        let mut fixed_code = contents.as_ref().to_string();
+
+        // To handle potential conflicts with different lint suggestions, we apply conflicting fixes one at a time.
+        // Then we re-evaluate the lints with the new code until there are no more fixes to apply
+        while diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.diagnostic.fixed_code.is_some())
+        {
+            fixed_code = apply_diagnostics_fixes(
+                fixed_code.as_str(),
+                &diagnostics
+                    .iter()
+                    .map(|diagnostic| &diagnostic.diagnostic)
+                    .collect(),
+            );
+
+            let fixed_ast = full_moon::parse(&fixed_code).expect(
+                "selene tried applying lint suggestions, but it generated invalid code that could not be parsed; \
+                this is likely a selene bug",
+            );
+            diagnostics = checker.test_on(&fixed_ast);
+            diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.start_position());
+        }
+
+        let _ = fs::write(filename, fixed_code);
+    }
+
     let (mut errors, mut warnings) = (0, 0);
     for diagnostic in &diagnostics {
         match diagnostic.severity {
@@ -335,17 +383,6 @@ fn read<R: Read>(
 
     let stdout = termcolor::StandardStream::stdout(get_color());
     let mut stdout = stdout.lock();
-
-    if is_fix {
-        let fixed_code = apply_diagnostics_fixes(
-            contents.as_ref(),
-            &diagnostics
-                .iter()
-                .map(|diagnostic| &diagnostic.diagnostic)
-                .collect(),
-        );
-        let _ = fs::write(filename, fixed_code);
-    }
 
     for diagnostic in diagnostics {
         if opts.luacheck {
