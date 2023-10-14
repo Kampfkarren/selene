@@ -41,6 +41,7 @@ impl Lint for IfsSameCondLint {
                         position.1,
                         "note: same as this".to_owned(),
                     )],
+                    None,
                 )
             })
             .collect()

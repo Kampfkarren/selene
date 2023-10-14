@@ -37,6 +37,7 @@ impl Lint for UnbalancedAssignmentsLint {
                         "unbalanced_assignments",
                         "too many values on the right side of the assignment".to_owned(),
                         Label::new(assignment.range),
+                        None,
                     )
                 } else {
                     let secondary_labels = match assignment.first_call {
@@ -56,6 +57,7 @@ impl Lint for UnbalancedAssignmentsLint {
                         Label::new(assignment.range),
                         Vec::new(),
                         secondary_labels,
+                        None,
                     )
                 }
             })

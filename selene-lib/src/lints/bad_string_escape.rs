@@ -50,11 +50,13 @@ impl Lint for BadStringEscapeLint {
                     "bad_string_escape",
                     "string escape sequence doesn't exist".to_owned(),
                     Label::new(sequence.range.to_owned()),
+                    None,
                 ),
                 ReasonWhy::Malformed => Diagnostic::new(
                     "bad_string_escape",
                     "string escape sequence is malformed".to_owned(),
                     Label::new(sequence.range.to_owned()),
+                    None,
                 ),
                 ReasonWhy::DecimalTooHigh => Diagnostic::new_complete(
                     "bad_string_escape",
@@ -65,6 +67,7 @@ impl Lint for BadStringEscapeLint {
                             .to_owned(),
                     ],
                     Vec::new(),
+                    None,
                 ),
                 ReasonWhy::CodepointTooHigh => Diagnostic::new_complete(
                     "bad_string_escape",
@@ -75,18 +78,21 @@ impl Lint for BadStringEscapeLint {
                             .to_owned(),
                     ],
                     Vec::new(),
+                    None,
                 ),
                 ReasonWhy::DoubleInSingle => Diagnostic::new(
                     "bad_string_escape",
                     "double quotes do not have to be escaped when inside single quoted strings"
                         .to_owned(),
                     Label::new(sequence.range.to_owned()),
+                    None,
                 ),
                 ReasonWhy::SingleInDouble => Diagnostic::new(
                     "bad_string_escape",
                     "single quotes do not have to be escaped when inside double quoted strings"
                         .to_owned(),
                     Label::new(sequence.range.to_owned()),
+                    None,
                 ),
             })
             .collect()

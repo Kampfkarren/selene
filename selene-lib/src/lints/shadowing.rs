@@ -69,6 +69,7 @@ impl Lint for ShadowingLint {
                         shadow.first_defined,
                         "previously defined here".to_owned(),
                     )],
+                    None,
                 )
             })
             .collect()

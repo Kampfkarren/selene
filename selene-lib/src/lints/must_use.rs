@@ -48,6 +48,7 @@ impl Lint for MustUseLint {
                     function_call_stmt.call_name_path.join(".")
                 ),
                 Label::new(function_call_stmt.call_prefix_range),
+                None,
             ));
         }
 

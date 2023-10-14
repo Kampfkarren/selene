@@ -157,6 +157,9 @@ impl Lint for UnusedVariableLint {
             {
                 let mut notes = Vec::new();
 
+                let mut variable_range = variable.identifiers[0];
+                let mut fixed_code = format!("_{}", variable.name);
+
                 if variable.is_self {
                     if self.allow_unused_self {
                         continue;
@@ -165,18 +168,21 @@ impl Lint for UnusedVariableLint {
                     notes.push("`self` is implicitly defined when defining a method".to_owned());
                     notes
                         .push("if you don't need it, consider using `.` instead of `:`".to_owned());
+
+                    variable_range = (variable_range.0 - 1, variable_range.0);
+                    fixed_code = ".".to_string();
                 }
 
                 let write_only = !analyzed_references.is_empty();
 
-                diagnostics.push(Diagnostic::new_complete_fix(
+                diagnostics.push(Diagnostic::new_complete(
                     "unused_variable",
                     if write_only {
                         format!("{} is assigned a value, but never used", variable.name)
                     } else {
                         format!("{} is defined, but never used", variable.name)
                     },
-                    Label::new(variable.identifiers[0]),
+                    Label::new(variable_range),
                     notes,
                     analyzed_references
                         .into_iter()
@@ -188,7 +194,7 @@ impl Lint for UnusedVariableLint {
                             }
                         })
                         .collect(),
-                    format!("_{}", variable.name),
+                    Some(fixed_code),
                 ));
             };
         }

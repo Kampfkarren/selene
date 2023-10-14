@@ -58,6 +58,7 @@ impl Lint for HighCyclomaticComplexityLint {
                         self.config.maximum_complexity
                     ),
                     Label::new(position),
+                    None,
                 )
             })
             .collect()

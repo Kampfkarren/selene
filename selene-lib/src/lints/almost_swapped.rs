@@ -45,6 +45,7 @@ impl Lint for AlmostSwappedLint {
                         name2 = almost_swap.names.1,
                     )],
                     Vec::new(),
+                    None,
                 )
             })
             .collect()

@@ -54,11 +54,11 @@ impl Lint for EmptyLoopLint {
                 }
             })
             .map(|position| {
-                Diagnostic::new_fix(
+                Diagnostic::new(
                     "empty_loop",
                     "empty loop block".to_owned(),
                     Label::new(position),
-                    String::new(),
+                    Some(String::new()),
                 )
             })
             .collect()

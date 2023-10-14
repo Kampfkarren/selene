@@ -40,6 +40,7 @@ impl Lint for CompareNanLint {
                         operator = comparisons.operator,
                     )],
                     Vec::new(),
+                    None,
                 )
             })
             .collect()

@@ -60,6 +60,7 @@ impl Lint for UnscopedVariablesLint {
                         reference.name
                     ),
                     Label::new(reference.identifier),
+                    None,
                 ));
             }
         }

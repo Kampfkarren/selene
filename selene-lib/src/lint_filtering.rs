@@ -149,6 +149,7 @@ impl NodeVisitor for FilterVisitor {
                                     trivia_start_position.bytes(),
                                     trivia_end_position.bytes(),
                                 )),
+                                None,
                             ))
                         }
                     }));
@@ -223,6 +224,7 @@ pub fn filter_diagnostics(
                                 (first_code.0.bytes(), first_code.1.bytes()),
                                 "global filter must be before this".to_owned(),
                             )],
+                            None,
                         ));
 
                         continue;
@@ -244,6 +246,7 @@ pub fn filter_diagnostics(
                                     possibly_conflicting.comment_range,
                                     "conflicts with this".to_owned(),
                                 )],
+                                None,
                             ));
                         }
                     }

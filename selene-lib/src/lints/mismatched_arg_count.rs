@@ -72,6 +72,7 @@ impl Lint for MismatchedArgCountLint {
                             )
                         })
                         .collect(),
+                    None,
                 )
             })
             .collect()

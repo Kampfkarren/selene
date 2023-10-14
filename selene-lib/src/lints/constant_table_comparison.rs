@@ -59,6 +59,7 @@ impl Lint for ConstantTableComparisonLint {
                         Vec::new()
                     },
                     Vec::new(),
+                    None,
                 )
             })
             .collect()

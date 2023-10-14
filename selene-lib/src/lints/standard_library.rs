@@ -252,6 +252,7 @@ impl StandardLibraryVisitor<'_> {
                     self.user_set_standard_library,
                 ),
                 Vec::new(),
+                None,
             ));
         }
     }
@@ -310,6 +311,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                                     Label::new((range.0.bytes(), range.1.bytes())),
                                     Vec::new(),
                                     Vec::new(),
+                                    None,
                                 ));
                             }
 
@@ -347,6 +349,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                             Label::new((range.0.bytes(), range.1.bytes())),
                             Vec::new(),
                             Vec::new(),
+                            None,
                         ));
                     }
                 }
@@ -427,6 +430,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                         name_path.join("."),
                     ),
                     Label::from_node(call, None),
+                    None,
                 ));
 
                 return;
@@ -472,6 +476,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                     name
                 )],
                 Vec::new(),
+                None,
             ));
 
             return;
@@ -552,6 +557,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                             Label::from_node(call, None),
                             message.iter().cloned().collect(),
                             Vec::new(),
+                            None,
                         ));
                     }
 
@@ -589,6 +595,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                 Label::from_node(call, None),
                 required_param_message,
                 Vec::new(),
+                None,
             ));
         }
 
@@ -623,6 +630,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                                 passed_type.type_name()
                             ),
                         ),
+                        None,
                     ));
                 }
             }

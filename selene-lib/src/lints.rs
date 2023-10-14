@@ -100,12 +100,17 @@ pub struct Diagnostic {
 }
 
 impl Diagnostic {
-    pub fn new(code: &'static str, message: String, primary_label: Label) -> Self {
+    pub fn new(
+        code: &'static str,
+        message: String,
+        primary_label: Label,
+        fixed_code: Option<String>,
+    ) -> Self {
         Self {
             code,
             message,
             primary_label,
-            fixed_code: None,
+            fixed_code,
 
             notes: Vec::new(),
             secondary_labels: Vec::new(),
@@ -118,6 +123,7 @@ impl Diagnostic {
         primary_label: Label,
         notes: Vec<String>,
         secondary_labels: Vec<Label>,
+        fixed_code: Option<String>,
     ) -> Self {
         Self {
             code,
@@ -125,42 +131,7 @@ impl Diagnostic {
             notes,
             primary_label,
             secondary_labels,
-            fixed_code: None,
-        }
-    }
-
-    pub fn new_fix(
-        code: &'static str,
-        message: String,
-        primary_label: Label,
-        fixed_code: String,
-    ) -> Self {
-        Self {
-            code,
-            message,
-            primary_label,
-            fixed_code: Some(fixed_code),
-
-            notes: Vec::new(),
-            secondary_labels: Vec::new(),
-        }
-    }
-
-    pub fn new_complete_fix(
-        code: &'static str,
-        message: String,
-        primary_label: Label,
-        notes: Vec<String>,
-        secondary_labels: Vec<Label>,
-        fixed_code: String,
-    ) -> Self {
-        Self {
-            code,
-            message,
-            notes,
-            primary_label,
-            secondary_labels,
-            fixed_code: Some(fixed_code),
+            fixed_code,
         }
     }
 

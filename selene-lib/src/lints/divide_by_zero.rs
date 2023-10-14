@@ -35,6 +35,7 @@ impl Lint for DivideByZeroLint {
                     "divide_by_zero",
                     "dividing by zero is not allowed, use math.huge instead".to_owned(),
                     Label::new(*position),
+                    None,
                 )
             })
             .collect()

@@ -93,6 +93,7 @@ impl Lint for IncorrectRoactUsageLint {
                     invalid_event.event_name, invalid_event.class_name
                 ),
                 Label::new(invalid_event.range),
+                None,
             ));
         }
 
@@ -112,6 +113,7 @@ impl Lint for IncorrectRoactUsageLint {
                             invalid_property.create_element_expression,
                         )],
                         Vec::new(),
+                        None,
                     ));
                 }
                 _ => {
@@ -122,6 +124,7 @@ impl Lint for IncorrectRoactUsageLint {
                             invalid_property.property_name, invalid_property.class_name
                         ),
                         Label::new(invalid_property.range),
+                        None,
                     ));
                 }
             }
@@ -132,6 +135,7 @@ impl Lint for IncorrectRoactUsageLint {
                 "roblox_incorrect_roact_usage",
                 format!("`{}` is not a valid class", unknown_class.name),
                 Label::new(unknown_class.range),
+                None,
             ));
         }
 

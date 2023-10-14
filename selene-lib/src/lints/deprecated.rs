@@ -128,6 +128,7 @@ impl<'a> DeprecatedVisitor<'a> {
                 Label::from_node(node, None),
                 notes,
                 Vec::new(),
+                None,
             ));
         }
     }
