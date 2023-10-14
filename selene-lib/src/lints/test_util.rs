@@ -50,18 +50,16 @@ fn apply_diagnostics_fixes(code: &str, diagnostics: &Vec<Diagnostic>) -> String 
     let new_code = diagnostics
         .iter()
         .fold(code.to_string(), |code, diagnostic| {
-            if diagnostic.fixed_code.is_some() {
+            if let Some(fixed) = &diagnostic.fixed_code {
+                let (start, end) = diagnostic.primary_label.range;
                 let new_code = replace_code_range(
                     code.as_str(),
-                    (diagnostic.primary_label.range.0 as isize + bytes_offset as isize) as usize,
-                    (diagnostic.primary_label.range.1 as isize + bytes_offset as isize) as usize,
-                    &diagnostic.fixed_code.clone().unwrap().as_str(),
+                    (start as isize + bytes_offset as isize) as usize,
+                    (end as isize + bytes_offset as isize) as usize,
+                    &fixed.as_str(),
                 );
 
-                bytes_offset += diagnostic.fixed_code.as_ref().unwrap().len() as isize
-                    - (diagnostic.primary_label.range.1 - diagnostic.primary_label.range.0)
-                        as isize;
-
+                bytes_offset += fixed.len() as isize - (end - start) as isize;
                 new_code
             } else {
                 code
