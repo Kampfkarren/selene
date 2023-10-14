@@ -1,12 +1,15 @@
  -- Functions
 -local function unusedFunction()
+-    local unusedVariableA = 1
+-    local unusedVariableB = 1
 +local function _unusedFunction()
-     local unusedVariableA = 1
-     local unusedVariableB = 1
++    local _unusedVariableA = 1
++    local _unusedVariableB = 1
  end
  
  print(unusedVariableB)
- local overidden = true
+-local overidden = true
++local _overidden = true
  
  local function overridesIt()
      local overidden = false

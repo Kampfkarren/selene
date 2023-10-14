@@ -28,4 +28,5 @@
  
  -- Put into a table
  local localH = 1
- local localI = { localH }
+-local localI = { localH }
++local _localI = { localH }

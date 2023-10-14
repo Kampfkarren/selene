@@ -172,10 +172,15 @@ impl Lint for UnusedVariableLint {
                     fixed_code = None;
                 }
 
-                // Applying fix would cause references to reference the old variable. It's possible to also rename those
-                // references as well, but we'd need to check each of their scopes for potentially colliding variables.
-                // Cargo just doesn't apply a fix in these cases.
-                if !variable.references.is_empty() {
+                // Applying fix would cause existing references to reference a nonexistent variable. It's possible to
+                // also rename those references as well, but we'd need to check each of their scopes for potentially
+                // colliding variables. Cargo just doesn't apply a fix at all in these cases.
+                if variable.references.iter().any(|reference| {
+                    ast_context.scope_manager.references[*reference]
+                        .identifier
+                        .0
+                        != variable.identifiers[0].0
+                }) {
                     fixed_code = None;
                 }
 
