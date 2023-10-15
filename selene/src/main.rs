@@ -130,6 +130,7 @@ fn emit_codespan(
     writer: &mut impl termcolor::WriteColor,
     files: &codespan::Files<&str>,
     diagnostic: &CodespanDiagnostic<codespan::FileId>,
+    fixed_code: Option<String>,
 ) {
     let lock = OPTIONS.read().unwrap();
     let opts = lock.as_ref().unwrap();
@@ -148,7 +149,10 @@ fn emit_codespan(
             writeln!(
                 writer,
                 "{}",
-                serde_json::to_string(&json_output::diagnostic_to_json(diagnostic, files)).unwrap()
+                serde_json::to_string(&json_output::diagnostic_to_json(
+                    diagnostic, files, fixed_code
+                ))
+                .unwrap()
             )
             .unwrap();
         }
@@ -158,7 +162,7 @@ fn emit_codespan(
                 writer,
                 "{}",
                 serde_json::to_string(&json_output::JsonOutput::Diagnostic(
-                    json_output::diagnostic_to_json(diagnostic, files)
+                    json_output::diagnostic_to_json(diagnostic, files, fixed_code)
                 ))
                 .unwrap()
             )
@@ -179,7 +183,7 @@ fn emit_codespan_locked(
     let stdout = termcolor::StandardStream::stdout(get_color());
     let mut stdout = stdout.lock();
 
-    emit_codespan(&mut stdout, files, diagnostic);
+    emit_codespan(&mut stdout, files, diagnostic, None);
 }
 
 fn replace_code_range(code: &str, start: usize, end: usize, replacement: &str) -> String {
@@ -491,6 +495,7 @@ fn read<R: Read>(
                 write(&mut stack, new_start).unwrap();
             }
         } else {
+            let fixed_code = diagnostic.diagnostic.fixed_code.clone();
             let diagnostic = diagnostic.diagnostic.into_codespan_diagnostic(
                 source_id,
                 match diagnostic.severity {
@@ -500,7 +505,7 @@ fn read<R: Read>(
                 },
             );
 
-            emit_codespan(&mut stdout, &files, &diagnostic);
+            emit_codespan(&mut stdout, &files, &diagnostic, fixed_code);
         }
     }
 }
