@@ -79,7 +79,7 @@ Results:
 
 **--fix** *fix*
 
-Automatically applies lint suggestions. Because this can be potentially destructive, it's not allowed by default when there are uncommitted changes. This safety can be ignored by including `--allow-dirty` to allow with unstaged changes or `--allow-staged` to allow only staged changes.
+Automatically applies lint suggestions. Since this can be potentially destructive, it's not allowed when there are uncommitted changes. This safety mechanism can be ignored by including `--allow-dirty` to allow unstaged changes or `--allow-staged` to allow only staged changes.
 
 **--num-threads** *num-threads*
 
