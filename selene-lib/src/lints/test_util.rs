@@ -92,19 +92,31 @@ fn apply_diagnostics_fixes(code: &str, diagnostics: &[&Diagnostic]) -> String {
     new_code
 }
 
+/// Returns empty string if there are no diffs
 fn generate_diff(source1: &str, source2: &str) -> String {
     let mut result = String::new();
+    let mut has_changes = false;
 
     for change in TextDiff::from_lines(source1, source2).iter_all_changes() {
         let sign = match change.tag() {
-            ChangeTag::Delete => "-",
-            ChangeTag::Insert => "+",
+            ChangeTag::Delete => {
+                has_changes = true;
+                "-"
+            }
+            ChangeTag::Insert => {
+                has_changes = true;
+                "+"
+            }
             ChangeTag::Equal => " ",
         };
         result.push_str(&format!("{}{}", sign, change.value()));
     }
 
-    result
+    if has_changes {
+        result
+    } else {
+        "".to_string()
+    }
 }
 
 pub fn test_lint_config_with_output<
