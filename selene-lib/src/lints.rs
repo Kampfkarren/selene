@@ -243,12 +243,16 @@ impl Context {
 #[derive(Debug)]
 pub struct AstContext {
     pub scope_manager: ScopeManager,
+
+    // Converting ast -> code should probably come from the parser, but this should be ok as a temporary solution
+    pub code: String,
 }
 
 impl AstContext {
-    pub fn from_ast(ast: &Ast) -> Self {
+    pub fn from_ast(ast: &Ast, code: &String) -> Self {
         Self {
             scope_manager: ScopeManager::new(ast),
+            code: code.to_string(),
         }
     }
 }

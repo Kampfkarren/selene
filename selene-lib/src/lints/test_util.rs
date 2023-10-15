@@ -142,7 +142,7 @@ pub fn test_lint_config_with_output<
         },
     };
 
-    let mut diagnostics = lint.pass(&ast, &context, &AstContext::from_ast(&ast));
+    let mut diagnostics = lint.pass(&ast, &context, &AstContext::from_ast(&ast, &lua_source));
     diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.range);
 
     let mut fixed_code = lua_source.to_string();
@@ -158,7 +158,11 @@ pub fn test_lint_config_with_output<
         fixed_code = apply_diagnostics_fixes(fixed_code.as_str(), &fixed_diagnostics);
 
         let fixed_ast = full_moon::parse(&fixed_code).expect("Fix generated invalid code");
-        lint_results = lint.pass(&fixed_ast, &context, &AstContext::from_ast(&fixed_ast));
+        lint_results = lint.pass(
+            &fixed_ast,
+            &context,
+            &AstContext::from_ast(&fixed_ast, &lua_source),
+        );
         fixed_diagnostics = lint_results.iter().collect::<Vec<_>>();
         fixed_diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.range);
     }

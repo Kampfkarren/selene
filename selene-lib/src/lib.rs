@@ -229,10 +229,10 @@ macro_rules! use_lints {
                 })
             }
 
-            pub fn test_on(&self, ast: &Ast) -> Vec<CheckerDiagnostic> {
+            pub fn test_on(&self, ast: &Ast, code: &String) -> Vec<CheckerDiagnostic> {
                 let mut diagnostics = Vec::new();
 
-                let ast_context = AstContext::from_ast(ast);
+                let ast_context = AstContext::from_ast(ast, &code.to_string());
 
                 macro_rules! check_lint {
                     ($name:ident) => {

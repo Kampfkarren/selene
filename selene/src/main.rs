@@ -338,7 +338,7 @@ fn read<R: Read>(
         }
     };
 
-    let mut diagnostics = checker.test_on(&ast);
+    let mut diagnostics = checker.test_on(&ast, &contents.as_ref().to_string());
     diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.start_position());
 
     if is_fix {
@@ -362,7 +362,7 @@ fn read<R: Read>(
                 "selene tried applying lint suggestions, but it generated invalid code that could not be parsed; \
                 this is likely a selene bug",
             );
-            diagnostics = checker.test_on(&fixed_ast);
+            diagnostics = checker.test_on(&fixed_ast, &fixed_code);
             diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.start_position());
         }
 
