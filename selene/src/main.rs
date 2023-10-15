@@ -238,6 +238,8 @@ fn apply_diagnostics_fixes(code: &str, diagnostics: &Vec<&Diagnostic>) -> String
             }
         });
 
+    println!("{}", chosen_diagnostics.iter().count());
+
     new_code
 }
 
@@ -355,7 +357,16 @@ fn read<R: Read>(
                 &diagnostics
                     .iter()
                     .map(|diagnostic| &diagnostic.diagnostic)
+                    .filter(|diagnostic| diagnostic.fixed_code.is_some())
                     .collect(),
+            );
+
+            println!(
+                "Fixer generated invalid code:\n\
+                ----------------\n\
+                {}\n\
+                ----------------\n",
+                fixed_code
             );
 
             let fixed_ast = full_moon::parse(&fixed_code).expect(

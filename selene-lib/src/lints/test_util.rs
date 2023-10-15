@@ -40,7 +40,7 @@ fn replace_code_range(code: &str, start: usize, end: usize, replacement: &str) -
         return code.to_string();
     }
 
-    return format!("{}{}{}", &code[..start], replacement, &code[end..]);
+    format!("{}{}{}", &code[..start], replacement, &code[end..])
 }
 
 /// Assumes diagnostics is sorted by starting positions
@@ -146,7 +146,10 @@ pub fn test_lint_config_with_output<
     diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.range);
 
     let mut fixed_code = lua_source.to_string();
-    let mut fixed_diagnostics = diagnostics.iter().collect::<Vec<_>>();
+    let mut fixed_diagnostics = diagnostics
+        .iter()
+        .filter(|diagnostic| diagnostic.fixed_code.is_some())
+        .collect::<Vec<_>>();
     let mut lint_results;
 
     // To handle potential conflicts with different lint suggestions, we apply conflicting fixes one at a time.
