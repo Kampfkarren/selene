@@ -30,7 +30,6 @@ class SeleneCodeActionProvider implements vscode.CodeActionProvider {
         context: vscode.CodeActionContext,
         _token: vscode.CancellationToken,
     ): vscode.ProviderResult<vscode.Command[] | vscode.CodeAction[]> {
-        // You can retrieve the diagnostic from the context, then decide what action to provide.
         const codeActions: vscode.CodeAction[] = []
 
         for (const diagnostic of context.diagnostics) {
