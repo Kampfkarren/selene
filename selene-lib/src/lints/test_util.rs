@@ -157,14 +157,20 @@ pub fn test_lint_config_with_output<
     {
         fixed_code = apply_diagnostics_fixes(fixed_code.as_str(), &fixed_diagnostics);
 
-        let fixed_ast = full_moon::parse(&fixed_code).expect("Fix generated invalid code");
+        let fixed_ast = full_moon::parse(&fixed_code).expect(&format!(
+            "Fixer generated invalid code:\n\
+            ----------------\n\
+            {}\n\
+            ----------------\n",
+            fixed_code
+        ));
         lint_results = lint.pass(
             &fixed_ast,
             &context,
-            &AstContext::from_ast(&fixed_ast, &lua_source),
+            &AstContext::from_ast(&fixed_ast, &fixed_code),
         );
         fixed_diagnostics = lint_results.iter().collect::<Vec<_>>();
-        fixed_diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.range);
+        fixed_diagnostics.sort_by_key(|diagnostic| diagnostic.start_position());
     }
 
     let fixed_diff = generate_diff(&lua_source, &fixed_code);
@@ -177,7 +183,7 @@ pub fn test_lint_config_with_output<
             fs::File::create(diff_output_path).expect("couldn't create fixed.diff output file");
         output_file
             .write_all(fixed_diff.as_bytes())
-            .expect("couldn't write fixed.diff to output file");
+            .expect("couldn't write fixed.diff to output file.");
     }
 
     let mut files = codespan::Files::new();

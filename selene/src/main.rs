@@ -367,6 +367,7 @@ fn read<R: Read>(
         }
 
         let _ = fs::write(filename, fixed_code);
+        return;
     }
 
     let (mut errors, mut warnings) = (0, 0);

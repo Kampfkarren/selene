@@ -28,3 +28,18 @@ error[parenthese_conditions]: lua does not require parentheses around conditions
 13 │ repeat until (false)
    │              ^^^^^^^
 
+error[parenthese_conditions]: lua does not require parentheses around conditions
+   ┌─ parenthese_conditions.lua:17:4
+   │  
+17 │   if ((function()
+   │ ╭────^
+18 │ │     if (x) then end
+19 │ │ end)()) then end
+   │ ╰───────^
+
+error[parenthese_conditions]: lua does not require parentheses around conditions
+   ┌─ parenthese_conditions.lua:18:8
+   │
+18 │     if (x) then end
+   │        ^^^
+
