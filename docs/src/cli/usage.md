@@ -77,6 +77,10 @@ Results:
 0 parse errors
 ```
 
+**--fix** *fix*
+
+Automatically applies lint suggestions. Because this can be potentially destructive, it's not allowed by default when there are uncommitted changes. This safety can be ignored by including `--allow-dirty` to allow with unstaged changes or `--allow-staged` to allow only staged changes.
+
 **--num-threads** *num-threads*
 
 Specifies the number of threads for selene to use. Defaults to however many cores your CPU has. If you type `selene --help`, you can see this number because it will show as the default for you.
