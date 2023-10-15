@@ -98,22 +98,22 @@ fn generate_diff(source1: &str, source2: &str, diagnostics: &[&Diagnostic]) -> S
     let mut result = String::new();
     let mut has_changes = false;
     let mut byte_offset = 0;
-    let mut prev_non_insert_applicability_prefix = "  ";
+    let mut prev_non_insert_applicability_prefix = "    ";
 
     for change in TextDiff::from_lines(source1, source2).iter_all_changes() {
         let change_length = change.value().len() as u32;
 
         let change_end_byte = byte_offset + change_length as u32;
 
-        let mut applicability_prefix = "  ";
+        let mut applicability_prefix = "    ";
         for diagnostic in diagnostics {
             let (start, end) = diagnostic.primary_label.range;
             if start < change_end_byte && end > byte_offset {
                 if diagnostic.applicability == Applicability::MachineApplicable {
-                    applicability_prefix = "MA";
+                    applicability_prefix = "[MA]";
                     break;
                 } else if diagnostic.applicability == Applicability::MaybeIncorrect {
-                    applicability_prefix = "MI";
+                    applicability_prefix = "[MI]";
                     break;
                 }
             }
@@ -132,7 +132,7 @@ fn generate_diff(source1: &str, source2: &str, diagnostics: &[&Diagnostic]) -> S
                 has_changes = true;
                 format!("+{}", applicability_prefix)
             }
-            ChangeTag::Equal => "   ".to_string(),
+            ChangeTag::Equal => "     ".to_string(),
         };
 
         result.push_str(&format!("{} {}", sign, change.value()));

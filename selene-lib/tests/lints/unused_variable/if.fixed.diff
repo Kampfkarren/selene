@@ -1,18 +1,18 @@
-    if 1 then
--MA     local localA
-+MA     local _localA
-    elseif 2 then
--MA     local localB
-+MA     local _localB
-        print(localA)
-    elseif 3 then
--MA     local localC
-+MA     local _localC
-        print(localB)
-    else
--MA     local localD
-+MA     local _localD
-        print(localC)
-    end
-    
-    print(localA, localB, localC, localD)
+      if 1 then
+-[MA]     local localA
++[MA]     local _localA
+      elseif 2 then
+-[MA]     local localB
++[MA]     local _localB
+          print(localA)
+      elseif 3 then
+-[MA]     local localC
++[MA]     local _localC
+          print(localB)
+      else
+-[MA]     local localD
++[MA]     local _localD
+          print(localC)
+      end
+      
+      print(localA, localB, localC, localD)

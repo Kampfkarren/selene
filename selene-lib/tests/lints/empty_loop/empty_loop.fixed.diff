@@ -1,73 +1,73 @@
-    for _ = 1, 10 do
-        return "Should not warn"
-    end
-    
-    for _ = 1, 10 do
-        print("Should not warn")
-    end
-    
--MI for _ = 1, 10 do
--MI     -- Should warn
--MI end
-    
--MI for _ = 1, 10 do
--MI     --[[
--MI     Should warn
--MI     ]]
--MI end
-    
--MI for _ = 1, 10 do
-    
-    
--MI     
--MI end
-    
-+   
-    for _ in pairs({}) do
-        return "Should not warn"
-    end
-    
--MI for _ in pairs({}) do
--MI end
-    
-+   
-    for _ in ipairs({}) do
-        return "Should not warn"
-    end
-    
--MI for _ in ipairs({}) do
--MI end
-    
-+   
-    for _ in {} do
-        return "Should not warn"
-    end
-    
--MI for _ in {} do
--MI end
-    
-+   
-    for _ in a() do
-        return "Should not warn"
-    end
-    
--MI for _ in a() do
--MI end
-    
-+   
-    while true do
-        return "Should not warn"
-    end
-    
--MI while true do
--MI end
-    
-+   
-    repeat
-        return "Should not warn"
-    until true
-    
--MI repeat
--MI until true
-+MI 
-    -- comment here shouldn't break anything
+      for _ = 1, 10 do
+          return "Should not warn"
+      end
+      
+      for _ = 1, 10 do
+          print("Should not warn")
+      end
+      
+-[MI] for _ = 1, 10 do
+-[MI]     -- Should warn
+-[MI] end
+      
+-[MI] for _ = 1, 10 do
+-[MI]     --[[
+-[MI]     Should warn
+-[MI]     ]]
+-[MI] end
+      
+-[MI] for _ = 1, 10 do
+      
+      
+-[MI]     
+-[MI] end
+      
++     
+      for _ in pairs({}) do
+          return "Should not warn"
+      end
+      
+-[MI] for _ in pairs({}) do
+-[MI] end
+      
++     
+      for _ in ipairs({}) do
+          return "Should not warn"
+      end
+      
+-[MI] for _ in ipairs({}) do
+-[MI] end
+      
++     
+      for _ in {} do
+          return "Should not warn"
+      end
+      
+-[MI] for _ in {} do
+-[MI] end
+      
++     
+      for _ in a() do
+          return "Should not warn"
+      end
+      
+-[MI] for _ in a() do
+-[MI] end
+      
++     
+      while true do
+          return "Should not warn"
+      end
+      
+-[MI] while true do
+-[MI] end
+      
++     
+      repeat
+          return "Should not warn"
+      until true
+      
+-[MI] repeat
+-[MI] until true
++[MI] 
+      -- comment here shouldn't break anything

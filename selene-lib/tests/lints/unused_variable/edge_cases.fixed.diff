@@ -1,10 +1,10 @@
-    local foo = 1
--MA local foo = foo + 1
--MA local bar = bar
-+MA local _foo = foo + 1
-+MA local _bar = bar
-    
-    -- The variables inside of a repeat...until are accessible from the until statement
-    repeat
-        local baz
-    until baz
+      local foo = 1
+-[MA] local foo = foo + 1
+-[MA] local bar = bar
++[MA] local _foo = foo + 1
++[MA] local _bar = bar
+      
+      -- The variables inside of a repeat...until are accessible from the until statement
+      repeat
+          local baz
+      until baz
