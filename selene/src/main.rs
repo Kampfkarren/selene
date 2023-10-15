@@ -17,7 +17,7 @@ use codespan_reporting::{
     term::DisplayStyle as CodespanDisplayStyle,
 };
 use selene_lib::{
-    lints::{Diagnostic, Severity},
+    lints::{Applicability, Diagnostic, Severity},
     *,
 };
 use structopt::{clap, StructOpt};
@@ -349,21 +349,27 @@ fn read<R: Read>(
     if is_fix {
         let num_fixes = diagnostics
             .iter()
-            .filter(|diagnostic| diagnostic.diagnostic.fixed_code.is_some())
+            .filter(|diagnostic| {
+                diagnostic.diagnostic.fixed_code.is_some()
+                    && diagnostic.diagnostic.applicability == Applicability::MachineApplicable
+            })
             .count();
 
         // To handle potential conflicts with different lint suggestions, we apply conflicting fixes one at a time.
         // Then we re-evaluate the lints with the new code until there are no more fixes to apply
-        while diagnostics
-            .iter()
-            .any(|diagnostic| diagnostic.diagnostic.fixed_code.is_some())
-        {
+        while diagnostics.iter().any(|diagnostic| {
+            diagnostic.diagnostic.fixed_code.is_some()
+                && diagnostic.diagnostic.applicability == Applicability::MachineApplicable
+        }) {
             fixed_code = apply_diagnostics_fixes(
                 fixed_code.as_str(),
                 &diagnostics
                     .iter()
                     .map(|diagnostic| &diagnostic.diagnostic)
-                    .filter(|diagnostic| diagnostic.fixed_code.is_some())
+                    .filter(|diagnostic| {
+                        diagnostic.fixed_code.is_some()
+                            && diagnostic.applicability == Applicability::MachineApplicable
+                    })
                     .collect::<Vec<_>>(),
             );
 

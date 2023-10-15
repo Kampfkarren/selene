@@ -73,6 +73,7 @@ impl Lint for MismatchedArgCountLint {
                         })
                         .collect(),
                     None,
+                    Applicability::Unspecified,
                 )
             })
             .collect()

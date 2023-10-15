@@ -36,6 +36,7 @@ impl Lint for ParentheseConditionsLint {
                     "lua does not require parentheses around conditions".to_owned(),
                     Label::new(*position),
                     Some(context.code[position.0 + 1..position.1 - 1].to_string()),
+                    Applicability::MachineApplicable,
                 )
             })
             .collect()

@@ -49,6 +49,7 @@ impl Lint for MustUseLint {
                 ),
                 Label::new(function_call_stmt.call_prefix_range),
                 None,
+                Applicability::Unspecified,
             ));
         }
 

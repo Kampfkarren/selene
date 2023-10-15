@@ -35,9 +35,16 @@ fn create_diagnostic(mismatch: &MismatchedArgCount) -> Diagnostic {
             .to_owned()],
             Vec::new(),
             None,
+            Applicability::Unspecified,
         )
     } else {
-        Diagnostic::new(code, message, primary_label, None)
+        Diagnostic::new(
+            code,
+            message,
+            primary_label,
+            None,
+            Applicability::Unspecified,
+        )
     }
 }
 

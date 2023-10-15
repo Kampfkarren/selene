@@ -59,6 +59,7 @@ impl Lint for EmptyLoopLint {
                     "empty loop block".to_owned(),
                     Label::new(position),
                     Some(String::new()),
+                    Applicability::MaybeIncorrect,
                 )
             })
             .collect()

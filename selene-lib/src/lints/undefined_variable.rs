@@ -49,6 +49,7 @@ impl Lint for UndefinedVariableLint {
                     ),
                     Vec::new(),
                     None,
+                    Applicability::Unspecified,
                 ));
             }
         }

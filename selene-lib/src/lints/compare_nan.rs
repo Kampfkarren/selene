@@ -43,6 +43,7 @@ impl Lint for CompareNanLint {
                     vec![format!("try: `{}` instead", fixed_code.clone())],
                     Vec::new(),
                     Some(fixed_code),
+                    Applicability::MaybeIncorrect,
                 )
             })
             .collect()

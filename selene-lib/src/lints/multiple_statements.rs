@@ -54,6 +54,7 @@ impl Lint for MultipleStatementsLint {
                     "only one statement per line is allowed".to_owned(),
                     Label::new(*position),
                     None,
+                    Applicability::Unspecified,
                 )
             })
             .collect()

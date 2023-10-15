@@ -59,6 +59,7 @@ impl Lint for HighCyclomaticComplexityLint {
                     ),
                     Label::new(position),
                     None,
+                    Applicability::Unspecified,
                 )
             })
             .collect()

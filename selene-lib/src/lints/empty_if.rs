@@ -64,6 +64,7 @@ impl Lint for EmptyIfLint {
                     .to_owned(),
                     Label::new(position.0),
                     None,
+                    Applicability::Unspecified,
                 )
             })
             .collect()

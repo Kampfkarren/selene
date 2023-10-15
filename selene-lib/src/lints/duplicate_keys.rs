@@ -43,6 +43,7 @@ impl Lint for DuplicateKeysLint {
                         format!("`{}` originally declared here", duplicate.name),
                     )],
                     None,
+                    Applicability::Unspecified,
                 )
             })
             .collect()

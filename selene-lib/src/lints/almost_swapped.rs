@@ -46,6 +46,7 @@ impl Lint for AlmostSwappedLint {
                     )],
                     Vec::new(),
                     None,
+                    Applicability::Unspecified,
                 )
             })
             .collect()

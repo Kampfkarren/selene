@@ -51,12 +51,14 @@ impl Lint for BadStringEscapeLint {
                     "string escape sequence doesn't exist".to_owned(),
                     Label::new(sequence.range.to_owned()),
                     None,
+                    Applicability::Unspecified,
                 ),
                 ReasonWhy::Malformed => Diagnostic::new(
                     "bad_string_escape",
                     "string escape sequence is malformed".to_owned(),
                     Label::new(sequence.range.to_owned()),
                     None,
+                    Applicability::Unspecified,
                 ),
                 ReasonWhy::DecimalTooHigh => Diagnostic::new_complete(
                     "bad_string_escape",
@@ -68,6 +70,7 @@ impl Lint for BadStringEscapeLint {
                     ],
                     Vec::new(),
                     None,
+                    Applicability::Unspecified,
                 ),
                 ReasonWhy::CodepointTooHigh => Diagnostic::new_complete(
                     "bad_string_escape",
@@ -79,6 +82,7 @@ impl Lint for BadStringEscapeLint {
                     ],
                     Vec::new(),
                     None,
+                    Applicability::Unspecified,
                 ),
                 ReasonWhy::DoubleInSingle => Diagnostic::new(
                     "bad_string_escape",
@@ -86,6 +90,7 @@ impl Lint for BadStringEscapeLint {
                         .to_owned(),
                     Label::new(sequence.range.to_owned()),
                     None,
+                    Applicability::Unspecified,
                 ),
                 ReasonWhy::SingleInDouble => Diagnostic::new(
                     "bad_string_escape",
@@ -93,6 +98,7 @@ impl Lint for BadStringEscapeLint {
                         .to_owned(),
                     Label::new(sequence.range.to_owned()),
                     None,
+                    Applicability::Unspecified,
                 ),
             })
             .collect()

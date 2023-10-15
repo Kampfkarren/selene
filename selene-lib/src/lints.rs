@@ -89,6 +89,27 @@ pub enum Severity {
     Warning,
 }
 
+/// Indicates the confidence in the correctness of a suggestion
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Applicability {
+    /// The suggestion is definitely what the user intended, or maintains the exact meaning of the code
+    ///
+    /// The suggestion is safe to be automatically applied
+    MachineApplicable,
+
+    /// The suggestion is probably what the user intended, but may not maintain the exact meaning of the code
+    ///
+    /// The suggestion generates valid code when applied
+    MaybeIncorrect,
+
+    /// The suggestion is probably what the user intended, but may not maintain the exact meaning of the code
+    ///
+    /// The suggestion does not generate valid code when applied
+    HasPlaceholders,
+
+    Unspecified,
+}
+
 #[derive(Debug)]
 pub struct Diagnostic {
     pub code: &'static str,
@@ -97,6 +118,7 @@ pub struct Diagnostic {
     pub primary_label: Label,
     pub secondary_labels: Vec<Label>,
     pub fixed_code: Option<String>,
+    pub applicability: Applicability,
 }
 
 impl Diagnostic {
@@ -105,12 +127,14 @@ impl Diagnostic {
         message: String,
         primary_label: Label,
         fixed_code: Option<String>,
+        applicability: Applicability,
     ) -> Self {
         Self {
             code,
             message,
             primary_label,
             fixed_code,
+            applicability,
 
             notes: Vec::new(),
             secondary_labels: Vec::new(),
@@ -124,6 +148,7 @@ impl Diagnostic {
         notes: Vec<String>,
         secondary_labels: Vec<Label>,
         fixed_code: Option<String>,
+        applicability: Applicability,
     ) -> Self {
         Self {
             code,
@@ -132,6 +157,7 @@ impl Diagnostic {
             primary_label,
             secondary_labels,
             fixed_code,
+            applicability,
         }
     }
 

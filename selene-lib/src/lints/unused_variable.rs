@@ -206,6 +206,7 @@ impl Lint for UnusedVariableLint {
                         })
                         .collect(),
                     fixed_code,
+                    Applicability::MachineApplicable,
                 ));
             };
         }

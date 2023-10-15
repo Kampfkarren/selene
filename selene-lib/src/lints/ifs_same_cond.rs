@@ -42,6 +42,7 @@ impl Lint for IfsSameCondLint {
                         "note: same as this".to_owned(),
                     )],
                     None,
+                    Applicability::Unspecified,
                 )
             })
             .collect()

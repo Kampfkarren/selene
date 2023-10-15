@@ -253,6 +253,7 @@ impl StandardLibraryVisitor<'_> {
                 ),
                 Vec::new(),
                 None,
+                Applicability::Unspecified,
             ));
         }
     }
@@ -312,6 +313,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                                     Vec::new(),
                                     Vec::new(),
                                     None,
+                                    Applicability::Unspecified,
                                 ));
                             }
 
@@ -350,6 +352,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                             Vec::new(),
                             Vec::new(),
                             None,
+                            Applicability::Unspecified,
                         ));
                     }
                 }
@@ -431,6 +434,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                     ),
                     Label::from_node(call, None),
                     None,
+                    Applicability::Unspecified,
                 ));
 
                 return;
@@ -477,6 +481,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                 )],
                 Vec::new(),
                 None,
+                Applicability::Unspecified,
             ));
 
             return;
@@ -558,6 +563,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                             message.iter().cloned().collect(),
                             Vec::new(),
                             None,
+                            Applicability::Unspecified,
                         ));
                     }
 
@@ -596,6 +602,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                 required_param_message,
                 Vec::new(),
                 None,
+                Applicability::Unspecified,
             ));
         }
 
@@ -631,6 +638,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                             ),
                         ),
                         None,
+                        Applicability::Unspecified,
                     ));
                 }
             }

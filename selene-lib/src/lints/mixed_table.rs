@@ -35,6 +35,7 @@ impl Lint for MixedTableLint {
                 vec!["help: change this table to either an array or dictionary".to_owned()],
                 Vec::new(),
                 None,
+                Applicability::Unspecified,
             ));
         }
 

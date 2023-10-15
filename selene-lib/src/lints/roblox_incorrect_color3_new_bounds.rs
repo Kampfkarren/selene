@@ -40,6 +40,7 @@ impl Lint for Color3BoundsLint {
                     vec!["help: did you mean to use Color3.fromRGB instead?".to_owned()],
                     Vec::new(),
                     None,
+                    Applicability::Unspecified,
                 )
             })
             .collect()

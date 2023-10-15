@@ -70,6 +70,7 @@ impl Lint for ShadowingLint {
                         "previously defined here".to_owned(),
                     )],
                     None,
+                    Applicability::Unspecified,
                 )
             })
             .collect()

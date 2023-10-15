@@ -60,6 +60,7 @@ impl Lint for ConstantTableComparisonLint {
                     },
                     Vec::new(),
                     None,
+                    Applicability::Unspecified,
                 )
             })
             .collect()

@@ -94,6 +94,7 @@ impl Lint for IncorrectRoactUsageLint {
                 ),
                 Label::new(invalid_event.range),
                 None,
+                Applicability::Unspecified,
             ));
         }
 
@@ -114,6 +115,7 @@ impl Lint for IncorrectRoactUsageLint {
                         )],
                         Vec::new(),
                         None,
+                        Applicability::Unspecified,
                     ));
                 }
                 _ => {
@@ -125,6 +127,7 @@ impl Lint for IncorrectRoactUsageLint {
                         ),
                         Label::new(invalid_property.range),
                         None,
+                        Applicability::Unspecified,
                     ));
                 }
             }
@@ -136,6 +139,7 @@ impl Lint for IncorrectRoactUsageLint {
                 format!("`{}` is not a valid class", unknown_class.name),
                 Label::new(unknown_class.range),
                 None,
+                Applicability::Unspecified,
             ));
         }
 
