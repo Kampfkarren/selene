@@ -11,7 +11,8 @@ use std::{
 };
 
 use codespan_reporting::{
-    diagnostic::Severity as CodespanSeverity, term::Config as CodespanConfig,
+    diagnostic::{self, Severity as CodespanSeverity},
+    term::Config as CodespanConfig,
 };
 
 use serde::de::DeserializeOwned;
@@ -93,23 +94,53 @@ fn apply_diagnostics_fixes(code: &str, diagnostics: &[&Diagnostic]) -> String {
 }
 
 /// Returns empty string if there are no diffs
-fn generate_diff(source1: &str, source2: &str) -> String {
+fn generate_diff(source1: &str, source2: &str, diagnostics: &[&Diagnostic]) -> String {
     let mut result = String::new();
     let mut has_changes = false;
+    let mut byte_offset = 0;
+    let mut prev_non_insert_applicability_prefix = "  ";
 
     for change in TextDiff::from_lines(source1, source2).iter_all_changes() {
+        let change_length = change.value().len() as u32;
+
+        let change_end_byte = byte_offset + change_length as u32;
+
+        let mut applicability_prefix = "  ";
+        for diagnostic in diagnostics {
+            let (start, end) = diagnostic.primary_label.range;
+            if start < change_end_byte && end > byte_offset {
+                if diagnostic.applicability == Applicability::MachineApplicable {
+                    applicability_prefix = "MA";
+                    break;
+                } else if diagnostic.applicability == Applicability::MaybeIncorrect {
+                    applicability_prefix = "MI";
+                    break;
+                }
+            }
+        }
+
+        if change.tag() == ChangeTag::Insert {
+            applicability_prefix = prev_non_insert_applicability_prefix;
+        }
+
         let sign = match change.tag() {
             ChangeTag::Delete => {
                 has_changes = true;
-                "-"
+                format!("-{}", applicability_prefix)
             }
             ChangeTag::Insert => {
                 has_changes = true;
-                "+"
+                format!("+{}", applicability_prefix)
             }
-            ChangeTag::Equal => " ",
+            ChangeTag::Equal => "   ".to_string(),
         };
-        result.push_str(&format!("{}{}", sign, change.value()));
+
+        result.push_str(&format!("{} {}", sign, change.value()));
+
+        if change.tag() != ChangeTag::Insert {
+            byte_offset = change_end_byte;
+            prev_non_insert_applicability_prefix = applicability_prefix;
+        }
     }
 
     if has_changes {
@@ -195,7 +226,11 @@ pub fn test_lint_config_with_output<
         fixed_diagnostics.sort_by_key(|diagnostic| diagnostic.start_position());
     }
 
-    let fixed_diff = generate_diff(&lua_source, &fixed_code);
+    let fixed_diff = generate_diff(
+        &lua_source,
+        &fixed_code,
+        &diagnostics.iter().collect::<Vec<_>>(),
+    );
     let diff_output_path = path_base.with_extension("fixed.diff");
 
     if let Ok(expected) = fs::read_to_string(&diff_output_path) {

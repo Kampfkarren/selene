@@ -1,5 +1,5 @@
--local function foo(self)
-+local function foo(_self)
- end
- 
- foo()
+-MA local function foo(self)
++MA local function foo(_self)
+    end
+    
+    foo()

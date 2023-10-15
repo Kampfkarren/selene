@@ -1,10 +1,10 @@
- local function foo(...)
-     call(...)
- end
- 
--local function bar(...)
-+local function _bar(...)
-     call(...)
- end
- 
- foo()
+    local function foo(...)
+        call(...)
+    end
+    
+-MA local function bar(...)
++MA local function _bar(...)
+        call(...)
+    end
+    
+    foo()
