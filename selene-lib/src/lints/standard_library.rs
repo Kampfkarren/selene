@@ -463,7 +463,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
 
             let name = name_path.pop().unwrap();
 
-            self.diagnostics.push(Diagnostic::new_complete(
+            self.diagnostics.push(Diagnostic::new(
                 "incorrect_standard_library_use",
                 format!(
                     "standard library function `{}{}{}` {}",
@@ -473,15 +473,13 @@ impl Visitor for StandardLibraryVisitor<'_> {
                     problem,
                 ),
                 Label::from_node(call, None),
-                vec![format!(
-                    "try: {}{}{}(...)",
+                Some(format!(
+                    "{}{}{}(...)",
                     name_path.join("."),
                     use_instead,
                     name
-                )],
-                Vec::new(),
-                None,
-                Applicability::Unspecified,
+                )),
+                Applicability::HasPlaceholders,
             ));
 
             return;

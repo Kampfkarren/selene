@@ -10,7 +10,7 @@ error[incorrect_standard_library_use]: standard library function `foo.bar` is a 
 3 │ foo.bar()
   │ ^^^^^^^^^
   │
-  = try: foo:bar(...)
+  = try: `foo:bar(...)`
 
 error[incorrect_standard_library_use]: standard library global `foo` does not contain the field `baz`
   ┌─ method_call.lua:4:1

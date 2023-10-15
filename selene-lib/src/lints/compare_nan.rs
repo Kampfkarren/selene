@@ -36,12 +36,10 @@ impl Lint for CompareNanLint {
                     operator = comparisons.operator,
                 );
 
-                Diagnostic::new_complete(
+                Diagnostic::new(
                     "compare_nan",
                     "comparing things to nan directly is not allowed".to_owned(),
                     Label::new(comparisons.range),
-                    vec![format!("try: `{}` instead", fixed_code.clone())],
-                    Vec::new(),
                     Some(fixed_code),
                     Applicability::MaybeIncorrect,
                 )

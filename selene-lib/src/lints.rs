@@ -129,14 +129,20 @@ impl Diagnostic {
         fixed_code: Option<String>,
         applicability: Applicability,
     ) -> Self {
+        let notes = if let Some(ref fixed_code_str) = fixed_code {
+            vec![format!("try: `{}`", fixed_code_str)]
+        } else {
+            Vec::new()
+        };
+
         Self {
             code,
             message,
             primary_label,
             fixed_code,
             applicability,
+            notes,
 
-            notes: Vec::new(),
             secondary_labels: Vec::new(),
         }
     }
