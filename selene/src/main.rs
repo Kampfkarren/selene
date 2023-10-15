@@ -197,7 +197,7 @@ fn replace_code_range(code: &str, start: usize, end: usize, replacement: &str) -
 /// 2. If fixes partially overlap, chooses the fix that starts first and discard the other one
 ///
 // This is just copied from `test_util`. Can we get a better abstraction?
-fn apply_diagnostics_fixes(code: &str, diagnostics: &Vec<&Diagnostic>) -> String {
+fn apply_diagnostics_fixes(code: &str, diagnostics: &[&Diagnostic]) -> String {
     let mut chosen_diagnostics = Vec::new();
 
     let mut candidate = diagnostics[0];
@@ -341,8 +341,12 @@ fn read<R: Read>(
     let mut diagnostics = checker.test_on(&ast, &contents.as_ref().to_string());
     diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.start_position());
 
+    let mut fixed_code = contents.as_ref().to_string();
     if is_fix {
-        let mut fixed_code = contents.as_ref().to_string();
+        let num_fixes = diagnostics
+            .iter()
+            .filter(|diagnostic| diagnostic.diagnostic.fixed_code.is_some())
+            .count();
 
         // To handle potential conflicts with different lint suggestions, we apply conflicting fixes one at a time.
         // Then we re-evaluate the lints with the new code until there are no more fixes to apply
@@ -356,7 +360,7 @@ fn read<R: Read>(
                     .iter()
                     .map(|diagnostic| &diagnostic.diagnostic)
                     .filter(|diagnostic| diagnostic.fixed_code.is_some())
-                    .collect(),
+                    .collect::<Vec<_>>(),
             );
 
             let fixed_ast = full_moon::parse(&fixed_code).expect(
@@ -367,8 +371,35 @@ fn read<R: Read>(
             diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.start_position());
         }
 
-        let _ = fs::write(filename, fixed_code);
-        return;
+        if num_fixes > 0 {
+            if fs::write(filename, fixed_code.clone()).is_ok() {
+                files.update(source_id, &fixed_code);
+
+                let stdout = StandardStream::stdout(get_color());
+                let mut stdout = stdout.lock();
+                let _ =
+                    stdout.set_color(ColorSpec::new().set_fg(Some(Color::Green)).set_bold(true));
+
+                print!("fixed ");
+
+                let _ = stdout.reset();
+
+                println!(
+                    "{} ({})",
+                    filename.display(),
+                    if num_fixes == 1 {
+                        "1 fix".to_string()
+                    } else {
+                        format!("{} fixes", num_fixes)
+                    }
+                );
+
+                drop(stdout);
+            } else {
+                error(format!("failed to write to {}", filename.display()).as_str());
+                std::process::exit(1);
+            }
+        }
     }
 
     let (mut errors, mut warnings) = (0, 0);
