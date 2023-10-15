@@ -44,8 +44,8 @@ impl Lint for AlmostSwappedLint {
                         name1 = almost_swap.names.0,
                         name2 = almost_swap.names.1,
                     )),
-                    // FIXME: Ideally `MaybeIncorrect`, but cannot because the end range of swapping `t[1]` and `t[2]`
-                    // doesn't include the closing `]`
+                    // FIXME: Ideally `MaybeIncorrect`, but the end range for swapping `t[1]` and `t[2]`
+                    // currently doesn't include the closing `]`
                     Applicability::HasPlaceholders,
                 )
             })
