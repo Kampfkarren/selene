@@ -89,16 +89,16 @@ impl Lint for BadStringEscapeLint {
                     "double quotes do not have to be escaped when inside single quoted strings"
                         .to_owned(),
                     Label::new(sequence.range.to_owned()),
-                    None,
-                    Applicability::Unspecified,
+                    Some("\"".to_string()),
+                    Applicability::MachineApplicable,
                 ),
                 ReasonWhy::SingleInDouble => Diagnostic::new(
                     "bad_string_escape",
                     "single quotes do not have to be escaped when inside double quoted strings"
                         .to_owned(),
                     Label::new(sequence.range.to_owned()),
-                    None,
-                    Applicability::Unspecified,
+                    Some("'".to_string()),
+                    Applicability::MachineApplicable,
                 ),
             })
             .collect()

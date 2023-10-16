@@ -3,12 +3,16 @@ error[bad_string_escape]: single quotes do not have to be escaped when inside do
    │
 11 │ local x = "\'\""
    │            ^^
+   │
+   = try: `'`
 
 error[bad_string_escape]: double quotes do not have to be escaped when inside single quoted strings
    ┌─ lua51_string_escapes.lua:13:12
    │
 13 │ local x = '\"\''
    │            ^^
+   │
+   = try: `"`
 
 error[bad_string_escape]: string escape sequence doesn't exist
    ┌─ lua51_string_escapes.lua:20:14
