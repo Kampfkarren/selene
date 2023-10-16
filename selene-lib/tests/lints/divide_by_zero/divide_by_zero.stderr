@@ -1,12 +1,16 @@
-error[divide_by_zero]: dividing by zero is not allowed, use math.huge instead
+error[divide_by_zero]: dividing by zero is not readable
   ┌─ divide_by_zero.lua:2:11
   │
 2 │ local _ = 5 / 0
   │           ^^^^^
+  │
+  = try: `math.huge()`
 
-error[divide_by_zero]: dividing by zero is not allowed, use math.huge instead
+error[divide_by_zero]: dividing by zero is not readable
   ┌─ divide_by_zero.lua:4:11
   │
 4 │ local _ = x / 0
   │           ^^^^^
+  │
+  = try: `math.huge()`
 
