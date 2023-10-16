@@ -60,8 +60,8 @@ impl Lint for UnscopedVariablesLint {
                         reference.name
                     ),
                     Label::new(reference.identifier),
-                    None,
-                    Applicability::Unspecified,
+                    Some(format!("local {}", reference.name)),
+                    Applicability::MaybeIncorrect,
                 ));
             }
         }

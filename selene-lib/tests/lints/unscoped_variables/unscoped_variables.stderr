@@ -3,10 +3,14 @@ error[unscoped_variables]: `bar` is not declared locally, and will be available 
   │
 1 │ bar = true
   │ ^^^
+  │
+  = try: `local bar`
 
 error[unscoped_variables]: `baz` is not declared locally, and will be available in every scope
    ┌─ unscoped_variables.lua:11:5
    │
 11 │     baz = 1
    │     ^^^
+   │
+   = try: `local baz`
 
