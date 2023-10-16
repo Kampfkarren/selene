@@ -24,10 +24,15 @@ export interface Diagnostic {
 }
 
 export class SeleneDiagnostic extends vscode.Diagnostic {
-    fixed_code?: string;
+    fixed_code?: string
 
-    constructor(range: vscode.Range, message: string, severity: vscode.DiagnosticSeverity, fixed_code?: string) {
-        super(range, message, severity);
-        this.fixed_code = fixed_code;
+    constructor(
+        range: vscode.Range,
+        message: string,
+        severity: vscode.DiagnosticSeverity,
+        fixed_code?: string,
+    ) {
+        super(range, message, severity)
+        this.fixed_code = fixed_code
     }
 }
