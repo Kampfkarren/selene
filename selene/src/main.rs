@@ -17,7 +17,7 @@ use codespan_reporting::{
     term::DisplayStyle as CodespanDisplayStyle,
 };
 use selene_lib::{
-    lints::{Applicability, Diagnostic, Severity},
+    lints::{Diagnostic, Severity},
     *,
 };
 use structopt::{clap, StructOpt};
@@ -186,65 +186,6 @@ fn emit_codespan_locked(
     emit_codespan(&mut stdout, files, diagnostic, None);
 }
 
-fn replace_code_range(code: &str, start: usize, end: usize, replacement: &str) -> String {
-    if start > end || end > code.len() {
-        return code.to_string();
-    }
-
-    format!("{}{}{}", &code[..start], replacement, &code[end..])
-}
-
-/// Assumes diagnostics is sorted by starting positions
-///
-/// 1. Applies all disjoint fixes
-/// 1. If a fix is completely contained inside another fix, uses the inner one and discard the outer one
-/// 2. If fixes partially overlap, chooses the fix that starts first and discard the other one
-///
-// This is just copied from `test_util`. Can we get a better abstraction?
-fn apply_diagnostics_fixes(code: &str, diagnostics: &[&Diagnostic]) -> String {
-    let mut chosen_diagnostics = Vec::new();
-
-    let mut candidate = diagnostics[0];
-    for diagnostic in diagnostics.iter().skip(1) {
-        let this_range = diagnostic.primary_label.range;
-
-        if this_range.1 <= candidate.primary_label.range.1 {
-            // Completely contained inside
-            candidate = diagnostic;
-        } else if this_range.0 <= candidate.primary_label.range.1 {
-            // Partially overlapping
-            continue;
-        } else {
-            chosen_diagnostics.push(candidate);
-            candidate = diagnostic;
-        }
-    }
-    chosen_diagnostics.push(candidate);
-
-    let mut bytes_offset = 0;
-
-    let new_code = chosen_diagnostics
-        .iter()
-        .fold(code.to_string(), |code, diagnostic| {
-            if let Some(fixed) = &diagnostic.fixed_code {
-                let (start, end) = diagnostic.primary_label.range;
-                let new_code = replace_code_range(
-                    code.as_str(),
-                    (start as isize + bytes_offset) as usize,
-                    (end as isize + bytes_offset) as usize,
-                    fixed.as_str(),
-                );
-
-                bytes_offset += fixed.len() as isize - (end - start) as isize;
-                new_code
-            } else {
-                code
-            }
-        });
-
-    new_code
-}
-
 fn read<R: Read>(
     checker: &Checker<toml::value::Value>,
     filename: &Path,
@@ -347,29 +288,24 @@ fn read<R: Read>(
 
     let mut fixed_code = contents.as_ref().to_string();
     if is_fix {
+        // This only counts the number of inital automatic fixes. Additional fixes caused by a previous fix won't
+        // be counted
         let num_fixes = diagnostics
             .iter()
-            .filter(|diagnostic| {
-                diagnostic.diagnostic.fixed_code.is_some()
-                    && diagnostic.diagnostic.applicability == Applicability::MachineApplicable
-            })
+            .filter(|diagnostic| diagnostic.diagnostic.has_machine_applicable_fix())
             .count();
 
         // To handle potential conflicts with different lint suggestions, we apply conflicting fixes one at a time.
         // Then we re-evaluate the lints with the new code until there are no more fixes to apply
-        while diagnostics.iter().any(|diagnostic| {
-            diagnostic.diagnostic.fixed_code.is_some()
-                && diagnostic.diagnostic.applicability == Applicability::MachineApplicable
-        }) {
-            fixed_code = apply_diagnostics_fixes(
+        while diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.diagnostic.has_machine_applicable_fix())
+        {
+            fixed_code = Diagnostic::get_applied_suggestions_code(
                 fixed_code.as_str(),
                 &diagnostics
                     .iter()
                     .map(|diagnostic| &diagnostic.diagnostic)
-                    .filter(|diagnostic| {
-                        diagnostic.fixed_code.is_some()
-                            && diagnostic.applicability == Applicability::MachineApplicable
-                    })
                     .collect::<Vec<_>>(),
             );
 

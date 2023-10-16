@@ -11,8 +11,7 @@ use std::{
 };
 
 use codespan_reporting::{
-    diagnostic::{self, Severity as CodespanSeverity},
-    term::Config as CodespanConfig,
+    diagnostic::Severity as CodespanSeverity, term::Config as CodespanConfig,
 };
 
 use serde::de::DeserializeOwned;
@@ -34,63 +33,6 @@ impl Default for TestUtilConfig {
             __non_exhaustive: (),
         }
     }
-}
-
-fn replace_code_range(code: &str, start: usize, end: usize, replacement: &str) -> String {
-    if start > end || end > code.len() {
-        return code.to_string();
-    }
-
-    format!("{}{}{}", &code[..start], replacement, &code[end..])
-}
-
-/// Assumes diagnostics is sorted by starting positions
-///
-/// 1. Applies all disjoint fixes
-/// 1. If a fix is completely contained inside another fix, uses the inner one and discard the outer one
-/// 2. If fixes partially overlap, chooses the fix that starts first and discard the other one
-fn apply_diagnostics_fixes(code: &str, diagnostics: &[&Diagnostic]) -> String {
-    let mut chosen_diagnostics = Vec::new();
-
-    let mut candidate = diagnostics[0];
-    for diagnostic in diagnostics.iter().skip(1) {
-        let this_range = diagnostic.primary_label.range;
-
-        if this_range.1 <= candidate.primary_label.range.1 {
-            // Completely contained inside
-            candidate = diagnostic;
-        } else if this_range.0 <= candidate.primary_label.range.1 {
-            // Partially overlapping
-            continue;
-        } else {
-            chosen_diagnostics.push(candidate);
-            candidate = diagnostic;
-        }
-    }
-    chosen_diagnostics.push(candidate);
-
-    let mut bytes_offset = 0;
-
-    let new_code = chosen_diagnostics
-        .iter()
-        .fold(code.to_string(), |code, diagnostic| {
-            if let Some(fixed) = &diagnostic.fixed_code {
-                let (start, end) = diagnostic.primary_label.range;
-                let new_code = replace_code_range(
-                    code.as_str(),
-                    (start as isize + bytes_offset) as usize,
-                    (end as isize + bytes_offset) as usize,
-                    fixed.as_str(),
-                );
-
-                bytes_offset += fixed.len() as isize - (end - start) as isize;
-                new_code
-            } else {
-                code
-            }
-        });
-
-    new_code
 }
 
 /// Returns empty string if there are no diffs
@@ -206,7 +148,8 @@ pub fn test_lint_config_with_output<
             && (diagnostic.applicability == Applicability::MachineApplicable
                 || diagnostic.applicability == Applicability::MaybeIncorrect)
     }) {
-        fixed_code = apply_diagnostics_fixes(fixed_code.as_str(), &fixed_diagnostics);
+        fixed_code =
+            Diagnostic::get_applied_suggestions_code(fixed_code.as_str(), &fixed_diagnostics);
 
         let fixed_ast = full_moon::parse(&fixed_code).unwrap_or_else(|_| {
             panic!(

@@ -191,6 +191,80 @@ impl Diagnostic {
     pub fn start_position(&self) -> u32 {
         self.primary_label.range.0
     }
+
+    pub fn has_machine_applicable_fix(&self) -> bool {
+        self.fixed_code.is_some() && self.applicability == Applicability::MachineApplicable
+    }
+
+    /// 1. Applies all disjoint fixes
+    /// 1. If a fix is completely contained inside another fix, uses the inner one and discard the outer one
+    /// 2. If fixes partially overlap, chooses the fix that starts first and discard the other one
+    pub fn get_applied_suggestions_code(code: &str, diagnostics: &[&Diagnostic]) -> String {
+        let mut sorted_diagnostics = diagnostics
+            .iter()
+            .filter(|diagnostic| diagnostic.has_machine_applicable_fix())
+            .collect::<Vec<_>>();
+        sorted_diagnostics.sort_by_key(|diagnostic| diagnostic.start_position());
+
+        let mut chosen_diagnostics = Vec::new();
+
+        let mut candidate = match sorted_diagnostics.first() {
+            Some(first) => first,
+            None => return code.to_string(),
+        };
+
+        for diagnostic in sorted_diagnostics.iter().skip(1) {
+            let this_range = diagnostic.primary_label.range;
+
+            if this_range.1 <= candidate.primary_label.range.1 {
+                // Completely contained inside
+                candidate = diagnostic;
+            } else if this_range.0 <= candidate.primary_label.range.1 {
+                // Partially overlapping
+                continue;
+            } else {
+                chosen_diagnostics.push(candidate);
+                candidate = diagnostic;
+            }
+        }
+        chosen_diagnostics.push(candidate);
+
+        let mut bytes_offset = 0;
+
+        let new_code = chosen_diagnostics
+            .iter()
+            .fold(code.to_string(), |code, diagnostic| {
+                if let Some(fixed) = &diagnostic.fixed_code {
+                    let (start, end) = diagnostic.primary_label.range;
+
+                    // This can theoretically overflow, but the user would face memory constraints
+                    // of such large strings long before
+                    let start_with_offset = start as isize + bytes_offset;
+                    let end_with_offset = end as isize + bytes_offset;
+
+                    let new_code = if start_with_offset > end_with_offset
+                        || end_with_offset > code.len().try_into().unwrap()
+                    {
+                        code.to_string()
+                    } else {
+                        format!(
+                            "{}{}{}",
+                            // Conversion is safe as range with offset will never be negative
+                            &code[..start_with_offset as usize],
+                            fixed.as_str(),
+                            &code[(end_with_offset as usize)..]
+                        )
+                    };
+
+                    bytes_offset += fixed.len() as isize - (end_with_offset - start_with_offset);
+                    new_code
+                } else {
+                    code
+                }
+            });
+
+        new_code
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]
