@@ -28,7 +28,6 @@ class SeleneCodeActionProvider implements vscode.CodeActionProvider {
         document: vscode.TextDocument,
         _range: vscode.Range | vscode.Selection,
         context: vscode.CodeActionContext,
-        _token: vscode.CancellationToken,
     ): vscode.ProviderResult<vscode.Command[] | vscode.CodeAction[]> {
         const codeActions: vscode.CodeAction[] = []
 
