@@ -45,7 +45,7 @@ fn generate_diff(source1: &str, source2: &str, diagnostics: &[&Diagnostic]) -> S
     for change in TextDiff::from_lines(source1, source2).iter_all_changes() {
         let change_length = change.value().len() as u32;
 
-        let change_end_byte = byte_offset + change_length as u32;
+        let change_end_byte = byte_offset + change_length;
 
         let mut applicability_prefix = "    ";
         for diagnostic in diagnostics {
@@ -139,35 +139,45 @@ pub fn test_lint_config_with_output<
                     || diagnostic.applicability == Applicability::MaybeIncorrect)
         })
         .collect::<Vec<_>>();
-    let mut lint_results;
 
-    // To handle potential conflicts with different lint suggestions, we apply conflicting fixes one at a time.
-    // Then we re-evaluate the lints with the new code until there are no more fixes to apply
-    while fixed_diagnostics.iter().any(|diagnostic| {
-        diagnostic.fixed_code.is_some()
-            && (diagnostic.applicability == Applicability::MachineApplicable
-                || diagnostic.applicability == Applicability::MaybeIncorrect)
-    }) {
-        fixed_code =
-            Diagnostic::get_applied_suggestions_code(fixed_code.as_str(), &fixed_diagnostics);
+    fixed_code = Diagnostic::get_applied_suggestions_code(
+        fixed_code.as_str(),
+        fixed_diagnostics,
+        |new_code| {
+            println!("Fixer generated code:\n{}", new_code);
+            let fixed_ast = full_moon::parse(new_code).unwrap_or_else(|_| {
+                panic!(
+                    "Fixer generated invalid code:\n\
+                        ----------------\n\
+                        {}\n\
+                        ----------------\n",
+                    new_code
+                )
+            });
+            lint.pass(
+                &fixed_ast,
+                &context,
+                &AstContext::from_ast(&fixed_ast, &new_code.to_string()),
+            )
+        },
+    );
 
-        let fixed_ast = full_moon::parse(&fixed_code).unwrap_or_else(|_| {
-            panic!(
-                "Fixer generated invalid code:\n\
+    let fixed_ast = full_moon::parse(&fixed_code).unwrap_or_else(|_| {
+        panic!(
+            "Fixer generated invalid code:\n\
                 ----------------\n\
                 {}\n\
                 ----------------\n",
-                fixed_code
-            )
-        });
-        lint_results = lint.pass(
-            &fixed_ast,
-            &context,
-            &AstContext::from_ast(&fixed_ast, &fixed_code),
-        );
-        fixed_diagnostics = lint_results.iter().collect::<Vec<_>>();
-        fixed_diagnostics.sort_by_key(|diagnostic| diagnostic.start_position());
-    }
+            fixed_code
+        )
+    });
+    let lint_results = lint.pass(
+        &fixed_ast,
+        &context,
+        &AstContext::from_ast(&fixed_ast, &fixed_code),
+    );
+    fixed_diagnostics = lint_results.iter().collect::<Vec<_>>();
+    fixed_diagnostics.sort_by_key(|diagnostic| diagnostic.start_position());
 
     let fixed_diff = generate_diff(
         &lua_source,

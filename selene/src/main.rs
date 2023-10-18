@@ -295,27 +295,34 @@ fn read<R: Read>(
             .filter(|diagnostic| diagnostic.diagnostic.has_machine_applicable_fix())
             .count();
 
-        // To handle potential conflicts with different lint suggestions, we apply conflicting fixes one at a time.
-        // Then we re-evaluate the lints with the new code until there are no more fixes to apply
-        while diagnostics
-            .iter()
-            .any(|diagnostic| diagnostic.diagnostic.has_machine_applicable_fix())
-        {
-            fixed_code = Diagnostic::get_applied_suggestions_code(
-                fixed_code.as_str(),
-                &diagnostics
-                    .iter()
-                    .map(|diagnostic| &diagnostic.diagnostic)
-                    .collect::<Vec<_>>(),
-            );
+        fixed_code = Diagnostic::get_applied_suggestions_code(
+            fixed_code.as_str(),
+            diagnostics
+                .iter()
+                .filter(|diagnostic| diagnostic.diagnostic.has_machine_applicable_fix())
+                .map(|diagnostic| &diagnostic.diagnostic)
+                .collect::<Vec<_>>(),
+            |new_code| {
+                let new_ast = full_moon::parse(&new_code).expect(
+                    "selene tried applying lint suggestions, but it generated invalid code that could not be parsed; \
+                    this is likely a selene bug",
+                );
 
-            let fixed_ast = full_moon::parse(&fixed_code).expect(
+                checker
+                    .test_on(&new_ast, &new_code.to_string())
+                    .into_iter()
+                    .filter(|diagnostic| diagnostic.diagnostic.has_machine_applicable_fix())
+                    .map(|diagnostic| diagnostic.diagnostic)
+                    .collect::<Vec<_>>()
+            },
+        );
+
+        let fixed_ast = full_moon::parse(&fixed_code).expect(
                 "selene tried applying lint suggestions, but it generated invalid code that could not be parsed; \
                 this is likely a selene bug",
             );
-            diagnostics = checker.test_on(&fixed_ast, &fixed_code);
-            diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.start_position());
-        }
+        diagnostics = checker.test_on(&fixed_ast, &fixed_code);
+        diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.start_position());
 
         if num_fixes > 0 {
             if fs::write(filename, fixed_code.clone()).is_ok() {

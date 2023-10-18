@@ -196,24 +196,79 @@ impl Diagnostic {
         self.fixed_code.is_some() && self.applicability == Applicability::MachineApplicable
     }
 
-    /// 1. Applies all disjoint fixes
-    /// 1. If a fix is completely contained inside another fix, uses the inner one and discard the outer one
-    /// 2. If fixes partially overlap, chooses the fix that starts first and discard the other one
-    pub fn get_applied_suggestions_code(code: &str, diagnostics: &[&Diagnostic]) -> String {
+    pub fn has_maybe_incorrect_fix(&self) -> bool {
+        self.fixed_code.is_some() && self.applicability == Applicability::MaybeIncorrect
+    }
+
+    /// After applying suggestions, calls `get_new_diagnostics` and reruns to ensure fixes didn't produce new errors
+    pub fn get_applied_suggestions_code<F>(
+        code: &str,
+        diagnostics: Vec<&Diagnostic>,
+        get_new_diagnostics: F,
+    ) -> String
+    where
+        F: Fn(&str) -> Vec<Diagnostic>,
+    {
+        let mut chosen_diagnostics = Self::get_independent_suggestions(&diagnostics);
+        let mut owned_diagnostics_ref;
+        let mut owned_diagnostics;
+
+        let mut fixed_code = code.to_string();
+
+        while !chosen_diagnostics.is_empty() {
+            let mut bytes_offset = 0;
+
+            for diagnostic in chosen_diagnostics {
+                if let Some(suggestion) = &diagnostic.fixed_code {
+                    let (start, end) = diagnostic.primary_label.range;
+
+                    // This conversion can theoretically overflow, but it's tied to string length so the user
+                    // would face memory constraints of such large strings long before this is an issue
+                    let start_with_offset = start as isize + bytes_offset;
+                    let end_with_offset = end as isize + bytes_offset;
+
+                    fixed_code = format!(
+                        "{}{}{}",
+                        // Conversion is safe as this algorithm guarantees range + offset will never be negative
+                        &fixed_code[..start_with_offset as usize],
+                        suggestion.as_str(),
+                        &fixed_code[(end_with_offset as usize)..]
+                    );
+
+                    bytes_offset +=
+                        suggestion.len() as isize - (end_with_offset - start_with_offset);
+                }
+            }
+
+            owned_diagnostics = get_new_diagnostics(&fixed_code);
+            owned_diagnostics_ref = owned_diagnostics.iter().collect::<Vec<_>>();
+            chosen_diagnostics = Self::get_independent_suggestions(&owned_diagnostics_ref);
+        }
+
+        fixed_code
+    }
+
+    /// * Chooses all disjoint suggestions
+    /// * If a suggestion is completely contained inside others, uses the innermost one and discards the outer ones
+    /// * If suggestions partially overlap, chooses the one that starts first and discard the other ones
+    fn get_independent_suggestions<'a>(diagnostics: &'a [&'a Diagnostic]) -> Vec<&'a Diagnostic> {
         let mut sorted_diagnostics = diagnostics
             .iter()
-            .filter(|diagnostic| diagnostic.has_machine_applicable_fix())
+            .filter(|&&diagnostic| {
+                diagnostic.has_machine_applicable_fix() || diagnostic.has_maybe_incorrect_fix()
+            })
+            .copied()
             .collect::<Vec<_>>();
         sorted_diagnostics.sort_by_key(|diagnostic| diagnostic.start_position());
 
         let mut chosen_diagnostics = Vec::new();
 
         let mut candidate = match sorted_diagnostics.first() {
-            Some(first) => first,
-            None => return code.to_string(),
+            Some(first) => *first,
+            None => return Vec::new(),
         };
 
-        for diagnostic in sorted_diagnostics.iter().skip(1) {
+        for &diagnostic in sorted_diagnostics.iter().skip(1) {
             let this_range = diagnostic.primary_label.range;
 
             if this_range.1 <= candidate.primary_label.range.1 {
@@ -229,41 +284,7 @@ impl Diagnostic {
         }
         chosen_diagnostics.push(candidate);
 
-        let mut bytes_offset = 0;
-
-        let new_code = chosen_diagnostics
-            .iter()
-            .fold(code.to_string(), |code, diagnostic| {
-                if let Some(fixed) = &diagnostic.fixed_code {
-                    let (start, end) = diagnostic.primary_label.range;
-
-                    // This can theoretically overflow, but the user would face memory constraints
-                    // of such large strings long before
-                    let start_with_offset = start as isize + bytes_offset;
-                    let end_with_offset = end as isize + bytes_offset;
-
-                    let new_code = if start_with_offset > end_with_offset
-                        || end_with_offset > code.len().try_into().unwrap()
-                    {
-                        code.to_string()
-                    } else {
-                        format!(
-                            "{}{}{}",
-                            // Conversion is safe as range with offset will never be negative
-                            &code[..start_with_offset as usize],
-                            fixed.as_str(),
-                            &code[(end_with_offset as usize)..]
-                        )
-                    };
-
-                    bytes_offset += fixed.len() as isize - (end_with_offset - start_with_offset);
-                    new_code
-                } else {
-                    code
-                }
-            });
-
-        new_code
+        chosen_diagnostics
     }
 }
 
