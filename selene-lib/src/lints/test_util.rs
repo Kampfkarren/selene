@@ -186,7 +186,7 @@ pub fn test_lint_config_with_output<
     let diff_output_path = path_base.with_extension("fixed.diff");
 
     if let Ok(expected) = fs::read_to_string(&diff_output_path) {
-        pretty_assertions::assert_str_eq!(&expected, &fixed_diff.as_str());
+        pretty_assertions::assert_str_eq!(&(expected + "\n"), &fixed_diff.as_str());
     } else {
         let mut output_file =
             fs::File::create(diff_output_path).expect("couldn't create fixed.diff output file");
