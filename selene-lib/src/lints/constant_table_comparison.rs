@@ -58,11 +58,7 @@ impl Lint for ConstantTableComparisonLint {
                     "comparing to a constant table will always fail".to_owned(),
                     Label::new(comparison.range),
                     suggestion.clone(),
-                    if suggestion.is_some() {
-                        Applicability::MaybeIncorrect
-                    } else {
-                        Applicability::Unspecified
-                    },
+                    Applicability::MaybeIncorrect,
                 )
             })
             .collect()

@@ -132,7 +132,7 @@ impl<'a> DeprecatedVisitor<'a> {
                 notes,
                 Vec::new(),
                 fixed_code,
-                Applicability::MachineApplicable,
+                Applicability::MaybeIncorrect,
             ));
         }
     }
