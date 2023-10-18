@@ -144,7 +144,6 @@ pub fn test_lint_config_with_output<
         fixed_code.as_str(),
         fixed_diagnostics,
         |new_code| {
-            println!("Fixer generated code:\n{}", new_code);
             let fixed_ast = full_moon::parse(new_code).unwrap_or_else(|_| {
                 panic!(
                     "Fixer generated invalid code:\n\
