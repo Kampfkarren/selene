@@ -37,7 +37,7 @@ class SeleneCodeActionProvider implements vscode.CodeActionProvider {
                 diagnostic.suggestion
             ) {
                 const action = new vscode.CodeAction(
-                    `fix: ${diagnostic.message}`,
+                    diagnostic.message,
                     vscode.CodeActionKind.QuickFix,
                 )
                 action.diagnostics = [diagnostic]
