@@ -117,7 +117,7 @@ pub struct Diagnostic {
     pub notes: Vec<String>,
     pub primary_label: Label,
     pub secondary_labels: Vec<Label>,
-    pub fixed_code: Option<String>,
+    pub suggestion: Option<String>,
     pub applicability: Applicability,
 }
 
@@ -126,11 +126,11 @@ impl Diagnostic {
         code: &'static str,
         message: String,
         primary_label: Label,
-        fixed_code: Option<String>,
+        suggestion: Option<String>,
         applicability: Applicability,
     ) -> Self {
-        let notes = if let Some(ref fixed_code_str) = fixed_code {
-            vec![format!("try: `{}`", fixed_code_str)]
+        let notes = if let Some(ref suggestion_str) = suggestion {
+            vec![format!("try: `{}`", suggestion_str)]
         } else {
             Vec::new()
         };
@@ -139,7 +139,7 @@ impl Diagnostic {
             code,
             message,
             primary_label,
-            fixed_code,
+            suggestion,
             applicability,
             notes,
 
@@ -153,7 +153,7 @@ impl Diagnostic {
         primary_label: Label,
         notes: Vec<String>,
         secondary_labels: Vec<Label>,
-        fixed_code: Option<String>,
+        suggestion: Option<String>,
         applicability: Applicability,
     ) -> Self {
         Self {
@@ -162,7 +162,7 @@ impl Diagnostic {
             notes,
             primary_label,
             secondary_labels,
-            fixed_code,
+            suggestion,
             applicability,
         }
     }
@@ -193,11 +193,11 @@ impl Diagnostic {
     }
 
     pub fn has_machine_applicable_fix(&self) -> bool {
-        self.fixed_code.is_some() && self.applicability == Applicability::MachineApplicable
+        self.suggestion.is_some() && self.applicability == Applicability::MachineApplicable
     }
 
     pub fn has_maybe_incorrect_fix(&self) -> bool {
-        self.fixed_code.is_some() && self.applicability == Applicability::MaybeIncorrect
+        self.suggestion.is_some() && self.applicability == Applicability::MaybeIncorrect
     }
 
     /// After applying suggestions, calls `get_new_diagnostics` and reruns to ensure fixes didn't produce new errors
@@ -219,7 +219,7 @@ impl Diagnostic {
             let mut bytes_offset = 0;
 
             for diagnostic in chosen_diagnostics {
-                if let Some(suggestion) = &diagnostic.fixed_code {
+                if let Some(suggestion) = &diagnostic.suggestion {
                     let (start, end) = diagnostic.primary_label.range;
 
                     // This conversion can theoretically overflow, but it's tied to string length so the user

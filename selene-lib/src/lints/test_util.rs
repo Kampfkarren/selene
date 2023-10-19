@@ -130,18 +130,18 @@ pub fn test_lint_config_with_output<
     let mut diagnostics = lint.pass(&ast, &context, &AstContext::from_ast(&ast, &lua_source));
     diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.range);
 
-    let mut fixed_code = lua_source.to_string();
+    let mut suggestion = lua_source.to_string();
     let mut fixed_diagnostics = diagnostics
         .iter()
         .filter(|diagnostic| {
-            diagnostic.fixed_code.is_some()
+            diagnostic.suggestion.is_some()
                 && (diagnostic.applicability == Applicability::MachineApplicable
                     || diagnostic.applicability == Applicability::MaybeIncorrect)
         })
         .collect::<Vec<_>>();
 
-    fixed_code = Diagnostic::get_applied_suggestions_code(
-        fixed_code.as_str(),
+    suggestion = Diagnostic::get_applied_suggestions_code(
+        suggestion.as_str(),
         fixed_diagnostics,
         |new_code| {
             let fixed_ast = full_moon::parse(new_code).unwrap_or_else(|_| {
@@ -161,26 +161,26 @@ pub fn test_lint_config_with_output<
         },
     );
 
-    let fixed_ast = full_moon::parse(&fixed_code).unwrap_or_else(|_| {
+    let fixed_ast = full_moon::parse(&suggestion).unwrap_or_else(|_| {
         panic!(
             "Fixer generated invalid code:\n\
                 ----------------\n\
                 {}\n\
                 ----------------\n",
-            fixed_code
+            suggestion
         )
     });
     let lint_results = lint.pass(
         &fixed_ast,
         &context,
-        &AstContext::from_ast(&fixed_ast, &fixed_code),
+        &AstContext::from_ast(&fixed_ast, &suggestion),
     );
     fixed_diagnostics = lint_results.iter().collect::<Vec<_>>();
     fixed_diagnostics.sort_by_key(|diagnostic| diagnostic.start_position());
 
     let fixed_diff = generate_diff(
         &lua_source,
-        &fixed_code,
+        &suggestion,
         &diagnostics.iter().collect::<Vec<_>>(),
     );
     let diff_output_path = path_base.with_extension("fixed.diff");

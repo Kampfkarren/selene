@@ -30,7 +30,7 @@ impl Lint for CompareNanLint {
             .comparisons
             .iter()
             .map(|comparisons| {
-                let fixed_code = format!(
+                let suggestion = format!(
                     "{variable} {operator} {variable}",
                     variable = comparisons.variable,
                     operator = comparisons.operator,
@@ -40,7 +40,7 @@ impl Lint for CompareNanLint {
                     "compare_nan",
                     "comparing things to nan directly is not allowed".to_owned(),
                     Label::new(comparisons.range),
-                    Some(fixed_code),
+                    Some(suggestion),
                     Applicability::MaybeIncorrect,
                 )
             })

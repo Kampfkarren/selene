@@ -34,7 +34,7 @@ class SeleneCodeActionProvider implements vscode.CodeActionProvider {
         for (const diagnostic of context.diagnostics) {
             if (
                 diagnostic instanceof SeleneDiagnostic &&
-                diagnostic.fixed_code
+                diagnostic.suggestion
             ) {
                 const action = new vscode.CodeAction(
                     `fix: ${diagnostic.message}`,
@@ -46,7 +46,7 @@ class SeleneCodeActionProvider implements vscode.CodeActionProvider {
                 action.edit.replace(
                     document.uri,
                     diagnostic.range,
-                    diagnostic.fixed_code,
+                    diagnostic.suggestion,
                 )
 
                 codeActions.push(action)
@@ -256,7 +256,7 @@ export async function activate(
                 data.severity === Severity.Error
                     ? vscode.DiagnosticSeverity.Error
                     : vscode.DiagnosticSeverity.Warning,
-                data.fixed_code,
+                data.suggestion,
             )
 
             diagnostic.source = `selene::${data.code}`

@@ -130,7 +130,7 @@ fn emit_codespan(
     writer: &mut impl termcolor::WriteColor,
     files: &codespan::Files<&str>,
     diagnostic: &CodespanDiagnostic<codespan::FileId>,
-    fixed_code: Option<String>,
+    suggestion: Option<String>,
 ) {
     let lock = OPTIONS.read().unwrap();
     let opts = lock.as_ref().unwrap();
@@ -150,7 +150,7 @@ fn emit_codespan(
                 writer,
                 "{}",
                 serde_json::to_string(&json_output::diagnostic_to_json(
-                    diagnostic, files, fixed_code
+                    diagnostic, files, suggestion
                 ))
                 .unwrap()
             )
@@ -162,7 +162,7 @@ fn emit_codespan(
                 writer,
                 "{}",
                 serde_json::to_string(&json_output::JsonOutput::Diagnostic(
-                    json_output::diagnostic_to_json(diagnostic, files, fixed_code)
+                    json_output::diagnostic_to_json(diagnostic, files, suggestion)
                 ))
                 .unwrap()
             )
@@ -286,7 +286,7 @@ fn read<R: Read>(
     let mut diagnostics = checker.test_on(&ast, &contents.as_ref().to_string());
     diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.start_position());
 
-    let mut fixed_code = contents.as_ref().to_string();
+    let mut suggestion = contents.as_ref().to_string();
     if is_fix {
         // This only counts the number of inital automatic fixes. Additional fixes caused by a previous fix won't
         // be counted
@@ -295,8 +295,8 @@ fn read<R: Read>(
             .filter(|diagnostic| diagnostic.diagnostic.has_machine_applicable_fix())
             .count();
 
-        fixed_code = Diagnostic::get_applied_suggestions_code(
-            fixed_code.as_str(),
+        suggestion = Diagnostic::get_applied_suggestions_code(
+            suggestion.as_str(),
             diagnostics
                 .iter()
                 .filter(|diagnostic| diagnostic.diagnostic.has_machine_applicable_fix())
@@ -317,16 +317,16 @@ fn read<R: Read>(
             },
         );
 
-        let fixed_ast = full_moon::parse(&fixed_code).expect(
+        let fixed_ast = full_moon::parse(&suggestion).expect(
                 "selene tried applying lint suggestions, but it generated invalid code that could not be parsed; \
                 this is likely a selene bug",
             );
-        diagnostics = checker.test_on(&fixed_ast, &fixed_code);
+        diagnostics = checker.test_on(&fixed_ast, &suggestion);
         diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.start_position());
 
         if num_fixes > 0 {
-            if fs::write(filename, fixed_code.clone()).is_ok() {
-                files.update(source_id, &fixed_code);
+            if fs::write(filename, suggestion.clone()).is_ok() {
+                files.update(source_id, &suggestion);
 
                 let stdout = StandardStream::stdout(get_color());
                 let mut stdout = stdout.lock();
@@ -444,7 +444,7 @@ fn read<R: Read>(
                 write(&mut stack, new_start).unwrap();
             }
         } else {
-            let fixed_code = diagnostic.diagnostic.fixed_code.clone();
+            let suggestion = diagnostic.diagnostic.suggestion.clone();
             let diagnostic = diagnostic.diagnostic.into_codespan_diagnostic(
                 source_id,
                 match diagnostic.severity {
@@ -454,7 +454,7 @@ fn read<R: Read>(
                 },
             );
 
-            emit_codespan(&mut stdout, &files, &diagnostic, fixed_code);
+            emit_codespan(&mut stdout, &files, &diagnostic, suggestion);
         }
     }
 }

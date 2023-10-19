@@ -158,7 +158,7 @@ impl Lint for UnusedVariableLint {
                 let mut notes = Vec::new();
                 let mut report_range = variable.identifiers[0];
 
-                let mut fixed_code = Some(format!("_{}", variable.name));
+                let mut suggestion = Some(format!("_{}", variable.name));
                 let mut applicability = Applicability::MachineApplicable;
 
                 if variable.is_self {
@@ -177,7 +177,7 @@ impl Lint for UnusedVariableLint {
 
                         // Applying fix by changing `:` to `.` would break any existing methods calls
                         applicability = Applicability::MaybeIncorrect;
-                        fixed_code = Some(".".to_string());
+                        suggestion = Some(".".to_string());
                     }
                 }
 
@@ -189,7 +189,7 @@ impl Lint for UnusedVariableLint {
                         .0
                         != variable.identifiers[0].0
                 }) {
-                    fixed_code = None;
+                    suggestion = None;
                 }
 
                 let write_only = !analyzed_references.is_empty();
@@ -213,7 +213,7 @@ impl Lint for UnusedVariableLint {
                             }
                         })
                         .collect(),
-                    fixed_code,
+                    suggestion,
                     applicability,
                 ));
             };

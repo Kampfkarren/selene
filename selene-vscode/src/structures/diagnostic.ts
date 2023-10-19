@@ -20,19 +20,19 @@ export interface Diagnostic {
     notes: string[]
     primary_label: Label
     secondary_labels: Label[]
-    fixed_code: string
+    suggestion: string
 }
 
 export class SeleneDiagnostic extends vscode.Diagnostic {
-    fixed_code?: string
+    suggestion?: string
 
     constructor(
         range: vscode.Range,
         message: string,
         severity: vscode.DiagnosticSeverity,
-        fixed_code?: string,
+        suggestion?: string,
     ) {
         super(range, message, severity)
-        this.fixed_code = fixed_code
+        this.suggestion = suggestion
     }
 }
