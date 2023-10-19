@@ -187,6 +187,8 @@ pub fn test_lint_config_with_output<
 
     if let Ok(expected) = fs::read_to_string(&diff_output_path) {
         pretty_assertions::assert_str_eq!(
+            // Must normalize newline characters otherwise testing on windows locally passes but fails
+            // in github actions environment
             &expected.replace("\r\n", "\n"),
             &fixed_diff.replace("\r\n", "\n")
         );
