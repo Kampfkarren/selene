@@ -14,33 +14,25 @@ error[constant_table_comparison]: comparing to a constant table will always fail
   ┌─ constant_table_comparison.lua:4:7
   │
 4 │ print(x == {})
-  │       ^^^^^^^
-  │
-  = try: `next(x) == nil`
+  │       ^^^^^^^ try: `next(x) == nil`
 
 error[constant_table_comparison]: comparing to a constant table will always fail
   ┌─ constant_table_comparison.lua:5:7
   │
 5 │ print({} == x)
-  │       ^^^^^^^
-  │
-  = try: `next(x) == nil`
+  │       ^^^^^^^ try: `next(x) == nil`
 
 error[constant_table_comparison]: comparing to a constant table will always fail
   ┌─ constant_table_comparison.lua:6:7
   │
 6 │ print(x ~= {})
-  │       ^^^^^^^
-  │
-  = try: `next(x) ~= nil`
+  │       ^^^^^^^ try: `next(x) ~= nil`
 
 error[constant_table_comparison]: comparing to a constant table will always fail
   ┌─ constant_table_comparison.lua:7:7
   │
 7 │ print({} ~= x)
-  │       ^^^^^^^
-  │
-  = try: `next(x) ~= nil`
+  │       ^^^^^^^ try: `next(x) ~= nil`
 
 error[constant_table_comparison]: comparing to a constant table will always fail
   ┌─ constant_table_comparison.lua:9:7
@@ -64,7 +56,5 @@ error[constant_table_comparison]: comparing to a constant table will always fail
    ┌─ constant_table_comparison.lua:14:2
    │
 14 │     t == {}
-   │     ^^^^^^^
-   │
-   = try: `next(t) == nil`
+   │     ^^^^^^^ try: `next(t) == nil`
 

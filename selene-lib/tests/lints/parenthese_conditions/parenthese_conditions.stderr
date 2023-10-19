@@ -2,41 +2,31 @@ error[parenthese_conditions]: lua does not require parentheses around conditions
   ┌─ parenthese_conditions.lua:2:4
   │
 2 │ if (x) then end
-  │    ^^^
-  │
-  = try: `x`
+  │    ^^^ try: `x`
 
 error[parenthese_conditions]: lua does not require parentheses around conditions
   ┌─ parenthese_conditions.lua:4:4
   │
 4 │ if (x) then
-  │    ^^^
-  │
-  = try: `x`
+  │    ^^^ try: `x`
 
 error[parenthese_conditions]: lua does not require parentheses around conditions
   ┌─ parenthese_conditions.lua:6:8
   │
 6 │ elseif (z) then
-  │        ^^^
-  │
-  = try: `z`
+  │        ^^^ try: `z`
 
 error[parenthese_conditions]: lua does not require parentheses around conditions
    ┌─ parenthese_conditions.lua:10:7
    │
 10 │ while (true) do end
-   │       ^^^^^^
-   │
-   = try: `true`
+   │       ^^^^^^ try: `true`
 
 error[parenthese_conditions]: lua does not require parentheses around conditions
    ┌─ parenthese_conditions.lua:13:14
    │
 13 │ repeat until (false)
-   │              ^^^^^^^
-   │
-   = try: `false`
+   │              ^^^^^^^ try: `false`
 
 error[parenthese_conditions]: lua does not require parentheses around conditions
    ┌─ parenthese_conditions.lua:17:4
@@ -45,17 +35,13 @@ error[parenthese_conditions]: lua does not require parentheses around conditions
    │ ╭────^
 18 │ │     if (x) then end
 19 │ │ end)()) then end
-   │ ╰───────^
-   │  
-   = try: `(function()
-         if (x) then end
-     end)()`
+   │ ╰───────^ try: `(function()
+    if (x) then end
+end)()`
 
 error[parenthese_conditions]: lua does not require parentheses around conditions
    ┌─ parenthese_conditions.lua:18:8
    │
 18 │     if (x) then end
-   │        ^^^
-   │
-   = try: `x`
+   │        ^^^ try: `x`
 

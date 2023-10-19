@@ -129,20 +129,21 @@ impl Diagnostic {
         suggestion: Option<String>,
         applicability: Applicability,
     ) -> Self {
-        let notes = if let Some(ref suggestion_str) = suggestion {
-            vec![format!("try: `{}`", suggestion_str)]
-        } else {
-            Vec::new()
+        let mut label = primary_label;
+        if let Some(ref suggestion_str) = suggestion {
+            if label.message.is_none() {
+                label = Label::new_with_message(label.range, format!("try: `{}`", suggestion_str));
+            }
         };
 
         Self {
             code,
             message,
-            primary_label,
+            primary_label: label,
             suggestion,
             applicability,
-            notes,
 
+            notes: Vec::new(),
             secondary_labels: Vec::new(),
         }
     }
