@@ -132,7 +132,14 @@ impl Diagnostic {
         let mut label = primary_label;
         if let Some(ref suggestion_str) = suggestion {
             if label.message.is_none() {
-                label = Label::new_with_message(label.range, format!("try: `{}`", suggestion_str));
+                label = Label::new_with_message(
+                    label.range,
+                    if suggestion_str.is_empty() {
+                        "consider removing this".to_string()
+                    } else {
+                        format!("try: `{}`", suggestion_str)
+                    },
+                );
             }
         };
 
