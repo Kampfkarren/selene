@@ -303,7 +303,7 @@ fn read<R: Read>(
                 .map(|diagnostic| &diagnostic.diagnostic)
                 .collect::<Vec<_>>(),
             |new_code| {
-                let new_ast = full_moon::parse(&new_code).expect(
+                let new_ast = full_moon::parse(new_code).expect(
                     "selene tried applying lint suggestions, but it generated invalid code that could not be parsed; \
                     this is likely a selene bug",
                 );
