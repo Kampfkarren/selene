@@ -120,7 +120,9 @@ pub fn validate_config(
         ErrorRange { start, end }
     });
 
-    let Err(error) = crate::standard_library::collect_standard_library(&config, config.std(), directory, &None) else {
+    let Err(error) =
+        crate::standard_library::collect_standard_library(&config, config.std(), directory, &None)
+    else {
         return Ok(());
     };
 
@@ -185,16 +187,16 @@ mod tests {
 
             let Err(validate_result) =
                 validate_config(&config_path, &config_contents, &validate_config_test.path())
-                else {
-                    tests_pass = false;
+            else {
+                tests_pass = false;
 
-                    eprintln!(
-                        "{} did not error",
-                        validate_config_test.file_name().to_string_lossy()
-                    );
+                eprintln!(
+                    "{} did not error",
+                    validate_config_test.file_name().to_string_lossy()
+                );
 
-                    continue;
-                };
+                continue;
+            };
 
             let mut rich_output_buffer = termcolor::NoColor::new(Vec::new());
             validate_result
