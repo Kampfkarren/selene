@@ -1,0 +1,15 @@
+- id: selene-system
+  name: selene (system)
+  description: An opinionated Lua code linter
+  entry: selene
+  language: system
+  types:
+      - lua
+
+- id: selene-docker
+  name: selene (docker)
+  description: An opinionated Lua code linter
+  entry: /selene
+  language: docker
+  types:
+      - lua
