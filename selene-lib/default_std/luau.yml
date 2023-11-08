@@ -73,11 +73,11 @@ globals:
       - type: number
     must_use: true
   buffer.create:
-    arg:
+    args:
       - type: number
     must_use: true
   buffer.copy:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
@@ -88,7 +88,7 @@ globals:
       - required: false
         type: number
   buffer.fill:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
@@ -96,124 +96,124 @@ globals:
       - required: false
         type: number
   buffer.fromstring:
-    arg:
+    args:
       - type: string
     must_use: true
   buffer.len:
-    arg:
+    args:
       - type:
           display: buffer
     must_use: true
   buffer.readi8:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
     must_use: true
   buffer.readi16:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
     must_use: true
   buffer.readi32:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
     must_use: true
   buffer.readf32:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
     must_use: true
   buffer.readf64:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
     must_use: true
   buffer.readu8:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
     must_use: true
   buffer.readu16:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
     must_use: true
   buffer.readu32:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
     must_use: true
   buffer.readstring:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
       - type: number
     must_use: true
   buffer.tostring:
-    arg:
+    args:
       - type:
           display: buffer
     must_use: true
   buffer.writei8:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
       - type: number
   buffer.writei16:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
       - type: number
   buffer.writei32:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
       - type: number
   buffer.writef32:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
       - type: number
   buffer.writef64:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
       - type: number
   buffer.writeu8:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
       - type: number
   buffer.writeu16:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
       - type: number
   buffer.writeu32:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
       - type: number
   buffer.writestring:
-    arg:
+    args:
       - type:
           display: buffer
       - type: number
