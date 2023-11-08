@@ -29,6 +29,10 @@ globals:
     args:
       - type: "..."
     must_use: true
+  bit32.byteswap:
+    args:
+      - type: number
+    must_use: true
   bit32.countlz:
     args:
       - type: number
