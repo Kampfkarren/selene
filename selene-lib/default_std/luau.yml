@@ -72,10 +72,6 @@ globals:
       - type: number
       - type: number
     must_use: true
-  buffer.create:
-    args:
-      - type: number
-    must_use: true
   buffer.copy:
     args:
       - type:
@@ -87,6 +83,10 @@ globals:
         type: number
       - required: false
         type: number
+  buffer.create:
+    args:
+      - type: number
+    must_use: true
   buffer.fill:
     args:
       - type:
@@ -103,6 +103,18 @@ globals:
     args:
       - type:
           display: buffer
+    must_use: true
+  buffer.readf32:
+    args:
+      - type:
+          display: buffer
+      - type: number
+    must_use: true
+  buffer.readf64:
+    args:
+      - type:
+          display: buffer
+      - type: number
     must_use: true
   buffer.readi8:
     args:
@@ -122,16 +134,11 @@ globals:
           display: buffer
       - type: number
     must_use: true
-  buffer.readf32:
+  buffer.readstring:
     args:
       - type:
           display: buffer
       - type: number
-    must_use: true
-  buffer.readf64:
-    args:
-      - type:
-          display: buffer
       - type: number
     must_use: true
   buffer.readu8:
@@ -152,18 +159,23 @@ globals:
           display: buffer
       - type: number
     must_use: true
-  buffer.readstring:
-    args:
-      - type:
-          display: buffer
-      - type: number
-      - type: number
-    must_use: true
   buffer.tostring:
     args:
       - type:
           display: buffer
     must_use: true
+  buffer.writef32:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: number
+  buffer.writef64:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: number
   buffer.writei8:
     args:
       - type:
@@ -182,18 +194,14 @@ globals:
           display: buffer
       - type: number
       - type: number
-  buffer.writef32:
+  buffer.writestring:
     args:
       - type:
           display: buffer
       - type: number
-      - type: number
-  buffer.writef64:
-    args:
-      - type:
-          display: buffer
-      - type: number
-      - type: number
+      - type: string
+      - required: false
+        type: number
   buffer.writeu8:
     args:
       - type:
@@ -212,14 +220,6 @@ globals:
           display: buffer
       - type: number
       - type: number
-  buffer.writestring:
-    args:
-      - type:
-          display: buffer
-      - type: number
-      - type: string
-      - required: false
-        type: number
   collectgarbage:
     args:
       - type:
