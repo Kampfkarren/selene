@@ -29,6 +29,10 @@ globals:
     args:
       - type: "..."
     must_use: true
+  bit32.byteswap:
+    args:
+      - type: number
+    must_use: true
   bit32.countlz:
     args:
       - type: number
@@ -72,6 +76,154 @@ globals:
       - type: number
       - type: number
     must_use: true
+  buffer.copy:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type:
+          display: buffer
+      - required: false
+        type: number
+      - required: false
+        type: number
+  buffer.create:
+    args:
+      - type: number
+    must_use: true
+  buffer.fill:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: number
+      - required: false
+        type: number
+  buffer.fromstring:
+    args:
+      - type: string
+    must_use: true
+  buffer.len:
+    args:
+      - type:
+          display: buffer
+    must_use: true
+  buffer.readf32:
+    args:
+      - type:
+          display: buffer
+      - type: number
+    must_use: true
+  buffer.readf64:
+    args:
+      - type:
+          display: buffer
+      - type: number
+    must_use: true
+  buffer.readi8:
+    args:
+      - type:
+          display: buffer
+      - type: number
+    must_use: true
+  buffer.readi16:
+    args:
+      - type:
+          display: buffer
+      - type: number
+    must_use: true
+  buffer.readi32:
+    args:
+      - type:
+          display: buffer
+      - type: number
+    must_use: true
+  buffer.readstring:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: number
+    must_use: true
+  buffer.readu8:
+    args:
+      - type:
+          display: buffer
+      - type: number
+    must_use: true
+  buffer.readu16:
+    args:
+      - type:
+          display: buffer
+      - type: number
+    must_use: true
+  buffer.readu32:
+    args:
+      - type:
+          display: buffer
+      - type: number
+    must_use: true
+  buffer.tostring:
+    args:
+      - type:
+          display: buffer
+    must_use: true
+  buffer.writef32:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: number
+  buffer.writef64:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: number
+  buffer.writei8:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: number
+  buffer.writei16:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: number
+  buffer.writei32:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: number
+  buffer.writestring:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: string
+      - required: false
+        type: number
+  buffer.writeu8:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: number
+  buffer.writeu16:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: number
+  buffer.writeu32:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: number
   collectgarbage:
     args:
       - type:

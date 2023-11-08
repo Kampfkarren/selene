@@ -15,6 +15,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `no-exclude` cli flag to disable excludes.
 - When given in standard library format, additional information now shows up in `incorrect_standard_library_use` missing required parameter errors.
 - Added new [`mixed_table` lint](https://kampfkarren.github.io/selene/lints/mixed_table.html), which will warn against mixed tables.
+- Added `bit32.byteswap` to Luau standard library
+- Added `buffer` library to Luau standard library
 - Added new [`roblox_roact_non_exhaustive_deps` lint](https://kampfkarren.github.io/selene/lints/roblox_roact_non_exhaustive_deps.html), which will check for valid dependency arrays.
 
 ### Fixed
