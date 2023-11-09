@@ -23,6 +23,7 @@ pub mod ifs_same_cond;
 pub mod invalid_lint_filter;
 pub mod manual_table_clone;
 pub mod mismatched_arg_count;
+pub mod mixed_table;
 pub mod multiple_statements;
 pub mod must_use;
 pub mod parenthese_conditions;

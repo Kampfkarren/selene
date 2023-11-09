@@ -3,12 +3,10 @@ use full_moon::{
     visitors::Visitor,
 };
 
-use crate::ast_util::{
-    expression_to_ident, range, scopes::AssignedValue, strip_parentheses, LoopTracker,
-};
+use crate::ast_util::{expression_to_ident, range, scopes::AssignedValue, strip_parentheses};
 
 use super::*;
-use std::convert::Infallible;
+use std::{collections::HashSet, convert::Infallible};
 
 pub struct ManualTableCloneLint;
 
@@ -34,9 +32,9 @@ impl Lint for ManualTableCloneLint {
 
         let mut visitor = ManualTableCloneVisitor {
             matches: Vec::new(),
-            loop_tracker: LoopTracker::new(ast),
             scope_manager: &ast_context.scope_manager,
-            stmt_begins: Vec::new(),
+            completed_stmt_begins: Vec::new(),
+            inside_stmt_begins: HashSet::new(),
         };
 
         visitor.visit_ast(ast);
@@ -92,9 +90,9 @@ impl ManualTableCloneMatch {
 
 struct ManualTableCloneVisitor<'ast> {
     matches: Vec<ManualTableCloneMatch>,
-    loop_tracker: LoopTracker,
     scope_manager: &'ast ScopeManager,
-    stmt_begins: Vec<usize>,
+    completed_stmt_begins: Vec<usize>,
+    inside_stmt_begins: HashSet<usize>,
 }
 
 #[derive(Debug)]
@@ -214,7 +212,7 @@ impl ManualTableCloneVisitor<'_> {
     ) -> bool {
         debug_assert!(assigment_start > definition_end);
 
-        for &stmt_begin in self.stmt_begins.iter() {
+        for &stmt_begin in self.completed_stmt_begins.iter() {
             if stmt_begin > definition_end {
                 return true;
             } else if stmt_begin > assigment_start {
@@ -223,6 +221,13 @@ impl ManualTableCloneVisitor<'_> {
         }
 
         false
+    }
+
+    fn get_depth_at_byte(&self, byte: usize) -> usize {
+        self.inside_stmt_begins
+            .iter()
+            .filter(|&&start| start < byte)
+            .count()
     }
 }
 
@@ -374,9 +379,7 @@ impl Visitor for ManualTableCloneVisitor<'_> {
 
         let (position_start, position_end) = range(node);
 
-        if self.loop_tracker.depth_at_byte(position_start)
-            != self.loop_tracker.depth_at_byte(*definition_start)
-        {
+        if self.get_depth_at_byte(*definition_start) != self.get_depth_at_byte(position_start) {
             return;
         }
 
@@ -401,8 +404,13 @@ impl Visitor for ManualTableCloneVisitor<'_> {
         });
     }
 
+    fn visit_stmt(&mut self, stmt: &ast::Stmt) {
+        self.inside_stmt_begins.insert(range(stmt).0);
+    }
+
     fn visit_stmt_end(&mut self, stmt: &ast::Stmt) {
-        self.stmt_begins.push(range(stmt).0);
+        self.completed_stmt_begins.push(range(stmt).0);
+        self.inside_stmt_begins.remove(&range(stmt).0);
     }
 }
 

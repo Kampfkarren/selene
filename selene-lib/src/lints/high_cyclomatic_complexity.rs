@@ -131,10 +131,9 @@ fn count_suffix_complexity(suffix: &ast::Suffix, starting_complexity: u16) -> u1
         ast::Suffix::Index(ast::Index::Brackets { expression, .. }) => {
             complexity = count_expression_complexity(expression, complexity)
         }
-        #[cfg_attr(
-            feature = "force_exhaustive_checks",
-            deny(non_exhaustive_omitted_patterns)
-        )]
+        ast::Suffix::Index(ast::Index::Dot { .. }) => {
+            // Dot indexing doesn't contribute to complexity
+        }
         ast::Suffix::Call(call) => match call {
             ast::Call::AnonymousCall(arguments) => {
                 complexity = count_arguments_complexity(arguments, complexity)
