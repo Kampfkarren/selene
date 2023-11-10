@@ -533,6 +533,51 @@ globals:
   require:
     args:
       - type: number
+  SharedTable.clear:
+    args:
+      - type:
+          display: SharedTable
+  SharedTable.clone:
+    args:
+      - type:
+          display: SharedTable
+      - required: false
+        type: bool
+    must_use: true
+  SharedTable.cloneAndFreeze:
+    args:
+      - type:
+          display: SharedTable
+      - required: false
+        type: bool
+    must_use: true
+  SharedTable.increment:
+    args:
+      - type:
+          display: SharedTable
+      - type: any
+      - type: number
+  SharedTable.isFrozen:
+    args:
+      - type:
+          display: SharedTable
+    must_use: true
+  SharedTable.new:
+    args:
+      - required: false
+        type: table
+    must_use: true
+  SharedTable.size:
+    args:
+      - type:
+          display: SharedTable
+    must_use: true
+  SharedTable.update:
+    args:
+      - type:
+          display: SharedTable
+      - type: any
+      - type: function
   settings:
     args: []
   shared:
