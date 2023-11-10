@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added new [`mixed_table` lint](https://kampfkarren.github.io/selene/lints/mixed_table.html), which will warn against mixed tables.
 - Added `bit32.byteswap` to Luau standard library
 - Added `buffer` library to Luau standard library
+- Added `SharedTable` to Roblox standard library
 - Added new [`--fix`](https://kampfkarren.github.io/selene/cli/usage.html#fix) flag, which will automatically apply lint suggestions.
 
 ### Fixed
