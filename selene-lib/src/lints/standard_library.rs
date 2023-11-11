@@ -177,9 +177,24 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                     None
                 }
 
+                #[cfg(feature = "roblox")]
+                ast::BinOp::DoubleSlash(_) => {
+                    let lhs_type = get_argument_type(lhs);
+                    let rhs_type = get_argument_type(rhs);
+
+                    if lhs_type == rhs_type {
+                        lhs_type
+                    } else {
+                        None
+                    }
+                }
+
                 _ => None,
             }
         }
+
+        #[cfg(feature = "roblox")]
+        ast::Expression::TypeAssertion { expression, .. } => get_argument_type(expression),
 
         _ => None,
     }

@@ -233,6 +233,11 @@ fn count_expression_complexity(expression: &ast::Expression, starting_complexity
             complexity
         }
 
+        #[cfg(feature = "roblox")]
+        ast::Expression::TypeAssertion { expression, .. } => {
+            count_expression_complexity(expression, complexity)
+        }
+
         _ => complexity,
     }
 }

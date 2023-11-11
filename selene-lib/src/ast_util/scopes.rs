@@ -388,6 +388,11 @@ impl ScopeVisitor {
                 }
             }
 
+            #[cfg(feature = "roblox")]
+            ast::Expression::TypeAssertion { expression, .. } => {
+                self.read_expression(expression);
+            }
+
             ast::Expression::Number(_) | ast::Expression::String(_) => {}
 
             _ => {}

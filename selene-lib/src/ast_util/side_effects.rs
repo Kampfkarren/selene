@@ -72,6 +72,9 @@ impl HasSideEffects for ast::Expression {
                 false
             }
 
+            #[cfg(feature = "roblox")]
+            ast::Expression::TypeAssertion { expression, .. } => expression.has_side_effects(),
+
             _ => true,
         }
     }
