@@ -387,6 +387,7 @@ pub struct AstContext {
 }
 
 impl AstContext {
+    #[must_use]
     pub fn from_ast(ast: &Ast, code: &String) -> Self {
         Self {
             scope_manager: ScopeManager::new(ast),
