@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.26.0...HEAD)
+### Fixed
+- Fixed `UDim2.new()` firing the [`roblox_suspicious_udim2_new` lint](https://kampfkarren.github.io/selene/lints/roblox_suspicious_udim2_new.html).
 
 ## [0.26.0](https://github.com/Kampfkarren/selene/releases/tag/0.26.0) - 2023-11-11
 ### Added
