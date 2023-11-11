@@ -18,13 +18,13 @@ pub fn extract_static_token(expression: &ast::Expression) -> Option<&TokenRefere
         | ast::Expression::UnaryOperator { .. }
         | ast::Expression::Function(_)
         | ast::Expression::FunctionCall(_)
-        | ast::Expression::IfExpression(_)
-        | ast::Expression::InterpolatedString(_)
         | ast::Expression::TableConstructor(_)
         | ast::Expression::Var(_) => None,
 
         #[cfg(feature = "roblox")]
-        ast::Expression::TypeAssertion { .. } => None,
+        ast::Expression::IfExpression(_)
+        | ast::Expression::InterpolatedString(_)
+        | ast::Expression::TypeAssertion { .. } => None,
 
         _ => None,
     }
