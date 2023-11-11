@@ -1,4 +1,4 @@
-use super::*;
+use super::{AstContext, Context, Diagnostic, Label, Lint, LintType, Node, Severity};
 use crate::ast_util::range;
 use std::{collections::HashSet, convert::Infallible};
 
@@ -16,7 +16,7 @@ impl Lint for RoactDanglingConnectionLint {
     const SEVERITY: Severity = Severity::Error;
     const LINT_TYPE: LintType = LintType::Correctness;
 
-    fn new(_: Self::Config) -> Result<Self, Self::Error> {
+    fn new((): Self::Config) -> Result<Self, Self::Error> {
         Ok(Self)
     }
 
@@ -89,14 +89,14 @@ fn get_last_function_call_suffix(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]
                 return if let ast::Prefix::Name(name) = prefix {
                     name.token().to_string()
                 } else {
-                    "".to_owned()
+                    String::new()
                 };
             } else {
                 // In a.b(), b is the suffix before the last one
                 Some(&suffixes[suffixes.len() - 2])
             }
         }
-        _ => return "".to_owned(),
+        _ => return String::new(),
     };
 
     last_suffix
@@ -108,7 +108,7 @@ fn get_last_function_call_suffix(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]
             ast::Suffix::Call(ast::Call::AnonymousCall(anonymous_call)) => {
                 anonymous_call.to_string()
             }
-            _ => "".to_string(),
+            _ => String::new(),
         })
         .unwrap_or_default()
 }
