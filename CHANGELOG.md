@@ -17,6 +17,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added new [`mixed_table` lint](https://kampfkarren.github.io/selene/lints/mixed_table.html), which will warn against mixed tables.
 - Added `bit32.byteswap` to Luau standard library
 - Added `buffer` library to Luau standard library
+- Added `SharedTable` to Roblox standard library
+
+### Changed
+- Updated internal parser, which includes floor division (`//`), more correct parsing of string interpolation with double braces, and better parsing of `\z` escapes.
 
 ### Fixed
 - `string.pack` and `string.unpack` now have proper function signatures in the Lua 5.3 standard library.

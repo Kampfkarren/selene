@@ -1,4 +1,4 @@
-use crate::ast_util::{purge_trivia, range, strip_parentheses};
+use crate::ast_util::{purge_trivia, range};
 
 use super::*;
 use std::convert::Infallible;
@@ -94,14 +94,12 @@ enum ConstantTableMatch {
 }
 
 fn constant_table_match(expression: &ast::Expression) -> Option<ConstantTableMatch> {
-    if let ast::Expression::Value { value, .. } = strip_parentheses(expression) {
-        if let ast::Value::TableConstructor(table_constructor) = &**value {
-            return if table_constructor.fields().is_empty() {
-                Some(ConstantTableMatch::Empty)
-            } else {
-                Some(ConstantTableMatch::NotEmpty)
-            };
-        }
+    if let ast::Expression::TableConstructor(table_constructor) = expression {
+        return if table_constructor.fields().is_empty() {
+            Some(ConstantTableMatch::Empty)
+        } else {
+            Some(ConstantTableMatch::NotEmpty)
+        };
     }
 
     None

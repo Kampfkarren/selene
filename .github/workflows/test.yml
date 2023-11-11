@@ -12,13 +12,13 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Run tests (selene, all features)
-      run: cargo test -- --nocapture
+      run: cargo test --release -- --nocapture
       working-directory: selene
     - name: Run tests (selene, no features)
-      run: cargo test --no-default-features -- --nocapture
+      run: cargo test --release --no-default-features -- --nocapture
       working-directory: selene
     - name: Run tests (selene-lib, all features)
-      run: cargo test
+      run: cargo test --release
       working-directory: selene-lib
     - name: Run tests (selene-lib, no features)
       run: cargo test --no-default-features
