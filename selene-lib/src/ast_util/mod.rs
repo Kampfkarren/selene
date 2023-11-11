@@ -49,8 +49,7 @@ pub fn first_code(ast: &Ast) -> Option<(Position, Position)> {
 
 pub fn is_vararg(expression: &ast::Expression) -> bool {
     if_chain::if_chain! {
-        if let ast::Expression::Value { value, .. } = expression;
-        if let ast::Value::Symbol(token) = &**value;
+        if let ast::Expression::Symbol(token) = expression;
         if let tokenizer::TokenType::Symbol {
             symbol: tokenizer::Symbol::Ellipse,
         } = token.token().token_type();
@@ -63,21 +62,9 @@ pub fn is_vararg(expression: &ast::Expression) -> bool {
     }
 }
 
-pub fn is_function_call(expression: &ast::Expression) -> bool {
-    if let ast::Expression::Value { value, .. } = expression {
-        if let ast::Value::FunctionCall(_) = &**value {
-            return true;
-        }
-    }
-
-    false
-}
-
 pub fn expression_to_ident(expression: &ast::Expression) -> Option<&TokenReference> {
-    if let ast::Expression::Value { value, .. } = expression {
-        if let ast::Value::Var(ast::Var::Name(name)) = &**value {
-            return Some(name);
-        }
+    if let ast::Expression::Var(ast::Var::Name(name)) = expression {
+        return Some(name);
     }
 
     None

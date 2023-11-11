@@ -538,8 +538,7 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
     fn visit_local_assignment(&mut self, assignment: &ast::LocalAssignment) {
         if_chain! {
             if let Some(ast::punctuated::Pair::End(expression)) = assignment.expressions().first();
-            if let ast::Expression::Value { value, .. } = expression;
-            if let ast::Value::FunctionCall(call) = &**value;
+            if let ast::Expression::FunctionCall(call) = expression;
             if is_roact_function(call);
             then {
                 let function_suffix = get_last_function_call_suffix(

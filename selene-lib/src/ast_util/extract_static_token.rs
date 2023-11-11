@@ -8,21 +8,23 @@ pub fn extract_static_token(expression: &ast::Expression) -> Option<&TokenRefere
         deny(non_exhaustive_omitted_patterns)
     )]
     match expression {
-        ast::Expression::BinaryOperator { .. } | ast::Expression::UnaryOperator { .. } => None,
-
         ast::Expression::Parentheses { expression, .. } => extract_static_token(expression),
 
-        #[cfg_attr(
-            feature = "force_exhaustive_checks",
-            allow(non_exhaustive_omitted_patterns)
-        )]
-        ast::Expression::Value { value, .. } => match &**value {
-            ast::Value::Number(token) => Some(token),
-            ast::Value::String(token) => Some(token),
-            ast::Value::Symbol(token) => Some(token),
+        ast::Expression::Number(token)
+        | ast::Expression::String(token)
+        | ast::Expression::Symbol(token) => Some(token),
 
-            _ => None,
-        },
+        ast::Expression::BinaryOperator { .. }
+        | ast::Expression::UnaryOperator { .. }
+        | ast::Expression::Function(_)
+        | ast::Expression::FunctionCall(_)
+        | ast::Expression::TableConstructor(_)
+        | ast::Expression::Var(_) => None,
+
+        #[cfg(feature = "roblox")]
+        ast::Expression::IfExpression(_)
+        | ast::Expression::InterpolatedString(_)
+        | ast::Expression::TypeAssertion { .. } => None,
 
         _ => None,
     }
