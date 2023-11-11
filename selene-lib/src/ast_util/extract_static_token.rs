@@ -12,17 +12,9 @@ pub fn extract_static_token(expression: &ast::Expression) -> Option<&TokenRefere
 
         ast::Expression::Parentheses { expression, .. } => extract_static_token(expression),
 
-        #[cfg_attr(
-            feature = "force_exhaustive_checks",
-            allow(non_exhaustive_omitted_patterns)
-        )]
-        ast::Expression::Value { value, .. } => match &**value {
-            ast::Value::Number(token) => Some(token),
-            ast::Value::String(token) => Some(token),
-            ast::Value::Symbol(token) => Some(token),
-
-            _ => None,
-        },
+        ast::Expression::Number(token)
+        | ast::Expression::String(token)
+        | ast::Expression::Symbol(token) => Some(token),
 
         _ => None,
     }

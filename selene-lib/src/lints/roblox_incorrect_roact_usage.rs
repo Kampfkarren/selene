@@ -192,13 +192,11 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
 
             // Get first argument, check if it is a Roblox class
             let name_arg = iter.next().unwrap();
-            if let ast::Expression::Value { value, .. } = name_arg;
-            if let ast::Value::String(token) = &**value;
+            if let ast::Expression::String(token) = name_arg;
             if let Some((name, class)) = self.check_class_name(token);
 
             // Get second argument, check if it is a table
-            if let Some(ast::Expression::Value { value, .. }) = iter.next();
-            if let ast::Value::TableConstructor(table) = &**value;
+            if let Some(ast::Expression::TableConstructor(table)) = iter.next();
 
             then {
                 ((name, class), table)
@@ -224,8 +222,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
                     let key = strip_parentheses(key);
 
                     if_chain::if_chain! {
-                        if let ast::Expression::Value { value, .. } = key;
-                        if let ast::Value::Var(ast::Var::Expression(var_expression)) = &**value;
+                        if let ast::Expression::Var(ast::Var::Expression(var_expression)) = key;
 
                         if let ast::Prefix::Name(constant_roact_name) = var_expression.prefix();
                         if constant_roact_name.token().to_string() == "Roact";
@@ -256,8 +253,7 @@ impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
     fn visit_local_assignment(&mut self, node: &ast::LocalAssignment) {
         for (name, expr) in node.names().iter().zip(node.expressions().iter()) {
             if_chain! {
-                if let ast::Expression::Value { value, .. } = expr;
-                if let ast::Value::Var(ast::Var::Expression(var_expr)) = &**value;
+                if let ast::Expression::Var(ast::Var::Expression(var_expr)) = expr;
                 if is_roact_create_element(var_expr.prefix(), &var_expr.suffixes().collect::<Vec<_>>());
                 then {
                     self.definitions_of_create_element.insert(name.token().to_string());

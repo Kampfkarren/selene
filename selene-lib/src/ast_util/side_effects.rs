@@ -18,8 +18,61 @@ impl HasSideEffects for ast::Expression {
             }
             ast::Expression::Parentheses { expression, .. }
             | ast::Expression::UnaryOperator { expression, .. } => expression.has_side_effects(),
-            ast::Expression::Value { value, .. } => value.has_side_effects(),
-            _ => false,
+            ast::Expression::Function(_)
+            | ast::Expression::Number(_)
+            | ast::Expression::String(_)
+            | ast::Expression::Symbol(_) => false,
+            ast::Expression::FunctionCall(_) => true,
+            ast::Expression::TableConstructor(table_constructor) => table_constructor
+                .fields()
+                .into_iter()
+                .any(|field| match field {
+                    ast::Field::ExpressionKey { key, value, .. } => {
+                        key.has_side_effects() || value.has_side_effects()
+                    }
+
+                    ast::Field::NameKey { value, .. } => value.has_side_effects(),
+
+                    ast::Field::NoKey(expression) => expression.has_side_effects(),
+
+                    _ => true,
+                }),
+            ast::Expression::Var(var) => var.has_side_effects(),
+
+            #[cfg(feature = "roblox")]
+            ast::Expression::IfExpression(if_expression) => {
+                if if_expression.if_expression().has_side_effects()
+                    || if_expression.condition().has_side_effects()
+                    || if_expression.else_expression().has_side_effects()
+                {
+                    return true;
+                }
+
+                if let Some(else_if_expressions) = if_expression.else_if_expressions() {
+                    for else_if_expression in else_if_expressions {
+                        if else_if_expression.condition().has_side_effects()
+                            || else_if_expression.expression().has_side_effects()
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                false
+            }
+
+            #[cfg(feature = "roblox")]
+            ast::Expression::InterpolatedString(interpolated_string) => {
+                for expression in interpolated_string.expressions() {
+                    if expression.has_side_effects() {
+                        return true;
+                    }
+                }
+
+                false
+            }
+
+            _ => true,
         }
     }
 }
@@ -47,73 +100,6 @@ impl HasSideEffects for ast::Suffix {
         match self {
             ast::Suffix::Call(_) => true,
             ast::Suffix::Index(_) => false,
-            _ => true,
-        }
-    }
-}
-
-impl HasSideEffects for ast::Value {
-    fn has_side_effects(&self) -> bool {
-        #[cfg_attr(
-            feature = "force_exhaustive_checks",
-            deny(non_exhaustive_omitted_patterns)
-        )]
-        match self {
-            ast::Value::Function(_)
-            | ast::Value::Number(_)
-            | ast::Value::String(_)
-            | ast::Value::Symbol(_) => false,
-            ast::Value::FunctionCall(_) => true,
-            ast::Value::ParenthesesExpression(expression) => expression.has_side_effects(),
-            ast::Value::TableConstructor(table_constructor) => table_constructor
-                .fields()
-                .into_iter()
-                .any(|field| match field {
-                    ast::Field::ExpressionKey { key, value, .. } => {
-                        key.has_side_effects() || value.has_side_effects()
-                    }
-
-                    ast::Field::NameKey { value, .. } => value.has_side_effects(),
-
-                    ast::Field::NoKey(expression) => expression.has_side_effects(),
-
-                    _ => true,
-                }),
-            ast::Value::Var(var) => var.has_side_effects(),
-
-            #[cfg(feature = "roblox")]
-            ast::Value::IfExpression(if_expression) => {
-                if if_expression.if_expression().has_side_effects()
-                    || if_expression.condition().has_side_effects()
-                    || if_expression.else_expression().has_side_effects()
-                {
-                    return true;
-                }
-
-                if let Some(else_if_expressions) = if_expression.else_if_expressions() {
-                    for else_if_expression in else_if_expressions {
-                        if else_if_expression.condition().has_side_effects()
-                            || else_if_expression.expression().has_side_effects()
-                        {
-                            return true;
-                        }
-                    }
-                }
-
-                false
-            }
-
-            #[cfg(feature = "roblox")]
-            ast::Value::InterpolatedString(interpolated_string) => {
-                for expression in interpolated_string.expressions() {
-                    if expression.has_side_effects() {
-                        return true;
-                    }
-                }
-
-                false
-            }
-
             _ => true,
         }
     }

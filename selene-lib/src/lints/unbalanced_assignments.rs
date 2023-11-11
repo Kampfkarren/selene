@@ -70,9 +70,7 @@ struct UnbalancedAssignmentsVisitor {
 fn expression_is_call(expression: &ast::Expression) -> bool {
     match expression {
         ast::Expression::Parentheses { expression, .. } => expression_is_call(expression),
-        ast::Expression::Value { value, .. } => {
-            matches!(&**value, ast::Value::FunctionCall(_))
-        }
+        ast::Expression::FunctionCall(_) => true,
 
         _ => false,
     }
@@ -81,15 +79,11 @@ fn expression_is_call(expression: &ast::Expression) -> bool {
 fn expression_is_nil(expression: &ast::Expression) -> bool {
     match expression {
         ast::Expression::Parentheses { expression, .. } => expression_is_call(expression),
-        ast::Expression::Value { value, .. } => {
-            if let ast::Value::Symbol(symbol) = &**value {
-                *symbol.token_type()
-                    == TokenType::Symbol {
-                        symbol: Symbol::Nil,
-                    }
-            } else {
-                false
-            }
+        ast::Expression::Symbol(symbol) => {
+            *symbol.token_type()
+                == TokenType::Symbol {
+                    symbol: Symbol::Nil,
+                }
         }
 
         _ => false,
@@ -97,13 +91,11 @@ fn expression_is_nil(expression: &ast::Expression) -> bool {
 }
 
 fn expression_is_ellipsis(expression: &ast::Expression) -> bool {
-    if let ast::Expression::Value { value, .. } = expression {
-        if let ast::Value::Symbol(symbol) = &**value {
-            return *symbol.token_type()
-                == TokenType::Symbol {
-                    symbol: Symbol::Ellipse,
-                };
-        }
+    if let ast::Expression::Symbol(symbol) = expression {
+        return *symbol.token_type()
+            == TokenType::Symbol {
+                symbol: Symbol::Ellipse,
+            };
     }
 
     false
