@@ -1,7 +1,9 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.25.0...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.26.0...HEAD)
+
+## [0.26.0](https://github.com/Kampfkarren/selene/releases/tag/0.26.0) - 2023-11-11
 ### Added
 - Added `table.move` and `math.tointeger` to Lua 5.3 standard library
 - Added `bit32.*` functions to Lua 5.2 standard library
