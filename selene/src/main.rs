@@ -297,7 +297,7 @@ fn read<R: Read>(
 
         suggestion = Diagnostic::get_applied_suggestions_code(
             suggestion.as_str(),
-            diagnostics
+            &diagnostics
                 .iter()
                 .filter(|diagnostic| diagnostic.diagnostic.has_machine_applicable_fix())
                 .map(|diagnostic| &diagnostic.diagnostic)

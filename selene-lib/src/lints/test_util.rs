@@ -142,7 +142,7 @@ pub fn test_lint_config_with_output<
 
     suggestion = Diagnostic::get_applied_suggestions_code(
         suggestion.as_str(),
-        fixed_diagnostics,
+        &fixed_diagnostics,
         |new_code| {
             let fixed_ast = full_moon::parse(new_code).unwrap_or_else(|_| {
                 panic!(

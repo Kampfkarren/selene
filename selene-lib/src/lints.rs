@@ -137,7 +137,7 @@ impl Diagnostic {
                     if suggestion_str.is_empty() {
                         "consider removing this".to_string()
                     } else {
-                        format!("try: `{}`", suggestion_str)
+                        format!("try: `{suggestion_str}`")
                     },
                 );
             }
@@ -196,14 +196,17 @@ impl Diagnostic {
         }
     }
 
+    #[must_use]
     pub fn start_position(&self) -> u32 {
         self.primary_label.range.0
     }
 
+    #[must_use]
     pub fn has_machine_applicable_fix(&self) -> bool {
         self.suggestion.is_some() && self.applicability == Applicability::MachineApplicable
     }
 
+    #[must_use]
     pub fn has_maybe_incorrect_fix(&self) -> bool {
         self.suggestion.is_some() && self.applicability == Applicability::MaybeIncorrect
     }
@@ -211,13 +214,13 @@ impl Diagnostic {
     /// After applying suggestions, calls `get_new_diagnostics` and reruns to ensure fixes didn't produce new errors
     pub fn get_applied_suggestions_code<F>(
         code: &str,
-        diagnostics: Vec<&Diagnostic>,
+        diagnostics: &[&Diagnostic],
         get_new_diagnostics: F,
     ) -> String
     where
         F: Fn(&str) -> Vec<Diagnostic>,
     {
-        let mut chosen_diagnostics = Self::get_independent_suggestions(&diagnostics);
+        let mut chosen_diagnostics = Self::get_independent_suggestions(diagnostics);
         let mut owned_diagnostics_ref;
         let mut owned_diagnostics;
 
