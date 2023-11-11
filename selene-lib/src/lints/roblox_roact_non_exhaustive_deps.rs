@@ -133,12 +133,13 @@ fn get_formatted_error_message(
     missing_or_unnecessary: &str,
 ) -> String {
     format!(
-        "react hook {} has {}: {}",
+        "react hook {} has {} {}: {}",
         hook_name,
+        missing_or_unnecessary,
         if missing_dependencies.len() == 1 {
-            format!("{} dependency", missing_or_unnecessary)
+            "dependency"
         } else {
-            format!("{} dependencies", missing_or_unnecessary)
+            "dependencies"
         },
         match missing_dependencies.len() {
             1 => format!("'{}'", missing_dependencies[0].indexing_expression_name()),
@@ -511,11 +512,8 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
             .iter()
             .filter_map(|(_, dependency)| {
                 if let Some(resolved_start) = dependency.resolved_start_range {
-                    if self.is_byte_outside_enclosing_named_fn(resolved_start) {
-                        Some(dependency.clone())
-                    } else {
-                        None
-                    }
+                    self.is_byte_outside_enclosing_named_fn(resolved_start)
+                        .then_some(dependency.clone())
                 } else {
                     // Assume unresolved variables are globals and should not be included in deps
                     Some(dependency.clone())
