@@ -6,7 +6,6 @@ use full_moon::{
     ast::{self, Ast},
     visitors::Visitor,
 };
-use if_chain::if_chain;
 
 pub struct RoactDanglingConnectionLint;
 
@@ -47,13 +46,9 @@ impl Lint for RoactDanglingConnectionLint {
                         .call_name_path
                         .last()
                         .and_then(|last_name| {
-                            if ["Connect", "connect", "ConnectParallel", "Once"]
+                            ["Connect", "connect", "ConnectParallel", "Once"]
                                 .contains(&last_name.as_str())
-                            {
-                                Some(function_call_stmt.call_prefix_range.0)
-                            } else {
-                                None
-                            }
+                                .then_some(function_call_stmt.call_prefix_range.0)
                         })
                 })
                 .collect(),
@@ -230,14 +225,12 @@ impl Visitor for RoactDanglingConnectionVisitor {
 
     fn visit_local_assignment(&mut self, node: &ast::LocalAssignment) {
         for (name, expr) in node.names().iter().zip(node.expressions().iter()) {
-            if_chain! {
-                if let ast::Expression::Value { value, .. } = expr;
-                if let ast::Value::Var(ast::Var::Expression(var_expr)) = &**value;
-                if is_roact_function(var_expr.prefix());
-                then {
-                    self.definitions_of_roact_functions.insert(name.token().to_string());
+            if let ast::Expression::Var(ast::Var::Expression(var_expr)) = expr {
+                if is_roact_function(var_expr.prefix()) {
+                    self.definitions_of_roact_functions
+                        .insert(name.token().to_string());
                 }
-            };
+            }
         }
     }
 }
