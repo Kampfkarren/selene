@@ -10,3 +10,9 @@ error[divide_by_zero]: dividing by zero is not allowed, use math.huge instead
 4 │ local _ = x / 0
   │           ^^^^^
 
+error[divide_by_zero]: dividing by zero is not allowed, use math.huge instead
+  ┌─ divide_by_zero.lua:6:11
+  │
+6 │ local _ = -1 / 0
+  │           ^^^^^^
+

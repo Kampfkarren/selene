@@ -45,8 +45,8 @@ struct DivideByZeroVisitor {
     positions: Vec<(usize, usize)>,
 }
 
-fn value_is_zero(value: &ast::Value) -> bool {
-    if let ast::Value::Number(token) = value {
+fn value_is_zero(value: &ast::Expression) -> bool {
+    if let ast::Expression::Number(token) = value {
         token.token().to_string() == "0"
     } else {
         false
@@ -57,12 +57,8 @@ impl Visitor for DivideByZeroVisitor {
     fn visit_expression(&mut self, node: &ast::Expression) {
         if_chain::if_chain! {
             if let ast::Expression::BinaryOperator { lhs, binop, rhs, .. } = node;
-            if let ast::Expression::Value { value, .. } = &**lhs;
             if let ast::BinOp::Slash(_) = binop;
-            if let ast::Expression::Value {
-                value: rhs_value, ..
-            } = &**rhs;
-            if value_is_zero(rhs_value) && !value_is_zero(value);
+            if value_is_zero(rhs) && !value_is_zero(lhs);
             then {
                 let range = node.range().unwrap();
                 self.positions.push((range.0.bytes(), range.1.bytes()));

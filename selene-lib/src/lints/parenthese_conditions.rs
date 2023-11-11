@@ -47,15 +47,7 @@ struct ParentheseConditionsVisitor {
 
 impl ParentheseConditionsVisitor {
     fn lint_condition(&mut self, condition: &ast::Expression) {
-        let is_parentheses = match condition {
-            ast::Expression::Parentheses { .. } => true,
-            ast::Expression::Value { value, .. } => {
-                matches!(&**value, ast::Value::ParenthesesExpression(_))
-            }
-            _ => false,
-        };
-
-        if is_parentheses {
+        if matches!(condition, ast::Expression::Parentheses { .. }) {
             self.positions.push(range(condition));
         }
     }

@@ -38,19 +38,15 @@ pub fn name_path_from_prefix_suffix<'a, S: Iterator<Item = &'a ast::Suffix>>(
 }
 
 pub fn name_path(expression: &ast::Expression) -> Option<Vec<String>> {
-    if let ast::Expression::Value { value, .. } = expression {
-        if let ast::Value::Var(var) = &**value {
-            match var {
-                ast::Var::Expression(expression) => {
-                    name_path_from_prefix_suffix(expression.prefix(), expression.suffixes())
-                }
-
-                ast::Var::Name(name) => Some(vec![name.to_string()]),
-
-                _ => None,
+    if let ast::Expression::Var(var) = expression {
+        match var {
+            ast::Var::Expression(expression) => {
+                name_path_from_prefix_suffix(expression.prefix(), expression.suffixes())
             }
-        } else {
-            None
+
+            ast::Var::Name(name) => Some(vec![name.to_string()]),
+
+            _ => None,
         }
     } else {
         None
