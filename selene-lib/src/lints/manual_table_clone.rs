@@ -119,14 +119,8 @@ impl ManualTableCloneVisitor<'_> {
                 let loop_expression = expressions.iter().next().unwrap();
 
                 let function_call = match strip_parentheses(loop_expression) {
-                    Expression::Value { value, .. } => match &**value {
-                        ast::Value::FunctionCall(function_call) => function_call,
-                        _ if self.is_luau() => return Some((LoopType::Other, loop_expression)),
-                        _ => return None,
-                    },
-
+                    Expression::FunctionCall(function_call) => function_call,
                     _ if self.is_luau() => return Some((LoopType::Other, loop_expression)),
-
                     _ => return None,
                 };
 

@@ -201,9 +201,9 @@ fn get_name_path_from_call(call: &ast::FunctionCall) -> Option<Vec<String>> {
     let mut all_suffixes = Vec::new();
 
     let mut path = match call.prefix() {
-        ast::Prefix::Expression(ast::Expression::Value { value, .. }) => match &**value {
-            ast::Value::Var(ast::Var::Name(name)) => vec![name.token().to_string()],
-            ast::Value::Var(ast::Var::Expression(var_expression)) => {
+        ast::Prefix::Expression(expression) => match &**expression {
+            ast::Expression::Var(ast::Var::Name(name)) => vec![name.token().to_string()],
+            ast::Expression::Var(ast::Var::Expression(var_expression)) => {
                 let mut path = Vec::new();
 
                 let name = if let ast::Prefix::Name(name) = var_expression.prefix() {
@@ -220,7 +220,6 @@ fn get_name_path_from_call(call: &ast::FunctionCall) -> Option<Vec<String>> {
             }
             _ => return None,
         },
-        ast::Prefix::Expression(_) => return None,
         ast::Prefix::Name(name) => vec![name.token().to_string()],
         _ => return None,
     };
@@ -259,12 +258,10 @@ fn get_name_path_from_call(call: &ast::FunctionCall) -> Option<Vec<String>> {
 }
 
 fn get_assigned_value(expression: &ast::Expression) -> Option<AssignedValue> {
-    if let ast::Expression::Value { value, .. } = expression {
-        if let ast::Value::TableConstructor(table_constructor) = &**value {
-            return Some(AssignedValue::StaticTable {
-                has_fields: !table_constructor.fields().is_empty(),
-            });
-        }
+    if let ast::Expression::TableConstructor(table_constructor) = expression {
+        return Some(AssignedValue::StaticTable {
+            has_fields: !table_constructor.fields().is_empty(),
+        });
     }
 
     None
@@ -342,62 +339,61 @@ impl ScopeVisitor {
                 self.read_expression(rhs);
             }
 
-            ast::Expression::Value { value, .. } => match &**value {
-                ast::Value::Function((name, _)) => {
-                    self.read_name(name);
-                }
+            ast::Expression::Function((name, _)) => {
+                self.read_name(name);
+            }
 
-                ast::Value::FunctionCall(call) => {
-                    self.read_prefix(call.prefix());
-                    for suffix in call.suffixes() {
-                        self.read_suffix(suffix);
+            ast::Expression::FunctionCall(call) => {
+                self.read_prefix(call.prefix());
+                for suffix in call.suffixes() {
+                    self.read_suffix(suffix);
+                }
+            }
+
+            ast::Expression::TableConstructor(table) => {
+                self.read_table_constructor(table);
+            }
+
+            ast::Expression::Symbol(symbol) => {
+                if *symbol.token_type()
+                    == (TokenType::Symbol {
+                        symbol: Symbol::Ellipse,
+                    })
+                {
+                    self.read_name(symbol);
+                }
+            }
+
+            ast::Expression::Var(var) => self.read_var(var),
+
+            #[cfg(feature = "roblox")]
+            ast::Expression::IfExpression(if_expression) => {
+                self.read_expression(if_expression.condition());
+                self.read_expression(if_expression.if_expression());
+
+                if let Some(else_if_expressions) = if_expression.else_if_expressions() {
+                    for else_if_expression in else_if_expressions {
+                        self.read_expression(else_if_expression.condition());
+                        self.read_expression(else_if_expression.expression());
                     }
                 }
 
-                ast::Value::TableConstructor(table) => {
-                    self.read_table_constructor(table);
+                self.read_expression(if_expression.else_expression());
+            }
+
+            #[cfg(feature = "roblox")]
+            ast::Expression::InterpolatedString(interpolated_string) => {
+                for expression in interpolated_string.expressions() {
+                    self.read_expression(expression);
                 }
+            }
 
-                ast::Value::ParenthesesExpression(expression) => self.read_expression(expression),
+            #[cfg(feature = "roblox")]
+            ast::Expression::TypeAssertion { expression, .. } => {
+                self.read_expression(expression);
+            }
 
-                ast::Value::Symbol(symbol) => {
-                    if *symbol.token_type()
-                        == (TokenType::Symbol {
-                            symbol: Symbol::Ellipse,
-                        })
-                    {
-                        self.read_name(symbol);
-                    }
-                }
-
-                ast::Value::Var(var) => self.read_var(var),
-
-                #[cfg(feature = "roblox")]
-                ast::Value::IfExpression(if_expression) => {
-                    self.read_expression(if_expression.condition());
-                    self.read_expression(if_expression.if_expression());
-
-                    if let Some(else_if_expressions) = if_expression.else_if_expressions() {
-                        for else_if_expression in else_if_expressions {
-                            self.read_expression(else_if_expression.condition());
-                            self.read_expression(else_if_expression.expression());
-                        }
-                    }
-
-                    self.read_expression(if_expression.else_expression());
-                }
-
-                #[cfg(feature = "roblox")]
-                ast::Value::InterpolatedString(interpolated_string) => {
-                    for expression in interpolated_string.expressions() {
-                        self.read_expression(expression);
-                    }
-                }
-
-                ast::Value::Number(_) | ast::Value::String(_) => {}
-
-                _ => {}
-            },
+            ast::Expression::Number(_) | ast::Expression::String(_) => {}
 
             _ => {}
         }

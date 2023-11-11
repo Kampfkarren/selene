@@ -78,20 +78,18 @@ struct DuplicateKeysVisitor {
 /// Also extracts `5` from `[5] = true`.
 /// Only works for string literal expression keys, or constant number keys.
 fn expression_to_key(expression: &ast::Expression) -> Option<Key> {
-    if let ast::Expression::Value { value, .. } = expression {
-        if let ast::Value::String(token) | ast::Value::Number(token) = &**value {
-            return match token.token().token_type() {
-                tokenizer::TokenType::StringLiteral { literal, .. } => Some(Key {
-                    key_type: KeyType::String,
-                    name: literal.to_string(),
-                }),
-                tokenizer::TokenType::Number { text, .. } => Some(Key {
-                    key_type: KeyType::Number,
-                    name: text.to_string(),
-                }),
-                _ => None,
-            };
-        }
+    if let ast::Expression::String(token) | ast::Expression::Number(token) = expression {
+        return match token.token().token_type() {
+            tokenizer::TokenType::StringLiteral { literal, .. } => Some(Key {
+                key_type: KeyType::String,
+                name: literal.to_string(),
+            }),
+            tokenizer::TokenType::Number { text, .. } => Some(Key {
+                key_type: KeyType::Number,
+                name: text.to_string(),
+            }),
+            _ => None,
+        };
     }
 
     None

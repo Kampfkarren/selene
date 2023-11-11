@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     ast_util::{
-        is_function_call, is_vararg, range,
+        is_vararg, range,
         scopes::{Reference, ScopeManager, Variable},
     },
     text::plural,
@@ -240,7 +240,9 @@ impl PassedArgumentCount {
                     passed_argument_count += 1;
 
                     if let ast::punctuated::Pair::End(expression) = argument {
-                        if is_function_call(expression) || is_vararg(expression) {
+                        if matches!(expression, ast::Expression::FunctionCall(_))
+                            || is_vararg(expression)
+                        {
                             return PassedArgumentCount::Variable(passed_argument_count);
                         }
                     }
@@ -331,14 +333,12 @@ impl Visitor for MapFunctionDefinitionVisitor<'_> {
             .zip(local_assignment.expressions());
 
         for (name_token, expression) in assignment_expressions {
-            if let ast::Expression::Value { value, .. } = expression {
-                if let ast::Value::Function((_, function_body)) = &**value {
-                    let identifier = range(name_token);
+            if let ast::Expression::Function((_, function_body)) = expression {
+                let identifier = range(name_token);
 
-                    if let Some(id) = self.find_variable(identifier) {
-                        self.definitions
-                            .insert(id, ParameterCount::from_function_body(function_body));
-                    }
+                if let Some(id) = self.find_variable(identifier) {
+                    self.definitions
+                        .insert(id, ParameterCount::from_function_body(function_body));
                 }
             }
         }
@@ -348,14 +348,12 @@ impl Visitor for MapFunctionDefinitionVisitor<'_> {
         let assignment_expressions = assignment.variables().iter().zip(assignment.expressions());
 
         for (var, expression) in assignment_expressions {
-            if let ast::Expression::Value { value, .. } = expression {
-                if let ast::Value::Function((_, function_body)) = &**value {
-                    let identifier = range(var);
+            if let ast::Expression::Function((_, function_body)) = expression {
+                let identifier = range(var);
 
-                    if let Some(reference) = self.find_reference(identifier) {
-                        if let Some(variable) = reference.resolved {
-                            self.verify_assignment(variable, function_body)
-                        }
+                if let Some(reference) = self.find_reference(identifier) {
+                    if let Some(variable) = reference.resolved {
+                        self.verify_assignment(variable, function_body)
                     }
                 }
             }

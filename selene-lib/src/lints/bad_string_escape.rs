@@ -116,9 +116,9 @@ struct StringEscapeSequence {
 }
 
 impl Visitor for BadStringEscapeVisitor {
-    fn visit_value(&mut self, node: &ast::Value) {
+    fn visit_expression(&mut self, node: &ast::Expression) {
         if_chain::if_chain! {
-            if let ast::Value::String(token) = node;
+            if let ast::Expression::String(token) = node;
             if let tokenizer::TokenType::StringLiteral { literal, multi_line, quote_type } = token.token_type();
             if multi_line.is_none();
             then {

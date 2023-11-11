@@ -58,8 +58,8 @@ struct Comparison {
     range: (usize, usize),
 }
 
-fn value_is_zero(value: &ast::Value) -> bool {
-    if let ast::Value::Number(token) = value {
+fn value_is_zero(value: &ast::Expression) -> bool {
+    if let ast::Expression::Number(token) = value {
         token.token().to_string() == "0"
     } else {
         false
@@ -69,11 +69,7 @@ fn value_is_zero(value: &ast::Value) -> bool {
 fn expression_is_nan(node: &ast::Expression) -> bool {
     if_chain::if_chain! {
         if let ast::Expression::BinaryOperator { lhs, binop: ast::BinOp::Slash(_), rhs } = node;
-        if let ast::Expression::Value { value, .. } = &**lhs;
-        if let ast::Expression::Value {
-            value: rhs_value, ..
-        } = &**rhs;
-        if value_is_zero(rhs_value) && value_is_zero(value);
+        if value_is_zero(lhs) && value_is_zero(rhs);
         then {
             return true;
         }
@@ -85,8 +81,7 @@ impl Visitor for CompareNanVisitor {
     fn visit_expression(&mut self, node: &ast::Expression) {
         if_chain::if_chain! {
             if let ast::Expression::BinaryOperator { lhs, binop, rhs } = node;
-            if let ast::Expression::Value { value, .. } = &**lhs;
-            if let ast::Value::Var(_) = value.as_ref();
+            if let ast::Expression::Var(_) = lhs.as_ref();
             then {
                 match binop {
                     ast::BinOp::TildeEqual(_) => {
@@ -94,7 +89,7 @@ impl Visitor for CompareNanVisitor {
                             let range = node.range().unwrap();
                             self.comparisons.push(
                                 Comparison {
-                                    variable: value.to_string().trim().to_owned(),
+                                    variable: lhs.to_string().trim().to_owned(),
                                     operator: "==".to_owned(),
                                     range: (range.0.bytes(), range.1.bytes()),
                                 }
@@ -106,7 +101,7 @@ impl Visitor for CompareNanVisitor {
                             let range = node.range().unwrap();
                             self.comparisons.push(
                                 Comparison {
-                                    variable: value.to_string().trim().to_owned(),
+                                    variable: lhs.to_string().trim().to_owned(),
                                     operator: "~=".to_owned(),
                                     range: (range.0.bytes(), range.1.bytes()),
                                 }

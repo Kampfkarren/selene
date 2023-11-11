@@ -67,8 +67,7 @@ impl Visitor for TypeCheckInsideCallVisitor {
                 = arguments.iter().next();
 
             // Check that rhs is a constant string
-            if let ast::Expression::Value { value: rhs_value, .. } = &**rhs;
-            if let ast::Value::String(_) = &**rhs_value;
+            if matches!(&**rhs, ast::Expression::String(_));
 
             then {
                 self.positions.push(range(call));

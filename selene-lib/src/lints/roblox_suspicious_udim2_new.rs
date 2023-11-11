@@ -110,10 +110,7 @@ impl Visitor for UDim2CountVisitor {
                 }
 
                 let numbers_passed = arguments.iter().filter(|expression| {
-                    match expression {
-                        ast::Expression::Value { value, .. } => matches!(&**value, ast::Value::Number(_)),
-                        _ => false,
-                    }
+                    matches!(expression, ast::Expression::Number(_))
                 }).count();
 
                 // Prevents false positives for UDim2.new(UDim.new(), UDim.new())

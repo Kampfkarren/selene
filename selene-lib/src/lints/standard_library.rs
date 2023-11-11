@@ -61,73 +61,66 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
             }
         }
 
-        ast::Expression::Value { value, .. } => match &**value {
-            ast::Value::Function(_) => Some(ArgumentType::Function.into()),
-            ast::Value::FunctionCall(_) => None,
-            ast::Value::Number(_) => Some(ArgumentType::Number.into()),
-            ast::Value::ParenthesesExpression(expression) => get_argument_type(expression),
-            ast::Value::String(token) => {
-                Some(PassedArgumentType::from_string(token.token().to_string()))
-            }
-            #[cfg_attr(
-                feature = "force_exhaustive_checks",
-                allow(non_exhaustive_omitted_patterns)
-            )]
-            ast::Value::Symbol(symbol) => match *symbol.token_type() {
-                TokenType::Symbol { symbol } => match symbol {
-                    Symbol::False => Some(ArgumentType::Bool.into()),
-                    Symbol::True => Some(ArgumentType::Bool.into()),
-                    Symbol::Nil => Some(ArgumentType::Nil.into()),
-                    Symbol::Ellipse => Some(ArgumentType::Vararg.into()),
-                    ref other => {
-                        unreachable!("TokenType::Symbol was not expected ({:?})", other)
-                    }
-                },
-
-                ref other => unreachable!(
-                    "ast::Value::Symbol token_type != TokenType::Symbol ({:?})",
-                    other
-                ),
+        ast::Expression::Function(_) => Some(ArgumentType::Function.into()),
+        ast::Expression::FunctionCall(_) => None,
+        ast::Expression::Number(_) => Some(ArgumentType::Number.into()),
+        ast::Expression::String(token) => {
+            Some(PassedArgumentType::from_string(token.token().to_string()))
+        }
+        #[cfg_attr(
+            feature = "force_exhaustive_checks",
+            allow(non_exhaustive_omitted_patterns)
+        )]
+        ast::Expression::Symbol(symbol) => match *symbol.token_type() {
+            TokenType::Symbol { symbol } => match symbol {
+                Symbol::False => Some(ArgumentType::Bool.into()),
+                Symbol::True => Some(ArgumentType::Bool.into()),
+                Symbol::Nil => Some(ArgumentType::Nil.into()),
+                Symbol::Ellipse => Some(ArgumentType::Vararg.into()),
+                ref other => {
+                    unreachable!("TokenType::Symbol was not expected ({:?})", other)
+                }
             },
-            ast::Value::TableConstructor(_) => Some(ArgumentType::Table.into()),
-            ast::Value::Var(_) => None,
 
-            #[cfg(feature = "roblox")]
-            ast::Value::IfExpression(if_expression) => {
-                // This could be a union type
-                let expected_type = get_argument_type(if_expression.if_expression())?;
+            ref other => unreachable!(
+                "ast::Expression::Symbol token_type != TokenType::Symbol ({:?})",
+                other
+            ),
+        },
+        ast::Expression::TableConstructor(_) => Some(ArgumentType::Table.into()),
+        ast::Expression::Var(_) => None,
 
-                if let Some(else_if_expressions) = if_expression.else_if_expressions() {
-                    for else_if_expression in else_if_expressions {
-                        if !get_argument_type(else_if_expression.expression())?
-                            .same_type(&expected_type)
-                        {
-                            return None;
-                        }
+        #[cfg(feature = "roblox")]
+        ast::Expression::IfExpression(if_expression) => {
+            // This could be a union type
+            let expected_type = get_argument_type(if_expression.if_expression())?;
+
+            if let Some(else_if_expressions) = if_expression.else_if_expressions() {
+                for else_if_expression in else_if_expressions {
+                    if !get_argument_type(else_if_expression.expression())?
+                        .same_type(&expected_type)
+                    {
+                        return None;
                     }
                 }
-
-                if get_argument_type(if_expression.else_expression())?.same_type(&expected_type) {
-                    Some(expected_type)
-                } else {
-                    None
-                }
             }
 
-            #[cfg(feature = "roblox")]
-            ast::Value::InterpolatedString(interpolated_string) => {
-                if interpolated_string.expressions().next().is_some() {
-                    Some(ArgumentType::String.into())
-                } else {
-                    // Simple string, aka `Workspace`
-                    Some(PassedArgumentType::from_string(
-                        interpolated_string.last_string().token().to_string(),
-                    ))
-                }
-            }
+            get_argument_type(if_expression.else_expression())?
+                .same_type(&expected_type)
+                .then_some(expected_type)
+        }
 
-            _ => None,
-        },
+        #[cfg(feature = "roblox")]
+        ast::Expression::InterpolatedString(interpolated_string) => {
+            if interpolated_string.expressions().next().is_some() {
+                Some(ArgumentType::String.into())
+            } else {
+                // Simple string, aka `Workspace`
+                Some(PassedArgumentType::from_string(
+                    interpolated_string.last_string().token().to_string(),
+                ))
+            }
+        }
 
         ast::Expression::BinaryOperator {
             lhs, binop, rhs, ..
@@ -184,9 +177,24 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                     None
                 }
 
+                #[cfg(feature = "roblox")]
+                ast::BinOp::DoubleSlash(_) => {
+                    let lhs_type = get_argument_type(lhs);
+                    let rhs_type = get_argument_type(rhs);
+
+                    if lhs_type == rhs_type {
+                        lhs_type
+                    } else {
+                        None
+                    }
+                }
+
                 _ => None,
             }
         }
+
+        #[cfg(feature = "roblox")]
+        ast::Expression::TypeAssertion { expression, .. } => get_argument_type(expression),
 
         _ => None,
     }
@@ -524,15 +532,13 @@ impl Visitor for StandardLibraryVisitor<'_> {
         let mut maybe_more_arguments = false;
 
         if let ast::FunctionArgs::Parentheses { arguments, .. } = function_args {
-            if let Some(ast::punctuated::Pair::End(ast::Expression::Value { value, .. })) =
-                arguments.last()
-            {
-                match &**value {
-                    ast::Value::FunctionCall(_) => {
+            if let Some(ast::punctuated::Pair::End(last_argument)) = arguments.last() {
+                match last_argument {
+                    ast::Expression::FunctionCall(_) => {
                         maybe_more_arguments = true;
                     }
 
-                    ast::Value::Symbol(token_ref) => {
+                    ast::Expression::Symbol(token_ref) => {
                         if let TokenType::Symbol { symbol } = token_ref.token().token_type() {
                             if symbol == &full_moon::tokenizer::Symbol::Ellipse {
                                 maybe_more_arguments = true;

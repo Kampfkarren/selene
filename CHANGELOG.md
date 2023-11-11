@@ -20,6 +20,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `SharedTable` to Roblox standard library
 - Added new [`--fix`](https://kampfkarren.github.io/selene/cli/usage.html#fix) flag, which will automatically apply lint suggestions.
 
+### Changed
+- Updated internal parser, which includes floor division (`//`), more correct parsing of string interpolation with double braces, and better parsing of `\z` escapes.
+
 ### Fixed
 - `string.pack` and `string.unpack` now have proper function signatures in the Lua 5.3 standard library.
 - Moved `math.log` second argument addition from Lua 5.3 std lib to 5.2 std lib
