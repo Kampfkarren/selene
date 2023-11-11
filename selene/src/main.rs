@@ -338,12 +338,13 @@ fn read<R: Read>(
                 let _ = stdout.reset();
 
                 println!(
-                    "{} ({})",
+                    "{} ({} {})",
                     filename.display(),
+                    num_fixes,
                     if num_fixes == 1 {
-                        "1 fix".to_string()
+                        "fix".to_string()
                     } else {
-                        format!("{} fixes", num_fixes)
+                        "fixes".to_string()
                     }
                 );
 
