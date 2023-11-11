@@ -34,17 +34,14 @@ fn is_lua_valid_table_key_identifier(string: &String) -> bool {
 
 fn get_lua_table_key_format(expression: &ast::Expression) -> String {
     match expression {
-        ast::Expression::Value { value, .. } => match &**value {
-            ast::Value::String(token) => {
-                let string = token.to_string();
-                if is_lua_valid_table_key_identifier(&string) {
-                    string[1..string.len() - 1].to_string()
-                } else {
-                    format!("[{}]", string)
-                }
+        ast::Expression::String(token) => {
+            let string = token.to_string();
+            if is_lua_valid_table_key_identifier(&string) {
+                string[1..string.len() - 1].to_string()
+            } else {
+                format!("[{}]", string)
             }
-            _ => format!("[{}]", expression),
-        },
+        }
         _ => format!("[{}]", expression),
     }
 }
