@@ -20,7 +20,7 @@ impl Lint for ParentheseConditionsLint {
         Ok(ParentheseConditionsLint)
     }
 
-    fn pass(&self, ast: &Ast, _: &Context, _: &AstContext) -> Vec<Diagnostic> {
+    fn pass(&self, ast: &Ast, _: &Context, context: &AstContext) -> Vec<Diagnostic> {
         let mut visitor = ParentheseConditionsVisitor {
             positions: Vec::new(),
         };
@@ -35,6 +35,8 @@ impl Lint for ParentheseConditionsLint {
                     "parenthese_conditions",
                     "lua does not require parentheses around conditions".to_owned(),
                     Label::new(*position),
+                    Some(context.code[position.0 + 1..position.1 - 1].to_string()),
+                    Applicability::MachineApplicable,
                 )
             })
             .collect()

@@ -33,8 +33,10 @@ impl Lint for DivideByZeroLint {
             .map(|position| {
                 Diagnostic::new(
                     "divide_by_zero",
-                    "dividing by zero is not allowed, use math.huge instead".to_owned(),
+                    "dividing by zero is not readable".to_owned(),
                     Label::new(*position),
+                    Some("math.huge()".to_string()),
+                    Applicability::MachineApplicable,
                 )
             })
             .collect()

@@ -156,6 +156,10 @@ impl Lint for UnusedVariableLint {
                 .any(|reference| reference == &AnalyzedReference::Read)
             {
                 let mut notes = Vec::new();
+                let mut report_range = variable.identifiers[0];
+
+                let mut suggestion = Some(format!("_{}", variable.name));
+                let mut applicability = Applicability::MachineApplicable;
 
                 if variable.is_self {
                     if self.allow_unused_self {
@@ -165,6 +169,27 @@ impl Lint for UnusedVariableLint {
                     notes.push("`self` is implicitly defined when defining a method".to_owned());
                     notes
                         .push("if you don't need it, consider using `.` instead of `:`".to_owned());
+
+                    if let Some(colon_position) =
+                        ast_context.code[..variable.identifiers[0].0].rfind(':')
+                    {
+                        report_range = (colon_position, colon_position + 1);
+
+                        // Applying fix by changing `:` to `.` would break any existing methods calls
+                        applicability = Applicability::MaybeIncorrect;
+                        suggestion = Some(".".to_string());
+                    }
+                }
+
+                // Applying fix would cause existing references to reference a nonexistent variable. It's possible to
+                // also rename those references as well. Clippy just doesn't apply a fix at all in these cases.
+                if variable.references.iter().any(|reference| {
+                    ast_context.scope_manager.references[*reference]
+                        .identifier
+                        .0
+                        != variable.identifiers[0].0
+                }) {
+                    suggestion = None;
                 }
 
                 let write_only = !analyzed_references.is_empty();
@@ -176,7 +201,7 @@ impl Lint for UnusedVariableLint {
                     } else {
                         format!("{} is defined, but never used", variable.name)
                     },
-                    Label::new(variable.identifiers[0]),
+                    Label::new(report_range),
                     notes,
                     analyzed_references
                         .into_iter()
@@ -188,6 +213,8 @@ impl Lint for UnusedVariableLint {
                             }
                         })
                         .collect(),
+                    suggestion,
+                    applicability,
                 ));
             };
         }

@@ -48,6 +48,8 @@ impl Lint for UndefinedVariableLint {
                         &context.user_set_standard_library,
                     ),
                     Vec::new(),
+                    None,
+                    Applicability::Unspecified,
                 ));
             }
         }

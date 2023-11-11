@@ -50,11 +50,15 @@ impl Lint for BadStringEscapeLint {
                     "bad_string_escape",
                     "string escape sequence doesn't exist".to_owned(),
                     Label::new(sequence.range.to_owned()),
+                    None,
+                    Applicability::Unspecified,
                 ),
                 ReasonWhy::Malformed => Diagnostic::new(
                     "bad_string_escape",
                     "string escape sequence is malformed".to_owned(),
                     Label::new(sequence.range.to_owned()),
+                    None,
+                    Applicability::Unspecified,
                 ),
                 ReasonWhy::DecimalTooHigh => Diagnostic::new_complete(
                     "bad_string_escape",
@@ -65,6 +69,8 @@ impl Lint for BadStringEscapeLint {
                             .to_owned(),
                     ],
                     Vec::new(),
+                    None,
+                    Applicability::Unspecified,
                 ),
                 ReasonWhy::CodepointTooHigh => Diagnostic::new_complete(
                     "bad_string_escape",
@@ -75,18 +81,24 @@ impl Lint for BadStringEscapeLint {
                             .to_owned(),
                     ],
                     Vec::new(),
+                    None,
+                    Applicability::Unspecified,
                 ),
                 ReasonWhy::DoubleInSingle => Diagnostic::new(
                     "bad_string_escape",
                     "double quotes do not have to be escaped when inside single quoted strings"
                         .to_owned(),
                     Label::new(sequence.range.to_owned()),
+                    Some("\"".to_string()),
+                    Applicability::MachineApplicable,
                 ),
                 ReasonWhy::SingleInDouble => Diagnostic::new(
                     "bad_string_escape",
                     "single quotes do not have to be escaped when inside double quoted strings"
                         .to_owned(),
                     Label::new(sequence.range.to_owned()),
+                    Some("'".to_string()),
+                    Applicability::MachineApplicable,
                 ),
             })
             .collect()

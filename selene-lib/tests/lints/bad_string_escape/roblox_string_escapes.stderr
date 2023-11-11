@@ -2,13 +2,13 @@ error[bad_string_escape]: single quotes do not have to be escaped when inside do
    ┌─ roblox_string_escapes.lua:11:12
    │
 11 │ local x = "\'\""
-   │            ^^
+   │            ^^ try: `'`
 
 error[bad_string_escape]: double quotes do not have to be escaped when inside single quoted strings
    ┌─ roblox_string_escapes.lua:13:12
    │
 13 │ local x = '\"\''
-   │            ^^
+   │            ^^ try: `"`
 
 error[bad_string_escape]: string escape sequence is malformed
    ┌─ roblox_string_escapes.lua:22:15

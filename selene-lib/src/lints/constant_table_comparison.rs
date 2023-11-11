@@ -32,33 +32,33 @@ impl Lint for ConstantTableComparisonLint {
             .comparisons
             .iter()
             .map(|comparison| {
-                Diagnostic::new_complete(
+                let suggestion = comparison.empty_side.as_ref().map(|empty_side| {
+                    format!(
+                        "next({}) {} nil",
+                        match empty_side {
+                            EmptyComparison::CheckEmpty(side) => match side {
+                                EmptyComparisonSide::Left => &comparison.rhs,
+                                EmptyComparisonSide::Right => &comparison.lhs,
+                            },
+
+                            EmptyComparison::CheckNotEmpty(side) => match side {
+                                EmptyComparisonSide::Left => &comparison.rhs,
+                                EmptyComparisonSide::Right => &comparison.lhs,
+                            },
+                        },
+                        match empty_side {
+                            EmptyComparison::CheckEmpty(_) => "==",
+                            EmptyComparison::CheckNotEmpty(_) => "~=",
+                        }
+                    )
+                });
+
+                Diagnostic::new(
                     "constant_table_comparison",
                     "comparing to a constant table will always fail".to_owned(),
                     Label::new(comparison.range),
-                    if let Some(empty_side) = comparison.empty_side {
-                        vec![format!(
-                            "try: `next({}) {} nil`",
-                            match empty_side {
-                                EmptyComparison::CheckEmpty(side) => match side {
-                                    EmptyComparisonSide::Left => &comparison.rhs,
-                                    EmptyComparisonSide::Right => &comparison.lhs,
-                                },
-
-                                EmptyComparison::CheckNotEmpty(side) => match side {
-                                    EmptyComparisonSide::Left => &comparison.rhs,
-                                    EmptyComparisonSide::Right => &comparison.lhs,
-                                },
-                            },
-                            match empty_side {
-                                EmptyComparison::CheckEmpty(_) => "==",
-                                EmptyComparison::CheckNotEmpty(_) => "~=",
-                            }
-                        )]
-                    } else {
-                        Vec::new()
-                    },
-                    Vec::new(),
+                    suggestion.clone(),
+                    Applicability::MaybeIncorrect,
                 )
             })
             .collect()

@@ -1,0 +1,5 @@
+-[MA] local function foo(self)
++[MA] local function foo(_self)
+      end
+      
+      foo()

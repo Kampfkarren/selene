@@ -3,6 +3,7 @@ use std::{
     fmt, fs,
     io::{self, Read, Write},
     path::{Path, PathBuf},
+    process::Command,
     sync::{
         atomic::{AtomicUsize, Ordering},
         Arc, RwLock,
@@ -15,7 +16,10 @@ use codespan_reporting::{
     },
     term::DisplayStyle as CodespanDisplayStyle,
 };
-use selene_lib::{lints::Severity, *};
+use selene_lib::{
+    lints::{Diagnostic, Severity},
+    *,
+};
 use structopt::{clap, StructOpt};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
@@ -126,6 +130,7 @@ fn emit_codespan(
     writer: &mut impl termcolor::WriteColor,
     files: &codespan::Files<&str>,
     diagnostic: &CodespanDiagnostic<codespan::FileId>,
+    suggestion: Option<String>,
 ) {
     let lock = OPTIONS.read().unwrap();
     let opts = lock.as_ref().unwrap();
@@ -144,7 +149,10 @@ fn emit_codespan(
             writeln!(
                 writer,
                 "{}",
-                serde_json::to_string(&json_output::diagnostic_to_json(diagnostic, files)).unwrap()
+                serde_json::to_string(&json_output::diagnostic_to_json(
+                    diagnostic, files, suggestion
+                ))
+                .unwrap()
             )
             .unwrap();
         }
@@ -154,7 +162,7 @@ fn emit_codespan(
                 writer,
                 "{}",
                 serde_json::to_string(&json_output::JsonOutput::Diagnostic(
-                    json_output::diagnostic_to_json(diagnostic, files)
+                    json_output::diagnostic_to_json(diagnostic, files, suggestion)
                 ))
                 .unwrap()
             )
@@ -175,10 +183,15 @@ fn emit_codespan_locked(
     let stdout = termcolor::StandardStream::stdout(get_color());
     let mut stdout = stdout.lock();
 
-    emit_codespan(&mut stdout, files, diagnostic);
+    emit_codespan(&mut stdout, files, diagnostic, None);
 }
 
-fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut reader: R) {
+fn read<R: Read>(
+    checker: &Checker<toml::value::Value>,
+    filename: &Path,
+    mut reader: R,
+    is_fix: bool,
+) {
     let mut buffer = Vec::new();
     if let Err(error) = reader.read_to_end(&mut buffer) {
         error!(
@@ -270,8 +283,78 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
         }
     };
 
-    let mut diagnostics = checker.test_on(&ast);
+    let mut diagnostics = checker.test_on(&ast, &contents.as_ref().to_string());
     diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.start_position());
+
+    let mut suggestion = contents.as_ref().to_string();
+    if is_fix {
+        // This only counts the number of inital automatic fixes. Additional fixes caused by a previous fix won't
+        // be counted
+        let num_fixes = diagnostics
+            .iter()
+            .filter(|diagnostic| diagnostic.diagnostic.has_machine_applicable_fix())
+            .count();
+
+        suggestion = Diagnostic::get_applied_suggestions_code(
+            suggestion.as_str(),
+            &diagnostics
+                .iter()
+                .filter(|diagnostic| diagnostic.diagnostic.has_machine_applicable_fix())
+                .map(|diagnostic| &diagnostic.diagnostic)
+                .collect::<Vec<_>>(),
+            |new_code| {
+                let new_ast = full_moon::parse(new_code).expect(
+                    "selene tried applying lint suggestions, but it generated invalid code that could not be parsed; \
+                    this is likely a selene bug",
+                );
+
+                checker
+                    .test_on(&new_ast, &new_code.to_string())
+                    .into_iter()
+                    .filter(|diagnostic| diagnostic.diagnostic.has_machine_applicable_fix())
+                    .map(|diagnostic| diagnostic.diagnostic)
+                    .collect::<Vec<_>>()
+            },
+        );
+
+        let fixed_ast = full_moon::parse(&suggestion).expect(
+                "selene tried applying lint suggestions, but it generated invalid code that could not be parsed; \
+                this is likely a selene bug",
+            );
+        diagnostics = checker.test_on(&fixed_ast, &suggestion);
+        diagnostics.sort_by_key(|diagnostic| diagnostic.diagnostic.start_position());
+
+        if num_fixes > 0 {
+            if fs::write(filename, suggestion.clone()).is_ok() {
+                files.update(source_id, &suggestion);
+
+                let stdout = StandardStream::stdout(get_color());
+                let mut stdout = stdout.lock();
+                let _ =
+                    stdout.set_color(ColorSpec::new().set_fg(Some(Color::Green)).set_bold(true));
+
+                print!("fixed ");
+
+                let _ = stdout.reset();
+
+                println!(
+                    "{} ({} {})",
+                    filename.display(),
+                    num_fixes,
+                    if num_fixes == 1 {
+                        "fix".to_string()
+                    } else {
+                        "fixes".to_string()
+                    }
+                );
+
+                drop(stdout);
+            } else {
+                error(format!("failed to write to {}", filename.display()).as_str());
+                std::process::exit(1);
+            }
+        }
+    }
 
     let (mut errors, mut warnings) = (0, 0);
     for diagnostic in &diagnostics {
@@ -362,6 +445,7 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                 write(&mut stack, new_start).unwrap();
             }
         } else {
+            let suggestion = diagnostic.diagnostic.suggestion.clone();
             let diagnostic = diagnostic.diagnostic.into_codespan_diagnostic(
                 source_id,
                 match diagnostic.severity {
@@ -371,12 +455,12 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
                 },
             );
 
-            emit_codespan(&mut stdout, &files, &diagnostic);
+            emit_codespan(&mut stdout, &files, &diagnostic, suggestion);
         }
     }
 }
 
-fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
+fn read_file(checker: &Checker<toml::value::Value>, filename: &Path, is_fix: bool) {
     read(
         checker,
         filename,
@@ -388,6 +472,7 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
                 return;
             }
         },
+        is_fix,
     );
 }
 
@@ -492,6 +577,18 @@ fn start(mut options: opts::Options) {
         }
 
         None => {}
+    }
+
+    if options.fix
+        && !options.allow_dirty
+        && (has_unstaged_changes() || (!options.allow_staged && has_staged_changes()))
+    {
+        error(
+            "the working directory of this package has uncommitted changes, and `selene --fix` can potentially \
+            perform destructive changes; if you'd like to suppress this error pass `--allow-dirty`, `--allow-staged`, \
+            or commit the changes"
+        );
+        std::process::exit(1);
     }
 
     let (config, config_directory): (CheckerConfig<toml::value::Value>, Option<PathBuf>) =
@@ -608,7 +705,7 @@ fn start(mut options: opts::Options) {
     for filename in &options.files {
         if filename == "-" {
             let checker = Arc::clone(&checker);
-            pool.execute(move || read(&checker, Path::new("-"), io::stdin().lock()));
+            pool.execute(move || read(&checker, Path::new("-"), io::stdin().lock(), options.fix));
             continue;
         }
 
@@ -622,7 +719,7 @@ fn start(mut options: opts::Options) {
                         continue;
                     }
 
-                    pool.execute(move || read_file(&checker, Path::new(&filename)));
+                    pool.execute(move || read_file(&checker, Path::new(&filename), options.fix));
                 } else if metadata.is_dir() {
                     for pattern in &options.pattern {
                         let glob = match glob::glob(&format!(
@@ -646,7 +743,7 @@ fn start(mut options: opts::Options) {
 
                                     let checker = Arc::clone(&checker);
 
-                                    pool.execute(move || read_file(&checker, &path));
+                                    pool.execute(move || read_file(&checker, &path, options.fix));
                                 }
 
                                 Err(error) => {
@@ -769,6 +866,30 @@ fn get_opts_safe(mut args: Vec<OsString>, luacheck: bool) -> Result<opts::Option
             },
         }
     }
+}
+
+fn has_unstaged_changes() -> bool {
+    let output = Command::new("git")
+        .arg("status")
+        .arg("--porcelain")
+        .output()
+        .expect("Failed to execute git");
+
+    let stdout = String::from_utf8(output.stdout).expect("Failed to convert git output to string");
+
+    stdout.lines().any(|line| line.chars().nth(1) != Some(' '))
+}
+
+fn has_staged_changes() -> bool {
+    let output = Command::new("git")
+        .arg("status")
+        .arg("--porcelain")
+        .output()
+        .expect("Failed to execute git");
+
+    let stdout = String::from_utf8(output.stdout).expect("Failed to convert git output to string");
+
+    stdout.lines().any(|line| !line.starts_with(' '))
 }
 
 #[cfg(feature = "roblox")]

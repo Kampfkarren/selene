@@ -1,0 +1,25 @@
+      -- Functions
+-[MA] local function unusedFunction()
+-[MA]     local unusedVariableA = 1
+-[MA]     local unusedVariableB = 1
++[MA] local function _unusedFunction()
++[MA]     local _unusedVariableA = 1
++[MA]     local _unusedVariableB = 1
+      end
+      
+      print(unusedVariableB)
+-[MA] local overidden = true
++[MA] local _overidden = true
+      
+      local function overridesIt()
+          local overidden = false
+          print(overidden)
+      end
+      
+      overridesIt()
+      
+      -- Anonymous functions
+      local a = 1
+      print(function()
+          _G.foo = a
+      end)

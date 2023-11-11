@@ -61,7 +61,7 @@ pub fn test_full_run_config_with_output(
 
     let ast = full_moon::parse(&lua_source).expect("Cannot parse lua file");
 
-    let mut diagnostics = checker.test_on(&ast);
+    let mut diagnostics = checker.test_on(&ast, &lua_source);
 
     let mut files = codespan::Files::new();
     let source_id = files.add(format!("{test_name}.lua"), lua_source);

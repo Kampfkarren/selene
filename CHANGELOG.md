@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `bit32.byteswap` to Luau standard library
 - Added `buffer` library to Luau standard library
 - Added `SharedTable` to Roblox standard library
+- Added new [`--fix`](https://kampfkarren.github.io/selene/cli/usage.html#fix) flag, which will automatically apply lint suggestions.
 
 ### Changed
 - Updated internal parser, which includes floor division (`//`), more correct parsing of string interpolation with double braces, and better parsing of `\z` escapes.

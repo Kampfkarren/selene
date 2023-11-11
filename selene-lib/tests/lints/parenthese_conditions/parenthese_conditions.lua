@@ -13,3 +13,7 @@ repeat until false
 repeat until (false)
 
 while (true) and false do end
+
+if ((function()
+    if (x) then end
+end)()) then end

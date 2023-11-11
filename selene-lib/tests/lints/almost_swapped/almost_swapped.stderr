@@ -3,25 +3,19 @@ error[almost_swapped]: this looks like you are trying to swap `a` and `b`
   │  
 3 │ ╭ a = b
 4 │ │ b = a
-  │ ╰─────^
-  │  
-  = try: `a, b = b, a`
+  │ ╰─────^ try: `a, b = b, a`
 
 error[almost_swapped]: this looks like you are trying to swap `t[1]` and `t[2]`
   ┌─ almost_swapped.lua:8:1
   │  
 8 │ ╭ t[1] = t[2]
 9 │ │ t[2] = t[1]
-  │ ╰──────────^
-  │  
-  = try: `t[1], t[2] = t[2], t[1]`
+  │ ╰──────────^ try: `t[1], t[2] = t[2], t[1]`
 
 error[almost_swapped]: this looks like you are trying to swap `a` and `b`
    ┌─ almost_swapped.lua:15:1
    │  
 15 │ ╭ a = b
 16 │ │ b = a
-   │ ╰─────^
-   │  
-   = try: `a, b = b, a`
+   │ ╰─────^ try: `a, b = b, a`
 

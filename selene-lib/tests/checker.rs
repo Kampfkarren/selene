@@ -62,6 +62,9 @@ fn uses_lint_variation_allow() {
     .unwrap();
 
     assert!(checker
-        .test_on(&parse("if true then\n\treturn\nend").unwrap())
+        .test_on(
+            &parse("if true then\n\treturn\nend").unwrap(),
+            &"".to_string()
+        )
         .is_empty());
 }

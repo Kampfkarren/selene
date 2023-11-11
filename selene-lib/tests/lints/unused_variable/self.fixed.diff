@@ -1,0 +1,9 @@
+      local Foo = {}
+      
+-[MI] function Foo:A() end
++[MI] function Foo.A() end
+      function Foo.B() end
+-[MI] function Foo    :    C() end
++[MI] function Foo    .    C() end
+      
+      return Foo

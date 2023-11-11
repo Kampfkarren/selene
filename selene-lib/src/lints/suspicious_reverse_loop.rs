@@ -37,6 +37,8 @@ impl Lint for SuspiciousReverseLoopLint {
                     Label::new(*position),
                     vec!["help: try adding `, -1` after `1`".to_owned()],
                     Vec::new(),
+                    None,
+                    Applicability::Unspecified,
                 )
             })
             .collect()

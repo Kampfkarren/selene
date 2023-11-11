@@ -260,6 +260,8 @@ impl StandardLibraryVisitor<'_> {
                     self.user_set_standard_library,
                 ),
                 Vec::new(),
+                None,
+                Applicability::Unspecified,
             ));
         }
     }
@@ -318,6 +320,8 @@ impl Visitor for StandardLibraryVisitor<'_> {
                                     Label::new((range.0.bytes(), range.1.bytes())),
                                     Vec::new(),
                                     Vec::new(),
+                                    None,
+                                    Applicability::Unspecified,
                                 ));
                             }
 
@@ -355,6 +359,8 @@ impl Visitor for StandardLibraryVisitor<'_> {
                             Label::new((range.0.bytes(), range.1.bytes())),
                             Vec::new(),
                             Vec::new(),
+                            None,
+                            Applicability::Unspecified,
                         ));
                     }
                 }
@@ -435,6 +441,8 @@ impl Visitor for StandardLibraryVisitor<'_> {
                         name_path.join("."),
                     ),
                     Label::from_node(call, None),
+                    None,
+                    Applicability::Unspecified,
                 ));
 
                 return;
@@ -463,7 +471,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
 
             let name = name_path.pop().unwrap();
 
-            self.diagnostics.push(Diagnostic::new_complete(
+            self.diagnostics.push(Diagnostic::new(
                 "incorrect_standard_library_use",
                 format!(
                     "standard library function `{}{}{}` {}",
@@ -473,13 +481,13 @@ impl Visitor for StandardLibraryVisitor<'_> {
                     problem,
                 ),
                 Label::from_node(call, None),
-                vec![format!(
-                    "try: {}{}{}(...)",
+                Some(format!(
+                    "{}{}{}(...)",
                     name_path.join("."),
                     use_instead,
                     name
-                )],
-                Vec::new(),
+                )),
+                Applicability::HasPlaceholders,
             ));
 
             return;
@@ -558,6 +566,8 @@ impl Visitor for StandardLibraryVisitor<'_> {
                             Label::from_node(call, None),
                             message.iter().cloned().collect(),
                             Vec::new(),
+                            None,
+                            Applicability::Unspecified,
                         ));
                     }
 
@@ -595,6 +605,8 @@ impl Visitor for StandardLibraryVisitor<'_> {
                 Label::from_node(call, None),
                 required_param_message,
                 Vec::new(),
+                None,
+                Applicability::Unspecified,
             ));
         }
 
@@ -629,6 +641,8 @@ impl Visitor for StandardLibraryVisitor<'_> {
                                 passed_type.type_name()
                             ),
                         ),
+                        None,
+                        Applicability::Unspecified,
                     ));
                 }
             }

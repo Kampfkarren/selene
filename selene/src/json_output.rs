@@ -30,6 +30,7 @@ pub struct JsonDiagnostic {
     primary_label: Label,
     notes: Vec<String>,
     secondary_labels: Vec<Label>,
+    suggestion: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -77,6 +78,7 @@ fn label_to_serializable(
 pub fn diagnostic_to_json(
     diagnostic: &CodespanDiagnostic<codespan::FileId>,
     files: &codespan::Files<&str>,
+    suggestion: Option<String>,
 ) -> JsonDiagnostic {
     let label = diagnostic.labels.first().expect("no labels passed");
     let filename = files.name(label.file_id).to_string_lossy().into_owned();
@@ -93,6 +95,7 @@ pub fn diagnostic_to_json(
             .filter(|label| label.style == LabelStyle::Secondary)
             .map(|label| label_to_serializable(&filename, label, files))
             .collect(),
+        suggestion,
     }
 }
 

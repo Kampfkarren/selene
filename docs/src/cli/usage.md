@@ -9,6 +9,7 @@ USAGE:
 FLAGS:
         --allow-warnings    Pass when only warnings occur
         --no-exclude        Ignore excludes defined in config
+        --fix               Automatically fix applicable lint warnings
     -h, --help              Prints help information
     -n, --no-summary        Suppress summary information
     -q, --quiet             Display only the necessary information. Equivalent to --display-style="quiet"
@@ -75,6 +76,10 @@ Results:
 1 warnings
 0 parse errors
 ```
+
+**--fix** *fix*
+
+Automatically applies lint suggestions. Since this can be potentially destructive, it's not allowed when there are uncommitted changes. This safety mechanism can be ignored by including `--allow-dirty` to allow unstaged changes or `--allow-staged` to allow only staged changes.
 
 **--num-threads** *num-threads*
 

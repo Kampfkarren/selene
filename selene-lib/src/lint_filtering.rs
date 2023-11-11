@@ -4,7 +4,7 @@ use crate::{
         visit_nodes::{NodeVisitor, VisitorType},
     },
     lint_exists,
-    lints::{Diagnostic, Label, Severity},
+    lints::{Applicability, Diagnostic, Label, Severity},
     CheckerDiagnostic, LintVariation,
 };
 use full_moon::{ast::Ast, node::Node, tokenizer::TokenType};
@@ -149,6 +149,8 @@ impl NodeVisitor for FilterVisitor {
                                     trivia_start_position.bytes(),
                                     trivia_end_position.bytes(),
                                 )),
+                                None,
+                                Applicability::Unspecified,
                             ))
                         }
                     }));
@@ -223,6 +225,8 @@ pub fn filter_diagnostics(
                                 (first_code.0.bytes(), first_code.1.bytes()),
                                 "global filter must be before this".to_owned(),
                             )],
+                            None,
+                            Applicability::Unspecified,
                         ));
 
                         continue;
@@ -244,6 +248,8 @@ pub fn filter_diagnostics(
                                     possibly_conflicting.comment_range,
                                     "conflicts with this".to_owned(),
                                 )],
+                                None,
+                                Applicability::Unspecified,
                             ));
                         }
                     }

@@ -1,3 +1,5 @@
+import * as vscode from "vscode"
+
 export interface Label {
     message: string
     span: {
@@ -18,4 +20,19 @@ export interface Diagnostic {
     notes: string[]
     primary_label: Label
     secondary_labels: Label[]
+    suggestion: string
+}
+
+export class SeleneDiagnostic extends vscode.Diagnostic {
+    suggestion?: string
+
+    constructor(
+        range: vscode.Range,
+        message: string,
+        severity: vscode.DiagnosticSeverity,
+        suggestion?: string,
+    ) {
+        super(range, message, severity)
+        this.suggestion = suggestion
+    }
 }

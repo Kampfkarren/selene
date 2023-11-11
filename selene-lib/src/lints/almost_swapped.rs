@@ -31,7 +31,7 @@ impl Lint for AlmostSwappedLint {
             .almost_swaps
             .iter()
             .map(|almost_swap| {
-                Diagnostic::new_complete(
+                Diagnostic::new(
                     "almost_swapped",
                     format!(
                         "this looks like you are trying to swap `{}` and `{}`",
@@ -39,12 +39,14 @@ impl Lint for AlmostSwappedLint {
                         (almost_swap.names.1),
                     ),
                     Label::new(almost_swap.range),
-                    vec![format!(
-                        "try: `{name1}, {name2} = {name2}, {name1}`",
+                    Some(format!(
+                        "{name1}, {name2} = {name2}, {name1}",
                         name1 = almost_swap.names.0,
                         name2 = almost_swap.names.1,
-                    )],
-                    Vec::new(),
+                    )),
+                    // FIXME: Ideally `MaybeIncorrect`, but the end range for swapping `t[1]` and `t[2]`
+                    // currently doesn't include the closing `]`
+                    Applicability::HasPlaceholders,
                 )
             })
             .collect()

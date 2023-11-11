@@ -69,6 +69,19 @@ pub struct Options {
 
     #[structopt(long)]
     pub no_exclude: bool,
+
+    #[structopt(long)]
+    pub fix: bool,
+
+    // Fix code even if the working directory has changes
+    // Only used with `fix`
+    #[structopt(long, hidden(true))]
+    pub allow_dirty: bool,
+
+    // Fix code even if the working directory has staged changes
+    // Only used with `fix`
+    #[structopt(long, hidden(true))]
+    pub allow_staged: bool,
 }
 
 impl Options {

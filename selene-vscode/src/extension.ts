@@ -3,7 +3,12 @@ import * as selene from "./selene"
 import * as timers from "timers"
 import * as util from "./util"
 import * as vscode from "vscode"
-import { Diagnostic, Severity, Label } from "./structures/diagnostic"
+import {
+    Diagnostic,
+    Severity,
+    Label,
+    SeleneDiagnostic,
+} from "./structures/diagnostic"
 import { Output } from "./structures/output"
 import { lintConfig } from "./configLint"
 import { byteToCharMap } from "./byteToCharMap"
@@ -16,6 +21,40 @@ enum RunType {
     OnType = "onType",
     OnNewLine = "onNewLine",
     OnIdle = "onIdle",
+}
+
+class SeleneCodeActionProvider implements vscode.CodeActionProvider {
+    public provideCodeActions(
+        document: vscode.TextDocument,
+        _range: vscode.Range | vscode.Selection,
+        context: vscode.CodeActionContext,
+    ): vscode.ProviderResult<vscode.Command[] | vscode.CodeAction[]> {
+        const codeActions: vscode.CodeAction[] = []
+
+        for (const diagnostic of context.diagnostics) {
+            if (
+                diagnostic instanceof SeleneDiagnostic &&
+                diagnostic.suggestion
+            ) {
+                const action = new vscode.CodeAction(
+                    diagnostic.message,
+                    vscode.CodeActionKind.QuickFix,
+                )
+                action.diagnostics = [diagnostic]
+
+                action.edit = new vscode.WorkspaceEdit()
+                action.edit.replace(
+                    document.uri,
+                    diagnostic.range,
+                    diagnostic.suggestion,
+                )
+
+                codeActions.push(action)
+            }
+        }
+
+        return codeActions
+    }
 }
 
 function labelToRange(
@@ -72,6 +111,13 @@ export async function activate(
         })
 
     await trySelene
+
+    context.subscriptions.push(
+        vscode.languages.registerCodeActionsProvider(
+            "lua",
+            new SeleneCodeActionProvider(),
+        ),
+    )
 
     context.subscriptions.push(
         vscode.commands.registerCommand("selene.reinstall", () => {
@@ -204,12 +250,13 @@ export async function activate(
                 message += `\n${data.notes.map((note) => `note: ${note}\n`)}`
             }
 
-            const diagnostic = new vscode.Diagnostic(
+            const diagnostic = new SeleneDiagnostic(
                 labelToRange(document, data.primary_label, byteOffsetMap),
                 message,
                 data.severity === Severity.Error
                     ? vscode.DiagnosticSeverity.Error
                     : vscode.DiagnosticSeverity.Warning,
+                data.suggestion,
             )
 
             diagnostic.source = `selene::${data.code}`

@@ -1,0 +1,8 @@
+      local _ = 3 / 2
+-[MA] local _ = 5 / 0
++[MA] local _ = math.huge()
+      local _ = 0 / 5
+-[MA] local _ = x / 0
++[MA] local _ = math.huge()
+      local _ = 0 / 0
+-[MA] local _ = -1 / 0+[MA] local _ = math.huge()

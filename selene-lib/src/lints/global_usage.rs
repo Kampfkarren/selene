@@ -76,6 +76,8 @@ impl Lint for GlobalLint {
                         reference.name
                     ),
                     Label::new(reference.identifier),
+                    None,
+                    Applicability::Unspecified,
                 )
             })
             .collect()

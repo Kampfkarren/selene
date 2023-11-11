@@ -34,6 +34,8 @@ impl Lint for MixedTableLint {
                 Label::new(mixed_table.range),
                 vec!["help: change this table to either an array or dictionary".to_owned()],
                 Vec::new(),
+                None,
+                Applicability::Unspecified,
             ));
         }
 

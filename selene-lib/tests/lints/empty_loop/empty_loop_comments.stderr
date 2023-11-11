@@ -6,47 +6,47 @@ error[empty_loop]: empty loop block
 21 │ │ 
 22 │ │ 
 23 │ │ end
-   │ ╰───^
+   │ ╰───^ consider removing this
 
 error[empty_loop]: empty loop block
    ┌─ empty_loop_comments.lua:29:1
    │  
 29 │ ╭ for _ in pairs({}) do
 30 │ │ end
-   │ ╰───^
+   │ ╰───^ consider removing this
 
 error[empty_loop]: empty loop block
    ┌─ empty_loop_comments.lua:36:1
    │  
 36 │ ╭ for _ in ipairs({}) do
 37 │ │ end
-   │ ╰───^
+   │ ╰───^ consider removing this
 
 error[empty_loop]: empty loop block
    ┌─ empty_loop_comments.lua:43:1
    │  
 43 │ ╭ for _ in {} do
 44 │ │ end
-   │ ╰───^
+   │ ╰───^ consider removing this
 
 error[empty_loop]: empty loop block
    ┌─ empty_loop_comments.lua:50:1
    │  
 50 │ ╭ for _ in a() do
 51 │ │ end
-   │ ╰───^
+   │ ╰───^ consider removing this
 
 error[empty_loop]: empty loop block
    ┌─ empty_loop_comments.lua:57:1
    │  
 57 │ ╭ while true do
 58 │ │ end
-   │ ╰───^
+   │ ╰───^ consider removing this
 
 error[empty_loop]: empty loop block
    ┌─ empty_loop_comments.lua:64:1
    │  
 64 │ ╭ repeat
 65 │ │ until true
-   │ ╰──────────^
+   │ ╰──────────^ consider removing this
 

@@ -30,16 +30,18 @@ impl Lint for CompareNanLint {
             .comparisons
             .iter()
             .map(|comparisons| {
-                Diagnostic::new_complete(
+                let suggestion = format!(
+                    "{variable} {operator} {variable}",
+                    variable = comparisons.variable,
+                    operator = comparisons.operator,
+                );
+
+                Diagnostic::new(
                     "compare_nan",
                     "comparing things to nan directly is not allowed".to_owned(),
                     Label::new(comparisons.range),
-                    vec![format!(
-                        "try: `{variable} {operator} {variable}` instead",
-                        variable = comparisons.variable,
-                        operator = comparisons.operator,
-                    )],
-                    Vec::new(),
+                    Some(suggestion),
+                    Applicability::MaybeIncorrect,
                 )
             })
             .collect()

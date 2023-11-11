@@ -1,8 +1,9 @@
-use super::{AstContext, Context, Lint};
+use super::{Applicability, AstContext, Context, Diagnostic, Lint};
 use crate::{
     test_util::{get_standard_library, PrettyString},
     StandardLibrary,
 };
+use similar::{ChangeTag, TextDiff};
 use std::{
     fs,
     io::Write,
@@ -34,6 +35,63 @@ impl Default for TestUtilConfig {
     }
 }
 
+/// Returns empty string if there are no diffs
+fn generate_diff(source1: &str, source2: &str, diagnostics: &[&Diagnostic]) -> String {
+    let mut result = String::new();
+    let mut has_changes = false;
+    let mut byte_offset = 0;
+    let mut prev_non_insert_applicability_prefix = "    ";
+
+    for change in TextDiff::from_lines(source1, source2).iter_all_changes() {
+        let change_length = change.value().len() as u32;
+
+        let change_end_byte = byte_offset + change_length;
+
+        let mut applicability_prefix = "    ";
+        for diagnostic in diagnostics {
+            let (start, end) = diagnostic.primary_label.range;
+            if start < change_end_byte && end > byte_offset {
+                if diagnostic.applicability == Applicability::MachineApplicable {
+                    applicability_prefix = "[MA]";
+                    break;
+                } else if diagnostic.applicability == Applicability::MaybeIncorrect {
+                    applicability_prefix = "[MI]";
+                    break;
+                }
+            }
+        }
+
+        if change.tag() == ChangeTag::Insert {
+            applicability_prefix = prev_non_insert_applicability_prefix;
+        }
+
+        let sign = match change.tag() {
+            ChangeTag::Delete => {
+                has_changes = true;
+                format!("-{}", applicability_prefix)
+            }
+            ChangeTag::Insert => {
+                has_changes = true;
+                format!("+{}", applicability_prefix)
+            }
+            ChangeTag::Equal => "     ".to_string(),
+        };
+
+        result.push_str(&format!("{} {}", sign, change.value()));
+
+        if change.tag() != ChangeTag::Insert {
+            byte_offset = change_end_byte;
+            prev_non_insert_applicability_prefix = applicability_prefix;
+        }
+    }
+
+    if has_changes {
+        result
+    } else {
+        "".to_string()
+    }
+}
+
 pub fn test_lint_config_with_output<
     C: DeserializeOwned,
     E: std::error::Error,
@@ -59,23 +117,91 @@ pub fn test_lint_config_with_output<
         fs::read_to_string(path_base.with_extension("lua")).expect("Cannot find lua file");
 
     let ast = full_moon::parse(&lua_source).expect("Cannot parse lua file");
-    let mut diagnostics = lint.pass(
-        &ast,
-        &Context {
-            standard_library: config.standard_library,
-            user_set_standard_library: if standard_library_is_set {
-                Some(vec!["test-set".to_owned()])
-            } else {
-                None
-            },
+
+    let context = Context {
+        standard_library: config.standard_library,
+        user_set_standard_library: if standard_library_is_set {
+            Some(vec!["test-set".to_owned()])
+        } else {
+            None
         },
-        &AstContext::from_ast(&ast),
+    };
+
+    let mut diagnostics = lint.pass(&ast, &context, &AstContext::from_ast(&ast, &lua_source));
+    diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.range);
+
+    let mut suggestion = lua_source.to_string();
+    let mut fixed_diagnostics = diagnostics
+        .iter()
+        .filter(|diagnostic| {
+            diagnostic.suggestion.is_some()
+                && (diagnostic.applicability == Applicability::MachineApplicable
+                    || diagnostic.applicability == Applicability::MaybeIncorrect)
+        })
+        .collect::<Vec<_>>();
+
+    suggestion = Diagnostic::get_applied_suggestions_code(
+        suggestion.as_str(),
+        &fixed_diagnostics,
+        |new_code| {
+            let fixed_ast = full_moon::parse(new_code).unwrap_or_else(|_| {
+                panic!(
+                    "Fixer generated invalid code:\n\
+                        ----------------\n\
+                        {}\n\
+                        ----------------\n",
+                    new_code
+                )
+            });
+            lint.pass(
+                &fixed_ast,
+                &context,
+                &AstContext::from_ast(&fixed_ast, &new_code.to_string()),
+            )
+        },
     );
 
-    let mut files = codespan::Files::new();
-    let source_id = files.add(format!("{test_name}.lua"), lua_source);
+    let fixed_ast = full_moon::parse(&suggestion).unwrap_or_else(|_| {
+        panic!(
+            "Fixer generated invalid code:\n\
+                ----------------\n\
+                {}\n\
+                ----------------\n",
+            suggestion
+        )
+    });
+    let lint_results = lint.pass(
+        &fixed_ast,
+        &context,
+        &AstContext::from_ast(&fixed_ast, &suggestion),
+    );
+    fixed_diagnostics = lint_results.iter().collect::<Vec<_>>();
+    fixed_diagnostics.sort_by_key(|diagnostic| diagnostic.start_position());
 
-    diagnostics.sort_by_key(|diagnostic| diagnostic.primary_label.range);
+    let fixed_diff = generate_diff(
+        &lua_source,
+        &suggestion,
+        &diagnostics.iter().collect::<Vec<_>>(),
+    );
+    let diff_output_path = path_base.with_extension("fixed.diff");
+
+    if let Ok(expected) = fs::read_to_string(&diff_output_path) {
+        pretty_assertions::assert_str_eq!(
+            // Must normalize newline characters otherwise testing on windows locally passes but fails
+            // in github actions environment
+            &expected.replace("\r\n", "\n"),
+            &fixed_diff.replace("\r\n", "\n")
+        );
+    } else {
+        let mut output_file =
+            fs::File::create(diff_output_path).expect("couldn't create fixed.diff output file");
+        output_file
+            .write_all(fixed_diff.as_bytes())
+            .expect("couldn't write fixed.diff to output file.");
+    }
+
+    let mut files = codespan::Files::new();
+    let source_id = files.add(format!("{test_name}.lua"), lua_source.clone());
 
     let mut output = termcolor::NoColor::new(Vec::new());
 
@@ -96,7 +222,10 @@ pub fn test_lint_config_with_output<
     let output_path = path_base.with_extension(output_extension);
 
     if let Ok(expected) = fs::read_to_string(&output_path) {
-        pretty_assertions::assert_eq!(PrettyString(&expected), PrettyString(stderr));
+        pretty_assertions::assert_eq!(
+            PrettyString(&expected.replace("\r\n", "\n")),
+            PrettyString(&stderr.to_string().replace("\r\n", "\n"))
+        );
     } else {
         let mut output_file = fs::File::create(output_path).expect("couldn't create output file");
         output_file

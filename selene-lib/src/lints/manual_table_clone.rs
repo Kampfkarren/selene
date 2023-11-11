@@ -84,6 +84,8 @@ impl ManualTableCloneMatch {
             } else {
                 Vec::new()
             },
+            None,
+            Applicability::Unspecified,
         )
     }
 }

@@ -1,0 +1,27 @@
+      if x then end
+-[MA] if (x) then end
++[MA] if x then end
+      
+-[MA] if (x) then
++[MA] if x then
+      elseif y then
+-[MA] elseif (z) then
++[MA] elseif z then
+      end
+      
+      while true do end
+-[MA] while (true) do end
++[MA] while true do end
+      
+      repeat until false
+-[MA] repeat until (false)
++[MA] repeat until false
+      
+      while (true) and false do end
+      
+-[MA] if ((function()
+-[MA]     if (x) then end
+-[MA] end)()) then end
++[MA] if (function()
++[MA]     if x then end
++[MA] end)() then end

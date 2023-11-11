@@ -38,6 +38,8 @@ impl Lint for TypeCheckInsideCallLint {
                     Label::new(*position),
                     vec!["note: this will always return `boolean`".to_owned()],
                     Vec::new(),
+                    None,
+                    Applicability::Unspecified,
                 )
             })
             .collect()
