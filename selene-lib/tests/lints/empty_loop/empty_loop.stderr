@@ -1,0 +1,70 @@
+error[empty_loop]: empty loop block
+   ┌─ empty_loop.lua:9:1
+   │  
+ 9 │ ╭ for _ = 1, 10 do
+10 │ │     -- Should warn
+11 │ │ end
+   │ ╰───^
+
+error[empty_loop]: empty loop block
+   ┌─ empty_loop.lua:13:1
+   │  
+13 │ ╭ for _ = 1, 10 do
+14 │ │     --[[
+15 │ │     Should warn
+16 │ │     ]]
+17 │ │ end
+   │ ╰───^
+
+error[empty_loop]: empty loop block
+   ┌─ empty_loop.lua:19:1
+   │  
+19 │ ╭ for _ = 1, 10 do
+20 │ │ 
+21 │ │ 
+22 │ │     
+23 │ │ end
+   │ ╰───^
+
+error[empty_loop]: empty loop block
+   ┌─ empty_loop.lua:29:1
+   │  
+29 │ ╭ for _ in pairs({}) do
+30 │ │ end
+   │ ╰───^
+
+error[empty_loop]: empty loop block
+   ┌─ empty_loop.lua:36:1
+   │  
+36 │ ╭ for _ in ipairs({}) do
+37 │ │ end
+   │ ╰───^
+
+error[empty_loop]: empty loop block
+   ┌─ empty_loop.lua:43:1
+   │  
+43 │ ╭ for _ in {} do
+44 │ │ end
+   │ ╰───^
+
+error[empty_loop]: empty loop block
+   ┌─ empty_loop.lua:50:1
+   │  
+50 │ ╭ for _ in a() do
+51 │ │ end
+   │ ╰───^
+
+error[empty_loop]: empty loop block
+   ┌─ empty_loop.lua:57:1
+   │  
+57 │ ╭ while true do
+58 │ │ end
+   │ ╰───^
+
+error[empty_loop]: empty loop block
+   ┌─ empty_loop.lua:64:1
+   │  
+64 │ ╭ repeat
+65 │ │ until true
+   │ ╰──────────^
+

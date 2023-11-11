@@ -303,6 +303,7 @@ use_lints! {
     divide_by_zero: lints::divide_by_zero::DivideByZeroLint,
     duplicate_keys: lints::duplicate_keys::DuplicateKeysLint,
     empty_if: lints::empty_if::EmptyIfLint,
+    empty_loop: lints::empty_loop::EmptyLoopLint,
     global_usage: lints::global_usage::GlobalLint,
     high_cyclomatic_complexity: lints::high_cyclomatic_complexity::HighCyclomaticComplexityLint,
     if_same_then_else: lints::if_same_then_else::IfSameThenElseLint,
@@ -311,6 +312,7 @@ use_lints! {
     invalid_lint_filter: lints::invalid_lint_filter::InvalidLintFilterLint,
     manual_table_clone: lints::manual_table_clone::ManualTableCloneLint,
     mismatched_arg_count: lints::mismatched_arg_count::MismatchedArgCountLint,
+    mixed_table: lints::mixed_table::MixedTableLint,
     multiple_statements: lints::multiple_statements::MultipleStatementsLint,
     must_use: lints::must_use::MustUseLint,
     parenthese_conditions: lints::parenthese_conditions::ParentheseConditionsLint,
@@ -326,5 +328,6 @@ use_lints! {
     {
         roblox_incorrect_color3_new_bounds: lints::roblox_incorrect_color3_new_bounds::Color3BoundsLint,
         roblox_incorrect_roact_usage: lints::roblox_incorrect_roact_usage::IncorrectRoactUsageLint,
+        roblox_suspicious_udim2_new: lints::roblox_suspicious_udim2_new::SuspiciousUDim2NewLint,
     },
 }

@@ -12,7 +12,7 @@ error[deprecated]: standard library function `table.getn` is deprecated
 2 │ print(table.getn(x))
   │       ^^^^^^^^^^^^^
   │
-  = `table.getn` has been superceded by #.
+  = `table.getn` has been superseded by #.
   = try: #x
 
 error[deprecated]: standard library function `table.foreach` is deprecated

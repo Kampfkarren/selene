@@ -1,0 +1,46 @@
+error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
+  ┌─ mixed_roact_react_usage.lua:8:5
+  │
+8 │     Name = "",
+  │     ^^^^
+  │
+  = try: [""] = e(...)
+
+error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Frame`
+  ┌─ mixed_roact_react_usage.lua:9:5
+  │
+9 │     ThisPropertyDoesntExist = true,
+  │     ^^^^^^^^^^^^^^^^^^^^^^^
+
+error[roblox_incorrect_roact_usage]: `key` is not a property of `Frame`
+   ┌─ mixed_roact_react_usage.lua:13:5
+   │
+13 │     key = "",
+   │     ^^^
+
+error[roblox_incorrect_roact_usage]: `ref` is not a property of `Frame`
+   ┌─ mixed_roact_react_usage.lua:14:5
+   │
+14 │     ref = a,
+   │     ^^^
+
+error[roblox_incorrect_roact_usage]: `children` is not a property of `Frame`
+   ┌─ mixed_roact_react_usage.lua:15:5
+   │
+15 │     children = {},
+   │     ^^^^^^^^
+
+error[roblox_incorrect_roact_usage]: `Name` is assigned through the element's key for Roblox instances
+   ┌─ mixed_roact_react_usage.lua:16:5
+   │
+16 │     Name = "",
+   │     ^^^^
+   │
+   = try: [""] = x(...)
+
+error[roblox_incorrect_roact_usage]: `ThisPropertyDoesntExist` is not a property of `Frame`
+   ┌─ mixed_roact_react_usage.lua:17:5
+   │
+17 │     ThisPropertyDoesntExist = true,
+   │     ^^^^^^^^^^^^^^^^^^^^^^^
+

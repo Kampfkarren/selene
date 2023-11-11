@@ -15,6 +15,7 @@ pub mod deprecated;
 pub mod divide_by_zero;
 pub mod duplicate_keys;
 pub mod empty_if;
+pub mod empty_loop;
 pub mod global_usage;
 pub mod high_cyclomatic_complexity;
 pub mod if_same_then_else;
@@ -22,6 +23,7 @@ pub mod ifs_same_cond;
 pub mod invalid_lint_filter;
 pub mod manual_table_clone;
 pub mod mismatched_arg_count;
+pub mod mixed_table;
 pub mod multiple_statements;
 pub mod must_use;
 pub mod parenthese_conditions;
@@ -39,6 +41,9 @@ pub mod roblox_incorrect_color3_new_bounds;
 
 #[cfg(feature = "roblox")]
 pub mod roblox_incorrect_roact_usage;
+
+#[cfg(feature = "roblox")]
+pub mod roblox_suspicious_udim2_new;
 
 #[cfg(test)]
 mod test_util;

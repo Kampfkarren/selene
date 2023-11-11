@@ -618,6 +618,10 @@ fn start(mut options: opts::Options) {
                     let checker = Arc::clone(&checker);
                     let filename = filename.to_owned();
 
+                    if !options.no_exclude && exclude_set.is_match(&filename) {
+                        continue;
+                    }
+
                     pool.execute(move || read_file(&checker, Path::new(&filename)));
                 } else if metadata.is_dir() {
                     for pattern in &options.pattern {
@@ -636,7 +640,7 @@ fn start(mut options: opts::Options) {
                         for entry in glob {
                             match entry {
                                 Ok(path) => {
-                                    if exclude_set.is_match(&path) {
+                                    if !options.no_exclude && exclude_set.is_match(&path) {
                                         continue;
                                     }
 

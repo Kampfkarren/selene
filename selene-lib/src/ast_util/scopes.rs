@@ -934,7 +934,7 @@ impl Visitor for ScopeVisitor {
         let mut names = name.names().iter();
         let base = names.next().unwrap();
 
-        let is_longer_expression = names.next().is_some();
+        let is_longer_expression = names.next().is_some() || name.method_colon().is_some();
 
         if is_longer_expression {
             self.write_name_with(

@@ -1,0 +1,6 @@
+error[global_usage]: use of `_G` is not allowed, structure your code in a more idiomatic way
+  ┌─ global_usage_ignore.lua:2:1
+  │
+2 │ _G.bar = 1
+  │ ^^
+

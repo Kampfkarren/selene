@@ -1,24 +1,24 @@
 error[manual_table_clone]: manual implementation of table.clone
-   ┌─ false_positive.lua:49:2
+   ┌─ false_positive.lua:77:2
    │  
-43 │       local result = {}
+71 │       local result = {}
    │       ----------------- remove this definition
    ·  
-49 │ ╭     for key, value in pairs(t) do
-50 │ │         result[key] = value
-51 │ │     end
+77 │ ╭     for key, value in pairs(t) do
+78 │ │         result[key] = value
+79 │ │     end
    │ ╰───────^
    │  
    = try `local result = table.clone(t)`
 
 error[manual_table_clone]: manual implementation of table.clone
-   ┌─ false_positive.lua:58:3
+   ┌─ false_positive.lua:86:3
    │  
-58 │ ╭         local result = {}
-59 │ │ 
-60 │ │         for key, value in pairs(t) do
-61 │ │             result[key] = value
-62 │ │         end
+86 │ ╭         local result = {}
+87 │ │ 
+88 │ │         for key, value in pairs(t) do
+89 │ │             result[key] = value
+90 │ │         end
    │ ╰───────────^
    │  
    = try `local result = table.clone(t)`
