@@ -55,8 +55,7 @@ impl Visitor for SuspiciousReverseLoopVisitor {
                 unop: ast::UnOp::Hash(_),
                 ..
             } = node.start();
-            if let ast::Expression::Value { value, .. } = node.end();
-            if let ast::Value::Number(number) = &**value;
+            if let ast::Expression::Number(number) = node.end();
             if str::parse::<f32>(&number.token().to_string()).ok() <= Some(1.0);
             then {
                 self.positions.push((
