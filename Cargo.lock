@@ -946,7 +946,7 @@ dependencies = [
 
 [[package]]
 name = "selene"
-version = "0.26.0"
+version = "0.26.1"
 dependencies = [
  "atty",
  "cfg-if",
@@ -976,7 +976,7 @@ dependencies = [
 
 [[package]]
 name = "selene-lib"
-version = "0.26.0"
+version = "0.26.1"
 dependencies = [
  "codespan",
  "codespan-reporting",
