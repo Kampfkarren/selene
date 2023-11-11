@@ -1,4 +1,4 @@
-use super::*;
+use super::{AstContext, Context, Diagnostic, Label, Lint, LintType, ScopeManager, Severity};
 use crate::ast_util::{range, scopes::Reference};
 use std::{
     collections::{HashMap, HashSet},
@@ -23,7 +23,7 @@ impl Lint for RoactNonExhaustiveDepsLint {
     const SEVERITY: Severity = Severity::Error;
     const LINT_TYPE: LintType = LintType::Correctness;
 
-    fn new(_: Self::Config) -> Result<Self, Self::Error> {
+    fn new((): Self::Config) -> Result<Self, Self::Error> {
         Ok(Self)
     }
 
@@ -186,14 +186,14 @@ fn get_last_function_call_suffix(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]
                 return if let ast::Prefix::Name(name) = prefix {
                     name.token().to_string()
                 } else {
-                    "".to_owned()
+                    String::new()
                 };
             } else {
                 // In a.b(), b is the suffix before the last one
                 Some(&suffixes[suffixes.len() - 2])
             }
         }
-        _ => return "".to_owned(),
+        _ => return String::new(),
     };
 
     last_suffix
@@ -205,7 +205,7 @@ fn get_last_function_call_suffix(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]
             ast::Suffix::Call(ast::Call::AnonymousCall(anonymous_call)) => {
                 anonymous_call.to_string()
             }
-            _ => "".to_string(),
+            _ => String::new(),
         })
         .unwrap_or_default()
 }
@@ -296,7 +296,7 @@ impl Upvalue {
     fn indexing_expression_name(&self) -> String {
         self.indexing_prefixes()
             .last()
-            .unwrap_or(&"".to_string())
+            .unwrap_or(&String::new())
             .to_string()
     }
 
@@ -306,9 +306,9 @@ impl Upvalue {
         let mut current_name = self.prefix.clone();
         for index_name in &self.indexing_identifiers {
             if is_lua_valid_identifier(index_name) {
-                current_name.push_str(format!(".{}", index_name).as_str());
+                current_name.push_str(format!(".{index_name}").as_str());
             } else {
-                current_name.push_str(format!("[\"{}\"]", index_name).as_str());
+                current_name.push_str(format!("[\"{index_name}\"]").as_str());
             }
             prefixes.push(current_name.clone());
         }
@@ -404,9 +404,10 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
         let last_suffix =
             get_last_function_call_suffix(call.prefix(), &call.suffixes().collect::<Vec<_>>());
 
-        let function_args = match call.suffixes().last() {
-            Some(ast::Suffix::Call(ast::Call::AnonymousCall(args))) => args,
-            _ => return,
+        let Some(ast::Suffix::Call(ast::Call::AnonymousCall(function_args))) =
+            call.suffixes().last()
+        else {
+            return;
         };
 
         if !["useEffect", "useMemo", "useCallback", "useLayoutEffect"]
@@ -416,14 +417,12 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
             return;
         }
 
-        let arguments = match function_args {
-            ast::FunctionArgs::Parentheses { arguments, .. } => arguments,
-            _ => return,
+        let ast::FunctionArgs::Parentheses { arguments, .. } = function_args else {
+            return;
         };
 
-        let dependency_array_expr = match arguments.iter().nth(1) {
-            Some(expr) => expr,
-            _ => return,
+        let Some(dependency_array_expr) = arguments.iter().nth(1) else {
+            return;
         };
 
         let referenced_upvalues = match arguments.first() {
@@ -481,7 +480,7 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
 
         if !missing_dependencies.is_empty() {
             // Without sorting, error message will be non-deterministic
-            missing_dependencies.sort_by_key(|upvalue| upvalue.indexing_expression_name());
+            missing_dependencies.sort_by_key(Upvalue::indexing_expression_name);
 
             let mut reported_indexing_prefixes = HashSet::new();
 
