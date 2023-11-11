@@ -494,6 +494,8 @@ fn start(mut options: opts::Options) {
         None => {}
     }
 
+    let current_dir = std::env::current_dir().unwrap();
+
     let (config, config_directory): (CheckerConfig<toml::value::Value>, Option<PathBuf>) =
         match options.config {
             Some(config_file) => {
@@ -517,20 +519,29 @@ fn start(mut options: opts::Options) {
                 }
             }
 
-            None => match fs::read_to_string("selene.toml") {
-                Ok(config_contents) => match toml::from_str(&config_contents) {
-                    Ok(config) => (config, None),
-                    Err(error) => {
-                        error!("Config file not in correct format: {}", error);
-                        std::process::exit(1);
-                    }
-                },
+            None => {
+                let config_file_path = current_dir
+                    .ancestors()
+                    .map(|path| path.join("selene.toml"))
+                    .find(|path| path.is_file());
 
-                Err(_) => (CheckerConfig::default(), None),
-            },
+                match config_file_path {
+                    Some(config_file) => match fs::read_to_string(&config_file) {
+                        Ok(config_contents) => match toml::from_str(&config_contents) {
+                            Ok(config) => (config, config_file.parent().map(Path::to_path_buf)),
+                            Err(error) => {
+                                error!("Config file not in correct format: {}", error);
+                                std::process::exit(1);
+                            }
+                        },
+
+                        Err(_) => (CheckerConfig::default(), None),
+                    },
+
+                    None => (CheckerConfig::default(), None),
+                }
+            }
         };
-
-    let current_dir = std::env::current_dir().unwrap();
 
     let standard_library = match standard_library::collect_standard_library(
         &config,

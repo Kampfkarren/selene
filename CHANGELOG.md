@@ -22,6 +22,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Updated internal parser, which includes floor division (`//`), more correct parsing of string interpolation with double braces, and better parsing of `\z` escapes.
 
+### Changed
+- If `--config` is not defined, `selene.toml` will now be searched for in the current directory and all parent directories.
+
 ### Fixed
 - `string.pack` and `string.unpack` now have proper function signatures in the Lua 5.3 standard library.
 - Moved `math.log` second argument addition from Lua 5.3 std lib to 5.2 std lib
