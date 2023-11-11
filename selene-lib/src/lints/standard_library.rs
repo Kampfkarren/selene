@@ -105,11 +105,9 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                 }
             }
 
-            if get_argument_type(if_expression.else_expression())?.same_type(&expected_type) {
-                Some(expected_type)
-            } else {
-                None
-            }
+            get_argument_type(if_expression.else_expression())?
+                .same_type(&expected_type)
+                .then_some(expected_type)
         }
 
         #[cfg(feature = "roblox")]
