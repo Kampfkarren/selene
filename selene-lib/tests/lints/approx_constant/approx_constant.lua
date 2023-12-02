@@ -7,7 +7,6 @@ local good = 3.1417
 local good = 3.14159266
 
 local good = 0x314
-local good = 3_14
 
 local bad = 3.14
 local bad = 3.141

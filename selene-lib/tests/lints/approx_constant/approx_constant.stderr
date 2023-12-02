@@ -1,54 +1,54 @@
 error[approx_constant]: `math.pi` is more precise
-   ┌─ approx_constant.lua:12:13
+   ┌─ approx_constant.lua:11:13
    │
-12 │ local bad = 3.14
+11 │ local bad = 3.14
    │             ^^^^
 
 error[approx_constant]: `math.pi` is more precise
-   ┌─ approx_constant.lua:13:13
+   ┌─ approx_constant.lua:12:13
    │
-13 │ local bad = 3.141
+12 │ local bad = 3.141
    │             ^^^^^
 
 error[approx_constant]: `math.pi` is more precise
-   ┌─ approx_constant.lua:14:14
+   ┌─ approx_constant.lua:13:14
    │
-14 │ local bad = -3.141
+13 │ local bad = -3.141
    │              ^^^^^
+
+error[approx_constant]: `math.pi` is more precise
+   ┌─ approx_constant.lua:14:13
+   │
+14 │ local bad = 3.142
+   │             ^^^^^
 
 error[approx_constant]: `math.pi` is more precise
    ┌─ approx_constant.lua:15:13
    │
-15 │ local bad = 3.142
-   │             ^^^^^
+15 │ local bad = 3.1415
+   │             ^^^^^^
 
 error[approx_constant]: `math.pi` is more precise
    ┌─ approx_constant.lua:16:13
    │
-16 │ local bad = 3.1415
-   │             ^^^^^^
-
-error[approx_constant]: `math.pi` is more precise
-   ┌─ approx_constant.lua:17:13
-   │
-17 │ local bad = 3.14159265
+16 │ local bad = 3.14159265
    │             ^^^^^^^^^^
 
 error[approx_constant]: `math.pi` is more precise
-   ┌─ approx_constant.lua:19:13
+   ┌─ approx_constant.lua:18:13
    │
-19 │ local bad = 3.14 + 1
+18 │ local bad = 3.14 + 1
    │             ^^^^
 
 error[approx_constant]: `math.pi` is more precise
-   ┌─ approx_constant.lua:20:15
+   ┌─ approx_constant.lua:19:15
    │
-20 │ local bad = f(3.14 + 1)
+19 │ local bad = f(3.14 + 1)
    │               ^^^^
 
 error[approx_constant]: `math.pi` is more precise
-   ┌─ approx_constant.lua:21:16
+   ┌─ approx_constant.lua:20:16
    │
-21 │ local bad = f(-3.14 + 1)
+20 │ local bad = f(-3.14 + 1)
    │                ^^^^
 
