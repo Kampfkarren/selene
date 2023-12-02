@@ -8,6 +8,7 @@ use full_moon::{ast::Ast, node::Node};
 use serde::de::DeserializeOwned;
 
 pub mod almost_swapped;
+pub mod approx_constant;
 pub mod bad_string_escape;
 pub mod compare_nan;
 pub mod constant_table_comparison;
