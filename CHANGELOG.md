@@ -1,7 +1,15 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.25.0...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.26.1...HEAD)
+### Added
+- Added new [`roblox_roact_non_exhaustive_deps` lint](https://kampfkarren.github.io/selene/lints/roblox_roact_non_exhaustive_deps.html), which will check for valid dependency arrays.
+
+## [0.26.1](https://github.com/Kampfkarren/selene/releases/tag/0.26.1) - 2023-11-11
+### Fixed
+- Fixed `UDim2.new()` firing the [`roblox_suspicious_udim2_new` lint](https://kampfkarren.github.io/selene/lints/roblox_suspicious_udim2_new.html).
+
+## [0.26.0](https://github.com/Kampfkarren/selene/releases/tag/0.26.0) - 2023-11-11
 ### Added
 - Added `table.move` and `math.tointeger` to Lua 5.3 standard library
 - Added `bit32.*` functions to Lua 5.2 standard library
@@ -18,7 +26,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `bit32.byteswap` to Luau standard library
 - Added `buffer` library to Luau standard library
 - Added `SharedTable` to Roblox standard library
-- Added new [`roblox_roact_non_exhaustive_deps` lint](https://kampfkarren.github.io/selene/lints/roblox_roact_non_exhaustive_deps.html), which will check for valid dependency arrays.
 
 ### Changed
 - Updated internal parser, which includes floor division (`//`), more correct parsing of string interpolation with double braces, and better parsing of `\z` escapes.

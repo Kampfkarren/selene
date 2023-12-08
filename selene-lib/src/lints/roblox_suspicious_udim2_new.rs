@@ -97,7 +97,7 @@ impl Visitor for UDim2CountVisitor {
             then {
                 let args_provided = arguments.len();
 
-                if args_provided >= 4 {
+                if args_provided == 0 || args_provided >= 4 {
                     return;
                 }
 
