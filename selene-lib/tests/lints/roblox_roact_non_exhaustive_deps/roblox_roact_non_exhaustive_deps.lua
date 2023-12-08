@@ -14,7 +14,7 @@ local function Component1(props)
     end, {})
 end
 
-local function Component2()
+local Component2 = function()
     local reactive1 = {}
 
     React.useEffect(function()

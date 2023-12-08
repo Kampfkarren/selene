@@ -45,7 +45,7 @@ impl Lint for RoactNonExhaustiveDepsLint {
 
         let mut visitor = RoactMissingDependencyVisitor {
             scope_manager,
-            fn_declaration_starts_stack: Vec::new(),
+            fn_body_starts_stack: Vec::new(),
             missing_dependencies: Vec::new(),
             unnecessary_dependencies: Vec::new(),
             complex_dependencies: Vec::new(),
@@ -225,7 +225,7 @@ struct RoactMissingDependencyVisitor<'a> {
     missing_dependencies: Vec<MissingDependency>,
     unnecessary_dependencies: Vec<UnnecessaryDependency>,
     complex_dependencies: Vec<ComplexDependency>,
-    fn_declaration_starts_stack: Vec<usize>,
+    fn_body_starts_stack: Vec<usize>,
 
     // Some variables are safe to omit from the dependency array, such as setState
     non_reactive_upvalue_starts: HashSet<usize>,
@@ -393,7 +393,7 @@ impl RoactMissingDependencyVisitor<'_> {
     ///  end
     /// ```
     fn is_byte_outside_enclosing_named_fn(&self, byte: usize) -> bool {
-        self.fn_declaration_starts_stack
+        self.fn_body_starts_stack
             .last()
             .map_or(false, |&last_fn_start| byte < last_fn_start)
     }
@@ -560,22 +560,12 @@ impl Visitor for RoactMissingDependencyVisitor<'_> {
         }
     }
 
-    fn visit_function_declaration(&mut self, function_declaration: &ast::FunctionDeclaration) {
-        self.fn_declaration_starts_stack
-            .push(range(function_declaration).0);
+    fn visit_function_body(&mut self, node: &ast::FunctionBody) {
+        self.fn_body_starts_stack.push(range(node).0);
     }
 
-    fn visit_function_declaration_end(&mut self, _: &ast::FunctionDeclaration) {
-        self.fn_declaration_starts_stack.pop();
-    }
-
-    fn visit_local_function(&mut self, local_function: &ast::LocalFunction) {
-        self.fn_declaration_starts_stack
-            .push(range(local_function).0);
-    }
-
-    fn visit_local_function_end(&mut self, _: &ast::LocalFunction) {
-        self.fn_declaration_starts_stack.pop();
+    fn visit_function_body_end(&mut self, _node: &ast::FunctionBody) {
+        self.fn_body_starts_stack.pop();
     }
 }
 
