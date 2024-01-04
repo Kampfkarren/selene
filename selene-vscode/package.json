@@ -13,6 +13,7 @@
     ],
     "activationEvents": [
         "onLanguage:lua",
+        "onLanguage:luau",
         "workspaceContains:selene.toml",
         "onCommand:selene.reinstall",
         "onCommand:selene.update-roblox-std",
