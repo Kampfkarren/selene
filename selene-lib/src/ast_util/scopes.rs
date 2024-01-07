@@ -244,7 +244,11 @@ fn get_name_path_from_call(call: &ast::FunctionCall) -> Option<Vec<String>> {
                 return None;
             }
 
-            ast::Suffix::Call(_) => {
+            ast::Suffix::Call(call) => {
+                if let ast::Call::MethodCall(method_call) = call {
+                    path.push(method_call.name().token().to_string());
+                }
+
                 if index + 1 == length {
                     return Some(path);
                 } else {

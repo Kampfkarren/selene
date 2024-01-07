@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.26.1...HEAD)
 ### Added
 - Added new [`roblox_roact_non_exhaustive_deps` lint](https://kampfkarren.github.io/selene/lints/roblox_roact_non_exhaustive_deps.html), which will check for valid dependency arrays.
+- Added new [`roblox_roact_dangling_connection`](https://kampfkarren.github.io/selene/lints/roblox_roact_dangling_connection.html), which will check for connections made in components without getting cleaned up.
 
 ## [0.26.1](https://github.com/Kampfkarren/selene/releases/tag/0.26.1) - 2023-11-11
 ### Fixed
