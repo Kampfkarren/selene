@@ -242,7 +242,9 @@ struct Upvalue {
     ///
     /// `a.b.c().d` yields `["a", "b", "c"]`
     // eslint requires passing in `a.b` for `a.b.c()` since js implicitly passes `a.b`
-    // as `this` to `c`. Lua doesn't do this, so we can allow `a.b.c` as deps
+    // as `this` to `c`. Lua only does this for colon operator like `a.b:c()`, so we can allow it for dot indexing
+    ///
+    /// `a.b:c().d` yields `["a", "b"]`
     indexing_identifiers: Vec<String>,
 
     /// True if there's any dynamic indexing or function calls such as `a[b]` or `a.b()`
@@ -254,6 +256,8 @@ struct Upvalue {
 }
 
 impl Upvalue {
+    /// FIXME: `indexing_identifier` for `local _ = a.b.c()` yields `["a", "b", "c"]`, but `a.b.c()` only yields `["a"]` due
+    /// to scope manager, so this breaks on function calls without assignment
     fn new(reference: &Reference, resolved_start_range: &Option<usize>) -> Self {
         let default_indexing = Vec::new();
         let indexing = reference.indexing.as_ref().unwrap_or(&default_indexing);
@@ -579,6 +583,15 @@ mod tests {
             RoactNonExhaustiveDepsLint::new(()).unwrap(),
             "roblox_roact_non_exhaustive_deps",
             "complex_deps",
+        );
+    }
+
+    #[test]
+    fn test_implicit_self() {
+        test_lint(
+            RoactNonExhaustiveDepsLint::new(()).unwrap(),
+            "roblox_roact_non_exhaustive_deps",
+            "implicit_self",
         );
     }
 
