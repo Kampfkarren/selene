@@ -166,7 +166,13 @@ impl Visitor for RoactDanglingConnectionVisitor {
         let last_suffix =
             get_last_function_call_suffix(call.prefix(), &call.suffixes().collect::<Vec<_>>());
 
-        if !self.function_contexts.is_empty() {
+        // Only warn in useEffect to prevent false negatives with unrelated functions. Ideally this should also work anywhere
+        // in the component body. Can we detect React components better?
+        if self
+            .function_contexts
+            .iter()
+            .any(|(_, context)| *context == ConnectionContext::UseEffect)
+        {
             if let Some(call_range) = call.range() {
                 if self
                     .dangling_connection_start_ranges

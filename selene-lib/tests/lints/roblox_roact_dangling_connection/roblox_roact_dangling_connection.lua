@@ -3,30 +3,37 @@ local useEffect = React.useEffect
 
 a:connect()
 
-local function c()
+local function Component()
     a:Connect()
-    a:connect()
-    a:ConnectParallel()
-    a:Once()
-
-    a.Connect()
-    a.connect()
-    a.ConnectParallel()
-    a.Once()
-
-    -- Ignore since `a` might take ownership of connections
-    a(b:Connect())
-    a(function() end, b:Connect())
 
     useEffect(function()
-        a:connect()
+        -- Ignore since `a` might take ownership of connections
         a(b:Connect())
-        local b = a:connect()
+        a(function() end, b:Connect())
+
+        a:Connect()
+        a:connect()
+
+        a.b:Connect()
+        a.b:connect()
+
+        a.b.c:Connect()
+        a.b.c:connect()
+
+        good = a:Connect()
+        good = a:connect()
+
+        good = a.b:Connect()
+        good = a.b:connect()
+
+        good = a.b.c:Connect()
+        good = a.b.c:connect()
     end)
 
     React.useEffect(function()
-        a:connect()
         a(b:Connect())
         local b = a:connect()
+
+        a:connect()
     end)
 end
