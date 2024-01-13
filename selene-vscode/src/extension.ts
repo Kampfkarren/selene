@@ -3,6 +3,10 @@ import * as selene from "./selene"
 import * as timers from "timers"
 import * as util from "./util"
 import * as vscode from "vscode"
+import * as path from "path"
+import * as fs from "fs"
+import * as toml from "toml"
+import { minimatch } from "minimatch"
 import { Diagnostic, Severity, Label } from "./structures/diagnostic"
 import { Output } from "./structures/output"
 import { lintConfig } from "./configLint"
@@ -147,11 +151,48 @@ export async function activate(
                 return
         }
 
+        const workspaceFolder = vscode.workspace.getWorkspaceFolder(
+            document.uri,
+        )
+        const workspaceRoot = workspaceFolder?.uri.fsPath
+        if (!workspaceRoot) {
+            console.error("Failed to find workspace root")
+            return
+        }
+
+        const configPath = path.join(workspaceRoot, "selene.toml")
+        let config
+        try {
+            const configFileContent = fs.readFileSync(configPath, "utf-8")
+            config = toml.parse(configFileContent)
+        } catch (error) {
+            console.error(`Error parsing config file: ${error}`)
+            return
+        }
+
+        const excludeGlobs = config?.exclude || []
+        const shouldExclude = excludeGlobs.some((pattern: string) => {
+            // Document path given is absolute so the patterns should be as well
+            // If multiple `selene.toml` becomes supported, this will likely need to be changed to support it.
+            const excludeGlobAbsolute = path.isAbsolute(pattern)
+                ? pattern
+                : path.join(workspaceRoot, pattern)
+
+            return minimatch(
+                document.uri.fsPath.replace(/\\/g, "/"),
+                excludeGlobAbsolute.replace(/\\/g, "/"),
+            )
+        })
+
+        if (shouldExclude) {
+            return
+        }
+
         const output = await selene.seleneCommand(
             context.globalStorageUri,
             "--display-style=json2 --no-summary -",
             selene.Expectation.Stderr,
-            vscode.workspace.getWorkspaceFolder(document.uri),
+            workspaceFolder,
             document.getText(),
         )
 
