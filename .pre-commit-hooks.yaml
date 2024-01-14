@@ -4,21 +4,18 @@
   description: An opinionated Lua code linter
   entry: selene
   language: system
-  types:
-      - lua
+  types: [lua]
 
 - id: selene-docker
   name: selene (docker)
   description: An opinionated Lua code linter
   entry: /selene
   language: docker
-  types:
-      - lua
+  types: [lua]
 
 - id: selene-github
   name: selene (GitHub)
   description: An opinionated Lua code linter
-  entry: selene
+  entry: bin/selene
   language: python
-  types:
-      - lua
+  types: [lua]

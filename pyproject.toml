@@ -4,8 +4,10 @@ build-backend = "pseudo_builder"
 
 [tool.release-gitter]
 git-url = "https://github.com/Kampfkarren/selene"
+extract-files = ["selene"]
+destination = "bin"
 format = "selene-{version}-{system}.zip"
-exec = "chmod +x selene"
+exec = "chmod +x bin/selene"
 
 [tool.release-gitter.map-system]
 Darwin = "macos"
