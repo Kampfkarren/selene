@@ -1,0 +1,6 @@
+error[roblox_roact_dangling_connection]: disconnect the connection in the useEffect cleanup function
+  ┌─ with_roact.lua:5:9
+  │
+5 │         a:Connect()
+  │         ^^^^^^^^^^^
+

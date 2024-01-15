@@ -1,0 +1,42 @@
+error[roblox_roact_dangling_connection]: disconnect the connection in the useEffect cleanup function
+   ┌─ roblox_roact_dangling_connection.lua:14:9
+   │
+14 │         a:Connect()
+   │         ^^^^^^^^^^^
+
+error[roblox_roact_dangling_connection]: disconnect the connection in the useEffect cleanup function
+   ┌─ roblox_roact_dangling_connection.lua:15:9
+   │
+15 │         a:connect()
+   │         ^^^^^^^^^^^
+
+error[roblox_roact_dangling_connection]: disconnect the connection in the useEffect cleanup function
+   ┌─ roblox_roact_dangling_connection.lua:17:9
+   │
+17 │         a.b:Connect()
+   │         ^^^^^^^^^^^^^
+
+error[roblox_roact_dangling_connection]: disconnect the connection in the useEffect cleanup function
+   ┌─ roblox_roact_dangling_connection.lua:18:9
+   │
+18 │         a.b:connect()
+   │         ^^^^^^^^^^^^^
+
+error[roblox_roact_dangling_connection]: disconnect the connection in the useEffect cleanup function
+   ┌─ roblox_roact_dangling_connection.lua:20:9
+   │
+20 │         a.b.c:Connect()
+   │         ^^^^^^^^^^^^^^^
+
+error[roblox_roact_dangling_connection]: disconnect the connection in the useEffect cleanup function
+   ┌─ roblox_roact_dangling_connection.lua:21:9
+   │
+21 │         a.b.c:connect()
+   │         ^^^^^^^^^^^^^^^
+
+error[roblox_roact_dangling_connection]: disconnect the connection in the useEffect cleanup function
+   ┌─ roblox_roact_dangling_connection.lua:37:9
+   │
+37 │         a:connect()
+   │         ^^^^^^^^^^^
+
