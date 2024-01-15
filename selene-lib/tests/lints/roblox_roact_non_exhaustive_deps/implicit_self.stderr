@@ -1,0 +1,8 @@
+error[roblox_roact_non_exhaustive_deps]: react hook useEffect has missing dependency: 'a.b'
+   ┌─ implicit_self.lua:12:10
+   │
+12 │     end, { a.b.c })
+   │          ^^^^^^^^^
+   │
+   = help: either include it or remove the dependency array
+

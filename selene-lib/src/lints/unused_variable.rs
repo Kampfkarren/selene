@@ -81,6 +81,7 @@ impl Lint for UnusedVariableLint {
                             if is_static_table
                                 && indexing.len() == 1 // This restriction can be lifted someday, but only once we can verify that the value has no side effects/is its own static table
                                 && indexing.iter().any(|index| index.static_name.is_some())
+                                && indexing.iter().all(|index| !index.is_function_call)
                             {
                                 return AnalyzedReference::ObservedWrite(Label::new_with_message(
                                     reference.identifier,
