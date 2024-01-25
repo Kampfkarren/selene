@@ -70,8 +70,8 @@ This field is used for allowing smarter introspection of how the argument given 
 #### "must_use"
 This field is used for checking if the return value of a function is used.
 
-- `true` - The default. The return value of this function must be used.
-- `false` - The return value of this function does not need to be used.
+- `true` - The return value of this function must be used.
+- `false` - The default. The return value of this function does not need to be used.
 
 Example:
 ```yml
