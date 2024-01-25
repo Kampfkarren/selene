@@ -117,10 +117,6 @@ globals:
       - type:
           display: Vector3
     must_use: true
-<<<<<<< HEAD
-=======
-
->>>>>>> 68a6451ceaf1ec65dccede34473fae71a77b744a
   CFrame.lookAt:
     args:
       - type:
