@@ -67,6 +67,17 @@ This field is used for allowing smarter introspection of how the argument given 
 - "read" - This argument is only read from. Currently unused.
 - "write" - This argument is only written to. Used by `unused_variable` to assist in detecting a variable only being written to, even if passed into a function.
 
+Example:
+```yml
+ table.insert:
+  args:
+    - type: table
+      observes: write # This way, `table.insert(x, 1)` doesn't count as a read to `x`
+    - type: any
+    - required: false
+      type: any
+```
+
 #### "must_use"
 This field is used for checking if the return value of a function is used.
 
@@ -78,10 +89,10 @@ Example:
 table.find:
   args:
     - type: table
-      observes: read  # The table is only read from
-      required: true  # The table to index is a required argument
+      observes: read
+      required: true
     - type: any
-      required: true  # The value to find is a required argument
+      required: true
   must_use: true  # The return value of this function must be used
 ```
 
