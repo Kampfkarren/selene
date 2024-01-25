@@ -109,13 +109,13 @@ globals:
     property: read-only
   CFrame.lookAlong:
     args:
-    - type:
-        display: Vector3
-    - type:
-        display: Vector3
-    - required: false
-      type:
-        display: Vector3
+      - type:
+          display: Vector3
+      - type:
+          display: Vector3
+      - required: false
+        type:
+          display: Vector3
     must_use: true
   CFrame.lookAt:
     args:
