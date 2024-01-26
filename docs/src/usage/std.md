@@ -86,14 +86,10 @@ This field is used for checking if the return value of a function is used.
 
 Example:
 ```yml
-table.find:
-  args:
-    - type: table
-      observes: read
-      required: true
-    - type: any
-      required: true
-  must_use: true  # The return value of this function must be used
+  tostring:
+    args:
+      - type: any
+    must_use: true
 ```
 
 #### Argument types
