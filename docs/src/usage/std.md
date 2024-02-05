@@ -78,6 +78,20 @@ Example:
       type: any
 ```
 
+#### "must_use"
+This field is used for checking if the return value of a function is used.
+
+- `false` - The default. The return value of this function does not need to be used.
+- `true` - The return value of this function must be used.
+
+Example:
+```yml
+  tostring:
+    args:
+      - type: any
+    must_use: true
+```
+
 #### Argument types
 - `"any"` - Allows any value.
 - `"bool"`, `"function"`, `"nil"`, `"number"`, `"string"`, `"table"` - Expects a value of the respective type.
