@@ -29,7 +29,7 @@ export async function getLatestSeleneRelease(): Promise<GithubRelease> {
         headers: {
             "User-Agent": "selene-vscode",
         },
-    }).then((body: any) => {
+    }).then((body) => {
         return JSON.parse(body) as GithubRelease
     })
 }
