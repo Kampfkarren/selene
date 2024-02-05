@@ -236,6 +236,18 @@ type: &quot;any&quot; | &quot;bool&quot; | &quot;function&quot; | &quot;nil&quot
     - required: false
       type: any
 </code></pre>
+<h4 id="must_use"><a class="header" href="#must_use">&quot;must_use&quot;</a></h4>
+<p>This field is used for checking if the return value of a function is used.</p>
+<ul>
+<li><code>false</code> - The default. The return value of this function does not need to be used.</li>
+<li><code>true</code> - The return value of this function must be used.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-yml">  tostring:
+    args:
+      - type: any
+    must_use: true
+</code></pre>
 <h4 id="argument-types"><a class="header" href="#argument-types">Argument types</a></h4>
 <ul>
 <li><code>&quot;any&quot;</code> - Allows any value.</li>

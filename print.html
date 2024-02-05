@@ -579,6 +579,18 @@ type: &quot;any&quot; | &quot;bool&quot; | &quot;function&quot; | &quot;nil&quot
     - required: false
       type: any
 </code></pre>
+<h4 id="must_use"><a class="header" href="#must_use">&quot;must_use&quot;</a></h4>
+<p>This field is used for checking if the return value of a function is used.</p>
+<ul>
+<li><code>false</code> - The default. The return value of this function does not need to be used.</li>
+<li><code>true</code> - The return value of this function must be used.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-yml">  tostring:
+    args:
+      - type: any
+    must_use: true
+</code></pre>
 <h4 id="argument-types"><a class="header" href="#argument-types">Argument types</a></h4>
 <ul>
 <li><code>&quot;any&quot;</code> - Allows any value.</li>
@@ -1181,7 +1193,7 @@ log(&quot;LOG MESSAGE&quot;, &quot;Something happened!&quot;)
 bar()
 baz()
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="must_use"><a class="header" href="#must_use">must_use</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="must_use-1"><a class="header" href="#must_use-1">must_use</a></h1>
 <h2 id="what-it-does-16"><a class="header" href="#what-it-does-16">What it does</a></h2>
 <p>Checks that the return values of functions <a href="lints/../usage/std.html#must_use">marked <code>must_use</code></a> are used.</p>
 <h2 id="why-this-is-bad-15"><a class="header" href="#why-this-is-bad-15">Why this is bad</a></h2>
