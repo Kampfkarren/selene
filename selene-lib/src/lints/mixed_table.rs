@@ -30,7 +30,7 @@ impl Lint for MixedTableLint {
         for mixed_table in visitor.mixed_tables {
             diagnostics.push(Diagnostic::new_complete(
                 "mixed_table",
-                "mixed tables are not allowed".to_owned(),
+                "mixed tables should be avoided, as they can cause confusing and hard to debug issues such as during iteration or encoding".to_owned(),
                 Label::new(mixed_table.range),
                 vec!["help: change this table to either an array or dictionary".to_owned()],
                 Vec::new(),
