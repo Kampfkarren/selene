@@ -189,18 +189,18 @@ foo(1, 2, 3) -- error, function takes 2 arguments, but 3 were supplied
 <code>foo(1)</code> could be used when meaning <code>foo(1, nil)</code>.</p>
 <p>If a defined function is reassigned anywhere in the program, it will try to match the best possible overlap. Take this example:</p>
 <pre><code class="language-lua">local function foo(a, b, c)
-    print(&quot;a&quot;)
+    print("a")
 end
 
 function updateFoo()
     foo = function(a, b, c, d)
-        print(&quot;b&quot;)
+        print("b")
     end
 end
 
-foo(1, 2, 3, 4) --&gt; &quot;a&quot; [mismatched args, but selene doesn't know]
+foo(1, 2, 3, 4) --&gt; "a" [mismatched args, but selene doesn't know]
 updateFoo()
-foo(1, 2, 3, 4) --&gt; &quot;b&quot; [no more mismatched args]
+foo(1, 2, 3, 4) --&gt; "b" [no more mismatched args]
 </code></pre>
 <p>selene can not tell that <code>foo</code> corresponds to a new definition because <code>updateFoo()</code> was called in the current context, without actually <em>running</em> the program.</p>
 <p>However, this would still lint properly:</p>
@@ -215,7 +215,7 @@ else
 end
 
 -- No definition of `log` takes more than 1 argument, so this will lint.
-log(&quot;LOG MESSAGE&quot;, &quot;Something happened!&quot;)
+log("LOG MESSAGE", "Something happened!")
 </code></pre>
 
                     </main>

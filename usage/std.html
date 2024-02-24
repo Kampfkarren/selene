@@ -210,22 +210,22 @@ globals:
 <p>If <code>method</code> is specified as <code>true</code> and the function is inside a table, then it will require the function be called in the form of <code>Table:FunctionName()</code>, instead of <code>Table.FunctionName()</code>.</p>
 <p><code>args</code> is an array of arguments, in order of how they're used in the function. An argument is in the form of:</p>
 <pre><code>required?: false | true | string;
-type: &quot;any&quot; | &quot;bool&quot; | &quot;function&quot; | &quot;nil&quot;
-    | &quot;number&quot; | &quot;string&quot; | &quot;table&quot; | &quot;...&quot;
-    | string[] | { &quot;display&quot;: string }
+type: "any" | "bool" | "function" | "nil"
+    | "number" | "string" | "table" | "..."
+    | string[] | { "display": string }
 </code></pre>
-<h4 id="required"><a class="header" href="#required">&quot;required&quot;</a></h4>
+<h4 id="required"><a class="header" href="#required">"required"</a></h4>
 <ul>
 <li><code>true</code> - The default, this argument is required.</li>
 <li><code>false</code> - This argument is optional.</li>
 <li>A string - This argument is required, and not using it will give this as the reason why.</li>
 </ul>
-<h4 id="observes"><a class="header" href="#observes">&quot;observes&quot;</a></h4>
+<h4 id="observes"><a class="header" href="#observes">"observes"</a></h4>
 <p>This field is used for allowing smarter introspection of how the argument given is used.</p>
 <ul>
-<li>&quot;read-write&quot; - The default. This argument is potentially both written to and read from.</li>
-<li>&quot;read&quot; - This argument is only read from. Currently unused.</li>
-<li>&quot;write&quot; - This argument is only written to. Used by <code>unused_variable</code> to assist in detecting a variable only being written to, even if passed into a function.</li>
+<li>"read-write" - The default. This argument is potentially both written to and read from.</li>
+<li>"read" - This argument is only read from. Currently unused.</li>
+<li>"write" - This argument is only written to. Used by <code>unused_variable</code> to assist in detecting a variable only being written to, even if passed into a function.</li>
 </ul>
 <p>Example:</p>
 <pre><code class="language-yml"> table.insert:
@@ -236,7 +236,7 @@ type: &quot;any&quot; | &quot;bool&quot; | &quot;function&quot; | &quot;nil&quot
     - required: false
       type: any
 </code></pre>
-<h4 id="must_use"><a class="header" href="#must_use">&quot;must_use&quot;</a></h4>
+<h4 id="must_use"><a class="header" href="#must_use">"must_use"</a></h4>
 <p>This field is used for checking if the return value of a function is used.</p>
 <ul>
 <li><code>false</code> - The default. The return value of this function does not need to be used.</li>
@@ -250,11 +250,11 @@ type: &quot;any&quot; | &quot;bool&quot; | &quot;function&quot; | &quot;nil&quot
 </code></pre>
 <h4 id="argument-types"><a class="header" href="#argument-types">Argument types</a></h4>
 <ul>
-<li><code>&quot;any&quot;</code> - Allows any value.</li>
-<li><code>&quot;bool&quot;</code>, <code>&quot;function&quot;</code>, <code>&quot;nil&quot;</code>, <code>&quot;number&quot;</code>, <code>&quot;string&quot;</code>, <code>&quot;table&quot;</code> - Expects a value of the respective type.</li>
-<li><code>&quot;...&quot;</code> - Allows any number of variables after this one. If <code>required</code> is true (it is by default), then this will lint if no additional arguments are given. It is incorrect to have this in the middle.</li>
-<li>Constant list of strings - Will check if the value provided is one of the strings in the list. For example, <code>collectgarbage</code> only takes one of a few exact string arguments--doing <code>collectgarbage(&quot;count&quot;)</code> will work, but <code>collectgarbage(&quot;whoops&quot;)</code> won't.</li>
-<li><code>{ &quot;display&quot;: string }</code> - Used when no constant could possibly be correct. If a constant is used, selene will tell the user that an argument of the type (display) is required. For an example, the Roblox method <code>Color3.toHSV</code> expects a <code>Color3</code> object--no constant inside it could be correct, so this is defined as:</li>
+<li><code>"any"</code> - Allows any value.</li>
+<li><code>"bool"</code>, <code>"function"</code>, <code>"nil"</code>, <code>"number"</code>, <code>"string"</code>, <code>"table"</code> - Expects a value of the respective type.</li>
+<li><code>"..."</code> - Allows any number of variables after this one. If <code>required</code> is true (it is by default), then this will lint if no additional arguments are given. It is incorrect to have this in the middle.</li>
+<li>Constant list of strings - Will check if the value provided is one of the strings in the list. For example, <code>collectgarbage</code> only takes one of a few exact string arguments--doing <code>collectgarbage("count")</code> will work, but <code>collectgarbage("whoops")</code> won't.</li>
+<li><code>{ "display": string }</code> - Used when no constant could possibly be correct. If a constant is used, selene will tell the user that an argument of the type (display) is required. For an example, the Roblox method <code>Color3.toHSV</code> expects a <code>Color3</code> object--no constant inside it could be correct, so this is defined as:</li>
 </ul>
 <pre><code class="language-yaml">---
 globals:
@@ -276,10 +276,10 @@ globals:
 </code></pre>
 <p>The value of property tells selene how it can be mutated and used:</p>
 <ul>
-<li><code>&quot;read-only&quot;</code> - New fields cannot be added or set, and the variable itself cannot be redefined.</li>
-<li><code>&quot;new-fields&quot;</code> - New fields can be added and set, but variable itself cannot be redefined. In the case of _G, it means that <code>_G = &quot;foo&quot;</code> is linted against.</li>
-<li><code>&quot;override-fields&quot;</code> - New fields can't be added, but entire variable can be overridden. In the case of Roblox's <code>Instance.Name</code>, it means we can do <code>Instance.Name = &quot;Hello&quot;</code>, but not <code>Instance.Name.Call()</code>.</li>
-<li><code>&quot;full-write&quot;</code> - New fields can be added and entire variable can be overridden.</li>
+<li><code>"read-only"</code> - New fields cannot be added or set, and the variable itself cannot be redefined.</li>
+<li><code>"new-fields"</code> - New fields can be added and set, but variable itself cannot be redefined. In the case of _G, it means that <code>_G = "foo"</code> is linted against.</li>
+<li><code>"override-fields"</code> - New fields can't be added, but entire variable can be overridden. In the case of Roblox's <code>Instance.Name</code>, it means we can do <code>Instance.Name = "Hello"</code>, but not <code>Instance.Name.Call()</code>.</li>
+<li><code>"full-write"</code> - New fields can be added and entire variable can be overridden.</li>
 </ul>
 <h3 id="struct"><a class="header" href="#struct">Struct</a></h3>
 <pre><code class="language-yaml">---
@@ -306,9 +306,9 @@ globals:
       - type: table
       - type: number
     deprecated:
-      message: &quot;`table.getn` has been superseded by #.&quot;
+      message: "`table.getn` has been superseded by #."
       replace:
-        - &quot;#%1&quot;
+        - "#%1"
 </code></pre>
 <p>The deprecated field consists of two subfields.</p>
 <p><code>message</code> is required, and is a human readable explanation of what the deprecation is, and potentially why.</p>
@@ -324,11 +324,11 @@ globals:
 globals:
   call:
     deprecated:
-      message: &quot;call will be removed in the next version&quot;
+      message: "call will be removed in the next version"
       replace:
-        - &quot;newcall(%...)&quot;
+        - "newcall(%...)"
     args:
-      - type: &quot;...&quot;
+      - type: "..."
         required: false
 </code></pre>
 <p>...will suggest <code>newcall(1, 2, 3)</code> for <code>call(1, 2, 3)</code>, and <code>newcall()</code> for <code>call()</code>.</p>
@@ -359,11 +359,11 @@ structs:
 <p>...and selene will know that <code>workspace.Changed:Connect(callback)</code> is valid, but <code>workspace.Changed:RandomNameHere()</code> is not.</p>
 <h2 id="wildcards"><a class="header" href="#wildcards">Wildcards</a></h2>
 <p>Fields can specify requirements if a field is referenced that is not explicitly named. For example, in Roblox, instances can have arbitrary fields of other instances (<code>workspace.Baseplate</code> indexes an instance named Baseplate inside <code>workspace</code>, but <code>Baseplate</code> is nowhere in the Roblox API).</p>
-<p>We can specify this behavior by using the special <code>&quot;*&quot;</code> field.</p>
+<p>We can specify this behavior by using the special <code>"*"</code> field.</p>
 <pre><code class="language-yaml">workspace.*:
   struct: Instance
 </code></pre>
-<p>This will tell selene &quot;any field accessed from <code>workspace</code> that doesn't exist must be an Instance <a href="#structs">struct</a>&quot;.</p>
+<p>This will tell selene "any field accessed from <code>workspace</code> that doesn't exist must be an Instance <a href="#structs">struct</a>".</p>
 <p>Wildcards can even be used in succession. For example, consider the following:</p>
 <pre><code class="language-yaml">script.Name:
   property: override-fields
@@ -373,7 +373,7 @@ script.*.*:
 </code></pre>
 <p>Ignoring the wildcard, so far this means:</p>
 <ul>
-<li><code>script.Name = &quot;Hello&quot;</code> <em>will</em> work.</li>
+<li><code>script.Name = "Hello"</code> <em>will</em> work.</li>
 <li><code>script = nil</code> <em>will not</em> work, because the writability of <code>script</code> is not specified.</li>
 <li><code>script.Name.UhOh</code> <em>will not</em> work, because <code>script.Name</code> does not have fields.</li>
 </ul>
@@ -386,7 +386,7 @@ script.*.*:
 <h2 id="internal-properties"><a class="header" href="#internal-properties">Internal properties</a></h2>
 <p>There are some properties that exist in standard library YAMLs that exist specifically for internal purposes. This is merely a reference, but these are not guaranteed to be stable.</p>
 <h3 id="name"><a class="header" href="#name">name</a></h3>
-<p>This specifies the name of the standard library. This is used internally for cases such as only giving Roblox lints if the standard library is named <code>&quot;roblox&quot;</code>.</p>
+<p>This specifies the name of the standard library. This is used internally for cases such as only giving Roblox lints if the standard library is named <code>"roblox"</code>.</p>
 <h3 id="last_updated"><a class="header" href="#last_updated">last_updated</a></h3>
 <p>A timestamp of when the standard library was last updated. This is used by the Roblox standard library generator to update when it gets too old.</p>
 <h3 id="last_selene_version"><a class="header" href="#last_selene_version">last_selene_version</a></h3>

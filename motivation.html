@@ -209,7 +209,7 @@ end
 <p>Other bugs arise because of Lua's lack of typing. While it can feel freeing to developers to not have to specify types everywhere, it makes it easier to mess up and write broken code. For example, take the following code:</p>
 <pre><code class="language-lua">for _, shop in pairs(GoldShop, ItemShop, MedicineShop) do
 </code></pre>
-<p>This code is yet again technically correct, but not what we wanted to do. <code>pairs</code> will take the first argument, <code>GoldShop</code>, and ignore the rest. Worse, the <code>shop</code> variable will now be the values of the contents of <code>GoldShop</code>, not the shop itself. This can cause massive headaches, since although you're likely to get an error later down the line, it's more likely it'll be in the vein of &quot;attempt to index a nil value <code>items</code>&quot; than something more helpful. If you used <code>ipairs</code> instead of <code>pairs</code>, your code inside might just not run, and won't produce an error at all.</p>
+<p>This code is yet again technically correct, but not what we wanted to do. <code>pairs</code> will take the first argument, <code>GoldShop</code>, and ignore the rest. Worse, the <code>shop</code> variable will now be the values of the contents of <code>GoldShop</code>, not the shop itself. This can cause massive headaches, since although you're likely to get an error later down the line, it's more likely it'll be in the vein of "attempt to index a nil value <code>items</code>" than something more helpful. If you used <code>ipairs</code> instead of <code>pairs</code>, your code inside might just not run, and won't produce an error at all.</p>
 <p>Yet again, selene saves us.</p>
 <pre><code>error[incorrect_standard_library_use]: standard library function `pairs` requires 1 parameters, 3 passed
 
@@ -238,7 +238,7 @@ end
    │
 </code></pre>
 <p>Furthermore, selene is meant to be easy for developers to add their own lints to. You could create your own lints for your team to prevent behavior that is non-idiomatic to the codebase. For example, let's say you're working on a <a href="https://developer.roblox.com/en-us">Roblox</a> codebase, and you don't want your developers using the data storage methods directly. You could create your own lint so that this code:</p>
-<pre><code class="language-lua">local DataStoreService = game:GetService(&quot;DataStoreService&quot;)
+<pre><code class="language-lua">local DataStoreService = game:GetService("DataStoreService")
 </code></pre>
 <p>...creates a warning, discouraging its use. For more information on how to create your own lints, check out the <a href="contributing.html">contribution guide</a>.</p>
 

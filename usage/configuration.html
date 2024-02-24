@@ -179,17 +179,17 @@
 <h2 id="changing-the-severity-of-lints"><a class="header" href="#changing-the-severity-of-lints">Changing the severity of lints</a></h2>
 <p>You can change the severity of lints by entering the following into selene.toml:</p>
 <pre><code class="language-toml">[lints]
-lint_1 = &quot;severity&quot;
-lint_2 = &quot;severity&quot;
+lint_1 = "severity"
+lint_2 = "severity"
 ...
 </code></pre>
-<p>Where &quot;severity&quot; is one of the following:</p>
+<p>Where "severity" is one of the following:</p>
 <ul>
-<li><code>&quot;allow&quot;</code> - Don't check for this lint</li>
-<li><code>&quot;warn&quot;</code> - Warn for this lint</li>
-<li><code>&quot;deny&quot;</code> - Error for this lint</li>
+<li><code>"allow"</code> - Don't check for this lint</li>
+<li><code>"warn"</code> - Warn for this lint</li>
+<li><code>"deny"</code> - Error for this lint</li>
 </ul>
-<p>Note that &quot;deny&quot; and &quot;warn&quot; are effectively the same, only warn will give orange text while error gives red text, and they both have different counters.</p>
+<p>Note that "deny" and "warn" are effectively the same, only warn will give orange text while error gives red text, and they both have different counters.</p>
 <h2 id="configuring-specific-lints"><a class="header" href="#configuring-specific-lints">Configuring specific lints</a></h2>
 <p>You can configure specific lints by entering the following into selene.toml:</p>
 <pre><code class="language-toml">[config]
@@ -204,19 +204,19 @@ empty_if = { comments_count = true }
 <h2 id="setting-the-standard-library"><a class="header" href="#setting-the-standard-library">Setting the standard library</a></h2>
 <p>Many lints use standard libraries for either verifying their correct usage or for knowing that variables exist where they otherwise wouldn't.</p>
 <p>By default, selene uses Lua 5.1, though if we wanted to use the Lua 5.2 standard library, we would write:</p>
-<pre><code class="language-toml">std = &quot;lua52&quot;
+<pre><code class="language-toml">std = "lua52"
 </code></pre>
 <p>...at the top of selene.toml. You can learn more about the standard library format on the <a href="./std.html">standard library guide</a>. The standard library given can either be one of the builtin ones (currently only <code>lua51</code> and <code>lua52</code>) or the filename of a standard library file in this format. For example, if we had a file named <code>special.toml</code>, we would write:</p>
-<pre><code class="language-toml">std = &quot;special&quot;
+<pre><code class="language-toml">std = "special"
 </code></pre>
 <h3 id="chaining-the-standard-library"><a class="header" href="#chaining-the-standard-library">Chaining the standard library</a></h3>
 <p>We can chain together multiple standard libraries by simply using a plus sign (<code>+</code>) in between the names.</p>
 <p>For example, if we had <code>game.toml</code> and <code>engine.toml</code> standard libraries, we could chain them together like so:</p>
-<pre><code class="language-toml">std = &quot;game+engine&quot;
+<pre><code class="language-toml">std = "game+engine"
 </code></pre>
 <h3 id="excluding-files-from-being-linted"><a class="header" href="#excluding-files-from-being-linted">Excluding files from being linted</a></h3>
 <p>It is possible to exclude files from being linted using the exclude option:</p>
-<pre><code class="language-toml">exclude = [&quot;external/*&quot;, &quot;*.spec.lua&quot;]
+<pre><code class="language-toml">exclude = ["external/*", "*.spec.lua"]
 </code></pre>
 
                     </main>

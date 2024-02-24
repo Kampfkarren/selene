@@ -182,23 +182,23 @@
 <pre><code class="language-lua">local foo = {
     a = 1,
     b = 5,
-    [&quot;a&quot;] = 3, -- duplicate definition
+    ["a"] = 3, -- duplicate definition
     c = 3,
     b = 1, -- duplicate definition
 }
 
 local bar = {
-    &quot;foo&quot;,
-    &quot;bar&quot;,
-    [1524] = &quot;hello&quot;,
-    &quot;baz&quot;,
-    &quot;foobar&quot;,
-    [2] = &quot;goodbye&quot;, -- duplicate to `bar` which has key `2`
+    "foo",
+    "bar",
+    [1524] = "hello",
+    "baz",
+    "foobar",
+    [2] = "goodbye", -- duplicate to `bar` which has key `2`
 }
 </code></pre>
 <h2 id="remarks"><a class="header" href="#remarks">Remarks</a></h2>
 <p>Only handles keys which constant string/number literals or named (such as <code>{ a = true }</code>).
-Array-like values are also handled, where <code>{&quot;foo&quot;}</code> is implicitly handled as <code>{ [1] = &quot;foo&quot; }</code>.</p>
+Array-like values are also handled, where <code>{"foo"}</code> is implicitly handled as <code>{ [1] = "foo" }</code>.</p>
 
                     </main>
 

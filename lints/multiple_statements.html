@@ -179,11 +179,11 @@
 <h2 id="why-this-is-bad"><a class="header" href="#why-this-is-bad">Why this is bad</a></h2>
 <p>This can make your code difficult to read.</p>
 <h2 id="configuration"><a class="header" href="#configuration">Configuration</a></h2>
-<p><code>one_line_if</code> (default: <code>&quot;break-return-only&quot;</code>) - Defines whether or not one line if statements should be allowed. One of three options:</p>
+<p><code>one_line_if</code> (default: <code>"break-return-only"</code>) - Defines whether or not one line if statements should be allowed. One of three options:</p>
 <ul>
-<li>&quot;break-return-only&quot; (default) - <code>if x then return end</code> or <code>if x then break end</code> is ok, but <code>if x then call() end</code> is not.</li>
-<li>&quot;allow&quot; - All one line if statements are allowed.</li>
-<li>&quot;deny&quot; - No one line if statements are allowed.</li>
+<li>"break-return-only" (default) - <code>if x then return end</code> or <code>if x then break end</code> is ok, but <code>if x then call() end</code> is not.</li>
+<li>"allow" - All one line if statements are allowed.</li>
+<li>"deny" - No one line if statements are allowed.</li>
 </ul>
 <h2 id="example"><a class="header" href="#example">Example</a></h2>
 <pre><code class="language-lua">foo() bar() baz()

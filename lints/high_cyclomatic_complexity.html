@@ -182,17 +182,17 @@
 <p><code>maximum_complexity</code> (default: <code>40</code>) - A number that determines the maximum threshold for cyclomatic complexity, beyond which the lint will report.</p>
 <h2 id="example"><a class="header" href="#example">Example</a></h2>
 <pre><code class="language-lua">function MyComponent(props)
-    if props.option1 == &quot;enum_value1&quot; then          -- 1st path
-        return React.createElement(&quot;Instance&quot;)
-    elseif props.option1 == &quot;enum_value2&quot;           -- 2nd path
+    if props.option1 == "enum_value1" then          -- 1st path
+        return React.createElement("Instance")
+    elseif props.option1 == "enum_value2"           -- 2nd path
       or props.option2 == nil then                  -- 3rd path
         return React.createElement(
-          &quot;TextLabel&quot;,
-          { Text = if _G.__DEV__ then &quot;X&quot; else &quot;Y&quot; }-- 4th path
+          "TextLabel",
+          { Text = if _G.__DEV__ then "X" else "Y" }-- 4th path
         )
     else
         return if props.option2 == true             -- 5th path
-          then React.createElement(&quot;Frame&quot;)
+          then React.createElement("Frame")
           else nil
     end
 end
@@ -200,7 +200,7 @@ end
 <h2 id="remarks"><a class="header" href="#remarks">Remarks</a></h2>
 <p>This lint is off by default. In order to enable it, add this to your selene.toml:</p>
 <pre><code class="language-toml">[lints]
-high_cyclomatic_complexity = &quot;warn&quot; # Or &quot;deny&quot;
+high_cyclomatic_complexity = "warn" # Or "deny"
 </code></pre>
 
                     </main>

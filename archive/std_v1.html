@@ -189,7 +189,7 @@
 <h2 id="selene"><a class="header" href="#selene">[selene]</a></h2>
 <p>Anything under the key <code>[selene]</code> is used for meta information. The following paths are accepted:</p>
 <p><code>[selene.base]</code> - Used for specifying what standard library to be based off of. Currently only accepts built in standard libraries, meaning <code>lua51</code> or <code>lua52</code>.</p>
-<p><code>[selene.name]</code> - Used for specifying the name of the standard library. Used internally for cases such as only giving Roblox lints if the standard library is named <code>&quot;roblox&quot;</code>.</p>
+<p><code>[selene.name]</code> - Used for specifying the name of the standard library. Used internally for cases such as only giving Roblox lints if the standard library is named <code>"roblox"</code>.</p>
 <p><code>[selene.structs]</code> - Used for declaring <a href="#structs">structs</a>.</p>
 <h2 id="globals"><a class="header" href="#globals">[globals]</a></h2>
 <p>This is where the magic happens. The <code>globals</code> field is a dictionary where the keys are the globals you want to define. The value you give tells selene what the value can be, do, and provide.</p>
@@ -203,21 +203,21 @@ any = true
 <h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
 <p>Example:</p>
 <pre><code class="language-toml">[[tonumber.args]]
-type = &quot;any&quot;
+type = "any"
 
 [[tonumber.args]]
-type = &quot;number&quot;
+type = "number"
 required = false
 </code></pre>
 <p>A field is a function if it contains an <code>args</code> and/or <code>method</code> field.</p>
 <p>If <code>method</code> is specified as <code>true</code> and the function is inside a table, then it will require the function be called in the form of <code>Table:FunctionName()</code>, instead of <code>Table.FunctionName()</code>.</p>
 <p><code>args</code> is an array of arguments, in order of how they're used in the function. An argument is in the form of:</p>
 <pre><code>required?: false | true | string;
-type: &quot;any&quot; | &quot;bool&quot; | &quot;function&quot; | &quot;nil&quot;
-    | &quot;number&quot; | &quot;string&quot; | &quot;table&quot; | &quot;...&quot;
-    | string[] | { &quot;display&quot;: string }
+type: "any" | "bool" | "function" | "nil"
+    | "number" | "string" | "table" | "..."
+    | string[] | { "display": string }
 </code></pre>
-<h2 id="required"><a class="header" href="#required">&quot;required&quot;</a></h2>
+<h2 id="required"><a class="header" href="#required">"required"</a></h2>
 <ul>
 <li><code>true</code> - The default, this argument is required.</li>
 <li><code>false</code> - This argument is optional.</li>
@@ -225,14 +225,14 @@ type: &quot;any&quot; | &quot;bool&quot; | &quot;function&quot; | &quot;nil&quot
 </ul>
 <h2 id="argument-types"><a class="header" href="#argument-types">Argument types</a></h2>
 <ul>
-<li><code>&quot;any&quot;</code> - Allows any value.</li>
-<li><code>&quot;bool&quot;</code>, <code>&quot;function&quot;</code>, <code>&quot;nil&quot;</code>, <code>&quot;number&quot;</code>, <code>&quot;string&quot;</code>, <code>&quot;table&quot;</code> - Expects a value of the respective type.</li>
-<li><code>&quot;...&quot;</code> - Allows any number of variables after this one. If <code>required</code> is true (it is by default), then this will lint if no additional arguments are given. It is incorrect to have this in the middle.</li>
-<li>Constant list of strings - Will check if the value provided is one of the strings in the list. For example, <code>collectgarbage</code> only takes one of a few exact string arguments--doing <code>collectgarbage(&quot;count&quot;)</code> will work, but <code>collectgarbage(&quot;whoops&quot;)</code> won't.</li>
-<li><code>{ &quot;display&quot;: string }</code> - Used when no constant could possibly be correct. If a constant is used, selene will tell the user that an argument of the type (display) is required. For an example, the Roblox method <code>Color3.toHSV</code> expects a <code>Color3</code> object--no constant inside it could be correct, so this is defined as:</li>
+<li><code>"any"</code> - Allows any value.</li>
+<li><code>"bool"</code>, <code>"function"</code>, <code>"nil"</code>, <code>"number"</code>, <code>"string"</code>, <code>"table"</code> - Expects a value of the respective type.</li>
+<li><code>"..."</code> - Allows any number of variables after this one. If <code>required</code> is true (it is by default), then this will lint if no additional arguments are given. It is incorrect to have this in the middle.</li>
+<li>Constant list of strings - Will check if the value provided is one of the strings in the list. For example, <code>collectgarbage</code> only takes one of a few exact string arguments--doing <code>collectgarbage("count")</code> will work, but <code>collectgarbage("whoops")</code> won't.</li>
+<li><code>{ "display": string }</code> - Used when no constant could possibly be correct. If a constant is used, selene will tell the user that an argument of the type (display) is required. For an example, the Roblox method <code>Color3.toHSV</code> expects a <code>Color3</code> object--no constant inside it could be correct, so this is defined as:</li>
 </ul>
 <pre><code class="language-toml">[[Color3.toHSV.args]]
-type = { display = &quot;Color3&quot; }
+type = { display = "Color3" }
 </code></pre>
 <h2 id="properties"><a class="header" href="#properties">Properties</a></h2>
 <p>Example:</p>
@@ -243,19 +243,19 @@ property = true
 <p>The same goes for <code>_G</code>, which is defined as:</p>
 <pre><code class="language-toml">[_G]
 property = true
-writable = &quot;new-fields&quot;
+writable = "new-fields"
 </code></pre>
 <p><code>writable</code> is an optional field that tells selene how the property can be mutated and used:</p>
 <ul>
-<li><code>&quot;new-fields&quot;</code> - New fields can be added and set, but variable itself cannot be redefined. In the case of _G, it means that <code>_G = &quot;foo&quot;</code> is linted against.</li>
-<li><code>&quot;overridden&quot;</code> - New fields can't be added, but entire variable can be overridden. In the case of Roblox's <code>Instance.Name</code>, it means we can do <code>Instance.Name = &quot;Hello&quot;</code>, but not <code>Instance.Name.Call()</code>.</li>
-<li><code>&quot;full&quot;</code> - New fields can be added and entire variable can be overridden.</li>
+<li><code>"new-fields"</code> - New fields can be added and set, but variable itself cannot be redefined. In the case of _G, it means that <code>_G = "foo"</code> is linted against.</li>
+<li><code>"overridden"</code> - New fields can't be added, but entire variable can be overridden. In the case of Roblox's <code>Instance.Name</code>, it means we can do <code>Instance.Name = "Hello"</code>, but not <code>Instance.Name.Call()</code>.</li>
+<li><code>"full"</code> - New fields can be added and entire variable can be overridden.</li>
 </ul>
 <p>If <code>writable</code> is not specified, selene will assume it can neither have new fields associated with it nor can be overridden.</p>
 <h2 id="struct"><a class="header" href="#struct">Struct</a></h2>
 <p>Example:</p>
 <pre><code class="language-toml">[game]
-struct = &quot;DataModel&quot;
+struct = "DataModel"
 </code></pre>
 <p>Specifies that the field is an instance of a <a href="#structs">struct</a>. The value is the name of the struct.</p>
 <h2 id="table"><a class="header" href="#table">Table</a></h2>
@@ -280,32 +280,32 @@ removed = true
 method = true
 
 [[selene.structs.Event.Connect.args]]
-type = &quot;function&quot;
+type = "function"
 </code></pre>
 <p>From there, it can define:</p>
 <pre><code class="language-toml">[workspace.Changed]
-struct = &quot;Event&quot;
+struct = "Event"
 </code></pre>
 <p>...and selene will know that <code>workspace.Changed:Connect(callback)</code> is valid, but <code>workspace.Changed:RandomNameHere()</code> is not.</p>
 <h2 id="wildcards"><a class="header" href="#wildcards">Wildcards</a></h2>
 <p>Fields can specify requirements if a field is referenced that is not explicitly named. For example, in Roblox, instances can have arbitrary fields of other instances (<code>workspace.Baseplate</code> indexes an instance named Baseplate inside <code>workspace</code>, but <code>Baseplate</code> is nowhere in the Roblox API).</p>
-<p>We can specify this behavior by using the special <code>&quot;*&quot;</code> field.</p>
-<pre><code class="language-toml">[workspace.&quot;*&quot;]
-struct = &quot;Instance&quot;
+<p>We can specify this behavior by using the special <code>"*"</code> field.</p>
+<pre><code class="language-toml">[workspace."*"]
+struct = "Instance"
 </code></pre>
-<p>This will tell selene &quot;any field accessed from <code>workspace</code> that doesn't exist must be an Instance <a href="#structs">struct</a>&quot;.</p>
+<p>This will tell selene "any field accessed from <code>workspace</code> that doesn't exist must be an Instance <a href="#structs">struct</a>".</p>
 <p>Wildcards can even be used in succession. For example, consider the following:</p>
 <pre><code class="language-toml">[script.Name]
 property = true
-writable = &quot;overridden&quot;
+writable = "overridden"
 
-[script.&quot;*&quot;.&quot;*&quot;]
+[script."*"."*"]
 property = true
-writable = &quot;full&quot;
+writable = "full"
 </code></pre>
 <p>Ignoring the wildcard, so far this means:</p>
 <ul>
-<li><code>script.Name = &quot;Hello&quot;</code> <em>will</em> work.</li>
+<li><code>script.Name = "Hello"</code> <em>will</em> work.</li>
 <li><code>script = nil</code> <em>will not</em> work, because the writability of <code>script</code> is not specified.</li>
 <li><code>script.Name.UhOh</code> <em>will not</em> work, because <code>script.Name</code> does not have fields.</li>
 </ul>

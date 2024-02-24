@@ -175,24 +175,24 @@
                     <main>
                         <h1 id="roblox-guide"><a class="header" href="#roblox-guide">Roblox Guide</a></h1>
 <p>selene is built with Roblox development in mind, and has special features for Roblox developers.</p>
-<p>If you try to run selene on a Roblox codebase, you'll get a bunch of errors saying things such as &quot;<code>game</code> is not defined&quot;. This is because these are Roblox specific globals that selene does not know about. You'll need to install the Roblox <a href="./usage/configuration.html">standard library</a> in order to fix these issues, as well as get Roblox specific lints.</p>
+<p>If you try to run selene on a Roblox codebase, you'll get a bunch of errors saying things such as "<code>game</code> is not defined". This is because these are Roblox specific globals that selene does not know about. You'll need to install the Roblox <a href="./usage/configuration.html">standard library</a> in order to fix these issues, as well as get Roblox specific lints.</p>
 <h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
 <p>Thankfully, this process is very simple. All you need to do is edit your <code>selene.toml</code> (or create one) and add the following:</p>
-<pre><code class="language-toml">std = &quot;roblox&quot;
+<pre><code class="language-toml">std = "roblox"
 </code></pre>
-<p>The next time you run selene, or if you use the Visual Studio Code extension and start typing Lua code, a Roblox standard library will be automatically generated and used. This is an automatic process that occurs whenever you don't have a cached standard library file and your <code>selene.toml</code> has <code>std = &quot;roblox&quot;</code>.</p>
+<p>The next time you run selene, or if you use the Visual Studio Code extension and start typing Lua code, a Roblox standard library will be automatically generated and used. This is an automatic process that occurs whenever you don't have a cached standard library file and your <code>selene.toml</code> has <code>std = "roblox"</code>.</p>
 <h2 id="updating-definitions"><a class="header" href="#updating-definitions">Updating definitions</a></h2>
 <p>The Roblox standard library file is updated automatically every 6 hours. If you need an update faster than that, you can run <code>selene update-roblox-std</code> manually.</p>
 <h2 id="testez-support"><a class="header" href="#testez-support">TestEZ Support</a></h2>
 <p>Roblox has provided an open source testing utility called <a href="https://roblox.github.io/testez/">TestEZ</a>, which allows you to write unit tests for your code. Writing unit tests is good practice, but selene will get angry at you if you don't include a <code>testez.yml</code> file and set the standard library to the following:</p>
-<p><code>std = &quot;roblox+testez&quot;</code></p>
+<p><code>std = "roblox+testez"</code></p>
 <p>But first you'll need to create a <code>testez.yml</code> file, which you can do so <a href="https://gist.github.com/Kampfkarren/f2dddc2ebfa4e0662e44b8702e519c2d">with this template</a>.</p>
 <h2 id="pinned-standard-library"><a class="header" href="#pinned-standard-library">Pinned standard library</a></h2>
 <p>There may be cases where you would rather not have selene automatically update the Roblox standard library, such as if speed is critically important and you want to limit potential internet access (generating the standard library requires an active internet connection).</p>
-<p>selene supports &quot;pinning&quot; the standard library to a specific version.</p>
+<p>selene supports "pinning" the standard library to a specific version.</p>
 <p>Add the following to your <code>selene.toml</code> configuration:</p>
 <pre><code class="language-toml"># `floating` by default, meaning it is stored in a cache folder on your system
-roblox-std-source = &quot;pinned&quot;
+roblox-std-source = "pinned"
 </code></pre>
 <p>This will generate the standard library file into <code>roblox.yml</code> where it is run.</p>
 <p>You can also create a <code>roblox.yml</code> file manually with <code>selene generate-roblox-std</code>.</p>
