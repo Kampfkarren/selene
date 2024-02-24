@@ -6,7 +6,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `CFrame.lookAlong` to the Roblox standard library
 
 ### Changed
-- Updated the warning message for the `must_use` lint to include why mixed tables should be avoided
+- Updated the warning message for the `mixed_table` lint to include why mixed tables should be avoided
 
 ## [0.26.1](https://github.com/Kampfkarren/selene/releases/tag/0.26.1) - 2023-11-11
 ### Fixed
