@@ -412,15 +412,28 @@ fn start(mut options: opts::Options) {
 
                 (config_contents, Path::new("-"))
             } else {
-                let config_path = Path::new("selene.toml");
+                let config_paths_to_check = [Path::new("selene.toml"), Path::new(".selene.toml")];
+                let mut config_contents = String::new();
+                let mut config_path = Path::new("");
+                let mut config_not_found = true;
 
-                let config_contents = match fs::read_to_string(config_path) {
-                    Ok(contents) => contents,
-                    Err(error) => {
-                        error!("Error reading config file: {error}");
-                        std::process::exit(1);
+                for path in &config_paths_to_check {
+                    match fs::read_to_string(path) {
+                        Ok(contents) => {
+                            config_contents = contents;
+                            config_path = path;
+                            config_not_found = false;
+                            break;
+                        }
+                        Err(error) => {
+                            error!("Error reading config file: {error}");
+                        }
                     }
-                };
+                }
+
+                if config_not_found {
+                    std::process::exit(1);
+                }
 
                 (config_contents, config_path)
             };
@@ -517,17 +530,23 @@ fn start(mut options: opts::Options) {
                 }
             }
 
-            None => match fs::read_to_string("selene.toml") {
-                Ok(config_contents) => match toml::from_str(&config_contents) {
-                    Ok(config) => (config, None),
-                    Err(error) => {
-                        error!("Config file not in correct format: {}", error);
-                        std::process::exit(1);
-                    }
-                },
+            None => {
+                let read_config_file = |file: &str| -> Option<CheckerConfig<toml::value::Value>> {
+                    let config_contents = fs::read_to_string(file).ok()?;
+                    toml::from_str(&config_contents)
+                        .map_err(|error| {
+                            eprintln!("Error parsing config file {}: {}", file, error);
+                            error
+                        })
+                        .ok()
+                };
 
-                Err(_) => (CheckerConfig::default(), None),
-            },
+                let config = read_config_file("selene.toml")
+                    .or_else(|| read_config_file(".selene.toml"))
+                    .unwrap_or_else(|| CheckerConfig::default());
+
+                (config, None)
+            }
         };
 
     let current_dir = std::env::current_dir().unwrap();
