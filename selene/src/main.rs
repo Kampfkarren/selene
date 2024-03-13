@@ -391,6 +391,15 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     );
 }
 
+fn read_config_file(file: &str) -> Option<CheckerConfig<toml::value::Value>> {
+    let config_contents = fs::read_to_string(file).ok()?;
+    toml::from_str(&config_contents)
+        .map_err(|error| {
+            error!("Error parsing config file {}: {}", file, error);
+        })
+        .ok()
+}
+
 fn start(mut options: opts::Options) {
     *OPTIONS.write().unwrap() = Some(options.clone());
 
@@ -531,15 +540,6 @@ fn start(mut options: opts::Options) {
             }
 
             None => {
-                let read_config_file = |file: &str| -> Option<CheckerConfig<toml::value::Value>> {
-                    let config_contents = fs::read_to_string(file).ok()?;
-                    toml::from_str(&config_contents)
-                        .map_err(|error| {
-                            error!("Error parsing config file {}: {}", file, error);
-                        })
-                        .ok()
-                };
-
                 let config = read_config_file(".selene.toml")
                     .or_else(|| read_config_file("selene.toml"))
                     .unwrap_or_else(|| CheckerConfig::default());
