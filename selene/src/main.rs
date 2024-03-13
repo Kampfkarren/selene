@@ -412,7 +412,7 @@ fn start(mut options: opts::Options) {
 
                 (config_contents, Path::new("-"))
             } else {
-                let config_paths_to_check = [Path::new("selene.toml"), Path::new(".selene.toml")];
+                let config_paths_to_check = [Path::new(".selene.toml"), Path::new("selene.toml")];
                 let mut config_contents = String::new();
                 let mut config_path = Path::new("");
                 let mut config_not_found = true;
@@ -541,8 +541,8 @@ fn start(mut options: opts::Options) {
                         .ok()
                 };
 
-                let config = read_config_file("selene.toml")
-                    .or_else(|| read_config_file(".selene.toml"))
+                let config = read_config_file(".selene.toml")
+                    .or_else(|| read_config_file("selene.toml"))
                     .unwrap_or_else(|| CheckerConfig::default());
 
                 (config, None)
