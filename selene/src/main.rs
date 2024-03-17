@@ -396,6 +396,7 @@ fn read_config_file(file: &str) -> Option<CheckerConfig<toml::value::Value>> {
     toml::from_str(&config_contents)
         .map_err(|error| {
             error!("Error parsing config file {file}: {error}");
+            std::process::exit(1);
         })
         .ok()
 }
