@@ -572,7 +572,7 @@ fn start(mut options: opts::Options) {
 
             None => {
                 let (config, _) = match read_config_file() {
-                    Some((config, config_path)) => (config, config_path),
+                    Some(config) => config,
                     None => (CheckerConfig::default(), None),
                 };
 
