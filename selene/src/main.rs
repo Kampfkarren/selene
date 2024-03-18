@@ -428,20 +428,18 @@ fn start(mut options: opts::Options) {
                 let mut config_not_found = true;
 
                 for path in &config_paths_to_check {
-                    match fs::read_to_string(path) {
-                        Ok(contents) => {
+                    if path.exists() {
+                        if let Ok(contents) = fs::read_to_string(path) {
                             config_contents = contents;
                             config_path = path;
                             config_not_found = false;
                             break;
                         }
-                        Err(error) => {
-                            error!("Error reading config file: {error}");
-                        }
                     }
                 }
 
                 if config_not_found {
+                    error!("Error reading config file");
                     std::process::exit(1);
                 }
 
