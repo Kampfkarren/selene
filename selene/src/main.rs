@@ -391,7 +391,39 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     );
 }
 
-fn read_config_file() -> Option<(CheckerConfig<toml::Value>, Option<PathBuf>)> {
+fn read_config_file_as_string() -> Option<(String, &'static Path)> {
+    let config_paths_to_check = [".selene.toml", "selene.toml"];
+    let mut config_contents = String::new();
+    let mut config_path = None;
+
+    for path in &config_paths_to_check {
+        if let Ok(contents) = fs::read_to_string(path) {
+            config_contents = contents;
+            config_path = Some(PathBuf::from(path)); // Convert str to PathBuf
+            break;
+        }
+    }
+
+    if config_contents.is_empty() {
+        return None;
+    }
+
+    // Create a static variable to hold config_path
+    static mut CONFIG_PATH: Option<PathBuf> = None;
+
+    // If config_path is Some, assign it to the static variable
+    if let Some(path) = config_path {
+        unsafe {
+            CONFIG_PATH = Some(path);
+        }
+    }
+
+    // Parse config_contents into String
+    Some((config_contents, unsafe { CONFIG_PATH.as_ref().unwrap().as_path() }))
+}
+
+
+fn read_config_file_as_checkerconfig() -> Option<(CheckerConfig<toml::Value>, Option<PathBuf>)> {
     let config_paths_to_check = [".selene.toml", "selene.toml"];
     let mut config_contents = String::new();
     let mut config_path = None;
@@ -440,42 +472,15 @@ fn start(mut options: opts::Options) {
 
                 (config_contents, Path::new("-"))
             } else {
+                let (config_content, config_path) = match read_config_file_as_string() {
+                    Some((config_content, config_path)) => (config_content, config_path),
+                    None => {
+                      error!("Error reading config file");
+                      std::process::exit(1);
+                    },
+                };
 
-                // How it should look
-                // let (config, config_path) = match read_config_file() {
-                //     Some((config, config_path)) => (config, config_path),
-                //     None => {
-                //       error!("Error reading config file");
-                //       std::process::exit(1);
-                //     },
-                // };
-                //
-                // (config, config_path)
-
-
-                // validate config
-                let config_paths_to_check = [Path::new(".selene.toml"), Path::new("selene.toml")];
-                let mut config_contents = String::new();
-                let mut config_path = Path::new("");
-                let mut config_not_found = true;
-
-                for path in &config_paths_to_check {
-                    if path.exists() {
-                        if let Ok(contents) = fs::read_to_string(path) {
-                            config_contents = contents;
-                            config_path = path;
-                            config_not_found = false;
-                            break;
-                        }
-                    }
-                }
-
-                if config_not_found {
-                    error!("Error reading config file");
-                    std::process::exit(1);
-                }
-
-                (config_contents, config_path)
+                (config_content, config_path)
             };
 
             if let Err(error) = validate_config::validate_config(
@@ -571,7 +576,7 @@ fn start(mut options: opts::Options) {
             }
 
             None => {
-                let (config, _) = match read_config_file() {
+                let (config, _) = match read_config_file_as_checkerconfig() {
                     Some(config) => config,
                     None => (CheckerConfig::default(), None),
                 };
