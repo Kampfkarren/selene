@@ -391,14 +391,32 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     );
 }
 
-fn read_config_file(file: &str) -> Option<CheckerConfig<toml::value::Value>> {
-    let config_contents = fs::read_to_string(file).ok()?;
-    toml::from_str(&config_contents)
+fn read_config_file() -> Option<(CheckerConfig<toml::Value>, Option<PathBuf>)> {
+    let config_paths_to_check = [".selene.toml", "selene.toml"];
+    let mut config_contents = String::new();
+    let mut config_path = None;
+
+    for path in &config_paths_to_check {
+        if let Ok(contents) = fs::read_to_string(path) {
+            config_contents = contents;
+            config_path = Some(PathBuf::from(path)); // Convert str to PathBuf
+            break;
+        }
+    }
+
+    if config_contents.is_empty() {
+        return None;
+    }
+
+    // Parse config_contents into CheckerConfig<toml::Value>
+    let config = toml::from_str(&config_contents)
         .map_err(|error| {
-            error!("Error parsing config file {file}: {error}");
+            error!("Error parsing config file: {}", error);
             std::process::exit(1);
         })
-        .ok()
+        .ok()?;
+
+    Some((config, config_path))
 }
 
 fn start(mut options: opts::Options) {
@@ -422,6 +440,20 @@ fn start(mut options: opts::Options) {
 
                 (config_contents, Path::new("-"))
             } else {
+
+                // How it should look
+                // let (config, config_path) = match read_config_file() {
+                //     Some((config, config_path)) => (config, config_path),
+                //     None => {
+                //       error!("Error reading config file");
+                //       std::process::exit(1);
+                //     },
+                // };
+                //
+                // (config, config_path)
+
+
+                // validate config
                 let config_paths_to_check = [Path::new(".selene.toml"), Path::new("selene.toml")];
                 let mut config_contents = String::new();
                 let mut config_path = Path::new("");
@@ -539,9 +571,10 @@ fn start(mut options: opts::Options) {
             }
 
             None => {
-                let config = read_config_file(".selene.toml")
-                    .or_else(|| read_config_file("selene.toml"))
-                    .unwrap_or_else(|| CheckerConfig::default());
+                let (config, _) = match read_config_file() {
+                    Some((config, config_path)) => (config, config_path),
+                    None => (CheckerConfig::default(), None),
+                };
 
                 (config, None)
             }
