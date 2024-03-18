@@ -391,7 +391,7 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     );
 }
 
-/// It reads a config file. It returns content and path. None if not found or empty.
+/// Reads a config file and return content and path. None if not found or empty.
 fn read_config_file() -> Option<(String, Option<PathBuf>)> {
     let config_paths_to_check = [".selene.toml", "selene.toml"];
     let mut config_contents = String::new();
