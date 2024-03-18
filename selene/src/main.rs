@@ -412,7 +412,7 @@ fn read_config_file() -> Option<(String, Option<PathBuf>)> {
     Some((config_contents, config_path))
 }
 
-/// Read the config file and return it as Option<(String, &'static Path)>.
+/// Read the config file and return it as `Option<(String, &'static Path)>`.
 fn parse_config_file_as_string() -> Option<(String, &'static Path)> {
     if let Some((config_contents, config_path)) = read_config_file() {
         if let Some(path) = config_path {
@@ -425,7 +425,7 @@ fn parse_config_file_as_string() -> Option<(String, &'static Path)> {
     None
 }
 
-/// Read the config file and return it as CheckerConfig<toml::Value>, Option<PathBuf>.
+/// Read the config file and return it as `CheckerConfig<toml::Value>, Option<PathBuf>`.
 fn parse_config_file_as_checkerconfig() -> Option<(CheckerConfig<toml::Value>, Option<PathBuf>)> {
     if let Some((config_contents, config_path)) = read_config_file() {
         match toml::from_str(&config_contents) {
