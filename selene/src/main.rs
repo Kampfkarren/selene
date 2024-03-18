@@ -391,7 +391,8 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     );
 }
 
-fn read_config_file_as_string() -> Option<(String, &'static Path)> {
+/// It reads a config file. It returns content and path. None if not found or empty.
+fn read_config_file() -> Option<(String, Option<PathBuf>)> {
     let config_paths_to_check = [".selene.toml", "selene.toml"];
     let mut config_contents = String::new();
     let mut config_path = None;
@@ -399,7 +400,7 @@ fn read_config_file_as_string() -> Option<(String, &'static Path)> {
     for path in &config_paths_to_check {
         if let Ok(contents) = fs::read_to_string(path) {
             config_contents = contents;
-            config_path = Some(PathBuf::from(path)); // Convert str to PathBuf
+            config_path = Some(PathBuf::from(path));
             break;
         }
     }
@@ -408,47 +409,35 @@ fn read_config_file_as_string() -> Option<(String, &'static Path)> {
         return None;
     }
 
-    // Create a static variable to hold config_path
-    static mut CONFIG_PATH: Option<PathBuf> = None;
-
-    // If config_path is Some, assign it to the static variable
-    if let Some(path) = config_path {
-        unsafe {
-            CONFIG_PATH = Some(path);
-        }
-    }
-
-    // Parse config_contents into String
-    Some((config_contents, unsafe { CONFIG_PATH.as_ref().unwrap().as_path() }))
+    Some((config_contents, config_path))
 }
 
-
-fn read_config_file_as_checkerconfig() -> Option<(CheckerConfig<toml::Value>, Option<PathBuf>)> {
-    let config_paths_to_check = [".selene.toml", "selene.toml"];
-    let mut config_contents = String::new();
-    let mut config_path = None;
-
-    for path in &config_paths_to_check {
-        if let Ok(contents) = fs::read_to_string(path) {
-            config_contents = contents;
-            config_path = Some(PathBuf::from(path)); // Convert str to PathBuf
-            break;
+/// Read the config file and return it as Option<(String, &'static Path)>.
+fn parse_config_file_as_string() -> Option<(String, &'static Path)> {
+    if let Some((config_contents, config_path)) = read_config_file() {
+        if let Some(path) = config_path {
+            return Some((config_contents, Box::leak(Box::new(path)).as_path()));
         }
+    } else {
+        error!("Error reading config file");
+        std::process::exit(1);
     }
+    None
+}
 
-    if config_contents.is_empty() {
-        return None;
+/// Read the config file and return it as CheckerConfig<toml::Value>, Option<PathBuf>.
+fn parse_config_file_as_checkerconfig() -> Option<(CheckerConfig<toml::Value>, Option<PathBuf>)> {
+    if let Some((config_contents, config_path)) = read_config_file() {
+        match toml::from_str(&config_contents) {
+            Ok(config) => Some((config, config_path)),
+            Err(error) => {
+                error!("Error parsing config file: {}", error);
+                std::process::exit(1);
+            }
+        }
+    } else {
+        None
     }
-
-    // Parse config_contents into CheckerConfig<toml::Value>
-    let config = toml::from_str(&config_contents)
-        .map_err(|error| {
-            error!("Error parsing config file: {}", error);
-            std::process::exit(1);
-        })
-        .ok()?;
-
-    Some((config, config_path))
 }
 
 fn start(mut options: opts::Options) {
@@ -472,14 +461,7 @@ fn start(mut options: opts::Options) {
 
                 (config_contents, Path::new("-"))
             } else {
-                let (config_content, config_path) = match read_config_file_as_string() {
-                    Some((config_content, config_path)) => (config_content, config_path),
-                    None => {
-                      error!("Error reading config file");
-                      std::process::exit(1);
-                    },
-                };
-
+                let (config_content, config_path) = parse_config_file_as_string().unwrap();
                 (config_content, config_path)
             };
 
@@ -576,7 +558,7 @@ fn start(mut options: opts::Options) {
             }
 
             None => {
-                let (config, _) = match read_config_file_as_checkerconfig() {
+                let (config, _) = match parse_config_file_as_checkerconfig() {
                     Some(config) => config,
                     None => (CheckerConfig::default(), None),
                 };
