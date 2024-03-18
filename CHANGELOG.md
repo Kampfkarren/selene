@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.26.1...HEAD)
 ### Added
 - Added `CFrame.lookAlong` to the Roblox standard library
+- Added `.selene.toml` as possible config file, with priority over `selene.toml`.
 
 ### Changed
 - Updated the warning message for the `mixed_table` lint to include why mixed tables should be avoided
