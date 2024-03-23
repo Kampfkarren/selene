@@ -150,8 +150,9 @@ export async function activate(
         const output = await selene.seleneCommand(
             context.globalStorageUri,
             // Must use relative path for now due to https://github.com/Kampfkarren/selene/issues/593
-            "--display-style=json2 --no-summary" +
-                vscode.workspace.asRelativePath(document.uri.fsPath),
+            `--display-style=json2 --no-summary ${vscode.workspace.asRelativePath(
+                document.uri.fsPath,
+            )}`,
             selene.Expectation.Stderr,
             vscode.workspace.getWorkspaceFolder(document.uri),
         )
