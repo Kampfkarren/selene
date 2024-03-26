@@ -412,7 +412,6 @@ fn read_config_file() -> Option<(String, Option<PathBuf>)> {
     Some((config_contents, config_path))
 }
 
-/// Read the config file and return it as `Option<(String, &'static Path)>`.
 fn parse_config_file_as_string() -> Option<(String, &'static Path)> {
     if let Some((config_contents, config_path)) = read_config_file() {
         if let Some(path) = config_path {
