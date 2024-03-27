@@ -405,7 +405,7 @@ fn read_config_file() -> (String, Option<PathBuf>) {
                             Some((valid_str, PathBuf::from(path)))
                         } else {
                             // Handle invalid UTF-8
-                            error!("Error reading config file: {}", path);
+                            error!("Error reading config file: {}, stream did not contain valid UTF-8", path);
                             std::process::exit(1);
                         }
                     }
