@@ -27,7 +27,7 @@ However, perhaps we as the programmer have some reason for leaving this unused (
 local something = 1
 ```
 
-This also works with settings other than `allow`--you can `warn` or `deny` lints in the same fashion. For example, you can have a project with the following `selene.toml` [configuration](./configuration.md):
+This also works with settings other than `allow`--you can `warn` or `deny` lints in the same fashion. For example, you can have a project with the following `.selene.toml` [configuration](./configuration.md):
 
 ```toml
 [lints]

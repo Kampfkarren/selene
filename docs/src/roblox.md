@@ -6,13 +6,13 @@ If you try to run selene on a Roblox codebase, you'll get a bunch of errors sayi
 
 ## Installation
 
-Thankfully, this process is very simple. All you need to do is edit your `selene.toml` (or create one) and add the following:
+Thankfully, this process is very simple. All you need to do is edit your `.selene.toml` (or create one) and add the following:
 
 ```toml
 std = "roblox"
 ```
 
-The next time you run selene, or if you use the Visual Studio Code extension and start typing Lua code, a Roblox standard library will be automatically generated and used. This is an automatic process that occurs whenever you don't have a cached standard library file and your `selene.toml` has `std = "roblox"`.
+The next time you run selene, or if you use the Visual Studio Code extension and start typing Lua code, a Roblox standard library will be automatically generated and used. This is an automatic process that occurs whenever you don't have a cached standard library file and your `.selene.toml` has `std = "roblox"`.
 
 ## Updating definitions
 
@@ -32,7 +32,7 @@ There may be cases where you would rather not have selene automatically update t
 
 selene supports "pinning" the standard library to a specific version.
 
-Add the following to your `selene.toml` configuration:
+Add the following to your `.selene.toml` configuration:
 ```toml
 # `floating` by default, meaning it is stored in a cache folder on your system
 roblox-std-source = "pinned"

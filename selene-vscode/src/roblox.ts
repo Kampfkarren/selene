@@ -35,43 +35,51 @@ export function processDiagnostic(
                     return
                 }
 
-                const configFilename = vscode.Uri.joinPath(
-                    workspace.uri,
-                    "selene.toml",
-                )
+                const configFilenames = [
+                    vscode.Uri.joinPath(workspace.uri, ".selene.toml"),
+                    vscode.Uri.joinPath(workspace.uri, "selene.toml"),
+                ]
 
                 let configContents: Uint8Array
+                let configFilename: vscode.Uri | undefined
 
-                try {
-                    configContents = await vscode.workspace.fs.readFile(
-                        configFilename,
-                    )
-                } catch (error) {
-                    if (
-                        error instanceof vscode.FileSystemError &&
-                        error.code === "FileNotFound"
-                    ) {
-                        configContents = new Uint8Array()
-                    } else {
-                        vscode.window.showErrorMessage(
-                            `Couldn't read existing config, if there was one.\n\n${
-                                typeof error === "object" && error !== null
+                for (const someConfigFilename of configFilenames) {
+                    try {
+                        configContents = await vscode.workspace.fs.readFile(someConfigFilename)
+                        configFilename = someConfigFilename
+                        break
+                    } catch (error) {
+                        if (
+                            error instanceof vscode.FileSystemError &&
+                            error.code === "FileNotFound"
+                        ) {
+                            continue
+                        } else {
+                            vscode.window.showErrorMessage(
+                                `Couldn't read existing config, if there was one.\n\n${typeof error === "object" && error !== null
                                     ? error.toString()
                                     : error
-                            }`,
-                        )
-
-                        return
+                                }`
+                            )
+                            return
+                        }
                     }
+                }
+
+                if (!configFilename) {
+                    configFilename = configFilenames[0]
+                    configContents = new Uint8Array()
                 }
 
                 const contents = new TextDecoder().decode(configContents)
 
                 vscode.workspace.fs.writeFile(
                     configFilename,
-                    new TextEncoder().encode(addRobloxLibrary(contents)),
+                    new TextEncoder().encode(addRobloxLibrary(contents))
                 )
             })
+
+
 
         return true
     }

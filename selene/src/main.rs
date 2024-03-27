@@ -8,7 +8,6 @@ use std::{
         Arc, RwLock,
     },
 };
-
 use codespan_reporting::{
     diagnostic::{
         Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
@@ -391,6 +390,58 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     );
 }
 
+/// Reads a config file and return content and path. None if not found or empty.
+
+fn read_config_file() -> (String, Option<PathBuf>) {
+    const CONFIG_PATHS_TO_CHECK: [&str; 2] = [".selene.toml", "selene.toml"];
+
+    let (config_contents, config_path) =
+        match CONFIG_PATHS_TO_CHECK
+            .iter()
+            .find_map(|path| {
+                match fs::read(path) {
+                    Ok(contents) => {
+                        if let Ok(valid_str) = String::from_utf8(contents) {
+                            Some((valid_str, PathBuf::from(path)))
+                        } else {
+                            // Handle invalid UTF-8
+                            error!("Error reading config file: {}, stream did not contain valid UTF-8", path);
+                            std::process::exit(1);
+                        }
+                    }
+                    Err(_) => None, // if a file do not exist, return none
+                }
+            }) {
+            Some((contents, path)) => (contents, Some(path)),
+            None => {
+                // If none of the paths exist or contain valid UTF-8, return (empty string + None)
+                (String::new(), None)
+            }
+        };
+
+    (config_contents, config_path)
+}
+
+
+fn parse_config_file_as_string() -> (String, &'static Path) {
+    let (config_contents, config_path) = read_config_file();
+    match config_path {
+        Some(path) => (config_contents, Box::leak(Box::new(path)).as_path()),
+        None => (config_contents, std::path::Path::new("")), // Return (empty string + empty path)
+    }
+}
+
+fn parse_config_file_as_checkerconfig() -> (CheckerConfig<toml::Value>, Option<PathBuf>) {
+    let (config_contents, config_path) = read_config_file();
+    match toml::from_str(&config_contents) {
+        Ok(config) => (config, config_path),
+        Err(error) => {
+            error!("Error parsing config file: {}", error);
+            std::process::exit(1);
+        }
+    }
+}
+
 fn start(mut options: opts::Options) {
     *OPTIONS.write().unwrap() = Some(options.clone());
 
@@ -412,17 +463,8 @@ fn start(mut options: opts::Options) {
 
                 (config_contents, Path::new("-"))
             } else {
-                let config_path = Path::new("selene.toml");
-
-                let config_contents = match fs::read_to_string(config_path) {
-                    Ok(contents) => contents,
-                    Err(error) => {
-                        error!("Error reading config file: {error}");
-                        std::process::exit(1);
-                    }
-                };
-
-                (config_contents, config_path)
+                let (config_content, config_path) = parse_config_file_as_string();
+                (config_content, config_path)
             };
 
             if let Err(error) = validate_config::validate_config(
@@ -517,17 +559,14 @@ fn start(mut options: opts::Options) {
                 }
             }
 
-            None => match fs::read_to_string("selene.toml") {
-                Ok(config_contents) => match toml::from_str(&config_contents) {
-                    Ok(config) => (config, None),
-                    Err(error) => {
-                        error!("Config file not in correct format: {}", error);
-                        std::process::exit(1);
-                    }
-                },
+            None => {
+                let (config, _) = match parse_config_file_as_checkerconfig() {
+                    (config, Some(_)) => (config, Some(())),
+                    _ => (CheckerConfig::default(), None),
+                };
 
-                Err(_) => (CheckerConfig::default(), None),
-            },
+                (config, None)
+            }
         };
 
     let current_dir = std::env::current_dir().unwrap();

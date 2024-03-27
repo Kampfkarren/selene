@@ -1,10 +1,10 @@
 # Configuration
 selene is meant to be easily configurable. You can specify configurations for the entire project as well as for individual lints.
 
-Configuration files are placed in the directory you are running selene in and are named **selene.toml**. As the name suggests, the configurations use the [Tom's Obvious, Minimal Language (TOML)](https://github.com/toml-lang/toml) format. It is recommended you quickly brush up on the syntax, though it is very easy.
+Configuration files are placed in the directory you are running selene in and are named **.selene.toml** (or **selene.toml**) . As the name suggests, the configurations use the [Tom's Obvious, Minimal Language (TOML)](https://github.com/toml-lang/toml) format. It is recommended you quickly brush up on the syntax, though it is very easy.
 
 ## Changing the severity of lints
-You can change the severity of lints by entering the following into selene.toml:
+You can change the severity of lints by entering the following into .selene.toml:
 
 ```toml
 [lints]
@@ -22,7 +22,7 @@ Where "severity" is one of the following:
 Note that "deny" and "warn" are effectively the same, only warn will give orange text while error gives red text, and they both have different counters.
 
 ## Configuring specific lints
-You can configure specific lints by entering the following into selene.toml:
+You can configure specific lints by entering the following into .selene.toml:
 
 ```toml
 [config]
@@ -47,7 +47,7 @@ By default, selene uses Lua 5.1, though if we wanted to use the Lua 5.2 standard
 std = "lua52"
 ```
 
-...at the top of selene.toml. You can learn more about the standard library format on the [standard library guide](./std.md). The standard library given can either be one of the builtin ones (currently only `lua51` and `lua52`) or the filename of a standard library file in this format. For example, if we had a file named `special.toml`, we would write:
+...at the top of .selene.toml. You can learn more about the standard library format on the [standard library guide](./std.md). The standard library given can either be one of the builtin ones (currently only `lua51` and `lua52`) or the filename of a standard library file in this format. For example, if we had a file named `special.toml`, we would write:
 
 ```toml
 std = "special"

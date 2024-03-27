@@ -15,6 +15,7 @@ export async function lintConfig(
 
     if (
         document.languageId === "toml" &&
+        !document.uri.path.endsWith(".selene.toml") &&
         !document.uri.path.endsWith("selene.toml")
     ) {
         return
