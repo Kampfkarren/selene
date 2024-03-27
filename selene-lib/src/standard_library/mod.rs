@@ -603,6 +603,10 @@ pub struct Argument {
     #[serde(default)]
     #[serde(skip_serializing_if = "is_default")]
     pub observes: Observes,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deprecated: Option<Deprecated>,
 }
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq)]

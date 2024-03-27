@@ -1,0 +1,40 @@
+error[deprecated]: this parameter is deprecated
+  ┌─ deprecated_params.lua:2:27
+  │
+2 │ local _ = Instance.new(a, b)
+  │                           ^
+  │
+  = set the instance's parent separately
+
+error[deprecated]: this parameter is deprecated
+  ┌─ deprecated_params.lua:4:27
+  │
+4 │ local _ = Instance.new(a, "nil")
+  │                           ^^^^^
+  │
+  = set the instance's parent separately
+
+error[deprecated]: this parameter is deprecated
+  ┌─ deprecated_params.lua:6:3
+  │
+6 │ a(1)
+  │   ^
+  │
+  = this is deprecated
+
+error[deprecated]: this parameter is deprecated
+  ┌─ deprecated_params.lua:7:3
+  │
+7 │ a ""
+  │   ^^
+  │
+  = this is deprecated
+
+error[deprecated]: this parameter is deprecated
+  ┌─ deprecated_params.lua:8:3
+  │
+8 │ a {}
+  │   ^^
+  │
+  = this is deprecated
+

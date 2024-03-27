@@ -4,9 +4,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.26.1...HEAD)
 ### Added
 - Added `CFrame.lookAlong` to the Roblox standard library
+- Added `deprecated` config field to standard library function parameters
 
 ### Changed
 - Updated the warning message for the `mixed_table` lint to include why mixed tables should be avoided
+- Properly deprecated `Instance.new`'s second argument in the Roblox standard library
 
 ## [0.26.1](https://github.com/Kampfkarren/selene/releases/tag/0.26.1) - 2023-11-11
 ### Fixed

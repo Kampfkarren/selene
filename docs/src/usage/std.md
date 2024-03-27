@@ -154,7 +154,7 @@ globals:
 A field is understood as a table if it has fields of its own. Notice that `math` is not defined anywhere, but its fields are. This will create an implicit `math` with the property writability of `read-only`.
 
 ### Deprecated
-Any field can have a deprecation notice added to it, which will then be read by [the deprecated lint](../lints/deprecated.md).
+Any field or arg can have a deprecation notice added to it, which will then be read by [the deprecated lint](../lints/deprecated.md).
 
 ```yaml
 ---
