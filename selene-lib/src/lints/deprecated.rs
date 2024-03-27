@@ -3,7 +3,7 @@ use std::convert::Infallible;
 use full_moon::{ast, visitors::Visitor};
 use serde::Deserialize;
 
-use crate::ast_util::{name_paths::*, scopes::ScopeManager};
+use crate::ast_util::{name_paths::*, range, scopes::ScopeManager};
 
 use super::{super::standard_library::*, *};
 
@@ -46,6 +46,11 @@ struct DeprecatedVisitor<'a> {
     diagnostics: Vec<Diagnostic>,
     scope_manager: &'a ScopeManager,
     standard_library: &'a StandardLibrary,
+}
+
+struct Argument {
+    display: String,
+    range: (usize, usize),
 }
 
 impl<'a> DeprecatedVisitor<'a> {
@@ -194,21 +199,62 @@ impl Visitor for DeprecatedVisitor<'_> {
             feature = "force_exhaustive_checks",
             deny(non_exhaustive_omitted_patterns)
         )]
-        let argument_displays = match function_args {
+        let arguments = match function_args {
             ast::FunctionArgs::Parentheses { arguments, .. } => arguments
                 .iter()
-                .map(|argument| argument.to_string())
+                .map(|argument| Argument {
+                    display: argument.to_string().trim_end().to_string(),
+                    range: range(argument),
+                })
                 .collect(),
 
-            ast::FunctionArgs::String(token) => vec![token.to_string()],
+            ast::FunctionArgs::String(token) => vec![
+                (Argument {
+                    display: token.to_string(),
+                    range: range(token),
+                }),
+            ],
             ast::FunctionArgs::TableConstructor(table_constructor) => {
-                vec![table_constructor.to_string()]
+                vec![Argument {
+                    display: table_constructor.to_string(),
+                    range: range(table_constructor),
+                }]
             }
 
             _ => Vec::new(),
         };
 
-        self.check_name_path(call, "function", &name_path, &argument_displays);
+        if let Some(Field {
+            field_kind: FieldKind::Function(function),
+            ..
+        }) = self.standard_library.find_global(&name_path)
+        {
+            for (arg, arg_std) in arguments.iter().zip(&function.arguments) {
+                if arg.display == "nil" {
+                    continue;
+                }
+
+                if let Some(deprecated) = &arg_std.deprecated {
+                    self.diagnostics.push(Diagnostic::new_complete(
+                        "deprecated",
+                        "this parameter is deprecated".to_string(),
+                        Label::new(arg.range),
+                        vec![deprecated.message.clone()],
+                        Vec::new(),
+                    ));
+                };
+            }
+        }
+
+        self.check_name_path(
+            call,
+            "function",
+            &name_path,
+            &arguments
+                .iter()
+                .map(|arg| arg.display.clone())
+                .collect::<Vec<_>>(),
+        );
     }
 }
 
@@ -231,6 +277,15 @@ mod tests {
             DeprecatedLint::new(DeprecatedLintConfig::default()).unwrap(),
             "deprecated",
             "deprecated_functions",
+        );
+    }
+
+    #[test]
+    fn test_deprecated_params() {
+        test_lint(
+            DeprecatedLint::new(DeprecatedLintConfig::default()).unwrap(),
+            "deprecated",
+            "deprecated_params",
         );
     }
 
