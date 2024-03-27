@@ -229,11 +229,11 @@ impl Visitor for DeprecatedVisitor<'_> {
             ..
         }) = self.standard_library.find_global(&name_path)
         {
-            for (arg, arg_std) in arguments.iter().zip(&function.arguments) {
-                if arg.display == "nil" {
-                    continue;
-                }
-
+            for (arg, arg_std) in arguments
+                .iter()
+                .zip(&function.arguments)
+                .filter(|(arg, _)| arg.display != "nil")
+            {
                 if let Some(deprecated) = &arg_std.deprecated {
                     self.diagnostics.push(Diagnostic::new_complete(
                         "deprecated",
