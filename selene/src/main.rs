@@ -8,7 +8,6 @@ use std::{
         Arc, RwLock,
     },
 };
-
 use codespan_reporting::{
     diagnostic::{
         Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
@@ -392,49 +391,54 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
 }
 
 /// Reads a config file and return content and path. None if not found or empty.
-fn read_config_file() -> Option<(String, Option<PathBuf>)> {
+
+fn read_config_file() -> (String, Option<PathBuf>) {
     const CONFIG_PATHS_TO_CHECK: [&str; 2] = [".selene.toml", "selene.toml"];
-    let mut config_contents = String::new();
-    let mut config_path = None;
 
-    for path in &CONFIG_PATHS_TO_CHECK {
-        if let Ok(contents) = fs::read_to_string(path) {
-            config_contents = contents;
-            config_path = Some(PathBuf::from(path));
-            break;
-        }
-    }
-
-    if config_contents.is_empty() {
-        return None;
-    }
-
-    Some((config_contents, config_path))
-}
-
-fn parse_config_file_as_string() -> Option<(String, &'static Path)> {
-    if let Some((config_contents, config_path)) = read_config_file() {
-        if let Some(path) = config_path {
-            return Some((config_contents, Box::leak(Box::new(path)).as_path()));
-        }
-    } else {
-        error!("Error reading config file");
-        std::process::exit(1);
-    }
-    None
-}
-
-fn parse_config_file_as_checkerconfig() -> Option<(CheckerConfig<toml::Value>, Option<PathBuf>)> {
-    if let Some((config_contents, config_path)) = read_config_file() {
-        match toml::from_str(&config_contents) {
-            Ok(config) => Some((config, config_path)),
-            Err(error) => {
-                error!("Error parsing config file: {}", error);
-                std::process::exit(1);
+    let (config_contents, config_path) =
+        match CONFIG_PATHS_TO_CHECK
+            .iter()
+            .find_map(|path| {
+                match fs::read(path) {
+                    Ok(contents) => {
+                        if let Ok(valid_str) = String::from_utf8(contents) {
+                            Some((valid_str, PathBuf::from(path)))
+                        } else {
+                            // Handle invalid UTF-8
+                            error!("Error reading config file: {}", path);
+                            std::process::exit(1);
+                        }
+                    }
+                    Err(_) => None, // if a file do not exist, return none
+                }
+            }) {
+            Some((contents, path)) => (contents, Some(path)),
+            None => {
+                // If none of the paths exist or contain valid UTF-8, return (empty string + None)
+                (String::new(), None)
             }
+        };
+
+    (config_contents, config_path)
+}
+
+
+fn parse_config_file_as_string() -> (String, &'static Path) {
+    let (config_contents, config_path) = read_config_file();
+    match config_path {
+        Some(path) => (config_contents, Box::leak(Box::new(path)).as_path()),
+        None => (config_contents, std::path::Path::new("")), // Return (empty string + empty path)
+    }
+}
+
+fn parse_config_file_as_checkerconfig() -> (CheckerConfig<toml::Value>, Option<PathBuf>) {
+    let (config_contents, config_path) = read_config_file();
+    match toml::from_str(&config_contents) {
+        Ok(config) => (config, config_path),
+        Err(error) => {
+            error!("Error parsing config file: {}", error);
+            std::process::exit(1);
         }
-    } else {
-        None
     }
 }
 
@@ -459,7 +463,7 @@ fn start(mut options: opts::Options) {
 
                 (config_contents, Path::new("-"))
             } else {
-                let (config_content, config_path) = parse_config_file_as_string().unwrap();
+                let (config_content, config_path) = parse_config_file_as_string();
                 (config_content, config_path)
             };
 
@@ -557,8 +561,8 @@ fn start(mut options: opts::Options) {
 
             None => {
                 let (config, _) = match parse_config_file_as_checkerconfig() {
-                    Some(config) => config,
-                    None => (CheckerConfig::default(), None),
+                    (config, Some(_)) => (config, Some(())),
+                    _ => (CheckerConfig::default(), None),
                 };
 
                 (config, None)
