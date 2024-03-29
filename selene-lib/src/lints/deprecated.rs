@@ -99,7 +99,7 @@ impl<'a> DeprecatedVisitor<'a> {
         node: &N,
         what: &str,
         name_path: &[String],
-        parameters: &[String],
+        arguments: &[Argument],
     ) {
         assert!(!name_path.is_empty());
 
@@ -120,7 +120,12 @@ impl<'a> DeprecatedVisitor<'a> {
 
             let mut notes = vec![deprecated.message.to_owned()];
 
-            if let Some(replace_with) = deprecated.try_instead(parameters) {
+            if let Some(replace_with) = deprecated.try_instead(
+                &arguments
+                    .iter()
+                    .map(|arg| arg.display.clone())
+                    .collect::<Vec<_>>(),
+            ) {
                 notes.push(format!("try: {replace_with}"));
             }
 
@@ -134,6 +139,28 @@ impl<'a> DeprecatedVisitor<'a> {
                 notes,
                 Vec::new(),
             ));
+        }
+
+        if let Some(Field {
+            field_kind: FieldKind::Function(function),
+            ..
+        }) = self.standard_library.find_global(name_path)
+        {
+            for (arg, arg_std) in arguments
+                .iter()
+                .zip(&function.arguments)
+                .filter(|(arg, _)| arg.display != "nil")
+            {
+                if let Some(deprecated) = &arg_std.deprecated {
+                    self.diagnostics.push(Diagnostic::new_complete(
+                        "deprecated",
+                        "this parameter is deprecated".to_string(),
+                        Label::new(arg.range),
+                        vec![deprecated.message.clone()],
+                        Vec::new(),
+                    ));
+                };
+            }
         }
     }
 }
@@ -224,37 +251,7 @@ impl Visitor for DeprecatedVisitor<'_> {
             _ => Vec::new(),
         };
 
-        if let Some(Field {
-            field_kind: FieldKind::Function(function),
-            ..
-        }) = self.standard_library.find_global(&name_path)
-        {
-            for (arg, arg_std) in arguments
-                .iter()
-                .zip(&function.arguments)
-                .filter(|(arg, _)| arg.display != "nil")
-            {
-                if let Some(deprecated) = &arg_std.deprecated {
-                    self.diagnostics.push(Diagnostic::new_complete(
-                        "deprecated",
-                        "this parameter is deprecated".to_string(),
-                        Label::new(arg.range),
-                        vec![deprecated.message.clone()],
-                        Vec::new(),
-                    ));
-                };
-            }
-        }
-
-        self.check_name_path(
-            call,
-            "function",
-            &name_path,
-            &arguments
-                .iter()
-                .map(|arg| arg.display.clone())
-                .collect::<Vec<_>>(),
-        );
+        self.check_name_path(call, "function", &name_path, &arguments);
     }
 }
 
@@ -297,6 +294,7 @@ mod tests {
                     "deprecated_allowed".to_owned(),
                     "more.*".to_owned(),
                     "wow.*.deprecated_allowed".to_owned(),
+                    "a".to_owned(),
                 ],
             })
             .unwrap(),

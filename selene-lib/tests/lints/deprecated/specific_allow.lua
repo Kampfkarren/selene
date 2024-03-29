@@ -5,3 +5,5 @@ more.deprecated_allowed()
 wow.extra.deprecated_allowed()
 
 deprecated_allowed.more()
+
+a(1)
