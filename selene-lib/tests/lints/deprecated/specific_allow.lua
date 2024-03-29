@@ -6,4 +6,4 @@ wow.extra.deprecated_allowed()
 
 deprecated_allowed.more()
 
-a(1)
+deprecated_param(1)

@@ -294,7 +294,7 @@ mod tests {
                     "deprecated_allowed".to_owned(),
                     "more.*".to_owned(),
                     "wow.*.deprecated_allowed".to_owned(),
-                    "a".to_owned(),
+                    "deprecated_param".to_owned(),
                 ],
             })
             .unwrap(),

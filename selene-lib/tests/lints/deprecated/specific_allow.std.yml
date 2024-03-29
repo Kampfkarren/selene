@@ -16,7 +16,7 @@ globals:
     args: []
     deprecated:
       message: "this is deprecated"
-  a:
+  deprecated_param:
     args:
       - required: false
         type:
