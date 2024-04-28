@@ -28,10 +28,10 @@ FROM bash AS selene-light
 COPY --from=selene-light-builder /usr/local/cargo/bin/selene /
 CMD ["/selene"]
 
-FROM bash AS selene-musl
-COPY --from=selene-musl-builder /usr/local/cargo/bin/selene /
-CMD ["/selene"]
-
 FROM bash AS selene-light-musl
 COPY --from=selene-light-musl-builder /usr/local/cargo/bin/selene /
+CMD ["/selene"]
+
+FROM bash AS selene-musl
+COPY --from=selene-musl-builder /usr/local/cargo/bin/selene /
 CMD ["/selene"]

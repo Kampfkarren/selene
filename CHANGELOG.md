@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.26.1...HEAD)
+### Added
+- Added support for selene as a `pre-commit` hook
 
 ## [0.27.0](https://github.com/Kampfkarren/selene/compare/0.26.1...0.26.2) - 2024-04-28
 ### Added
