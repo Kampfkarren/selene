@@ -1,0 +1,17 @@
+---
+globals:
+  Instance.new:
+    args:
+      - type: string
+      - required: false
+        type:
+          display: Instance
+        deprecated:
+          message: set the instance's parent separately
+  a:
+    args:
+      - required: false
+        type:
+          display: any
+        deprecated:
+          message: this is deprecated
