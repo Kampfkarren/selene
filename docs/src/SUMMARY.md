@@ -14,6 +14,7 @@
 - [Contributing](./contributing.md)
 - [Lints](./lints/index.md)
   - [almost_swapped](./lints/almost_swapped.md)
+  - [approx_constant](./lints/approx_constant.md)
   - [constant_table_comparison](./lints/constant_table_comparison.md)
   - [deprecated](./lints/deprecated.md)
   - [divide_by_zero](./lints/divide_by_zero.md)
