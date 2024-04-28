@@ -1,9 +1,13 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.26.1...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.27.1...HEAD)
 
-## [0.27.0](https://github.com/Kampfkarren/selene/compare/0.26.1...0.26.2) - 2024-04-28
+## [0.27.1](https://github.com/Kampfkarren/selene/releases/tag/0.27.1) - 2024-04-28
+### Fixed
+- Fixed `Instance.new`'s second parameter being incorrectly marked as required.
+
+## [0.27.0](https://github.com/Kampfkarren/selene/releases/tag/0.27.0) - 2024-04-28
 ### Added
 - Added `CFrame.lookAlong` to the Roblox standard library
 - Added `deprecated` config field to standard library function parameters
