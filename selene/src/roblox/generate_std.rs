@@ -270,7 +270,7 @@ impl RobloxGenerator {
                     },
                     Argument {
                         argument_type: ArgumentType::Display("Instance".to_string()),
-                        required: Required::Required(None),
+                        required: Required::NotRequired,
                         observes: Observes::ReadWrite,
                         deprecated: Some(Deprecated {
                             message: "set the instance's parent separately".to_owned(),
