@@ -400,15 +400,14 @@ fn read_config_file() -> (String, Option<PathBuf>) {
             .iter()
             .find_map(|path| {
                 match fs::read(path) {
-                    Ok(contents) => {
-                        if let Ok(valid_str) = String::from_utf8(contents) {
-                            Some((valid_str, PathBuf::from(path)))
-                        } else {
+                    Ok(contents) => match String::from_utf8(contents) {
+                        Ok(valid_str) => Some((valid_str, PathBuf::from(path))),
+                        Err(error) => {
                             // Handle invalid UTF-8
-                            error!("Error reading config file: {}, stream did not contain valid UTF-8", path);
+                            error!("{}", error);
                             std::process::exit(1);
                         }
-                    }
+                    },
                     Err(_) => None, // if a file do not exist, return none
                 }
             }) {
