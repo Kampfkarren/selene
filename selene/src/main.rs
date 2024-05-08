@@ -415,7 +415,7 @@ fn read_config_file() -> (String, Option<PathBuf>) {
             .next() {
                 Some((contents, path)) => (contents, Some(path)),
                 None => {
-                    // println!("No config file was found."); → We currently silence this cli info.
+                    // println!("INFO: No config file was found. Selene will use the default settings.");
 
                     // If none of the paths exist, return (empty string + None)
                     (String::new(), None)
