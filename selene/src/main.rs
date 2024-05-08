@@ -391,36 +391,42 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
 }
 
 /// Reads a config file and return content and path. None if not found or empty.
-
 fn read_config_file() -> (String, Option<PathBuf>) {
     const CONFIG_PATHS_TO_CHECK: [&str; 2] = [".selene.toml", "selene.toml"];
 
     let (config_contents, config_path) =
         match CONFIG_PATHS_TO_CHECK
             .iter()
-            .find_map(|path| {
-                match fs::read(path) {
-                    Ok(contents) => match String::from_utf8(contents) {
-                        Ok(valid_str) => Some((valid_str, PathBuf::from(path))),
-                        Err(error) => {
-                            // Handle invalid UTF-8
+            .filter_map(|path_str| {
+                let path = Path::new(path_str);
+                if path.exists() {
+                    match fs::read(path) {
+                        Ok(contents) => match String::from_utf8(contents) {
+                            Ok(valid_str) => Some((valid_str, path.to_path_buf())),
+                            Err(error) => { // Invalid UTF-8, exit.
+                                error!("{}", error);
+                                std::process::exit(1);
+                            }
+                        },
+                        Err(error) => { // Unexpected read error, exit.
                             error!("{}", error);
                             std::process::exit(1);
                         }
-                    },
-                    Err(_) => None, // if a file do not exist, return none
+                    }
+                } else {
+                    None // Path doesn't exist, check the next path.
                 }
-            }) {
-            Some((contents, path)) => (contents, Some(path)),
-            None => {
-                // If none of the paths exist or contain valid UTF-8, return (empty string + None)
-                (String::new(), None)
+            })
+            .next() {
+                Some((contents, path)) => (contents, Some(path)),
+                None => {
+                    // If no errors but none of the paths exist, return (empty string + None)
+                   (String::new(), None)
             }
         };
 
     (config_contents, config_path)
 }
-
 
 fn parse_config_file_as_string() -> (String, &'static Path) {
     let (config_contents, config_path) = read_config_file();
