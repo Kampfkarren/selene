@@ -400,15 +400,10 @@ fn read_config_file() -> (String, Option<PathBuf>) {
             .filter_map(|path_str| {
                 let path = Path::new(path_str);
                 if path.exists() {
-                    match fs::read(path) {
-                        Ok(contents) => match String::from_utf8(contents) {
-                            Ok(valid_str) => Some((valid_str, path.to_path_buf())),
-                            Err(error) => { // Invalid UTF-8, exit.
-                                error!("{}", error);
-                                std::process::exit(1);
-                            }
-                        },
-                        Err(error) => { // Unexpected read error, exit.
+                    match fs::read_to_string(path) {
+                        Ok(valid_str) => Some((valid_str, path.to_path_buf())),
+                        Err(error) => {
+                            // Path exist but there is a read error (not utf-8, bad permissions, etc)
                             error!("{}", error);
                             std::process::exit(1);
                         }
@@ -420,10 +415,12 @@ fn read_config_file() -> (String, Option<PathBuf>) {
             .next() {
                 Some((contents, path)) => (contents, Some(path)),
                 None => {
-                    // If no errors but none of the paths exist, return (empty string + None)
-                   (String::new(), None)
-            }
-        };
+                    // println!("No config file was found."); → We currently silence this cli info.
+
+                    // If none of the paths exist, return (empty string + None)
+                    (String::new(), None)
+                }
+            };
 
     (config_contents, config_path)
 }
