@@ -415,13 +415,6 @@ fn read_config_file() -> (String, Option<PathBuf>) {
             .next() {
                 Some((contents, path)) => (contents, Some(path)),
                 None => {
-                    // This error will display only in validate-config.
-                    let error = io::Error::new(
-                      io::ErrorKind::NotFound,
-                     "Error reading config file: No such file or directory (os error 2)"
-                    );
-                    error!("{}", error);
-
                     // If none of the paths exist, return (empty string + None)
                     (String::new(), None)
                 }
@@ -434,7 +427,16 @@ fn parse_config_file_as_string() -> (String, &'static Path) {
     let (config_contents, config_path) = read_config_file();
     match config_path {
         Some(path) => (config_contents, Box::leak(Box::new(path)).as_path()),
-        None => (config_contents, std::path::Path::new("")), // Return (empty string + empty path)
+        None => {
+            // This error will display only in validate-config.
+            let error = io::Error::new(
+              io::ErrorKind::NotFound,
+             "Error reading config file: No such file or directory (os error 2)"
+            );
+            error!("{}", error);
+
+            (config_contents, std::path::Path::new("")) // Return (empty string + empty path)
+        },
     }
 }
 
