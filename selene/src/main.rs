@@ -415,7 +415,7 @@ fn read_config_file() -> (String, Option<PathBuf>) {
             .next() {
                 Some((contents, path)) => (contents, Some(path)),
                 None => {
-                    // This error will display only in validate-config.
+                    // This error will display on validate-config and cli commands.
                     let error = io::Error::new(
                       io::ErrorKind::NotFound,
                      "Error reading config file: No such file or directory (os error 2)"
