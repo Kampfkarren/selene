@@ -415,7 +415,12 @@ fn read_config_file() -> (String, Option<PathBuf>) {
             .next() {
                 Some((contents, path)) => (contents, Some(path)),
                 None => {
-                    // println!("INFO: No config file was found. Selene will use the default settings.");
+                    // This error will display only in validate-config.
+                    let error = io::Error::new(
+                      io::ErrorKind::NotFound,
+                     "Error reading config file: No such file or directory (os error 2)"
+                    );
+                    error!("{}", error);
 
                     // If none of the paths exist, return (empty string + None)
                     (String::new(), None)
