@@ -1,12 +1,20 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.26.1...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.27.1...HEAD)
+
+## [0.27.1](https://github.com/Kampfkarren/selene/releases/tag/0.27.1) - 2024-04-28
+### Fixed
+- Fixed `Instance.new`'s second parameter being incorrectly marked as required.
+
+## [0.27.0](https://github.com/Kampfkarren/selene/releases/tag/0.27.0) - 2024-04-28
 ### Added
 - Added `CFrame.lookAlong` to the Roblox standard library
+- Added `deprecated` config field to standard library function parameters
 
 ### Changed
 - Updated the warning message for the `mixed_table` lint to include why mixed tables should be avoided
+- Properly deprecated `Instance.new`'s second argument in the Roblox standard library
 
 ## [0.26.1](https://github.com/Kampfkarren/selene/releases/tag/0.26.1) - 2023-11-11
 ### Fixed

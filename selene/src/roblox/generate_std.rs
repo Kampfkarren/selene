@@ -125,6 +125,7 @@ impl RobloxGenerator {
                                     argument_type: ArgumentType::Any,
                                     required: Required::NotRequired,
                                     observes: Observes::ReadWrite,
+                                    deprecated: None,
                                 })
                                 .collect(),
                             method: true,
@@ -260,11 +261,23 @@ impl RobloxGenerator {
         self.std.globals.insert(
             "Instance.new".to_owned(),
             Field::from_field_kind(FieldKind::Function(FunctionBehavior {
-                arguments: vec![Argument {
-                    argument_type: ArgumentType::Constant(instance_names),
-                    required: Required::Required(None),
-                    observes: Observes::ReadWrite,
-                }],
+                arguments: vec![
+                    Argument {
+                        argument_type: ArgumentType::Constant(instance_names),
+                        required: Required::Required(None),
+                        observes: Observes::ReadWrite,
+                        deprecated: None,
+                    },
+                    Argument {
+                        argument_type: ArgumentType::Display("Instance".to_string()),
+                        required: Required::NotRequired,
+                        observes: Observes::ReadWrite,
+                        deprecated: Some(Deprecated {
+                            message: "set the instance's parent separately".to_owned(),
+                            replace: vec![],
+                        }),
+                    },
+                ],
                 method: false,
 
                 // Only true because we don't allow the second parameter
@@ -294,6 +307,7 @@ impl RobloxGenerator {
                     argument_type: ArgumentType::Constant(service_names),
                     required: Required::Required(None),
                     observes: Observes::ReadWrite,
+                    deprecated: None,
                 }],
                 method: true,
                 must_use: true,

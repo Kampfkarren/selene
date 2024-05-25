@@ -16,3 +16,10 @@ globals:
     args: []
     deprecated:
       message: "this is deprecated"
+  deprecated_param:
+    args:
+      - required: false
+        type:
+          display: any
+        deprecated:
+          message: this is deprecated
