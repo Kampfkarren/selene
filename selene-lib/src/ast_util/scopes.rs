@@ -830,11 +830,7 @@ impl Visitor for ScopeVisitor {
 
     fn visit_block(&mut self, block: &ast::Block) {
         if let Some((start, end)) = block.range() {
-            if self
-                .else_blocks
-                .get(&(start.bytes(), end.bytes()))
-                .is_some()
-            {
+            if self.else_blocks.contains(&(start.bytes(), end.bytes())) {
                 self.close_scope(); // close the if or elseif's block
                 self.open_scope(block);
             }
@@ -843,11 +839,7 @@ impl Visitor for ScopeVisitor {
 
     fn visit_block_end(&mut self, block: &ast::Block) {
         if let Some((start, end)) = block.range() {
-            if self
-                .else_blocks
-                .get(&(start.bytes(), end.bytes()))
-                .is_some()
-            {
+            if self.else_blocks.contains(&(start.bytes(), end.bytes())) {
                 self.close_scope();
             }
         }
