@@ -38,3 +38,35 @@ error[roblox_complex_udim2_new]: this UDim2.new call only sets offset, and can b
    │
    = try: UDim2.fromOffset(1, 1)
 
+error[roblox_complex_udim2_new]: this UDim2.new call only sets offset, and can be simplified using UDim2.fromOffset
+   ┌─ roblox_complex_udim2_new.lua:23:1
+   │
+23 │ UDim2.new(0, a, 0, 1)
+   │ ^^^^^^^^^^^^^^^^^^^^^
+   │
+   = try: UDim2.fromOffset(a, 1)
+
+error[roblox_complex_udim2_new]: this UDim2.new call only sets offset, and can be simplified using UDim2.fromOffset
+   ┌─ roblox_complex_udim2_new.lua:24:1
+   │
+24 │ UDim2.new(0, a, 0, b)
+   │ ^^^^^^^^^^^^^^^^^^^^^
+   │
+   = try: UDim2.fromOffset(a, b)
+
+error[roblox_complex_udim2_new]: this UDim2.new call only sets scale, and can be simplified using UDim2.fromScale
+   ┌─ roblox_complex_udim2_new.lua:26:1
+   │
+26 │ UDim2.new(a, 0, 0, 0)
+   │ ^^^^^^^^^^^^^^^^^^^^^
+   │
+   = try: UDim2.fromScale(a, 0)
+
+error[roblox_complex_udim2_new]: this UDim2.new call only sets scale, and can be simplified using UDim2.fromScale
+   ┌─ roblox_complex_udim2_new.lua:27:1
+   │
+27 │ UDim2.new(a, 0.0, 0, 0.0)
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = try: UDim2.fromScale(a, 0)
+

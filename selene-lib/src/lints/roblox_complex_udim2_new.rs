@@ -9,34 +9,33 @@ use full_moon::{
 
 pub struct ComplexUDim2NewLint;
 
-fn create_diagnostic(mismatch: &UDim2ComplexArgs) -> Diagnostic {
+fn create_diagnostic(args: &UDim2ComplexArgs) -> Diagnostic {
     let code = "roblox_complex_udim2_new";
-    let primary_label = Label::new(mismatch.call_range);
+    let primary_label = Label::new(args.call_range);
 
-    if mismatch.no_scale {
-        Diagnostic::new_complete(
+    match args.complexity_type {
+        UDim2ConstructorType::OffsetOnly => Diagnostic::new_complete(
             code,
             "this UDim2.new call only sets offset, and can be simplified using UDim2.fromOffset"
                 .to_owned(),
             primary_label,
             vec![format!(
                 "try: UDim2.fromOffset({}, {})",
-                mismatch.arg_0, mismatch.arg_1
+                args.arg_0, args.arg_1
             )],
             Vec::new(),
-        )
-    } else {
-        Diagnostic::new_complete(
+        ),
+        UDim2ConstructorType::ScaleOnly => Diagnostic::new_complete(
             code,
             "this UDim2.new call only sets scale, and can be simplified using UDim2.fromScale"
                 .to_owned(),
             primary_label,
             vec![format!(
                 "try: UDim2.fromScale({}, {})",
-                mismatch.arg_0, mismatch.arg_1
+                args.arg_0, args.arg_1
             )],
             Vec::new(),
-        )
+        ),
     }
 }
 
@@ -69,11 +68,17 @@ struct UDim2NewVisitor {
     args: Vec<UDim2ComplexArgs>,
 }
 
+#[derive(PartialEq)]
+enum UDim2ConstructorType {
+    ScaleOnly,
+    OffsetOnly,
+}
+
 struct UDim2ComplexArgs {
+    complexity_type: UDim2ConstructorType,
     call_range: (usize, usize),
-    arg_0: f32,
-    arg_1: f32,
-    no_scale: bool,
+    arg_0: String,
+    arg_1: String,
 }
 
 impl Visitor for UDim2NewVisitor {
@@ -95,67 +100,42 @@ impl Visitor for UDim2NewVisitor {
             )) = call_suffix;
 
             then {
-                let args_provided = arguments.len();
-                if args_provided != 4 {
-                    return;
-                }
-
-
-                let numbers_passed = arguments.iter().filter(|expression| {
-                    matches!(expression, ast::Expression::Number(_))
-                }).count();
-                if numbers_passed != 4 {
+                if arguments.len() != 4 {
                     return;
                 }
 
                 let mut iter = arguments.iter();
-                let x_scale = match iter.next().unwrap().to_string().parse::<f32>() {
-                    Ok(value) => value,
-                    Err(_) => return,
-                };
-                let x_offset = match iter.next().unwrap().to_string().parse::<f32>() {
-                    Ok(value) => value,
-                    Err(_) => return,
-                };
-                let y_scale = match iter.next().unwrap().to_string().parse::<f32>() {
-                    Ok(value) => value,
-                    Err(_) => return,
-                };
-                let y_offset = match iter.next().unwrap().to_string().parse::<f32>() {
-                    Ok(value) => value,
-                    Err(_) => return,
-                };
+                let x_scale = iter.next().unwrap().to_string();
+                let x_offset = iter.next().unwrap().to_string();
+                let y_scale = iter.next().unwrap().to_string();
+                let y_offset = iter.next().unwrap().to_string();
 
-                let no_scale = x_scale == 0.0 && y_scale == 0.0;
-                let no_offset = x_offset == 0.0 && y_offset == 0.0;
+                let only_offset = x_scale.parse::<f32>() == Ok(0.0) && y_scale.parse::<f32>() == Ok(0.0);
+                let only_scale = x_offset.parse::<f32>() == Ok(0.0) && y_offset.parse::<f32>() == Ok(0.0);
 
-                let arg_0;
-                let arg_1;
-                if no_scale && no_offset
+                if only_offset && only_scale
                 {
-                    // Skip any lint
+                    // Skip linting if all are zero
                     return;
                 }
-                else if no_scale
+                else if only_offset
                 {
-                    arg_0 = x_offset;
-                    arg_1 = y_offset;
+                    self.args.push(UDim2ComplexArgs {
+                        call_range: range(call),
+                        arg_0: x_offset,
+                        arg_1: y_offset,
+                        complexity_type: UDim2ConstructorType::OffsetOnly,
+                    });
                 }
-                else if no_offset {
-                    arg_0 = x_scale;
-                    arg_1 = y_scale;
-                }
-                else
+                else if only_scale
                 {
-                    return;
+                    self.args.push(UDim2ComplexArgs {
+                        call_range: range(call),
+                        arg_0: x_scale,
+                        arg_1: y_scale,
+                        complexity_type: UDim2ConstructorType::ScaleOnly,
+                    });
                 }
-
-                self.args.push(UDim2ComplexArgs {
-                    call_range: range(call),
-                    arg_0: arg_0,
-                    arg_1: arg_1,
-                    no_scale: no_scale,
-                });
             }
         }
     }
