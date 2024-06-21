@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.27.1...HEAD)
+### Added
+- Added `Path2DControlPoint.new` to the Roblox standard library
 
 ## [0.27.1](https://github.com/Kampfkarren/selene/releases/tag/0.27.1) - 2024-04-28
 ### Fixed
