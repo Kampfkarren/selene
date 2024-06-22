@@ -349,15 +349,6 @@ globals:
   OverlapParams.new:
     args: []
     must_use: true
-  PathWaypoint.new:
-    args:
-      - required: false
-        type:
-          display: Vector3
-      - required: false
-        type:
-          display: PathWaypointAction
-    must_use: true
   Path2DControlPoint.new:
     args:
       - required: false
@@ -369,6 +360,15 @@ globals:
       - required: false
         type:
           display: UDim2
+    must_use: true
+  PathWaypoint.new:
+    args:
+      - required: false
+        type:
+          display: Vector3
+      - required: false
+        type:
+          display: PathWaypointAction
     must_use: true
   PhysicalProperties.new:
     args:
