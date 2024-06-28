@@ -349,6 +349,18 @@ globals:
   OverlapParams.new:
     args: []
     must_use: true
+  Path2DControlPoint.new:
+    args:
+      - required: false
+        type:
+          display: UDim2
+      - required: false
+        type:
+          display: UDim2
+      - required: false
+        type:
+          display: UDim2
+    must_use: true
   PathWaypoint.new:
     args:
       - required: false
