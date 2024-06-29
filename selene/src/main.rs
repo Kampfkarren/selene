@@ -1,3 +1,10 @@
+use codespan_reporting::{
+    diagnostic::{
+        Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
+    },
+    term::DisplayStyle as CodespanDisplayStyle,
+};
+use selene_lib::{lints::Severity, *};
 use std::{
     ffi::OsString,
     fmt, fs,
@@ -8,13 +15,6 @@ use std::{
         Arc, RwLock,
     },
 };
-use codespan_reporting::{
-    diagnostic::{
-        Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
-    },
-    term::DisplayStyle as CodespanDisplayStyle,
-};
-use selene_lib::{lints::Severity, *};
 use structopt::{clap, StructOpt};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
@@ -390,65 +390,20 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     );
 }
 
-/// Reads a config file and return content and path. None if not found or empty.
-fn read_config_file() -> (String, Option<PathBuf>) {
+fn read_config() -> Result<(String, PathBuf), String> {
     const CONFIG_PATHS_TO_CHECK: [&str; 2] = [".selene.toml", "selene.toml"];
 
-    let (config_contents, config_path) =
-        match CONFIG_PATHS_TO_CHECK
-            .iter()
-            .filter_map(|path_str| {
-                let path = Path::new(path_str);
-                if path.exists() {
-                    match fs::read_to_string(path) {
-                        Ok(valid_str) => Some((valid_str, path.to_path_buf())),
-                        Err(error) => {
-                            // Path exist but there is a read error (not utf-8, bad permissions, etc)
-                            error!("{}", error);
-                            std::process::exit(1);
-                        }
-                    }
-                } else {
-                    None // Path doesn't exist, check the next path.
-                }
+    CONFIG_PATHS_TO_CHECK
+        .iter()
+        .find_map(|path_str| {
+            let path = Path::new(path_str);
+
+            path.exists().then_some(match fs::read_to_string(path_str) {
+                Ok(contents) => Ok((contents, path.to_path_buf())),
+                Err(error) => Err(format!("Error reading config file: {error}")),
             })
-            .next() {
-                Some((contents, path)) => (contents, Some(path)),
-                None => {
-                    // If none of the paths exist, return (empty string + None)
-                    (String::new(), None)
-                }
-            };
-
-    (config_contents, config_path)
-}
-
-fn parse_config_file_as_string() -> (String, &'static Path) {
-    let (config_contents, config_path) = read_config_file();
-    match config_path {
-        Some(path) => (config_contents, Box::leak(Box::new(path)).as_path()),
-        None => {
-            // This error will display only in validate-config.
-            let error = io::Error::new(
-              io::ErrorKind::NotFound,
-             "Error reading config file: No such file or directory (os error 2)"
-            );
-            error!("{}", error);
-
-            (config_contents, std::path::Path::new("")) // Return (empty string + empty path)
-        },
-    }
-}
-
-fn parse_config_file_as_checkerconfig() -> (CheckerConfig<toml::Value>, Option<PathBuf>) {
-    let (config_contents, config_path) = read_config_file();
-    match toml::from_str(&config_contents) {
-        Ok(config) => (config, config_path),
-        Err(error) => {
-            error!("Error parsing config file: {}", error);
-            std::process::exit(1);
-        }
-    }
+        })
+        .unwrap_or(Err("No config file found".to_string()))
 }
 
 fn start(mut options: opts::Options) {
@@ -470,14 +425,16 @@ fn start(mut options: opts::Options) {
                     std::process::exit(1);
                 }
 
-                (config_contents, Path::new("-"))
+                (config_contents, Path::new("-").to_path_buf())
             } else {
-                let (config_content, config_path) = parse_config_file_as_string();
-                (config_content, config_path)
+                read_config().unwrap_or_else(|error| {
+                    error!("{error}");
+                    std::process::exit(1);
+                })
             };
 
             if let Err(error) = validate_config::validate_config(
-                config_path,
+                &config_path,
                 &config_contents,
                 &std::env::current_dir().unwrap(),
             ) {
@@ -568,14 +525,16 @@ fn start(mut options: opts::Options) {
                 }
             }
 
-            None => {
-                let (config, _) = match parse_config_file_as_checkerconfig() {
-                    (config, Some(_)) => (config, Some(())),
-                    _ => (CheckerConfig::default(), None),
-                };
-
-                (config, None)
-            }
+            None => match read_config() {
+                Ok((config_contents, _)) => match toml::from_str(&config_contents) {
+                    Ok(config) => (config, None),
+                    Err(error) => {
+                        error!("Config file not in correct format: {}", error);
+                        std::process::exit(1);
+                    }
+                },
+                Err(_) => (CheckerConfig::default(), None),
+            },
         };
 
     let current_dir = std::env::current_dir().unwrap();
