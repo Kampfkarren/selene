@@ -1,3 +1,10 @@
+use codespan_reporting::{
+    diagnostic::{
+        Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
+    },
+    term::DisplayStyle as CodespanDisplayStyle,
+};
+use selene_lib::{lints::Severity, *};
 use std::{
     ffi::OsString,
     fmt, fs,
@@ -8,14 +15,6 @@ use std::{
         Arc, RwLock,
     },
 };
-
-use codespan_reporting::{
-    diagnostic::{
-        Diagnostic as CodespanDiagnostic, Label as CodespanLabel, Severity as CodespanSeverity,
-    },
-    term::DisplayStyle as CodespanDisplayStyle,
-};
-use selene_lib::{lints::Severity, *};
 use structopt::{clap, StructOpt};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
@@ -391,6 +390,22 @@ fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
     );
 }
 
+fn read_config() -> Result<(String, PathBuf), String> {
+    const CONFIG_PATHS_TO_CHECK: [&str; 2] = [".selene.toml", "selene.toml"];
+
+    CONFIG_PATHS_TO_CHECK
+        .iter()
+        .find_map(|path_str| {
+            let path = Path::new(path_str);
+
+            path.exists().then_some(match fs::read_to_string(path_str) {
+                Ok(contents) => Ok((contents, path.to_path_buf())),
+                Err(error) => Err(format!("Error reading config file: {error}")),
+            })
+        })
+        .unwrap_or(Err("No config file found".to_string()))
+}
+
 fn start(mut options: opts::Options) {
     *OPTIONS.write().unwrap() = Some(options.clone());
 
@@ -410,23 +425,16 @@ fn start(mut options: opts::Options) {
                     std::process::exit(1);
                 }
 
-                (config_contents, Path::new("-"))
+                (config_contents, Path::new("-").to_path_buf())
             } else {
-                let config_path = Path::new("selene.toml");
-
-                let config_contents = match fs::read_to_string(config_path) {
-                    Ok(contents) => contents,
-                    Err(error) => {
-                        error!("Error reading config file: {error}");
-                        std::process::exit(1);
-                    }
-                };
-
-                (config_contents, config_path)
+                read_config().unwrap_or_else(|error| {
+                    error!("{error}");
+                    std::process::exit(1);
+                })
             };
 
             if let Err(error) = validate_config::validate_config(
-                config_path,
+                &config_path,
                 &config_contents,
                 &std::env::current_dir().unwrap(),
             ) {
@@ -517,15 +525,14 @@ fn start(mut options: opts::Options) {
                 }
             }
 
-            None => match fs::read_to_string("selene.toml") {
-                Ok(config_contents) => match toml::from_str(&config_contents) {
+            None => match read_config() {
+                Ok((config_contents, _)) => match toml::from_str(&config_contents) {
                     Ok(config) => (config, None),
                     Err(error) => {
                         error!("Config file not in correct format: {}", error);
                         std::process::exit(1);
                     }
                 },
-
                 Err(_) => (CheckerConfig::default(), None),
             },
         };
