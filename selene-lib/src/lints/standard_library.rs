@@ -76,7 +76,7 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                 Symbol::False => Some(ArgumentType::Bool.into()),
                 Symbol::True => Some(ArgumentType::Bool.into()),
                 Symbol::Nil => Some(ArgumentType::Nil.into()),
-                Symbol::Ellipse => Some(ArgumentType::Vararg.into()),
+                Symbol::Ellipsis => Some(ArgumentType::Vararg.into()),
                 ref other => {
                     unreachable!("TokenType::Symbol was not expected ({:?})", other)
                 }
@@ -532,7 +532,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
 
                     ast::Expression::Symbol(token_ref) => {
                         if let TokenType::Symbol { symbol } = token_ref.token().token_type() {
-                            if symbol == &full_moon::tokenizer::Symbol::Ellipse {
+                            if symbol == &full_moon::tokenizer::Symbol::Ellipsis {
                                 maybe_more_arguments = true;
                             }
                         }
