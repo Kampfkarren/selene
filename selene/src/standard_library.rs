@@ -41,10 +41,10 @@ pub enum StandardLibraryError {
 impl Display for StandardLibraryError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            StandardLibraryError::BaseStd { name, .. } => {
+            StandardLibraryError::BaseStd { name, source } => {
                 write!(
                     formatter,
-                    "failed to collect base standard library `{name}`",
+                    "failed to collect base standard library `{name}`: {source}",
                 )
             }
 
