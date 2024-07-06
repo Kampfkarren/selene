@@ -6,7 +6,7 @@ use crate::{
 use std::convert::Infallible;
 
 use full_moon::{
-    ast::{self, Ast},
+    ast::{self, Ast, Expression},
     node::Node,
     tokenizer::{Position, Symbol, TokenType},
     visitors::Visitor,
@@ -39,6 +39,17 @@ impl Lint for StandardLibraryLint {
     }
 }
 
+fn same_type_if_equal(lhs: &Expression, rhs: &Expression) -> Option<PassedArgumentType> {
+    let lhs_type = get_argument_type(lhs);
+    let rhs_type = get_argument_type(rhs);
+
+    if lhs_type == rhs_type {
+        lhs_type
+    } else {
+        None
+    }
+}
+
 // Returns the argument type of the expression if it can be constantly resolved
 // Otherwise, returns None
 // Only attempts to resolve constants
@@ -57,6 +68,8 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                 ast::UnOp::Hash(_) => Some(ArgumentType::Number.into()),
                 ast::UnOp::Minus(_) => get_argument_type(expression),
                 ast::UnOp::Not(_) => Some(ArgumentType::Bool.into()),
+                #[cfg(feature = "lua53")]
+                ast::UnOp::Tilde(_) => get_argument_type(expression),
                 _ => None,
             }
         }
@@ -155,16 +168,17 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                 ast::BinOp::Plus(_)
                 | ast::BinOp::Minus(_)
                 | ast::BinOp::Star(_)
-                | ast::BinOp::Slash(_) => {
-                    let lhs_type = get_argument_type(lhs);
-                    let rhs_type = get_argument_type(rhs);
+                | ast::BinOp::Slash(_) => same_type_if_equal(lhs, rhs),
 
-                    if lhs_type == rhs_type {
-                        lhs_type
-                    } else {
-                        None
-                    }
-                }
+                #[cfg(feature = "lua53")]
+                ast::BinOp::DoubleLessThan(_)
+                | ast::BinOp::DoubleGreaterThan(_)
+                | ast::BinOp::Ampersand(_)
+                | ast::BinOp::Tilde(_)
+                | ast::BinOp::Pipe(_) => same_type_if_equal(lhs, rhs),
+
+                #[cfg(any(feature = "lua53", feature = "roblox"))]
+                ast::BinOp::DoubleSlash(_) => same_type_if_equal(lhs, rhs),
 
                 ast::BinOp::Percent(_) => Some(ArgumentType::Number.into()),
 
@@ -175,18 +189,6 @@ fn get_argument_type(expression: &ast::Expression) -> Option<PassedArgumentType>
                     // Or even just produce one type if both the left and right sides can be evaluated
                     // But for now, the evaluation just isn't smart enough to where this would be practical
                     None
-                }
-
-                #[cfg(feature = "roblox")]
-                ast::BinOp::DoubleSlash(_) => {
-                    let lhs_type = get_argument_type(lhs);
-                    let rhs_type = get_argument_type(rhs);
-
-                    if lhs_type == rhs_type {
-                        lhs_type
-                    } else {
-                        None
-                    }
                 }
 
                 _ => None,
