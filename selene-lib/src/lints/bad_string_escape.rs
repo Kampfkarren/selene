@@ -107,8 +107,8 @@ impl Visitor for BadStringEscapeVisitor {
     fn visit_expression(&mut self, node: &ast::Expression) {
         if_chain::if_chain! {
             if let ast::Expression::String(token) = node;
-            if let tokenizer::TokenType::StringLiteral { literal, multi_line, quote_type } = token.token_type();
-            if multi_line.is_none();
+            if let tokenizer::TokenType::StringLiteral { literal, quote_type, .. } = token.token_type();
+            if *quote_type != tokenizer::StringLiteralQuoteType::Brackets;
             then {
                 let quote_type = *quote_type;
                 let value_start = node.range().unwrap().0.bytes();

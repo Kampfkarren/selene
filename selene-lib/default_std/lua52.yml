@@ -1,5 +1,7 @@
 ---
 base: lua51
+lua_versions:
+  - lua52
 globals:
   bit32.arshift:
     args:

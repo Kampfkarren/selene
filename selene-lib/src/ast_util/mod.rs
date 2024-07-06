@@ -51,7 +51,7 @@ pub fn is_vararg(expression: &ast::Expression) -> bool {
     if_chain::if_chain! {
         if let ast::Expression::Symbol(token) = expression;
         if let tokenizer::TokenType::Symbol {
-            symbol: tokenizer::Symbol::Ellipse,
+            symbol: tokenizer::Symbol::Ellipsis,
         } = token.token().token_type();
 
         then {

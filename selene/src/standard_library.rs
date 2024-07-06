@@ -12,7 +12,6 @@ use selene_lib::{
 #[derive(Debug)]
 pub enum StandardLibraryError {
     BaseStd {
-        source: Box<StandardLibraryError>,
         name: String,
     },
 
@@ -41,7 +40,7 @@ pub enum StandardLibraryError {
 impl Display for StandardLibraryError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            StandardLibraryError::BaseStd { name, .. } => {
+            StandardLibraryError::BaseStd { name } => {
                 write!(
                     formatter,
                     "failed to collect base standard library `{name}`",
@@ -200,8 +199,7 @@ fn from_name<V>(
             if let Some(base_name) = &library.base {
                 if let Some(base) =
                     collect_standard_library(config, base_name, directory, config_directory)
-                        .map_err(|error| StandardLibraryError::BaseStd {
-                            source: Box::new(error),
+                        .map_err(|_| StandardLibraryError::BaseStd {
                             name: base_name.clone(),
                         })?
                 {

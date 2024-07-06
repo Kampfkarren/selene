@@ -65,20 +65,13 @@ pub enum ApiMember {
 }
 
 #[derive(Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct ApiParameter {
-    pub default: Option<String>,
-    #[serde(rename = "Type")]
-    pub parameter_type: ApiValueType,
-}
+pub struct ApiParameter {}
 
 #[derive(Debug)]
 pub enum ApiValueType {
     Class { name: String },
     DataType { value: ApiDataType },
-    Group { value: ApiGroupType },
-    Primitive { value: ApiPrimitiveType },
-    Other { name: String },
+    Other,
 }
 
 impl<'de> Deserialize<'de> for ApiValueType {
@@ -118,15 +111,7 @@ impl<'de> Visitor<'de> for ApiValueTypeVisitor {
                 value: ApiDataType::deserialize(name.into_deserializer())?,
             },
 
-            "Group" => ApiValueType::Group {
-                value: ApiGroupType::deserialize(name.into_deserializer())?,
-            },
-
-            "Primitive" => ApiValueType::Primitive {
-                value: ApiPrimitiveType::deserialize(name.into_deserializer())?,
-            },
-
-            _ => ApiValueType::Other { name },
+            _ => ApiValueType::Other,
         })
     }
 }
@@ -167,7 +152,7 @@ pub enum ApiDataType {
     UDim,
     UDim2,
 
-    Other(String),
+    Other,
 }
 
 impl ApiDataType {
@@ -198,7 +183,7 @@ impl<'de> Deserialize<'de> for ApiDataType {
             "UDim2" => ApiDataType::UDim2,
             "Vector2" => ApiDataType::Vector2,
             "Vector3" => ApiDataType::Vector3,
-            _ => ApiDataType::Other(string),
+            _ => ApiDataType::Other,
         })
     }
 }
