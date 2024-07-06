@@ -199,7 +199,7 @@ fn from_name<V>(
             if let Some(base_name) = &library.base {
                 if let Some(base) =
                     collect_standard_library(config, base_name, directory, config_directory)
-                        .map_err(|error| StandardLibraryError::BaseStd {
+                        .map_err(|_| StandardLibraryError::BaseStd {
                             name: base_name.clone(),
                         })?
                 {
