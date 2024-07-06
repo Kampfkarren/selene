@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -13,18 +15,6 @@ pub enum LuaVersion {
 }
 
 impl LuaVersion {
-    pub fn from_str(value: &str) -> Self {
-        match value {
-            "lua51" => Self::Lua51,
-            "lua52" => Self::Lua52,
-            "lua53" => Self::Lua53,
-            "lua54" => Self::Lua54,
-            "luau" => Self::Luau,
-            "luajit" => Self::LuaJIT,
-            _ => Self::Unknown(value.to_string()),
-        }
-    }
-
     pub fn to_str(&self) -> &str {
         match self {
             Self::Lua51 => "lua51",
@@ -64,6 +54,22 @@ impl LuaVersion {
     }
 }
 
+impl FromStr for LuaVersion {
+    type Err = ();
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "lua51" => Ok(Self::Lua51),
+            "lua52" => Ok(Self::Lua52),
+            "lua53" => Ok(Self::Lua53),
+            "lua54" => Ok(Self::Lua54),
+            "luau" => Ok(Self::Luau),
+            "luajit" => Ok(Self::LuaJIT),
+            _ => Err(()),
+        }
+    }
+}
+
 pub enum LuaVersionError<'a> {
     FeatureNotEnabled(&'a str),
     Unknown(&'a str),
@@ -84,6 +90,10 @@ impl<'de> Deserialize<'de> for LuaVersion {
         D: serde::Deserializer<'de>,
     {
         let value = String::deserialize(deserializer)?;
-        Ok(Self::from_str(&value))
+        if let Ok(version) = Self::from_str(&value) {
+            Ok(version)
+        } else {
+            Ok(Self::Unknown(value))
+        }
     }
 }
