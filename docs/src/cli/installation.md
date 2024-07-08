@@ -16,4 +16,4 @@ cargo install --branch main --git https://github.com/Kampfkarren/selene selene
 ```
 
 ### Disabling Roblox features
-selene is built with Roblox specific lints by default. If you don't want these, type `--no-default-features` after whichever command you choose.
+selene is built with Roblox specific lints by default. If you don't want these, then pass `--no-default-features` to the `cargo install` command.
