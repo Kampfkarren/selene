@@ -78,6 +78,20 @@ Example:
       type: any
 ```
 
+#### "must_use"
+This field is used for checking if the return value of a function is used.
+
+- `false` - The default. The return value of this function does not need to be used.
+- `true` - The return value of this function must be used.
+
+Example:
+```yml
+  tostring:
+    args:
+      - type: any
+    must_use: true
+```
+
 #### Argument types
 - `"any"` - Allows any value.
 - `"bool"`, `"function"`, `"nil"`, `"number"`, `"string"`, `"table"` - Expects a value of the respective type.
@@ -140,7 +154,7 @@ globals:
 A field is understood as a table if it has fields of its own. Notice that `math` is not defined anywhere, but its fields are. This will create an implicit `math` with the property writability of `read-only`.
 
 ### Deprecated
-Any field can have a deprecation notice added to it, which will then be read by [the deprecated lint](../lints/deprecated.md).
+Any field or arg can have a deprecation notice added to it, which will then be read by [the deprecated lint](../lints/deprecated.md).
 
 ```yaml
 ---

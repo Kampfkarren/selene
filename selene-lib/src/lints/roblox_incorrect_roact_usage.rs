@@ -18,7 +18,7 @@ use if_chain::if_chain;
 pub struct IncorrectRoactUsageLint;
 
 // Assumes string includes quotes at start and end
-fn is_lua_valid_table_key_identifier(string: &String) -> bool {
+fn is_lua_valid_table_key_identifier(string: &str) -> bool {
     // Valid identifier cannot start with numbers
     let first_char = string.chars().nth(1).unwrap();
     if !first_char.is_alphabetic() && first_char != '_' {
