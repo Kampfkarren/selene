@@ -3,9 +3,9 @@ use std::convert::Infallible;
 
 use full_moon::{ast::Ast, tokenizer::TokenType, visitors::Visitor};
 
-pub struct ApproxConstantLint;
+pub struct ApproximatedConstantsLint;
 
-impl Lint for ApproxConstantLint {
+impl Lint for ApproximatedConstantsLint {
     type Config = ();
     type Error = Infallible;
 
@@ -13,22 +13,22 @@ impl Lint for ApproxConstantLint {
     const LINT_TYPE: LintType = LintType::Correctness;
 
     fn new((): Self::Config) -> Result<Self, Self::Error> {
-        Ok(ApproxConstantLint)
+        Ok(ApproximatedConstantsLint)
     }
 
     fn pass(&self, ast: &Ast, _: &Context, _: &AstContext) -> Vec<Diagnostic> {
         let mut visitor = ApproxConstantVisitor {
-            approx_constants: Vec::new(),
+            approximated_constants: Vec::new(),
         };
 
         visitor.visit_ast(ast);
 
         visitor
-            .approx_constants
+            .approximated_constants
             .iter()
             .map(|constant| {
                 Diagnostic::new(
-                    "approx_constant",
+                    "approximated_constants",
                     format!("`{}` is more precise", constant.constant),
                     Label::new(constant.range),
                 )
@@ -38,7 +38,7 @@ impl Lint for ApproxConstantLint {
 }
 
 struct ApproxConstantVisitor {
-    approx_constants: Vec<ApproximatedConstant>,
+    approximated_constants: Vec<ApproximatedConstant>,
 }
 
 struct ApproximatedConstant {
@@ -50,7 +50,7 @@ impl Visitor for ApproxConstantVisitor {
     fn visit_number(&mut self, token: &full_moon::tokenizer::Token) {
         if let TokenType::Number { text } = token.token_type() {
             if is_approx_const(std::f64::consts::PI, text, 3) {
-                self.approx_constants.push(ApproximatedConstant {
+                self.approximated_constants.push(ApproximatedConstant {
                     range: (token.start_position().bytes(), token.end_position().bytes()),
                     constant: "math.pi".to_string(),
                 });
@@ -77,11 +77,11 @@ mod tests {
     use super::{super::test_util::test_lint, *};
 
     #[test]
-    fn test_approx_constant() {
+    fn test_approximated_constants() {
         test_lint(
-            ApproxConstantLint::new(()).unwrap(),
-            "approx_constant",
-            "approx_constant",
+            ApproximatedConstantsLint::new(()).unwrap(),
+            "approximated_constants",
+            "approximated_constants",
         );
     }
 }

@@ -1,4 +1,4 @@
-# approx_constant
+# approximated_constants
 ## What it does
 Checks for number literals that approximate constants.
 
