@@ -1,4 +1,4 @@
-# roblox_complex_udim2_new
+# roblox_manual_fromscale_or_fromoffset
 ## What it does
 Checks for uses of `UDim2.new` where the arguments could be simplified to `UDim2.fromScale` or `UDim2.fromOffset`.
 

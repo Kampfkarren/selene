@@ -1,0 +1,72 @@
+error[roblox_manual_fromscale_or_fromoffset]: this UDim2.new call only sets scale, and can be simplified using UDim2.fromScale
+   ┌─ roblox_manual_fromscale_or_fromoffset.lua:17:1
+   │
+17 │ UDim2.new(1, 0, 1, 0)
+   │ ^^^^^^^^^^^^^^^^^^^^^
+   │
+   = try: UDim2.fromScale(1, 1)
+
+error[roblox_manual_fromscale_or_fromoffset]: this UDim2.new call only sets scale, and can be simplified using UDim2.fromScale
+   ┌─ roblox_manual_fromscale_or_fromoffset.lua:18:1
+   │
+18 │ UDim2.new(0, 0, 1, 0)
+   │ ^^^^^^^^^^^^^^^^^^^^^
+   │
+   = try: UDim2.fromScale(0, 1)
+
+error[roblox_manual_fromscale_or_fromoffset]: this UDim2.new call only sets offset, and can be simplified using UDim2.fromOffset
+   ┌─ roblox_manual_fromscale_or_fromoffset.lua:20:1
+   │
+20 │ UDim2.new(0, 5, 0, 1)
+   │ ^^^^^^^^^^^^^^^^^^^^^
+   │
+   = try: UDim2.fromOffset(5, 1)
+
+error[roblox_manual_fromscale_or_fromoffset]: this UDim2.new call only sets offset, and can be simplified using UDim2.fromOffset
+   ┌─ roblox_manual_fromscale_or_fromoffset.lua:21:1
+   │
+21 │ UDim2.new(0, 0, 0, 1)
+   │ ^^^^^^^^^^^^^^^^^^^^^
+   │
+   = try: UDim2.fromOffset(0, 1)
+
+error[roblox_manual_fromscale_or_fromoffset]: this UDim2.new call only sets offset, and can be simplified using UDim2.fromOffset
+   ┌─ roblox_manual_fromscale_or_fromoffset.lua:22:1
+   │
+22 │ UDim2.new(0, 1, 0, 1)
+   │ ^^^^^^^^^^^^^^^^^^^^^
+   │
+   = try: UDim2.fromOffset(1, 1)
+
+error[roblox_manual_fromscale_or_fromoffset]: this UDim2.new call only sets offset, and can be simplified using UDim2.fromOffset
+   ┌─ roblox_manual_fromscale_or_fromoffset.lua:23:1
+   │
+23 │ UDim2.new(0, a, 0, 1)
+   │ ^^^^^^^^^^^^^^^^^^^^^
+   │
+   = try: UDim2.fromOffset(a, 1)
+
+error[roblox_manual_fromscale_or_fromoffset]: this UDim2.new call only sets offset, and can be simplified using UDim2.fromOffset
+   ┌─ roblox_manual_fromscale_or_fromoffset.lua:24:1
+   │
+24 │ UDim2.new(0, a, 0, b)
+   │ ^^^^^^^^^^^^^^^^^^^^^
+   │
+   = try: UDim2.fromOffset(a, b)
+
+error[roblox_manual_fromscale_or_fromoffset]: this UDim2.new call only sets scale, and can be simplified using UDim2.fromScale
+   ┌─ roblox_manual_fromscale_or_fromoffset.lua:26:1
+   │
+26 │ UDim2.new(a, 0, 0, 0)
+   │ ^^^^^^^^^^^^^^^^^^^^^
+   │
+   = try: UDim2.fromScale(a, 0)
+
+error[roblox_manual_fromscale_or_fromoffset]: this UDim2.new call only sets scale, and can be simplified using UDim2.fromScale
+   ┌─ roblox_manual_fromscale_or_fromoffset.lua:27:1
+   │
+27 │ UDim2.new(a, 0.0, 0, 0.0)
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = try: UDim2.fromScale(a, 0)
+

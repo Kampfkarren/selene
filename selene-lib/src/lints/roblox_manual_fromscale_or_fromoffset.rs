@@ -7,10 +7,10 @@ use full_moon::{
     visitors::Visitor,
 };
 
-pub struct ComplexUDim2NewLint;
+pub struct ManualFromScaleOrFromOffsetLint;
 
 fn create_diagnostic(args: &UDim2ComplexArgs) -> Diagnostic {
-    let code = "roblox_complex_udim2_new";
+    let code = "roblox_manual_fromscale_or_fromoffset";
     let primary_label = Label::new(args.call_range);
 
     match args.complexity_type {
@@ -39,7 +39,7 @@ fn create_diagnostic(args: &UDim2ComplexArgs) -> Diagnostic {
     }
 }
 
-impl Lint for ComplexUDim2NewLint {
+impl Lint for ManualFromScaleOrFromOffsetLint {
     type Config = ();
     type Error = Infallible;
 
@@ -47,7 +47,7 @@ impl Lint for ComplexUDim2NewLint {
     const LINT_TYPE: LintType = LintType::Style;
 
     fn new(_: Self::Config) -> Result<Self, Self::Error> {
-        Ok(ComplexUDim2NewLint)
+        Ok(ManualFromScaleOrFromOffsetLint)
     }
 
     fn pass(&self, ast: &Ast, context: &Context, _: &AstContext) -> Vec<Diagnostic> {
@@ -146,11 +146,11 @@ mod tests {
     use super::{super::test_util::test_lint, *};
 
     #[test]
-    fn test_roblox_complex_udim2_new() {
+    fn test_manual_fromscale_or_fromoffset() {
         test_lint(
-            ComplexUDim2NewLint::new(()).unwrap(),
-            "roblox_complex_udim2_new",
-            "roblox_complex_udim2_new",
+            ManualFromScaleOrFromOffsetLint::new(()).unwrap(),
+            "roblox_manual_fromscale_or_fromoffset",
+            "roblox_manual_fromscale_or_fromoffset",
         );
     }
 }
