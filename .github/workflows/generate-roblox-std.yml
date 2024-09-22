@@ -8,7 +8,7 @@ jobs:
     - name: Generate
       run: cargo run --bin selene --verbose -- generate-roblox-std
     - name: Upload
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: roblox
         path: roblox.yml

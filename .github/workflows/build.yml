@@ -16,7 +16,7 @@ jobs:
         cd selene
         cargo build --locked --release
     - name: Upload selene
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: selene-windows
         path: ./target/release/selene.exe
@@ -29,7 +29,7 @@ jobs:
         cd selene
         cargo build --locked --release --verbose --no-default-features
     - name: Upload selene-light
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: selene-light-windows
         path: ./target/release/selene.exe
@@ -45,7 +45,7 @@ jobs:
         cd selene
         cargo build --locked --release
     - name: Upload selene
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: selene-macos
         path: ./target/release/selene
@@ -61,7 +61,7 @@ jobs:
         cd selene
         cargo build --locked --release --verbose --no-default-features
     - name: Upload selene-light
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: selene-light-macos
         path: ./target/release/selene
@@ -74,7 +74,7 @@ jobs:
         cd selene
         cargo build --locked --release
     - name: Upload selene
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: selene-linux
         path: ./target/release/selene
@@ -87,7 +87,7 @@ jobs:
         cd selene
         cargo build --locked --release --verbose --no-default-features
     - name: Upload selene-light
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: selene-light-linux
         path: ./target/release/selene
