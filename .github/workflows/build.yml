@@ -10,7 +10,7 @@ jobs:
   build_windows:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Build (Default features)
       run: |
         cd selene
@@ -23,7 +23,7 @@ jobs:
   build_windows_light:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Build (Lightweight)
       run: |
         cd selene
@@ -36,7 +36,7 @@ jobs:
   build_mac:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Install Rust
       run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - name: Build (Default features)
@@ -52,7 +52,7 @@ jobs:
   build_mac_light:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Install Rust
       run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - name: Build (Lightweight)
@@ -68,7 +68,7 @@ jobs:
   build_linux:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Build (Default features)
       run: |
         cd selene
@@ -81,7 +81,7 @@ jobs:
   build_linux_light:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Build (Lightweight)
       run: |
         cd selene
@@ -96,9 +96,9 @@ jobs:
     needs: ['build_windows_light', 'build_windows', 'build_mac', 'build_mac_light', 'build_linux', 'build_linux_light']
     if: contains(github.event.head_commit.message, '[release]')
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Download artifacts
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         path: artifacts
     - run: |
@@ -184,7 +184,7 @@ jobs:
         asset_path: ./selene-light-macos.zip
         asset_name: selene-light-${{ env.VERSION }}-macos.zip
         asset_content_type: application/zip
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Log in to Docker Hub
       uses: docker/login-action@v1
       with:
