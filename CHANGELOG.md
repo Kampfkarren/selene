@@ -4,7 +4,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.27.1...HEAD)
 ### Added
 - Added `Path2DControlPoint.new` to the Roblox standard library
+- [Adds `lua_versions` to standard library definitions](https://kampfkarren.github.io/selene/usage/std.html#lua_versions). Specifying this will only allow the syntax used by those languages. The default standard libraries now specify these, meaning that invalid syntax for that language will no longer be supported.
 - Added missing third parameter to `PathWaypoint.new` in the Roblox standard library
+
+### Changed
+- Upgrades to [full-moon 1.0.0](https://github.com/Kampfkarren/full-moon/blob/main/CHANGELOG.md#100---2024-10-08), which should provide faster parse speeds, support for multiple parsing errors at the same time, and support for some new Luau syntax.
 
 ## [0.27.1](https://github.com/Kampfkarren/selene/releases/tag/0.27.1) - 2024-04-28
 ### Fixed

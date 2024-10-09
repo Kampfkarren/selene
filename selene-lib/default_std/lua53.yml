@@ -1,5 +1,7 @@
 ---
 base: lua52
+lua_versions:
+  - lua53
 globals:
   math.tointeger:
     args:

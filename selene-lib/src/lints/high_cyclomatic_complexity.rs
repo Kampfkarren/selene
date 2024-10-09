@@ -400,7 +400,8 @@ impl Visitor for HighCyclomaticComplexityVisitor {
     }
 
     fn visit_expression(&mut self, expression: &ast::Expression) {
-        if let ast::Expression::Function((_, function_body)) = expression {
+        if let ast::Expression::Function(function_box) = expression {
+            let function_body = &function_box.1;
             let complexity = count_block_complexity(function_body.block(), 1);
             if complexity > self.config.maximum_complexity {
                 self.positions.push((

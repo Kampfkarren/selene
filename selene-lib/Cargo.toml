@@ -30,6 +30,11 @@ pretty_assertions = "1.3"
 termcolor = "1.2"
 
 [features]
-default = ["roblox"]
+default = ["lua52", "lua53", "lua54", "luajit", "roblox"]
 force_exhaustive_checks = []
+
+lua52 = ["full_moon/lua52"]
+lua53 = ["full_moon/lua53"]
+lua54 = ["full_moon/lua54"]
+luajit = ["full_moon/luajit"]
 roblox = ["full_moon/roblox"]
