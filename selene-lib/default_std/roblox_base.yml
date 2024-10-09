@@ -369,6 +369,8 @@ globals:
       - required: false
         type:
           display: PathWaypointAction
+      - required: false
+        type: string
     must_use: true
   PhysicalProperties.new:
     args:
