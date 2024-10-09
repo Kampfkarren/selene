@@ -107,7 +107,7 @@ impl ParameterCount {
             )]
             match parameter {
                 ast::Parameter::Name(_) => necessary_params += 1,
-                ast::Parameter::Ellipse(_) => {
+                ast::Parameter::Ellipsis(_) => {
                     if necessary_params == 0 {
                         return Self::Variable;
                     } else {
@@ -331,7 +331,8 @@ impl Visitor for MapFunctionDefinitionVisitor<'_> {
             .zip(local_assignment.expressions());
 
         for (name_token, expression) in assignment_expressions {
-            if let ast::Expression::Function((_, function_body)) = expression {
+            if let ast::Expression::Function(function_box) = expression {
+                let function_body = &function_box.1;
                 let identifier = range(name_token);
 
                 if let Some(id) = self.find_variable(identifier) {
@@ -346,7 +347,8 @@ impl Visitor for MapFunctionDefinitionVisitor<'_> {
         let assignment_expressions = assignment.variables().iter().zip(assignment.expressions());
 
         for (var, expression) in assignment_expressions {
-            if let ast::Expression::Function((_, function_body)) = expression {
+            if let ast::Expression::Function(function_box) = expression {
+                let function_body = &function_box.1;
                 let identifier = range(var);
 
                 if let Some(reference) = self.find_reference(identifier) {

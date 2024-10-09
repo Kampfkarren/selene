@@ -3,6 +3,8 @@
 # Invalid (put in selene-lib/default_std/roblox_base.yml instead): CFrame.new(), Instance.new(), task.spawn()
 ---
 base: lua51
+lua_versions:
+  - luau
 globals:
   bit32.arshift:
     args:

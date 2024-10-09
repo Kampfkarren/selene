@@ -15,7 +15,8 @@ use codespan_reporting::{
     },
     term::DisplayStyle as CodespanDisplayStyle,
 };
-use selene_lib::{lints::Severity, *};
+use full_moon::LuaVersion;
+use selene_lib::{lints::Severity, standard_library::LuaVersionError, *};
 use structopt::{clap, StructOpt};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use threadpool::ThreadPool;
@@ -52,6 +53,7 @@ lazy_static::lazy_static! {
 static LINT_ERRORS: AtomicUsize = AtomicUsize::new(0);
 static LINT_WARNINGS: AtomicUsize = AtomicUsize::new(0);
 static PARSE_ERRORS: AtomicUsize = AtomicUsize::new(0);
+static STANDARD_LIBRARY_ERRORS: AtomicUsize = AtomicUsize::new(0);
 
 fn get_color() -> ColorChoice {
     let lock = OPTIONS.read().unwrap();
@@ -178,7 +180,12 @@ fn emit_codespan_locked(
     emit_codespan(&mut stdout, files, diagnostic);
 }
 
-fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut reader: R) {
+fn read<R: Read>(
+    checker: &Checker<toml::value::Value>,
+    filename: &Path,
+    lua_version: LuaVersion,
+    mut reader: R,
+) {
     let mut buffer = Vec::new();
     if let Err(error) = reader.read_to_end(&mut buffer) {
         error!(
@@ -202,67 +209,75 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
     let ast = {
         profiling::scope!("full_moon::parse");
 
-        match full_moon::parse(&contents) {
+        match full_moon::parse_fallible(&contents, lua_version).into_result() {
             Ok(ast) => ast,
-            Err(error) => {
-                PARSE_ERRORS.fetch_add(1, Ordering::SeqCst);
+            Err(errors) => {
+                for error in errors {
+                    PARSE_ERRORS.fetch_add(1, Ordering::SeqCst);
+                    match error {
+                        full_moon::Error::AstError(ast_error) => {
+                            let token = ast_error.token();
 
-                match error {
-                    full_moon::Error::AstError(full_moon::ast::AstError::UnexpectedToken {
-                        token,
-                        additional,
-                    }) => emit_codespan_locked(
-                        &files,
-                        &CodespanDiagnostic {
-                            severity: CodespanSeverity::Error,
-                            code: Some("parse_error".to_owned()),
-                            message: format!("unexpected token `{token}`"),
-                            labels: vec![CodespanLabel::primary(
-                                source_id,
-                                codespan::Span::new(
-                                    token.start_position().bytes() as u32,
-                                    token.end_position().bytes() as u32,
-                                ),
+                            emit_codespan_locked(
+                                &files,
+                                &CodespanDiagnostic {
+                                    severity: CodespanSeverity::Error,
+                                    code: Some("parse_error".to_owned()),
+                                    message: format!("unexpected token `{token}`"),
+                                    labels: vec![CodespanLabel::primary(
+                                        source_id,
+                                        codespan::Span::new(
+                                            token.start_position().bytes() as u32,
+                                            token.end_position().bytes() as u32,
+                                        ),
+                                    )
+                                    .with_message(ast_error.error_message())],
+                                    notes: Vec::new(),
+                                },
                             )
-                            .with_message(additional.unwrap_or_default())],
-                            notes: Vec::new(),
-                        },
-                    ),
-                    full_moon::Error::TokenizerError(error) => emit_codespan_locked(
-                        &files,
-                        &CodespanDiagnostic {
-                            severity: CodespanSeverity::Error,
-                            code: Some("parse_error".to_owned()),
-                            message: match error.error() {
-                                full_moon::tokenizer::TokenizerErrorType::UnclosedComment => {
-                                    "unclosed comment".to_string()
-                                }
-                                full_moon::tokenizer::TokenizerErrorType::UnclosedString => {
-                                    "unclosed string".to_string()
-                                }
-                                full_moon::tokenizer::TokenizerErrorType::UnexpectedShebang => {
-                                    "unexpected shebang".to_string()
-                                }
-                                full_moon::tokenizer::TokenizerErrorType::UnexpectedToken(
-                                    character,
-                                ) => {
-                                    format!("unexpected character {character}")
-                                }
-                                full_moon::tokenizer::TokenizerErrorType::InvalidSymbol(symbol) => {
-                                    format!("invalid symbol {symbol}")
-                                }
+                        }
+
+                        full_moon::Error::TokenizerError(error) => emit_codespan_locked(
+                            &files,
+                            &CodespanDiagnostic {
+                                severity: CodespanSeverity::Error,
+                                code: Some("parse_error".to_owned()),
+                                message: match error.error() {
+                                    full_moon::tokenizer::TokenizerErrorType::UnclosedComment => {
+                                        "unclosed comment".to_string()
+                                    }
+
+                                    full_moon::tokenizer::TokenizerErrorType::UnclosedString => {
+                                        "unclosed string".to_string()
+                                    }
+
+                                    full_moon::tokenizer::TokenizerErrorType::UnexpectedToken(
+                                        character,
+                                    ) => {
+                                        format!("unexpected character {character}")
+                                    }
+
+                                    full_moon::tokenizer::TokenizerErrorType::InvalidNumber => {
+                                        "invalid number".to_string()
+                                    }
+
+                                    full_moon::tokenizer::TokenizerErrorType::InvalidSymbol(
+                                        symbol,
+                                    ) => {
+                                        format!("invalid symbol {symbol}")
+                                    }
+                                },
+                                labels: vec![CodespanLabel::primary(
+                                    source_id,
+                                    codespan::Span::new(
+                                        error.position().bytes() as u32,
+                                        error.position().bytes() as u32,
+                                    ),
+                                )],
+                                notes: Vec::new(),
                             },
-                            labels: vec![CodespanLabel::primary(
-                                source_id,
-                                codespan::Span::new(
-                                    error.position().bytes() as u32,
-                                    error.position().bytes() as u32,
-                                ),
-                            )],
-                            notes: Vec::new(),
-                        },
-                    ),
-                    _ => error!("Error parsing {}: {}", filename.display(), error),
+                        ),
+                    }
                 }
 
                 return;
@@ -376,10 +391,11 @@ fn read<R: Read>(checker: &Checker<toml::value::Value>, filename: &Path, mut rea
     }
 }
 
-fn read_file(checker: &Checker<toml::value::Value>, filename: &Path) {
+fn read_file(checker: &Checker<toml::value::Value>, lua_version: LuaVersion, filename: &Path) {
     read(
         checker,
         filename,
+        lua_version,
         match fs::File::open(filename) {
             Ok(file) => file,
             Err(error) => {
@@ -595,6 +611,21 @@ fn start(mut options: opts::Options) {
         }
     };
 
+    let (lua_version, problems) = standard_library.lua_version();
+    if !problems.is_empty() {
+        for problem in problems {
+            match problem {
+                LuaVersionError::FeatureNotEnabled(feature) => {
+                    error!("lua version {feature} in standard library, but feature for it is not enabled");
+                }
+
+                LuaVersionError::Unknown(version) => {
+                    error!("unknown lua version {version} in standard library");
+                }
+            }
+        }
+    }
+
     let checker = Arc::new(match Checker::new(config, standard_library) {
         Ok(checker) => checker,
         Err(error) => {
@@ -608,7 +639,7 @@ fn start(mut options: opts::Options) {
     for filename in &options.files {
         if filename == "-" {
             let checker = Arc::clone(&checker);
-            pool.execute(move || read(&checker, Path::new("-"), io::stdin().lock()));
+            pool.execute(move || read(&checker, Path::new("-"), lua_version, io::stdin().lock()));
             continue;
         }
 
@@ -622,7 +653,7 @@ fn start(mut options: opts::Options) {
                         continue;
                     }
 
-                    pool.execute(move || read_file(&checker, Path::new(&filename)));
+                    pool.execute(move || read_file(&checker, lua_version, Path::new(&filename)));
                 } else if metadata.is_dir() {
                     for pattern in &options.pattern {
                         let glob = match glob::glob(&format!(
@@ -646,7 +677,7 @@ fn start(mut options: opts::Options) {
 
                                     let checker = Arc::clone(&checker);
 
-                                    pool.execute(move || read_file(&checker, &path));
+                                    pool.execute(move || read_file(&checker, lua_version, &path));
                                 }
 
                                 Err(error) => {
@@ -678,17 +709,19 @@ fn start(mut options: opts::Options) {
 
     pool.join();
 
-    let (parse_errors, lint_errors, lint_warnings) = (
+    let (parse_errors, lint_errors, lint_warnings, standard_library_errors) = (
         PARSE_ERRORS.load(Ordering::SeqCst),
         LINT_ERRORS.load(Ordering::SeqCst),
         LINT_WARNINGS.load(Ordering::SeqCst),
+        STANDARD_LIBRARY_ERRORS.load(Ordering::SeqCst),
     );
 
     if !options.luacheck && !options.no_summary {
         log_total(parse_errors, lint_errors, lint_warnings).ok();
     }
 
-    let error_count = parse_errors + lint_errors + lint_warnings + pool.panic_count();
+    let error_count =
+        parse_errors + lint_errors + lint_warnings + standard_library_errors + pool.panic_count();
     if error_count > 0 {
         let lock = OPTIONS.read().unwrap();
         let opts = lock.as_ref().unwrap();
