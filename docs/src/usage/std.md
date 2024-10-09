@@ -9,12 +9,33 @@ For examples of the standard library format, see:
 
 ## base
 
-Used for specifying what standard library to be based off of. This supports both builtin libraries (lua51, lua52, lua53, roblox), as well as any standard libraries that can be found in the current directory.
+Used for specifying what standard library to be based off of. This supports both builtin libraries (lua51, lua52, lua53, lua54, roblox), as well as any standard libraries that can be found in the current directory.
 
 ```yaml
 --- # This begins a YAML file
 base: lua51 # We will be extending off of Lua 5.1.
 ```
+
+## lua_versions
+
+Used for specifying the versions of Lua you support for the purpose of supporting the syntax of those dialects. If empty, will default to 5.1.
+
+Supports the following options:
+- `lua51` - Lua 5.1
+- `lua52` - Lua 5.2
+- `lua53` - Lua 5.3
+- `lua54` - Lua 5.4
+- `luau` - [Luau](https://luau-lang.org)
+- `luajit` - LuaJIT
+
+Usually you only need to specify one--for example, `lua54` will give Lua 5.4 syntax and all versions prior. That means that if you specify it, it will look something like:
+
+```yml
+lua_versions:
+- luajit
+```
+
+If you are extending off a library that specifies it (like `lua51`, etc) then you do not need this. If you specify it while overriding a library, it will override it.
 
 ## globals
 This is where the magic happens. The `globals` field is a dictionary where the keys are the globals you want to define. The value you give tells selene what the value can be, do, and provide.
