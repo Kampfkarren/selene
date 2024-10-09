@@ -526,10 +526,26 @@ error[invalid_lint_filter]: global filters must come before any code
 <li><a href="https://gist.github.com/Kampfkarren/dff2dc17cc30d68a48510da58fff2381"><code>roblox.yml</code></a> - A standard library for Roblox that incorporates all the advanced features of the format. If you are a Roblox developer, don't use this as anything other than reference--an up to date version of this library is automatically generated.</li>
 </ul>
 <h2 id="base"><a class="header" href="#base">base</a></h2>
-<p>Used for specifying what standard library to be based off of. This supports both builtin libraries (lua51, lua52, lua53, roblox), as well as any standard libraries that can be found in the current directory.</p>
+<p>Used for specifying what standard library to be based off of. This supports both builtin libraries (lua51, lua52, lua53, lua54, roblox), as well as any standard libraries that can be found in the current directory.</p>
 <pre><code class="language-yaml">--- # This begins a YAML file
 base: lua51 # We will be extending off of Lua 5.1.
 </code></pre>
+<h2 id="lua_versions"><a class="header" href="#lua_versions">lua_versions</a></h2>
+<p>Used for specifying the versions of Lua you support for the purpose of supporting the syntax of those dialects. If empty, will default to 5.1.</p>
+<p>Supports the following options:</p>
+<ul>
+<li><code>lua51</code> - Lua 5.1</li>
+<li><code>lua52</code> - Lua 5.2</li>
+<li><code>lua53</code> - Lua 5.3</li>
+<li><code>lua54</code> - Lua 5.4</li>
+<li><code>luau</code> - <a href="https://luau-lang.org">Luau</a></li>
+<li><code>luajit</code> - LuaJIT</li>
+</ul>
+<p>Usually you only need to specify one--for example, <code>lua54</code> will give Lua 5.4 syntax and all versions prior. That means that if you specify it, it will look something like:</p>
+<pre><code class="language-yml">lua_versions:
+- luajit
+</code></pre>
+<p>If you are extending off a library that specifies it (like <code>lua51</code>, etc) then you do not need this. If you specify it while overriding a library, it will override it.</p>
 <h2 id="globals"><a class="header" href="#globals">globals</a></h2>
 <p>This is where the magic happens. The <code>globals</code> field is a dictionary where the keys are the globals you want to define. The value you give tells selene what the value can be, do, and provide.</p>
 <p>If your standard library is based off another, overriding something defined there will use your implementation over the original.</p>
