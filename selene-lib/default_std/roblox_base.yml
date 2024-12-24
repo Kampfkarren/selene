@@ -672,6 +672,21 @@ globals:
       - type: any
       - required: false
         type: "..."
+  Content.fromObject:
+    args:
+      - required: true
+        type:
+            display: Object
+    must_use: true
+  Content.fromUri:
+    args:
+      - required: true
+        type: string
+    must_use: true
+  Content.fromAssetId:
+    args:
+      - required: true
+        type: number
 structs:
   EnumItem:
     Name:
