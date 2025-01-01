@@ -300,6 +300,14 @@ globals:
       - required: false
         type: number
     must_use: true
+  math.map:
+    args:
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+    must_use: true
   math.noise:
     args:
       - type: number
