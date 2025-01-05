@@ -508,11 +508,6 @@ globals:
       - type:
           display: vector
     must_use: true
-  vector.normalize:
-    args:
-      - type:
-          display: vector
-    must_use: true
   vector.max:
     args:
       - type:
@@ -527,12 +522,17 @@ globals:
       - type: "..."
         required: false
     must_use: true
+  vector.normalize:
+    args:
+      - type:
+          display: vector
+    must_use: true
+  vector.one:
+    property: read-only
   vector.sign:
     args:
       - type:
           display: vector
     must_use: true
   vector.zero:
-    property: read-only
-  vector.one:
     property: read-only
