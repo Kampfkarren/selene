@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `Path2DControlPoint.new`, `Content.fromUri`, `Content.fromAssetId`, and `Content.fromObject` to the Roblox standard library
 - [Adds `lua_versions` to standard library definitions](https://kampfkarren.github.io/selene/usage/std.html#lua_versions). Specifying this will only allow the syntax used by those languages. The default standard libraries now specify these, meaning that invalid syntax for that language will no longer be supported.
 - Added missing third parameter to `PathWaypoint.new` in the Roblox standard library
+- Added `vector` library to Luau standard library
 - Added `math.map` to the Luau standard library
 
 ### Changed

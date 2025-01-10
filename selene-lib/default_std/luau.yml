@@ -457,3 +457,90 @@ globals:
       - required: false
         type: number
     must_use: true
+  vector.abs:
+    args:
+      - type:
+          display: vector
+    must_use: true
+  vector.angle:
+    args:
+      - type:
+          display: vector
+      - type:
+          display: vector
+      - required: false
+        type:
+            display: vector
+    must_use: true
+  vector.ceil:
+    args:
+      - type:
+          display: vector
+    must_use: true
+  vector.clamp:
+    args:
+      - type:
+          display: vector
+      - type:
+          display: vector
+      - type:
+          display: vector
+    must_use: true
+  vector.create:
+    args:
+      - type: number
+      - type: number
+      - type: number
+    must_use: true
+  vector.cross:
+    args:
+      - type:
+          display: vector
+      - type:
+          display: vector
+    must_use: true
+  vector.dot:
+    args:
+      - type:
+          display: vector
+      - type:
+          display: vector
+    must_use: true
+  vector.floor:
+    args:
+      - type:
+          display: vector
+    must_use: true
+  vector.magnitude:
+    args:
+      - type:
+          display: vector
+    must_use: true
+  vector.max:
+    args:
+      - type:
+          display: vector
+      - type: "..."
+        required: false
+    must_use: true
+  vector.min:
+    args:
+      - type:
+          display: vector
+      - type: "..."
+        required: false
+    must_use: true
+  vector.normalize:
+    args:
+      - type:
+          display: vector
+    must_use: true
+  vector.one:
+    property: read-only
+  vector.sign:
+    args:
+      - type:
+          display: vector
+    must_use: true
+  vector.zero:
+    property: read-only
