@@ -1,7 +1,9 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.27.1...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.28.0...HEAD)
+
+## [0.28.0](https://github.com/Kampfkarren/selene/releases/0.28.0) - 2025-01-09
 ### Added
 - Added `Path2DControlPoint.new`, `Content.fromUri`, `Content.fromAssetId`, and `Content.fromObject` to the Roblox standard library
 - [Adds `lua_versions` to standard library definitions](https://kampfkarren.github.io/selene/usage/std.html#lua_versions). Specifying this will only allow the syntax used by those languages. The default standard libraries now specify these, meaning that invalid syntax for that language will no longer be supported.
