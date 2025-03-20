@@ -326,9 +326,9 @@ use_lints! {
 
     #[cfg(feature = "roblox")]
     {
-        roblox_manual_fromscale_or_fromoffset: lints::roblox_manual_fromscale_or_fromoffset::ManualFromScaleOrFromOffsetLint,
         roblox_incorrect_color3_new_bounds: lints::roblox_incorrect_color3_new_bounds::Color3BoundsLint,
         roblox_incorrect_roact_usage: lints::roblox_incorrect_roact_usage::IncorrectRoactUsageLint,
+        roblox_manual_fromscale_or_fromoffset: lints::roblox_manual_fromscale_or_fromoffset::ManualFromScaleOrFromOffsetLint,
         roblox_suspicious_udim2_new: lints::roblox_suspicious_udim2_new::SuspiciousUDim2NewLint,
     },
 }
