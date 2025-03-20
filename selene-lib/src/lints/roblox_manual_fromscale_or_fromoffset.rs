@@ -116,7 +116,6 @@ impl Visitor for UDim2NewVisitor {
                 if only_offset && only_scale
                 {
                     // Skip linting if all are zero
-                    return;
                 }
                 else if only_offset
                 {
