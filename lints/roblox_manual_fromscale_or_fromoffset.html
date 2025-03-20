@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Lints - selene Documentation</title>
+        <title>roblox_manual_fromscale_or_fromoffset - selene Documentation</title>
 
 
         <!-- Custom HTML head -->
@@ -152,18 +152,26 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="lints"><a class="header" href="#lints">Lints</a></h1>
-<p>The following is the list of lints that selene will check for in your code.</p>
+                        <h1 id="roblox_manual_fromscale_or_fromoffset"><a class="header" href="#roblox_manual_fromscale_or_fromoffset">roblox_manual_fromscale_or_fromoffset</a></h1>
+<h2 id="what-it-does"><a class="header" href="#what-it-does">What it does</a></h2>
+<p>Checks for uses of <code>UDim2.new</code> where the arguments could be simplified to <code>UDim2.fromScale</code> or <code>UDim2.fromOffset</code>.</p>
+<h2 id="why-this-is-bad"><a class="header" href="#why-this-is-bad">Why this is bad</a></h2>
+<p>This reduces readability of <code>UDim2.new()</code> construction.</p>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
+<pre><code class="language-lua">UDim2.new(1, 0, 1, 0)
+</code></pre>
+<h2 id="remarks"><a class="header" href="#remarks">Remarks</a></h2>
+<p>This lint is only active if you are using the Roblox standard library.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../contributing.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../lints/roblox_incorrect_roact_usage.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../lints/almost_swapped.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../lints/roblox_suspicious_udim2_new.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -173,11 +181,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../contributing.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../lints/roblox_incorrect_roact_usage.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../lints/almost_swapped.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../lints/roblox_suspicious_udim2_new.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

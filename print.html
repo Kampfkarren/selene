@@ -25,9 +25,9 @@
         <link rel="stylesheet" href="fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" href="highlight.css">
-        <link rel="stylesheet" href="tomorrow-night.css">
-        <link rel="stylesheet" href="ayu-highlight.css">
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
@@ -1259,28 +1259,38 @@ Roact.createElement("BadClass", {})
 <p>This lint assumes legacy Roact if the variable name is <code>Roact</code> and Roact17 if the variable name is named <code>React</code>.</p>
 <p>This lint does not verify if the value you are giving is correct, so <code>Text = UDim2.new()</code> will be treated as correct. This lint, right now, only checks property and class names.</p>
 <p>This lint is only active if you are using the Roblox standard library.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="roblox_suspicious_udim2_new"><a class="header" href="#roblox_suspicious_udim2_new">roblox_suspicious_udim2_new</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="roblox_manual_fromscale_or_fromoffset"><a class="header" href="#roblox_manual_fromscale_or_fromoffset">roblox_manual_fromscale_or_fromoffset</a></h1>
 <h2 id="what-it-does-20"><a class="header" href="#what-it-does-20">What it does</a></h2>
-<p>Checks for too little arguments passed to <code>UDim2.new()</code>.</p>
+<p>Checks for uses of <code>UDim2.new</code> where the arguments could be simplified to <code>UDim2.fromScale</code> or <code>UDim2.fromOffset</code>.</p>
 <h2 id="why-this-is-bad-19"><a class="header" href="#why-this-is-bad-19">Why this is bad</a></h2>
+<p>This reduces readability of <code>UDim2.new()</code> construction.</p>
+<h2 id="example-20"><a class="header" href="#example-20">Example</a></h2>
+<pre><code class="language-lua">UDim2.new(1, 0, 1, 0)
+</code></pre>
+<h2 id="remarks-10"><a class="header" href="#remarks-10">Remarks</a></h2>
+<p>This lint is only active if you are using the Roblox standard library.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="roblox_suspicious_udim2_new"><a class="header" href="#roblox_suspicious_udim2_new">roblox_suspicious_udim2_new</a></h1>
+<h2 id="what-it-does-21"><a class="header" href="#what-it-does-21">What it does</a></h2>
+<p>Checks for too little arguments passed to <code>UDim2.new()</code>.</p>
+<h2 id="why-this-is-bad-20"><a class="header" href="#why-this-is-bad-20">Why this is bad</a></h2>
 <p>Passing in an incorrect number of arguments can indicate that the user meant to use <code>UDim2.fromScale</code> or <code>UDim2.fromOffset</code>.
 Even if the user really only needed to pass in a fewer number of arguments to <code>UDim2.new</code>, this lowers readability
 as it calls into question whether it's a bug or if the user truly meant to use <code>UDim2.new</code>.</p>
-<h2 id="example-20"><a class="header" href="#example-20">Example</a></h2>
+<h2 id="example-21"><a class="header" href="#example-21">Example</a></h2>
 <pre><code class="language-lua">UDim2.new(1, 1) -- error, UDim2.new takes 4 numbers, but 2 were provided.
 </code></pre>
-<h2 id="remarks-10"><a class="header" href="#remarks-10">Remarks</a></h2>
+<h2 id="remarks-11"><a class="header" href="#remarks-11">Remarks</a></h2>
 <p>This lint is only active if you are using the Roblox standard library.</p>
 <p>This lint does not warn if passing in exactly 2 arguments and none of those are number literals to prevent false positives
 with <code>UDim2.new(UDim.new(a, b), UDim.new(c, d))</code></p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="shadowing"><a class="header" href="#shadowing">shadowing</a></h1>
-<h2 id="what-it-does-21"><a class="header" href="#what-it-does-21">What it does</a></h2>
+<h2 id="what-it-does-22"><a class="header" href="#what-it-does-22">What it does</a></h2>
 <p>Checks for overriding of variables under the same name.</p>
-<h2 id="why-this-is-bad-20"><a class="header" href="#why-this-is-bad-20">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-21"><a class="header" href="#why-this-is-bad-21">Why this is bad</a></h2>
 <p>This can cause confusion when reading the code when trying to understand which variable is being used, and if you want to use the original variable you either have to redefine it under a temporary name or refactor the code that shadowed it.</p>
 <h2 id="configuration-7"><a class="header" href="#configuration-7">Configuration</a></h2>
 <p><code>ignore_pattern</code> (default: <code>"^_"</code>) - A <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a> that is used to specify names that are allowed to be shadowed. The default allows for variables like <code>_</code> to be shadowed, as they shouldn't be used anyway.</p>
-<h2 id="example-21"><a class="header" href="#example-21">Example</a></h2>
+<h2 id="example-22"><a class="header" href="#example-22">Example</a></h2>
 <pre><code class="language-lua">local x = 1
 
 if foo then
@@ -1288,39 +1298,39 @@ if foo then
 end
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="suspicious_reverse_loop"><a class="header" href="#suspicious_reverse_loop">suspicious_reverse_loop</a></h1>
-<h2 id="what-it-does-22"><a class="header" href="#what-it-does-22">What it does</a></h2>
+<h2 id="what-it-does-23"><a class="header" href="#what-it-does-23">What it does</a></h2>
 <p>Checks for <code>for _ = #x, 1 do</code> sequences without specifying a negative step.</p>
-<h2 id="why-this-is-bad-21"><a class="header" href="#why-this-is-bad-21">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-22"><a class="header" href="#why-this-is-bad-22">Why this is bad</a></h2>
 <p>This loop will only run at most once, instead of going in reverse. If you truly did mean to run your loop only once, just use <code>if #x &gt; 0</code> instead.</p>
-<h2 id="example-22"><a class="header" href="#example-22">Example</a></h2>
+<h2 id="example-23"><a class="header" href="#example-23">Example</a></h2>
 <pre><code class="language-lua">for _ = #x, 1 do
 </code></pre>
 <p>...should be written as...</p>
 <pre><code class="language-lua">for _ = #x, 1, -1 do
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="type_check_inside_call"><a class="header" href="#type_check_inside_call">type_check_inside_call</a></h1>
-<h2 id="what-it-does-23"><a class="header" href="#what-it-does-23">What it does</a></h2>
+<h2 id="what-it-does-24"><a class="header" href="#what-it-does-24">What it does</a></h2>
 <p>Checks for <code>type(foo == "type")</code>, instead of <code>type(foo) == "type"</code>.</p>
-<h2 id="why-this-is-bad-22"><a class="header" href="#why-this-is-bad-22">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-23"><a class="header" href="#why-this-is-bad-23">Why this is bad</a></h2>
 <p>This will always return <code>"boolean"</code>, and is undoubtedly not what you intended to write.</p>
-<h2 id="example-23"><a class="header" href="#example-23">Example</a></h2>
+<h2 id="example-24"><a class="header" href="#example-24">Example</a></h2>
 <pre><code class="language-lua">return type(foo == "number")
 </code></pre>
 <p>...should be written as...</p>
 <pre><code class="language-lua">return type(foo) == "number"
 </code></pre>
-<h2 id="remarks-11"><a class="header" href="#remarks-11">Remarks</a></h2>
+<h2 id="remarks-12"><a class="header" href="#remarks-12">Remarks</a></h2>
 <p>When using the Roblox standard library, this checks <code>typeof</code> as well.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="unbalanced_assignments"><a class="header" href="#unbalanced_assignments">unbalanced_assignments</a></h1>
-<h2 id="what-it-does-24"><a class="header" href="#what-it-does-24">What it does</a></h2>
+<h2 id="what-it-does-25"><a class="header" href="#what-it-does-25">What it does</a></h2>
 <p>Checks for unbalanced assignments, such as <code>a, b, c = 1</code>.</p>
-<h2 id="why-this-is-bad-23"><a class="header" href="#why-this-is-bad-23">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-24"><a class="header" href="#why-this-is-bad-24">Why this is bad</a></h2>
 <p>You shouldn't declare variables you're not immediately initializing on the same line as ones you are. This is most likely just forgetting to specify the rest of the variables.</p>
-<h2 id="example-24"><a class="header" href="#example-24">Example</a></h2>
+<h2 id="example-25"><a class="header" href="#example-25">Example</a></h2>
 <pre><code class="language-lua">a, b, c = 1
 a = 1, 2
 </code></pre>
-<h2 id="remarks-12"><a class="header" href="#remarks-12">Remarks</a></h2>
+<h2 id="remarks-13"><a class="header" href="#remarks-13">Remarks</a></h2>
 <p>There are a few things this lint won't catch.</p>
 <p><code>a, b, c = call()</code> will not lint, as <code>call()</code> could return multiple values.</p>
 <p><code>a, b, c = call(), 2</code> will, however, as you will only be using the first value of <code>call()</code>. You will even receive a helpful message about this.</p>
@@ -1343,38 +1353,38 @@ a = 1, 2
 </code></pre>
 <p>...will not lint.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="undefined_variable"><a class="header" href="#undefined_variable">undefined_variable</a></h1>
-<h2 id="what-it-does-25"><a class="header" href="#what-it-does-25">What it does</a></h2>
+<h2 id="what-it-does-26"><a class="header" href="#what-it-does-26">What it does</a></h2>
 <p>Checks for uses of variables that are not defined.</p>
-<h2 id="why-this-is-bad-24"><a class="header" href="#why-this-is-bad-24">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-25"><a class="header" href="#why-this-is-bad-25">Why this is bad</a></h2>
 <p>This is most likely a typo.</p>
-<h2 id="example-25"><a class="header" href="#example-25">Example</a></h2>
+<h2 id="example-26"><a class="header" href="#example-26">Example</a></h2>
 <pre><code class="language-lua">-- vv oops!
 prinnt("hello, world!")
 </code></pre>
-<h2 id="remarks-13"><a class="header" href="#remarks-13">Remarks</a></h2>
+<h2 id="remarks-14"><a class="header" href="#remarks-14">Remarks</a></h2>
 <p>If you are using a different standard library where a global variable is defined that selene isn't picking up on, create a <a href="lints/../usage/std.html">standard library</a> that specifies it.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="unscoped_variables"><a class="header" href="#unscoped_variables">unscoped_variables</a></h1>
-<h2 id="what-it-does-26"><a class="header" href="#what-it-does-26">What it does</a></h2>
+<h2 id="what-it-does-27"><a class="header" href="#what-it-does-27">What it does</a></h2>
 <p>Checks for variables that are unscoped (don't have a local variable attached).</p>
-<h2 id="why-this-is-bad-25"><a class="header" href="#why-this-is-bad-25">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-26"><a class="header" href="#why-this-is-bad-26">Why this is bad</a></h2>
 <p>Unscoped variables make code harder to read and debug, as well as making it harder for selene to analyze.</p>
 <h2 id="configuration-8"><a class="header" href="#configuration-8">Configuration</a></h2>
 <p><code>ignore_pattern</code> (default: <code>"^_"</code>) - A <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a> for variables that are allowed to be unscoped. The default allows for variables like <code>_</code> to be unscoped, as they shouldn't be used anyway.</p>
-<h2 id="example-26"><a class="header" href="#example-26">Example</a></h2>
+<h2 id="example-27"><a class="header" href="#example-27">Example</a></h2>
 <pre><code class="language-lua">baz = 3
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="unused_variable"><a class="header" href="#unused_variable">unused_variable</a></h1>
-<h2 id="what-it-does-27"><a class="header" href="#what-it-does-27">What it does</a></h2>
+<h2 id="what-it-does-28"><a class="header" href="#what-it-does-28">What it does</a></h2>
 <p>Checks for variables that are unused.</p>
-<h2 id="why-this-is-bad-26"><a class="header" href="#why-this-is-bad-26">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-27"><a class="header" href="#why-this-is-bad-27">Why this is bad</a></h2>
 <p>The existence of unused variables could indicate buggy code.</p>
 <h2 id="configuration-9"><a class="header" href="#configuration-9">Configuration</a></h2>
 <p><code>allow_unused_self</code> (default: <code>true</code>) - A bool that determines whether not using <code>self</code> in a method function (<code>function Player:SwapWeapons()</code>) is allowed.</p>
 <p><code>ignore_pattern</code> (default: <code>"^_"</code>) - A <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a> for variables that are allowed to be unused. The default allows for variables like <code>_</code> to be unused, as they shouldn't be used anyway.</p>
-<h2 id="example-27"><a class="header" href="#example-27">Example</a></h2>
+<h2 id="example-28"><a class="header" href="#example-28">Example</a></h2>
 <pre><code class="language-lua">local foo = 1
 </code></pre>
-<h2 id="remarks-14"><a class="header" href="#remarks-14">Remarks</a></h2>
+<h2 id="remarks-15"><a class="header" href="#remarks-15">Remarks</a></h2>
 <h3 id="_-prefixing"><a class="header" href="#_-prefixing"><code>_</code> prefixing</a></h3>
 <p>If you intend to create a variable without using it, replace it with <code>_</code> or something that starts with <code>_</code>. You'll see this most in generic for loops.</p>
 <pre><code class="language-lua">for _, value in ipairs(list) do
