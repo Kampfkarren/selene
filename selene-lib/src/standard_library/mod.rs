@@ -794,7 +794,7 @@ impl Serialize for Required {
 
 struct RequiredVisitor;
 
-impl<'de> Visitor<'de> for RequiredVisitor {
+impl Visitor<'_> for RequiredVisitor {
     type Value = Required;
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
