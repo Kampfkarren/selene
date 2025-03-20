@@ -327,6 +327,11 @@ globals:
           message: set the instance's parent separately
     # This is only must_use because we don't allow the second parameter
     must_use: true
+  Instance.fromExisting:
+    args:
+      - type:
+          display: Instance
+    must_use: true
   NumberRange.new:
     args:
       - type: number
