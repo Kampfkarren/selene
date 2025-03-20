@@ -692,6 +692,8 @@ globals:
     args:
       - required: true
         type: number
+  Content.none:
+    property: read-only
 structs:
   EnumItem:
     Name:
