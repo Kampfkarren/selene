@@ -105,6 +105,13 @@ globals:
       - type: number
       - type: number
     must_use: true
+  CFrame.fromRotationBetweenVectors:
+    args:
+      - type:
+          display: Vector3
+      - type:
+          display: Vector3
+    must_use: true
   CFrame.identity:
     property: read-only
   CFrame.lookAlong:
