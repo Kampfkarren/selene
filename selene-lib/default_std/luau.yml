@@ -294,6 +294,12 @@ globals:
       - type: number
       - type: number
     must_use: true
+  math.lerp:
+    args:
+      - type: number
+      - type: number
+      - type: number
+    must_use: true
   math.log:
     args:
       - type: number
@@ -322,12 +328,6 @@ globals:
     must_use: true
   math.sign:
     args:
-      - type: number
-    must_use: true
-  math.lerp:
-    args:
-      - type: number
-      - type: number
       - type: number
     must_use: true
   module:
