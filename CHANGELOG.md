@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added new [`roblox_manual_fromscale_or_fromoffset` lint](https://kampfkarren.github.io/selene/lints/roblox_manual_fromscale_or_fromoffset.html), which will warn when the arguments could be simplified to `UDim2.fromScale` or `UDim2.fromOffset`.
 - Added `Content.none` to the Roblox standard library
 - Added `CFrame.fromRotationBetweenVectors` to the Roblox standard library
+- Added `math.lerp` to the Luau standard library
 
 ## [0.28.0](https://github.com/Kampfkarren/selene/releases/0.28.0) - 2025-01-09
 ### Added

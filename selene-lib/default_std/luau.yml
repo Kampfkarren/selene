@@ -294,6 +294,12 @@ globals:
       - type: number
       - type: number
     must_use: true
+  math.lerp:
+    args:
+      - type: number
+      - type: number
+      - type: number
+    must_use: true
   math.log:
     args:
       - type: number
@@ -470,7 +476,7 @@ globals:
           display: vector
       - required: false
         type:
-            display: vector
+          display: vector
     must_use: true
   vector.ceil:
     args:
