@@ -132,6 +132,8 @@ jobs:
         zip -rj selene-linux.zip ./artifacts/selene-linux/*
         zip -rj selene-macos.zip ./artifacts/selene-macos/*
         zip -rj selene-windows.zip ./artifacts/selene-windows/*
+        zip -rj selene-linux-arm64.zip ./artifacts/selene-linux-aarch64/*
+        zip -rj selene-light-linux-arm64.zip ./artifacts/selene-light-linux-aarch64/*
 
         VERSION=`grep -Po '(?<=^version = ")([^"]+)' ./Cargo.toml`
         echo "VERSION=$VERSION" >> $GITHUB_ENV
@@ -207,6 +209,25 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./selene-light-macos.zip
         asset_name: selene-light-${{ env.VERSION }}-macos.zip
+        asset_content_type: application/zip
+    - name: Upload Linux ARM64 build
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./selene-linux-arm64.zip
+        asset_name: selene-${{ env.VERSION }}-linux-arm64.zip
+        asset_content_type: application/zip
+
+    - name: Upload Linux ARM64 build (light)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./selene-light-linux-arm64.zip
+        asset_name: selene-light-${{ env.VERSION }}-linux-arm64.zip
         asset_content_type: application/zip
     - uses: actions/checkout@v4
     - name: Log in to Docker Hub
