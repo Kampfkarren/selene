@@ -1,12 +1,18 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.28.0...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.29.0...HEAD)
+
+## [0.29.0](https://github.com/Kampfkarren/selene/releases/0.29.0) - 2025-01-18
+### Added
 - Added `Instance.fromExisting` to the Roblox standard library
 - Added new [`roblox_manual_fromscale_or_fromoffset` lint](https://kampfkarren.github.io/selene/lints/roblox_manual_fromscale_or_fromoffset.html), which will warn when the arguments could be simplified to `UDim2.fromScale` or `UDim2.fromOffset`.
 - Added `Content.none` to the Roblox standard library
 - Added `CFrame.fromRotationBetweenVectors` to the Roblox standard library
 - Added `math.lerp` to the Luau standard library
+
+### Changed
+- Upgrades to [full-moon 2.0.0](https://github.com/Kampfkarren/full-moon/blob/main/CHANGELOG.md#200---2024-11-30), which provides improved performance and API consistency. This is a breaking change for full-moon that required internal code updates.
 
 ## [0.28.0](https://github.com/Kampfkarren/selene/releases/0.28.0) - 2025-01-09
 ### Added
