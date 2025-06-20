@@ -359,6 +359,16 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
                 // not a dynamic branch point itself
             }
 
+            #[cfg(feature = "roblox")]
+            ast::Stmt::ExportedTypeFunction(_) => {
+                // doesn't contain branch points in type declarations
+            }
+
+            #[cfg(feature = "roblox")]
+            ast::Stmt::TypeFunction(_) => {
+                // doesn't contain branch points in type declarations
+            }
+
             _ => {}
         }
     }
