@@ -209,15 +209,18 @@ impl Visitor for DeprecatedVisitor<'_> {
         let call_suffix = suffixes.pop().unwrap();
 
         let function_args = match call_suffix {
-            #[cfg_attr(
-                feature = "force_exhaustive_checks",
-                deny(non_exhaustive_omitted_patterns)
-            )]
-            ast::Suffix::Call(call) => match call {
-                ast::Call::AnonymousCall(args) => args,
-                ast::Call::MethodCall(method_call) => method_call.args(),
-                _ => return,
-            },
+            ast::Suffix::Call(call) =>
+            {
+                #[cfg_attr(
+                    feature = "force_exhaustive_checks",
+                    deny(non_exhaustive_omitted_patterns)
+                )]
+                match call {
+                    ast::Call::AnonymousCall(args) => args,
+                    ast::Call::MethodCall(method_call) => method_call.args(),
+                    _ => return,
+                }
+            }
 
             _ => unreachable!("function_call.call_suffix != ast::Suffix::Call"),
         };

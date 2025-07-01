@@ -1,9 +1,23 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.27.1...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.28.0...HEAD)
+- Added `Instance.fromExisting` to the Roblox standard library
+- Added new [`roblox_manual_fromscale_or_fromoffset` lint](https://kampfkarren.github.io/selene/lints/roblox_manual_fromscale_or_fromoffset.html), which will warn when the arguments could be simplified to `UDim2.fromScale` or `UDim2.fromOffset`.
+- Added `Content.none` to the Roblox standard library
+- Added `CFrame.fromRotationBetweenVectors` to the Roblox standard library
+- Added `math.lerp` to the Luau standard library
+
+## [0.28.0](https://github.com/Kampfkarren/selene/releases/0.28.0) - 2025-01-09
 ### Added
-- Added `Path2DControlPoint.new` to the Roblox standard library
+- Added `Path2DControlPoint.new`, `Content.fromUri`, `Content.fromAssetId`, and `Content.fromObject` to the Roblox standard library
+- [Adds `lua_versions` to standard library definitions](https://kampfkarren.github.io/selene/usage/std.html#lua_versions). Specifying this will only allow the syntax used by those languages. The default standard libraries now specify these, meaning that invalid syntax for that language will no longer be supported.
+- Added missing third parameter to `PathWaypoint.new` in the Roblox standard library
+- Added `vector` library to Luau standard library
+- Added `math.map` to the Luau standard library
+
+### Changed
+- Upgrades to [full-moon 1.0.0](https://github.com/Kampfkarren/full-moon/blob/main/CHANGELOG.md#100---2024-10-08), which should provide faster parse speeds, support for multiple parsing errors at the same time, and support for some new Luau syntax.
 
 ## [0.27.1](https://github.com/Kampfkarren/selene/releases/tag/0.27.1) - 2024-04-28
 ### Fixed
