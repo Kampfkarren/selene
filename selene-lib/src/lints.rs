@@ -27,6 +27,7 @@ pub mod mixed_table;
 pub mod multiple_statements;
 pub mod must_use;
 pub mod parenthese_conditions;
+pub mod restricted_imports;
 pub mod shadowing;
 pub mod standard_library;
 pub mod suspicious_reverse_loop;

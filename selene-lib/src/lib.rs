@@ -316,6 +316,7 @@ use_lints! {
     multiple_statements: lints::multiple_statements::MultipleStatementsLint,
     must_use: lints::must_use::MustUseLint,
     parenthese_conditions: lints::parenthese_conditions::ParentheseConditionsLint,
+    restricted_imports: lints::restricted_imports::RestrictedImportsLint,
     shadowing: lints::shadowing::ShadowingLint,
     suspicious_reverse_loop: lints::suspicious_reverse_loop::SuspiciousReverseLoopLint,
     type_check_inside_call: lints::type_check_inside_call::TypeCheckInsideCallLint,

@@ -1,0 +1,6 @@
+error[restricted_imports]: Import path `OldLibrary.Utils.deprecatedFunction` is restricted: OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead.
+  ┌─ restricted_imports.lua:1:28
+  │
+1 │ local deprecatedFunction = OldLibrary.Utils.deprecatedFunction
+  │                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
