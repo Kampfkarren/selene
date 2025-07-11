@@ -31,6 +31,10 @@ impl Lint for RestrictedImportsLint {
     }
 
     fn pass(&self, ast: &Ast, _: &Context, _: &AstContext) -> Vec<Diagnostic> {
+        if self.config.restricted_paths.is_empty() {
+            return Vec::new();
+        }
+
         let mut visitor = RestrictedImportsVisitor {
             restricted_paths: &self.config.restricted_paths,
             violations: Vec::new(),
@@ -49,10 +53,6 @@ struct RestrictedImportsVisitor<'a> {
 
 impl<'a> Visitor for RestrictedImportsVisitor<'a> {
     fn visit_local_assignment(&mut self, node: &ast::LocalAssignment) {
-        if self.restricted_paths.is_empty() {
-            return;
-        }
-
         // Check each assignment in the local statement
         for expression in node.expressions() {
             if let Some(path) = name_path(expression) {
