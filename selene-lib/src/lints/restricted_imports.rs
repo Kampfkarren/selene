@@ -64,7 +64,7 @@ impl<'a> Visitor for RestrictedImportsVisitor<'a> {
 
                     self.violations.push(Diagnostic::new(
                         "restricted_imports",
-                        format!("Import path `{}` is restricted: {}", full_path, message),
+                        format!("import path `{full_path}` is restricted"),
                         Label::new((range.0.bytes() as u32, range.1.bytes() as u32)),
                     ));
                 }
