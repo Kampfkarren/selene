@@ -59,7 +59,7 @@ impl<'a> Visitor for RestrictedImportsVisitor<'a> {
                 let full_path = path.join(".");
 
                 // Check if this path is restricted
-                if let Some(message) = self.restricted_paths.get(&full_path) {
+                if self.restricted_paths.contains_key(&full_path) {
                     let range = expression.range().unwrap();
 
                     self.violations.push(Diagnostic::new(
