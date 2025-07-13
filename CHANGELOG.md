@@ -11,9 +11,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `CFrame.fromRotationBetweenVectors` to the Roblox standard library
 - Added `math.lerp` to the Luau standard library
 
-### Changed
-- Upgrades to [full-moon 2.0.0](https://github.com/Kampfkarren/full-moon/blob/main/CHANGELOG.md#200---2024-11-30), which provides improved performance and API consistency. This is a breaking change for full-moon that required internal code updates.
-
 ## [0.28.0](https://github.com/Kampfkarren/selene/releases/0.28.0) - 2025-01-09
 ### Added
 - Added `Path2DControlPoint.new`, `Content.fromUri`, `Content.fromAssetId`, and `Content.fromObject` to the Roblox standard library
