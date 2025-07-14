@@ -1,0 +1,8 @@
+error[restricted_module_paths]: Module path `OldLibrary.Utils.deprecatedFunction` is restricted
+  ┌─ restricted_module_paths.lua:1:28
+  │
+1 │ local deprecatedFunction = OldLibrary.Utils.deprecatedFunction
+  │                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │
+  = OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead.
+

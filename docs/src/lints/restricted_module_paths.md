@@ -1,4 +1,4 @@
-# restricted_imports
+# restricted_module_paths
 
 ## What it does
 
@@ -13,7 +13,7 @@ Some module paths may be deprecated, internal-only, or have better alternatives 
 `restricted_paths` - A map of restricted import paths to their respective error messages.
 
 ```toml
-[config.restricted_imports.restricted_paths]
+[config.restricted_module_paths.restricted_paths]
 "OldLibrary.Utils.deprecatedFunction" = "OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead."
 ```
 

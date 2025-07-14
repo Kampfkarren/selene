@@ -11,23 +11,23 @@ use serde::Deserialize;
 
 #[derive(Clone, Default, Deserialize)]
 #[serde(default)]
-pub struct RestrictedImportsConfig {
+pub struct RestrictedModulePathsConfig {
     pub restricted_paths: HashMap<String, String>,
 }
 
-pub struct RestrictedImportsLint {
-    config: RestrictedImportsConfig,
+pub struct RestrictedModulePathsLint {
+    config: RestrictedModulePathsConfig,
 }
 
-impl Lint for RestrictedImportsLint {
-    type Config = RestrictedImportsConfig;
+impl Lint for RestrictedModulePathsLint {
+    type Config = RestrictedModulePathsConfig;
     type Error = Infallible;
 
     const SEVERITY: Severity = Severity::Error;
     const LINT_TYPE: LintType = LintType::Correctness;
 
     fn new(config: Self::Config) -> Result<Self, Self::Error> {
-        Ok(RestrictedImportsLint { config })
+        Ok(RestrictedModulePathsLint { config })
     }
 
     fn pass(&self, ast: &Ast, _: &Context, _: &AstContext) -> Vec<Diagnostic> {
@@ -35,7 +35,7 @@ impl Lint for RestrictedImportsLint {
             return Vec::new();
         }
 
-        let mut visitor = RestrictedImportsVisitor {
+        let mut visitor = RestrictedModulePathsVisitor {
             restricted_paths: &self.config.restricted_paths,
             violations: Vec::new(),
         };
@@ -46,12 +46,12 @@ impl Lint for RestrictedImportsLint {
     }
 }
 
-struct RestrictedImportsVisitor<'a> {
+struct RestrictedModulePathsVisitor<'a> {
     restricted_paths: &'a HashMap<String, String>,
     violations: Vec<Diagnostic>,
 }
 
-impl<'a> Visitor for RestrictedImportsVisitor<'a> {
+impl<'a> Visitor for RestrictedModulePathsVisitor<'a> {
     fn visit_local_assignment(&mut self, node: &ast::LocalAssignment) {
         // Check each assignment in the local statement
         for expression in node.expressions() {
@@ -59,13 +59,15 @@ impl<'a> Visitor for RestrictedImportsVisitor<'a> {
                 let full_path = path.join(".");
 
                 // Check if this path is restricted
-                if self.restricted_paths.contains_key(&full_path) {
+                if let Some(message) = self.restricted_paths.get(&full_path) {
                     let range = expression.range().unwrap();
 
-                    self.violations.push(Diagnostic::new(
-                        "restricted_imports",
-                        format!("import path `{full_path}` is restricted"),
+                    self.violations.push(Diagnostic::new_complete(
+                        "restricted_module_paths",
+                        format!("Module path `{}` is restricted", full_path),
                         Label::new((range.0.bytes() as u32, range.1.bytes() as u32)),
+                        vec![message.clone()],
+                        Vec::new(),
                     ));
                 }
             }
@@ -79,7 +81,7 @@ mod tests {
     use std::collections::HashMap;
 
     #[test]
-    fn test_restricted_imports() {
+    fn test_restricted_module_paths() {
         let mut restricted_paths = HashMap::new();
         restricted_paths.insert(
             "OldLibrary.Utils.deprecatedFunction".to_string(),
@@ -87,9 +89,10 @@ mod tests {
         );
 
         test_lint(
-            RestrictedImportsLint::new(RestrictedImportsConfig { restricted_paths }).unwrap(),
-            "restricted_imports",
-            "restricted_imports",
+            RestrictedModulePathsLint::new(RestrictedModulePathsConfig { restricted_paths })
+                .unwrap(),
+            "restricted_module_paths",
+            "restricted_module_paths",
         );
     }
 }
