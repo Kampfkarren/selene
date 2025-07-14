@@ -1,5 +1,5 @@
 use super::*;
-use crate::ast_util::name_paths::name_path;
+use crate::ast_util::name_paths::{name_path, name_path_from_prefix_suffix, take_while_keep_going};
 use std::collections::HashMap;
 use std::convert::Infallible;
 
@@ -55,22 +55,53 @@ impl<'a> Visitor for RestrictedModulePathsVisitor<'a> {
     fn visit_local_assignment(&mut self, node: &ast::LocalAssignment) {
         // Check each assignment in the local statement
         for expression in node.expressions() {
-            if let Some(path) = name_path(expression) {
-                let full_path = path.join(".");
+            self.check_expression(expression);
+        }
+    }
 
-                // Check if this path is restricted
-                if let Some(message) = self.restricted_paths.get(&full_path) {
-                    let range = expression.range().unwrap();
+    fn visit_function_call(&mut self, node: &ast::FunctionCall) {
+        // Check the function being called (including suffixes)
+        let mut keep_going = true;
+        let suffixes: Vec<&ast::Suffix> = node
+            .suffixes()
+            .take_while(|suffix| take_while_keep_going(suffix, &mut keep_going))
+            .collect();
 
-                    self.violations.push(Diagnostic::new_complete(
-                        "restricted_module_paths",
-                        format!("Module path `{}` is restricted", full_path),
-                        Label::new((range.0.bytes() as u32, range.1.bytes() as u32)),
-                        vec![message.clone()],
-                        Vec::new(),
-                    ));
-                }
-            }
+        if let Some(path) = name_path_from_prefix_suffix(node.prefix(), suffixes.iter().copied()) {
+            let full_path = path.join(".");
+
+            // Calculate range from prefix start to last suffix end
+            let start_pos = node.prefix().start_position().unwrap();
+            let end_pos = if let Some(last_suffix) = suffixes.last() {
+                last_suffix.end_position().unwrap()
+            } else {
+                node.prefix().end_position().unwrap()
+            };
+
+            self.check_path_restriction(&full_path, (start_pos.bytes(), end_pos.bytes()));
+        }
+    }
+}
+
+impl<'a> RestrictedModulePathsVisitor<'a> {
+    fn check_expression(&mut self, expression: &ast::Expression) {
+        if let Some(path) = name_path(expression) {
+            let full_path = path.join(".");
+            let range = expression.range().unwrap();
+            self.check_path_restriction(&full_path, (range.0.bytes(), range.1.bytes()));
+        }
+    }
+
+    fn check_path_restriction(&mut self, full_path: &str, range: (usize, usize)) {
+        // Check if this path is restricted
+        if let Some(message) = self.restricted_paths.get(full_path) {
+            self.violations.push(Diagnostic::new_complete(
+                "restricted_module_paths",
+                format!("Module path `{}` is restricted", full_path),
+                Label::new((range.0 as u32, range.1 as u32)),
+                vec![message.clone()],
+                Vec::new(),
+            ));
         }
     }
 }
