@@ -332,7 +332,7 @@ impl Visitor for MapFunctionDefinitionVisitor<'_> {
 
         for (name_token, expression) in assignment_expressions {
             if let ast::Expression::Function(function_box) = expression {
-                let function_body = &function_box.1;
+                let function_body = function_box.body();
                 let identifier = range(name_token);
 
                 if let Some(id) = self.find_variable(identifier) {
@@ -348,7 +348,7 @@ impl Visitor for MapFunctionDefinitionVisitor<'_> {
 
         for (var, expression) in assignment_expressions {
             if let ast::Expression::Function(function_box) = expression {
-                let function_body = &function_box.1;
+                let function_body = function_box.body();
                 let identifier = range(var);
 
                 if let Some(reference) = self.find_reference(identifier) {

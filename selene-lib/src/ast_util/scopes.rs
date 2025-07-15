@@ -338,9 +338,8 @@ impl ScopeVisitor {
                 self.read_expression(lhs);
                 self.read_expression(rhs);
             }
-
             ast::Expression::Function(function_box) => {
-                self.read_name(&function_box.0);
+                self.read_name(function_box.function_token());
             }
 
             ast::Expression::FunctionCall(call) => {
@@ -876,9 +875,8 @@ impl Visitor for ScopeVisitor {
             _ => {}
         }
     }
-
     #[cfg(feature = "roblox")]
-    fn visit_compound_assignment(&mut self, compound_assignment: &ast::luau::CompoundAssignment) {
+    fn visit_compound_assignment(&mut self, compound_assignment: &ast::CompoundAssignment) {
         self.read_var(compound_assignment.lhs());
         self.read_expression(compound_assignment.rhs());
     }
