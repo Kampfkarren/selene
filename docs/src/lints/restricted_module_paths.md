@@ -40,7 +40,7 @@ local handler = condition and OldLibrary.Utils.deprecatedFunction or nil
 ## Remarks
 
 This lint comprehensively checks for restricted module paths in:
-- **Local assignments**: `local deprecatedFunction = OldLibrary.Utils.deprecatedFunction`
+- **Assignments**: `local deprecatedFunction = OldLibrary.Utils.deprecatedFunction`
 - **Function calls**: `OldLibrary.Utils.deprecatedFunction()`
 - **Function arguments**: `fn(OldLibrary.Utils.deprecatedFunction)`
 - **Table constructors**: `local config = { callback = OldLibrary.Utils.deprecatedFunction }`
@@ -49,8 +49,7 @@ This lint comprehensively checks for restricted module paths in:
 - **Conditional expressions**: `local handler = condition and OldLibrary.Utils.deprecatedFunction or nil`
 
 It does not check:
-- **Global assignments**: `x = Module.SubModule.function`
-- **Require statements**: `require("Module.SubModule")`
+- **String require statements**: `require("Module.SubModule")`
 - **String literals**: `"Module.SubModule.function"`
 
 The lint performs exact string matching on the full module path, so `"OldLibrary.Utils.deprecatedFunction"` will match exactly but not `"OldLibrary.Utils.deprecatedFunctionExtended"`.
