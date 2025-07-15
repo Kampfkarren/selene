@@ -37,11 +37,23 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc.js"></script>
     </head>
     <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
     <div id="body-container">
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
         <script>
@@ -82,10 +94,13 @@
                 sidebar = sidebar || 'visible';
             } else {
                 sidebar = 'hidden';
+                sidebar_toggle.checked = false;
             }
-            sidebar_toggle.checked = sidebar === 'visible';
-            html.classList.remove('sidebar-visible');
-            html.classList.add("sidebar-" + sidebar);
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
@@ -119,7 +134,7 @@
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
                         </ul>
-                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
                             <i class="fa fa-search"></i>
                         </button>
                     </div>
@@ -136,7 +151,12 @@
 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -1220,22 +1240,72 @@ while (x) do
 repeat until x
 while x do
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="roblox_incorrect_color3_new_bounds"><a class="header" href="#roblox_incorrect_color3_new_bounds">roblox_incorrect_color3_new_bounds</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="restricted_module_paths"><a class="header" href="#restricted_module_paths">restricted_module_paths</a></h1>
 <h2 id="what-it-does-18"><a class="header" href="#what-it-does-18">What it does</a></h2>
-<p>Checks for uses of <code>Color3.new</code> where the arguments are not between 0 and 1.</p>
+<p>Checks for restricted module paths in any expression context, preventing usage of specific module paths wherever they appear in code.</p>
 <h2 id="why-this-is-bad-17"><a class="header" href="#why-this-is-bad-17">Why this is bad</a></h2>
-<p>Most likely, you are trying to use values of 0 to 255. This will not give you an error, and will silently give you the wrong color. You probably meant to use <code>Color3.fromRGB</code> instead.</p>
+<p>Some module paths may be deprecated, internal-only, or have better alternatives that should be used instead. This lint helps enforce coding standards and prevents usage of restricted APIs.</p>
+<h2 id="configuration-7"><a class="header" href="#configuration-7">Configuration</a></h2>
+<p><code>restricted_paths</code> - A map of restricted module paths to their respective error messages.</p>
+<pre><code class="language-toml">[config.restricted_module_paths.restricted_paths]
+"OldLibrary.Utils.deprecatedFunction" = "OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead."
+</code></pre>
 <h2 id="example-18"><a class="header" href="#example-18">Example</a></h2>
-<pre><code class="language-lua">Color3.new(255, 0, 0)
+<pre><code class="language-lua">local deprecatedFunction = OldLibrary.Utils.deprecatedFunction
+
+OldLibrary.Utils.deprecatedFunction()
+
+fn(OldLibrary.Utils.deprecatedFunction)
+
+local config = { callback = OldLibrary.Utils.deprecatedFunction }
+
+function getHandler()
+    return OldLibrary.Utils.deprecatedFunction
+end
+
+local nested = { deep = { handler = OldLibrary.Utils.deprecatedFunction } }
+
+local handler = condition and OldLibrary.Utils.deprecatedFunction or nil
+
+local required = require(OldLibrary.Utils.deprecatedFunction)
+
+global = OldLibrary.Utils.deprecatedFunction
 </code></pre>
 <h2 id="remarks-8"><a class="header" href="#remarks-8">Remarks</a></h2>
+<p>The lint detects restricted module paths in various expression contexts:</p>
+<ul>
+<li><strong>Assignments</strong>: <code>local deprecatedFunction = OldLibrary.Utils.deprecatedFunction</code></li>
+<li><strong>Function calls</strong>: <code>OldLibrary.Utils.deprecatedFunction()</code></li>
+<li><strong>Function arguments</strong>: <code>fn(OldLibrary.Utils.deprecatedFunction)</code></li>
+<li><strong>Table constructors</strong>: <code>local config = { callback = OldLibrary.Utils.deprecatedFunction }</code></li>
+<li><strong>Return statements</strong>: <code>return OldLibrary.Utils.deprecatedFunction</code></li>
+<li><strong>Nested table structures</strong>: <code>local nested = { deep = { handler = OldLibrary.Utils.deprecatedFunction } }</code></li>
+<li><strong>Conditional expressions</strong>: <code>local handler = condition and OldLibrary.Utils.deprecatedFunction or nil</code></li>
+<li><strong>Require statements</strong>: <code>local required = require(OldLibrary.Utils.deprecatedFunction)</code></li>
+<li><strong>Global assignments</strong>: <code>global = OldLibrary.Utils.deprecatedFunction</code></li>
+</ul>
+<p>It does not check:</p>
+<ul>
+<li><strong>String require statements</strong>: <code>require("Module.SubModule")</code></li>
+<li><strong>String literals</strong>: <code>"Module.SubModule.function"</code></li>
+</ul>
+<p>The lint performs exact string matching on the full module path, so <code>"OldLibrary.Utils.deprecatedFunction"</code> will match exactly but not <code>"OldLibrary.Utils.deprecatedFunctionExtended"</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="roblox_incorrect_color3_new_bounds"><a class="header" href="#roblox_incorrect_color3_new_bounds">roblox_incorrect_color3_new_bounds</a></h1>
+<h2 id="what-it-does-19"><a class="header" href="#what-it-does-19">What it does</a></h2>
+<p>Checks for uses of <code>Color3.new</code> where the arguments are not between 0 and 1.</p>
+<h2 id="why-this-is-bad-18"><a class="header" href="#why-this-is-bad-18">Why this is bad</a></h2>
+<p>Most likely, you are trying to use values of 0 to 255. This will not give you an error, and will silently give you the wrong color. You probably meant to use <code>Color3.fromRGB</code> instead.</p>
+<h2 id="example-19"><a class="header" href="#example-19">Example</a></h2>
+<pre><code class="language-lua">Color3.new(255, 0, 0)
+</code></pre>
+<h2 id="remarks-9"><a class="header" href="#remarks-9">Remarks</a></h2>
 <p>This lint is only active if you are using the Roblox standard library.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="roblox_incorrect_roact_usage"><a class="header" href="#roblox_incorrect_roact_usage">roblox_incorrect_roact_usage</a></h1>
-<h2 id="what-it-does-19"><a class="header" href="#what-it-does-19">What it does</a></h2>
+<h2 id="what-it-does-20"><a class="header" href="#what-it-does-20">What it does</a></h2>
 <p>Checks for valid uses of createElement. Verifies that class name given is valid and that the properties passed for it are valid for that class.</p>
-<h2 id="why-this-is-bad-18"><a class="header" href="#why-this-is-bad-18">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-19"><a class="header" href="#why-this-is-bad-19">Why this is bad</a></h2>
 <p>This is guaranteed to fail once it is rendered. Furthermore, the createElement itself will not error--only once it's mounted will it error.</p>
-<h2 id="example-19"><a class="header" href="#example-19">Example</a></h2>
+<h2 id="example-20"><a class="header" href="#example-20">Example</a></h2>
 <pre><code class="language-lua">-- Using Roact17
 React.createElement("Frame", {
     key = "Valid property for React",
@@ -1252,7 +1322,7 @@ Roact.createElement("Frame", {
 
 Roact.createElement("BadClass", {})
 </code></pre>
-<h2 id="remarks-9"><a class="header" href="#remarks-9">Remarks</a></h2>
+<h2 id="remarks-10"><a class="header" href="#remarks-10">Remarks</a></h2>
 <p>This lint is naive and makes several assumptions about the way you write your code. The assumptions are based on idiomatic Roact.</p>
 <ol>
 <li>It assumes you are either calling <code>createElement</code> directly or creating a local variable that's assigned to <code>[Roact/React].createElement</code>.</li>
@@ -1263,37 +1333,37 @@ Roact.createElement("BadClass", {})
 <p>This lint does not verify if the value you are giving is correct, so <code>Text = UDim2.new()</code> will be treated as correct. This lint, right now, only checks property and class names.</p>
 <p>This lint is only active if you are using the Roblox standard library.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="roblox_manual_fromscale_or_fromoffset"><a class="header" href="#roblox_manual_fromscale_or_fromoffset">roblox_manual_fromscale_or_fromoffset</a></h1>
-<h2 id="what-it-does-20"><a class="header" href="#what-it-does-20">What it does</a></h2>
+<h2 id="what-it-does-21"><a class="header" href="#what-it-does-21">What it does</a></h2>
 <p>Checks for uses of <code>UDim2.new</code> where the arguments could be simplified to <code>UDim2.fromScale</code> or <code>UDim2.fromOffset</code>.</p>
-<h2 id="why-this-is-bad-19"><a class="header" href="#why-this-is-bad-19">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-20"><a class="header" href="#why-this-is-bad-20">Why this is bad</a></h2>
 <p>This reduces readability of <code>UDim2.new()</code> construction.</p>
-<h2 id="example-20"><a class="header" href="#example-20">Example</a></h2>
+<h2 id="example-21"><a class="header" href="#example-21">Example</a></h2>
 <pre><code class="language-lua">UDim2.new(1, 0, 1, 0)
 </code></pre>
-<h2 id="remarks-10"><a class="header" href="#remarks-10">Remarks</a></h2>
+<h2 id="remarks-11"><a class="header" href="#remarks-11">Remarks</a></h2>
 <p>This lint is only active if you are using the Roblox standard library.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="roblox_suspicious_udim2_new"><a class="header" href="#roblox_suspicious_udim2_new">roblox_suspicious_udim2_new</a></h1>
-<h2 id="what-it-does-21"><a class="header" href="#what-it-does-21">What it does</a></h2>
+<h2 id="what-it-does-22"><a class="header" href="#what-it-does-22">What it does</a></h2>
 <p>Checks for too little arguments passed to <code>UDim2.new()</code>.</p>
-<h2 id="why-this-is-bad-20"><a class="header" href="#why-this-is-bad-20">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-21"><a class="header" href="#why-this-is-bad-21">Why this is bad</a></h2>
 <p>Passing in an incorrect number of arguments can indicate that the user meant to use <code>UDim2.fromScale</code> or <code>UDim2.fromOffset</code>.
 Even if the user really only needed to pass in a fewer number of arguments to <code>UDim2.new</code>, this lowers readability
 as it calls into question whether it's a bug or if the user truly meant to use <code>UDim2.new</code>.</p>
-<h2 id="example-21"><a class="header" href="#example-21">Example</a></h2>
+<h2 id="example-22"><a class="header" href="#example-22">Example</a></h2>
 <pre><code class="language-lua">UDim2.new(1, 1) -- error, UDim2.new takes 4 numbers, but 2 were provided.
 </code></pre>
-<h2 id="remarks-11"><a class="header" href="#remarks-11">Remarks</a></h2>
+<h2 id="remarks-12"><a class="header" href="#remarks-12">Remarks</a></h2>
 <p>This lint is only active if you are using the Roblox standard library.</p>
 <p>This lint does not warn if passing in exactly 2 arguments and none of those are number literals to prevent false positives
 with <code>UDim2.new(UDim.new(a, b), UDim.new(c, d))</code></p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="shadowing"><a class="header" href="#shadowing">shadowing</a></h1>
-<h2 id="what-it-does-22"><a class="header" href="#what-it-does-22">What it does</a></h2>
+<h2 id="what-it-does-23"><a class="header" href="#what-it-does-23">What it does</a></h2>
 <p>Checks for overriding of variables under the same name.</p>
-<h2 id="why-this-is-bad-21"><a class="header" href="#why-this-is-bad-21">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-22"><a class="header" href="#why-this-is-bad-22">Why this is bad</a></h2>
 <p>This can cause confusion when reading the code when trying to understand which variable is being used, and if you want to use the original variable you either have to redefine it under a temporary name or refactor the code that shadowed it.</p>
-<h2 id="configuration-7"><a class="header" href="#configuration-7">Configuration</a></h2>
+<h2 id="configuration-8"><a class="header" href="#configuration-8">Configuration</a></h2>
 <p><code>ignore_pattern</code> (default: <code>"^_"</code>) - A <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a> that is used to specify names that are allowed to be shadowed. The default allows for variables like <code>_</code> to be shadowed, as they shouldn't be used anyway.</p>
-<h2 id="example-22"><a class="header" href="#example-22">Example</a></h2>
+<h2 id="example-23"><a class="header" href="#example-23">Example</a></h2>
 <pre><code class="language-lua">local x = 1
 
 if foo then
@@ -1301,39 +1371,39 @@ if foo then
 end
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="suspicious_reverse_loop"><a class="header" href="#suspicious_reverse_loop">suspicious_reverse_loop</a></h1>
-<h2 id="what-it-does-23"><a class="header" href="#what-it-does-23">What it does</a></h2>
+<h2 id="what-it-does-24"><a class="header" href="#what-it-does-24">What it does</a></h2>
 <p>Checks for <code>for _ = #x, 1 do</code> sequences without specifying a negative step.</p>
-<h2 id="why-this-is-bad-22"><a class="header" href="#why-this-is-bad-22">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-23"><a class="header" href="#why-this-is-bad-23">Why this is bad</a></h2>
 <p>This loop will only run at most once, instead of going in reverse. If you truly did mean to run your loop only once, just use <code>if #x &gt; 0</code> instead.</p>
-<h2 id="example-23"><a class="header" href="#example-23">Example</a></h2>
+<h2 id="example-24"><a class="header" href="#example-24">Example</a></h2>
 <pre><code class="language-lua">for _ = #x, 1 do
 </code></pre>
 <p>...should be written as...</p>
 <pre><code class="language-lua">for _ = #x, 1, -1 do
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="type_check_inside_call"><a class="header" href="#type_check_inside_call">type_check_inside_call</a></h1>
-<h2 id="what-it-does-24"><a class="header" href="#what-it-does-24">What it does</a></h2>
+<h2 id="what-it-does-25"><a class="header" href="#what-it-does-25">What it does</a></h2>
 <p>Checks for <code>type(foo == "type")</code>, instead of <code>type(foo) == "type"</code>.</p>
-<h2 id="why-this-is-bad-23"><a class="header" href="#why-this-is-bad-23">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-24"><a class="header" href="#why-this-is-bad-24">Why this is bad</a></h2>
 <p>This will always return <code>"boolean"</code>, and is undoubtedly not what you intended to write.</p>
-<h2 id="example-24"><a class="header" href="#example-24">Example</a></h2>
+<h2 id="example-25"><a class="header" href="#example-25">Example</a></h2>
 <pre><code class="language-lua">return type(foo == "number")
 </code></pre>
 <p>...should be written as...</p>
 <pre><code class="language-lua">return type(foo) == "number"
 </code></pre>
-<h2 id="remarks-12"><a class="header" href="#remarks-12">Remarks</a></h2>
+<h2 id="remarks-13"><a class="header" href="#remarks-13">Remarks</a></h2>
 <p>When using the Roblox standard library, this checks <code>typeof</code> as well.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="unbalanced_assignments"><a class="header" href="#unbalanced_assignments">unbalanced_assignments</a></h1>
-<h2 id="what-it-does-25"><a class="header" href="#what-it-does-25">What it does</a></h2>
+<h2 id="what-it-does-26"><a class="header" href="#what-it-does-26">What it does</a></h2>
 <p>Checks for unbalanced assignments, such as <code>a, b, c = 1</code>.</p>
-<h2 id="why-this-is-bad-24"><a class="header" href="#why-this-is-bad-24">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-25"><a class="header" href="#why-this-is-bad-25">Why this is bad</a></h2>
 <p>You shouldn't declare variables you're not immediately initializing on the same line as ones you are. This is most likely just forgetting to specify the rest of the variables.</p>
-<h2 id="example-25"><a class="header" href="#example-25">Example</a></h2>
+<h2 id="example-26"><a class="header" href="#example-26">Example</a></h2>
 <pre><code class="language-lua">a, b, c = 1
 a = 1, 2
 </code></pre>
-<h2 id="remarks-13"><a class="header" href="#remarks-13">Remarks</a></h2>
+<h2 id="remarks-14"><a class="header" href="#remarks-14">Remarks</a></h2>
 <p>There are a few things this lint won't catch.</p>
 <p><code>a, b, c = call()</code> will not lint, as <code>call()</code> could return multiple values.</p>
 <p><code>a, b, c = call(), 2</code> will, however, as you will only be using the first value of <code>call()</code>. You will even receive a helpful message about this.</p>
@@ -1356,38 +1426,38 @@ a = 1, 2
 </code></pre>
 <p>...will not lint.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="undefined_variable"><a class="header" href="#undefined_variable">undefined_variable</a></h1>
-<h2 id="what-it-does-26"><a class="header" href="#what-it-does-26">What it does</a></h2>
+<h2 id="what-it-does-27"><a class="header" href="#what-it-does-27">What it does</a></h2>
 <p>Checks for uses of variables that are not defined.</p>
-<h2 id="why-this-is-bad-25"><a class="header" href="#why-this-is-bad-25">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-26"><a class="header" href="#why-this-is-bad-26">Why this is bad</a></h2>
 <p>This is most likely a typo.</p>
-<h2 id="example-26"><a class="header" href="#example-26">Example</a></h2>
+<h2 id="example-27"><a class="header" href="#example-27">Example</a></h2>
 <pre><code class="language-lua">-- vv oops!
 prinnt("hello, world!")
 </code></pre>
-<h2 id="remarks-14"><a class="header" href="#remarks-14">Remarks</a></h2>
+<h2 id="remarks-15"><a class="header" href="#remarks-15">Remarks</a></h2>
 <p>If you are using a different standard library where a global variable is defined that selene isn't picking up on, create a <a href="lints/../usage/std.html">standard library</a> that specifies it.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="unscoped_variables"><a class="header" href="#unscoped_variables">unscoped_variables</a></h1>
-<h2 id="what-it-does-27"><a class="header" href="#what-it-does-27">What it does</a></h2>
+<h2 id="what-it-does-28"><a class="header" href="#what-it-does-28">What it does</a></h2>
 <p>Checks for variables that are unscoped (don't have a local variable attached).</p>
-<h2 id="why-this-is-bad-26"><a class="header" href="#why-this-is-bad-26">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-27"><a class="header" href="#why-this-is-bad-27">Why this is bad</a></h2>
 <p>Unscoped variables make code harder to read and debug, as well as making it harder for selene to analyze.</p>
-<h2 id="configuration-8"><a class="header" href="#configuration-8">Configuration</a></h2>
+<h2 id="configuration-9"><a class="header" href="#configuration-9">Configuration</a></h2>
 <p><code>ignore_pattern</code> (default: <code>"^_"</code>) - A <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a> for variables that are allowed to be unscoped. The default allows for variables like <code>_</code> to be unscoped, as they shouldn't be used anyway.</p>
-<h2 id="example-27"><a class="header" href="#example-27">Example</a></h2>
+<h2 id="example-28"><a class="header" href="#example-28">Example</a></h2>
 <pre><code class="language-lua">baz = 3
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="unused_variable"><a class="header" href="#unused_variable">unused_variable</a></h1>
-<h2 id="what-it-does-28"><a class="header" href="#what-it-does-28">What it does</a></h2>
+<h2 id="what-it-does-29"><a class="header" href="#what-it-does-29">What it does</a></h2>
 <p>Checks for variables that are unused.</p>
-<h2 id="why-this-is-bad-27"><a class="header" href="#why-this-is-bad-27">Why this is bad</a></h2>
+<h2 id="why-this-is-bad-28"><a class="header" href="#why-this-is-bad-28">Why this is bad</a></h2>
 <p>The existence of unused variables could indicate buggy code.</p>
-<h2 id="configuration-9"><a class="header" href="#configuration-9">Configuration</a></h2>
+<h2 id="configuration-10"><a class="header" href="#configuration-10">Configuration</a></h2>
 <p><code>allow_unused_self</code> (default: <code>true</code>) - A bool that determines whether not using <code>self</code> in a method function (<code>function Player:SwapWeapons()</code>) is allowed.</p>
 <p><code>ignore_pattern</code> (default: <code>"^_"</code>) - A <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a> for variables that are allowed to be unused. The default allows for variables like <code>_</code> to be unused, as they shouldn't be used anyway.</p>
-<h2 id="example-28"><a class="header" href="#example-28">Example</a></h2>
+<h2 id="example-29"><a class="header" href="#example-29">Example</a></h2>
 <pre><code class="language-lua">local foo = 1
 </code></pre>
-<h2 id="remarks-15"><a class="header" href="#remarks-15">Remarks</a></h2>
+<h2 id="remarks-16"><a class="header" href="#remarks-16">Remarks</a></h2>
 <h3 id="_-prefixing"><a class="header" href="#_-prefixing"><code>_</code> prefixing</a></h3>
 <p>If you intend to create a variable without using it, replace it with <code>_</code> or something that starts with <code>_</code>. You'll see this most in generic for loops.</p>
 <pre><code class="language-lua">for _, value in ipairs(list) do
@@ -1606,6 +1676,7 @@ writable = "full"
             window.setTimeout(window.print, 100);
         });
         </script>
+
 
     </div>
     </body>

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>type_check_inside_call - selene Documentation</title>
+        <title>restricted_module_paths - selene Documentation</title>
 
 
         <!-- Custom HTML head -->
@@ -175,29 +175,66 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="type_check_inside_call"><a class="header" href="#type_check_inside_call">type_check_inside_call</a></h1>
+                        <h1 id="restricted_module_paths"><a class="header" href="#restricted_module_paths">restricted_module_paths</a></h1>
 <h2 id="what-it-does"><a class="header" href="#what-it-does">What it does</a></h2>
-<p>Checks for <code>type(foo == "type")</code>, instead of <code>type(foo) == "type"</code>.</p>
+<p>Checks for restricted module paths in any expression context, preventing usage of specific module paths wherever they appear in code.</p>
 <h2 id="why-this-is-bad"><a class="header" href="#why-this-is-bad">Why this is bad</a></h2>
-<p>This will always return <code>"boolean"</code>, and is undoubtedly not what you intended to write.</p>
-<h2 id="example"><a class="header" href="#example">Example</a></h2>
-<pre><code class="language-lua">return type(foo == "number")
+<p>Some module paths may be deprecated, internal-only, or have better alternatives that should be used instead. This lint helps enforce coding standards and prevents usage of restricted APIs.</p>
+<h2 id="configuration"><a class="header" href="#configuration">Configuration</a></h2>
+<p><code>restricted_paths</code> - A map of restricted module paths to their respective error messages.</p>
+<pre><code class="language-toml">[config.restricted_module_paths.restricted_paths]
+"OldLibrary.Utils.deprecatedFunction" = "OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead."
 </code></pre>
-<p>...should be written as...</p>
-<pre><code class="language-lua">return type(foo) == "number"
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
+<pre><code class="language-lua">local deprecatedFunction = OldLibrary.Utils.deprecatedFunction
+
+OldLibrary.Utils.deprecatedFunction()
+
+fn(OldLibrary.Utils.deprecatedFunction)
+
+local config = { callback = OldLibrary.Utils.deprecatedFunction }
+
+function getHandler()
+    return OldLibrary.Utils.deprecatedFunction
+end
+
+local nested = { deep = { handler = OldLibrary.Utils.deprecatedFunction } }
+
+local handler = condition and OldLibrary.Utils.deprecatedFunction or nil
+
+local required = require(OldLibrary.Utils.deprecatedFunction)
+
+global = OldLibrary.Utils.deprecatedFunction
 </code></pre>
 <h2 id="remarks"><a class="header" href="#remarks">Remarks</a></h2>
-<p>When using the Roblox standard library, this checks <code>typeof</code> as well.</p>
+<p>The lint detects restricted module paths in various expression contexts:</p>
+<ul>
+<li><strong>Assignments</strong>: <code>local deprecatedFunction = OldLibrary.Utils.deprecatedFunction</code></li>
+<li><strong>Function calls</strong>: <code>OldLibrary.Utils.deprecatedFunction()</code></li>
+<li><strong>Function arguments</strong>: <code>fn(OldLibrary.Utils.deprecatedFunction)</code></li>
+<li><strong>Table constructors</strong>: <code>local config = { callback = OldLibrary.Utils.deprecatedFunction }</code></li>
+<li><strong>Return statements</strong>: <code>return OldLibrary.Utils.deprecatedFunction</code></li>
+<li><strong>Nested table structures</strong>: <code>local nested = { deep = { handler = OldLibrary.Utils.deprecatedFunction } }</code></li>
+<li><strong>Conditional expressions</strong>: <code>local handler = condition and OldLibrary.Utils.deprecatedFunction or nil</code></li>
+<li><strong>Require statements</strong>: <code>local required = require(OldLibrary.Utils.deprecatedFunction)</code></li>
+<li><strong>Global assignments</strong>: <code>global = OldLibrary.Utils.deprecatedFunction</code></li>
+</ul>
+<p>It does not check:</p>
+<ul>
+<li><strong>String require statements</strong>: <code>require("Module.SubModule")</code></li>
+<li><strong>String literals</strong>: <code>"Module.SubModule.function"</code></li>
+</ul>
+<p>The lint performs exact string matching on the full module path, so <code>"OldLibrary.Utils.deprecatedFunction"</code> will match exactly but not <code>"OldLibrary.Utils.deprecatedFunctionExtended"</code>.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../lints/suspicious_reverse_loop.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../lints/parenthese_conditions.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../lints/unbalanced_assignments.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../lints/roblox_incorrect_color3_new_bounds.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -207,11 +244,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../lints/suspicious_reverse_loop.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../lints/parenthese_conditions.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../lints/unbalanced_assignments.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../lints/roblox_incorrect_color3_new_bounds.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
