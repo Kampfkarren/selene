@@ -35,11 +35,16 @@ end
 local nested = { deep = { handler = OldLibrary.Utils.deprecatedFunction } }
 
 local handler = condition and OldLibrary.Utils.deprecatedFunction or nil
+
+local required = require(OldLibrary.Utils.deprecatedFunction)
+
+global = OldLibrary.Utils.deprecatedFunction
 ```
 
 ## Remarks
 
-This lint comprehensively checks for restricted module paths in:
+The lint detects restricted module paths in various expression contexts:
+
 - **Assignments**: `local deprecatedFunction = OldLibrary.Utils.deprecatedFunction`
 - **Function calls**: `OldLibrary.Utils.deprecatedFunction()`
 - **Function arguments**: `fn(OldLibrary.Utils.deprecatedFunction)`
@@ -47,6 +52,8 @@ This lint comprehensively checks for restricted module paths in:
 - **Return statements**: `return OldLibrary.Utils.deprecatedFunction`
 - **Nested table structures**: `local nested = { deep = { handler = OldLibrary.Utils.deprecatedFunction } }`
 - **Conditional expressions**: `local handler = condition and OldLibrary.Utils.deprecatedFunction or nil`
+- **Require statements**: `local required = require(OldLibrary.Utils.deprecatedFunction)`
+- **Global assignments**: `global = OldLibrary.Utils.deprecatedFunction`
 
 It does not check:
 - **String require statements**: `require("Module.SubModule")`

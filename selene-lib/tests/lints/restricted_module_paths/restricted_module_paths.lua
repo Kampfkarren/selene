@@ -20,3 +20,9 @@ local nested = { deep = { handler = OldLibrary.Utils.deprecatedFunction } }
 
 -- Test if expression restriction
 local handler = condition and OldLibrary.Utils.deprecatedFunction or nil
+
+-- Test require restriction
+local required = require(OldLibrary.Utils.deprecatedFunction)
+
+-- Test global assignment restriction
+global = OldLibrary.Utils.deprecatedFunction

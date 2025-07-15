@@ -54,3 +54,19 @@ error[restricted_module_paths]: Module path `OldLibrary.Utils.deprecatedFunction
    │
    = OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead.
 
+error[restricted_module_paths]: Module path `OldLibrary.Utils.deprecatedFunction` is restricted
+   ┌─ restricted_module_paths.lua:25:26
+   │
+25 │ local required = require(OldLibrary.Utils.deprecatedFunction)
+   │                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead.
+
+error[restricted_module_paths]: Module path `OldLibrary.Utils.deprecatedFunction` is restricted
+   ┌─ restricted_module_paths.lua:28:10
+   │
+28 │ global = OldLibrary.Utils.deprecatedFunction
+   │          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead.
+
