@@ -97,7 +97,7 @@ impl<'a> RestrictedModulePathsVisitor<'a> {
         if let Some(message) = self.restricted_paths.get(full_path) {
             self.violations.push(Diagnostic::new_complete(
                 "restricted_module_paths",
-                format!("Module path `{}` is restricted", full_path),
+                format!("Module path `{full_path}` is restricted"),
                 Label::new((range.0 as u32, range.1 as u32)),
                 vec![message.clone()],
                 Vec::new(),
