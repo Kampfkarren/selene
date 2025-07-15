@@ -52,30 +52,27 @@ struct RestrictedModulePathsVisitor<'a> {
 }
 
 impl<'a> Visitor for RestrictedModulePathsVisitor<'a> {
-    fn visit_local_assignment(&mut self, node: &ast::LocalAssignment) {
-        // Check each assignment in the local statement
-        for expression in node.expressions() {
-            self.check_expression(expression);
-        }
+    fn visit_expression(&mut self, expression: &ast::Expression) {
+        self.check_expression(expression);
     }
 
-    fn visit_function_call(&mut self, node: &ast::FunctionCall) {
-        // Check the function being called (including suffixes)
+    fn visit_function_call(&mut self, call: &ast::FunctionCall) {
+        // Handle function call statements (standalone function calls)
         let mut keep_going = true;
-        let suffixes: Vec<&ast::Suffix> = node
+        let suffixes: Vec<&ast::Suffix> = call
             .suffixes()
             .take_while(|suffix| take_while_keep_going(suffix, &mut keep_going))
             .collect();
 
-        if let Some(path) = name_path_from_prefix_suffix(node.prefix(), suffixes.iter().copied()) {
+        if let Some(path) = name_path_from_prefix_suffix(call.prefix(), suffixes.iter().copied()) {
             let full_path = path.join(".");
 
             // Calculate range from prefix start to last suffix end
-            let start_pos = node.prefix().start_position().unwrap();
+            let start_pos = call.prefix().start_position().unwrap();
             let end_pos = if let Some(last_suffix) = suffixes.last() {
                 last_suffix.end_position().unwrap()
             } else {
-                node.prefix().end_position().unwrap()
+                call.prefix().end_position().unwrap()
             };
 
             self.check_path_restriction(&full_path, (start_pos.bytes(), end_pos.bytes()));
@@ -85,10 +82,13 @@ impl<'a> Visitor for RestrictedModulePathsVisitor<'a> {
 
 impl<'a> RestrictedModulePathsVisitor<'a> {
     fn check_expression(&mut self, expression: &ast::Expression) {
-        if let Some(path) = name_path(expression) {
-            let full_path = path.join(".");
-            let range = expression.range().unwrap();
-            self.check_path_restriction(&full_path, (range.0.bytes(), range.1.bytes()));
+        // Only handle variable expressions here, function calls are handled by visit_function_call
+        if let ast::Expression::Var(_) = expression {
+            if let Some(path) = name_path(expression) {
+                let full_path = path.join(".");
+                let range = expression.range().unwrap();
+                self.check_path_restriction(&full_path, (range.0.bytes(), range.1.bytes()));
+            }
         }
     }
 

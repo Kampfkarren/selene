@@ -2,7 +2,7 @@
 
 ## What it does
 
-Checks for restricted module paths in local assignments and function calls, preventing usage of specific module paths.
+Checks for restricted module paths in any expression context, preventing usage of specific module paths wherever they appear in code.
 
 ## Why this is bad
 
@@ -20,22 +20,37 @@ Some module paths may be deprecated, internal-only, or have better alternatives 
 ## Example
 
 ```lua
--- This will trigger the lint (local assignment)
 local deprecatedFunction = OldLibrary.Utils.deprecatedFunction
 
--- This will also trigger the lint (function call)
 OldLibrary.Utils.deprecatedFunction()
+
+fn(OldLibrary.Utils.deprecatedFunction)
+
+local config = { callback = OldLibrary.Utils.deprecatedFunction }
+
+function getHandler()
+    return OldLibrary.Utils.deprecatedFunction
+end
+
+local nested = { deep = { handler = OldLibrary.Utils.deprecatedFunction } }
+
+local handler = condition and OldLibrary.Utils.deprecatedFunction or nil
 ```
 
 ## Remarks
 
-This lint checks:
-- Local assignments with property access patterns (e.g., `local x = Module.SubModule.function`)
-- Function calls with module paths (e.g., `Module.SubModule.function()`)
+This lint comprehensively checks for restricted module paths in:
+- **Local assignments**: `local deprecatedFunction = OldLibrary.Utils.deprecatedFunction`
+- **Function calls**: `OldLibrary.Utils.deprecatedFunction()`
+- **Function arguments**: `fn(OldLibrary.Utils.deprecatedFunction)`
+- **Table constructors**: `local config = { callback = OldLibrary.Utils.deprecatedFunction }`
+- **Return statements**: `return OldLibrary.Utils.deprecatedFunction`
+- **Nested table structures**: `local nested = { deep = { handler = OldLibrary.Utils.deprecatedFunction } }`
+- **Conditional expressions**: `local handler = condition and OldLibrary.Utils.deprecatedFunction or nil`
 
 It does not check:
-- Global assignments like `x = Module.SubModule.function`
-- Require statements like `require("Module.SubModule")`
-- String literals containing module paths
+- **Global assignments**: `x = Module.SubModule.function`
+- **Require statements**: `require("Module.SubModule")`
+- **String literals**: `"Module.SubModule.function"`
 
-For broader restriction of tokens regardless of context, consider using the [`denylist_filter`](./denylist_filter.md) lint instead.
+The lint performs exact string matching on the full module path, so `"OldLibrary.Utils.deprecatedFunction"` will match exactly but not `"OldLibrary.Utils.deprecatedFunctionExtended"`.
