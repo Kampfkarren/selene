@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `Content.none` to the Roblox standard library
 - Added `CFrame.fromRotationBetweenVectors` to the Roblox standard library
 - Added `math.lerp` to the Luau standard library
+- Added new [`restricted_module_paths` lint](https://kampfkarren.github.io/selene/lints/restricted_module_paths.html) to disallow specified module paths in any expression context (local assignments, function calls, function arguments, table constructors, return statements, nested tables, and conditional expressions)
 
 ## [0.28.0](https://github.com/Kampfkarren/selene/releases/0.28.0) - 2025-01-09
 ### Added

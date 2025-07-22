@@ -1,0 +1,72 @@
+error[restricted_module_paths]: Module path `OldLibrary.Utils.deprecatedFunction` is restricted
+  ┌─ restricted_module_paths.lua:2:28
+  │
+2 │ local deprecatedFunction = OldLibrary.Utils.deprecatedFunction
+  │                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │
+  = OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead.
+
+error[restricted_module_paths]: Module path `OldLibrary.Utils.deprecatedFunction` is restricted
+  ┌─ restricted_module_paths.lua:5:1
+  │
+5 │ OldLibrary.Utils.deprecatedFunction()
+  │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │
+  = OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead.
+
+error[restricted_module_paths]: Module path `OldLibrary.Utils.deprecatedFunction` is restricted
+  ┌─ restricted_module_paths.lua:8:4
+  │
+8 │ fn(OldLibrary.Utils.deprecatedFunction)
+  │    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │
+  = OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead.
+
+error[restricted_module_paths]: Module path `OldLibrary.Utils.deprecatedFunction` is restricted
+   ┌─ restricted_module_paths.lua:11:29
+   │
+11 │ local config = { callback = OldLibrary.Utils.deprecatedFunction }
+   │                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead.
+
+error[restricted_module_paths]: Module path `OldLibrary.Utils.deprecatedFunction` is restricted
+   ┌─ restricted_module_paths.lua:15:12
+   │
+15 │     return OldLibrary.Utils.deprecatedFunction
+   │            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead.
+
+error[restricted_module_paths]: Module path `OldLibrary.Utils.deprecatedFunction` is restricted
+   ┌─ restricted_module_paths.lua:19:37
+   │
+19 │ local nested = { deep = { handler = OldLibrary.Utils.deprecatedFunction } }
+   │                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead.
+
+error[restricted_module_paths]: Module path `OldLibrary.Utils.deprecatedFunction` is restricted
+   ┌─ restricted_module_paths.lua:22:31
+   │
+22 │ local handler = condition and OldLibrary.Utils.deprecatedFunction or nil
+   │                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead.
+
+error[restricted_module_paths]: Module path `OldLibrary.Utils.deprecatedFunction` is restricted
+   ┌─ restricted_module_paths.lua:25:26
+   │
+25 │ local required = require(OldLibrary.Utils.deprecatedFunction)
+   │                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead.
+
+error[restricted_module_paths]: Module path `OldLibrary.Utils.deprecatedFunction` is restricted
+   ┌─ restricted_module_paths.lua:28:10
+   │
+28 │ global = OldLibrary.Utils.deprecatedFunction
+   │          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = OldLibrary.Utils.deprecatedFunction has been deprecated. Use NewLibrary.Utils.modernFunction instead.
+

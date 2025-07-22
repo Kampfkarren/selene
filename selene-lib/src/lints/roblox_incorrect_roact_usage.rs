@@ -39,10 +39,10 @@ fn get_lua_table_key_format(expression: &ast::Expression) -> String {
             if is_lua_valid_table_key_identifier(&string) {
                 string[1..string.len() - 1].to_string()
             } else {
-                format!("[{}]", string)
+                format!("[{string}]")
             }
         }
-        _ => format!("[{}]", expression),
+        _ => format!("[{expression}]"),
     }
 }
 
