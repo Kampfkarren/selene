@@ -3,12 +3,12 @@ members = ["selene", "selene-lib"]
 resolver = "2"
 
 [workspace.package]
+version = "0.29.0"
 authors = ["Kampfkarren <kampfkarren@gmail.com>"]
 edition = "2021"
 homepage = "https://kampfkarren.github.io/selene/"
 license = "MPL-2.0"
 repository = "https://github.com/Kampfkarren/selene"
-version = "0.28.0"
 
 [workspace.dependencies]
 full_moon = "2.0.0"
