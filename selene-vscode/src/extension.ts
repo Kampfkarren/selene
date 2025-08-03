@@ -151,7 +151,7 @@ export async function activate(
                 .getConfiguration("selene")
                 .get<string | null>("configPath")
         const command = "--display-style=json2 --no-summary -"
-        const configCommand = configPath ? `${configPath} ${command}` : command
+        const configCommand = configPath ? `--config ${configPath} ${command}` : command
 
         const output = await selene.seleneCommand(
             context.globalStorageUri,
