@@ -150,8 +150,8 @@ export async function activate(
         const configPath = vscode.workspace
                 .getConfiguration("selene")
                 .get<string | null>("configPath")
-        let command = "--display-style=json2 --no-summary -"
-        let configCommand = configPath ? `${configPath} ${command}` : command
+        const command = "--display-style=json2 --no-summary -"
+        const configCommand = configPath ? `${configPath} ${command}` : command
 
         const output = await selene.seleneCommand(
             context.globalStorageUri,
