@@ -27,6 +27,7 @@ pub mod mixed_table;
 pub mod multiple_statements;
 pub mod must_use;
 pub mod parenthese_conditions;
+pub mod restricted_module_paths;
 pub mod shadowing;
 pub mod standard_library;
 pub mod suspicious_reverse_loop;
@@ -41,6 +42,9 @@ pub mod roblox_incorrect_color3_new_bounds;
 
 #[cfg(feature = "roblox")]
 pub mod roblox_incorrect_roact_usage;
+
+#[cfg(feature = "roblox")]
+pub mod roblox_manual_fromscale_or_fromoffset;
 
 #[cfg(feature = "roblox")]
 pub mod roblox_suspicious_udim2_new;

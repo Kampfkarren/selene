@@ -128,10 +128,7 @@ impl ManualTableCloneVisitor<'_> {
                 )]
                 let function_token = match function_call.prefix() {
                     ast::Prefix::Name(name) => name,
-                    ast::Prefix::Expression(expression) => match expression_to_ident(expression) {
-                        Some(name) => name,
-                        None => return None,
-                    },
+                    ast::Prefix::Expression(expression) => expression_to_ident(expression)?,
                     _ => return None,
                 };
 

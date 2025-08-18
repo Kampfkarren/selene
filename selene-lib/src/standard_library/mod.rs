@@ -1,3 +1,4 @@
+mod lua_versions;
 pub mod v1;
 mod v1_upgrade;
 
@@ -14,6 +15,8 @@ use serde::{
     ser::{SerializeMap, SerializeSeq, Serializer},
     Deserialize, Serialize,
 };
+
+pub use lua_versions::*;
 
 lazy_static::lazy_static! {
     static ref ANY_TABLE: BTreeMap<String, Field> = {
@@ -116,6 +119,9 @@ pub struct StandardLibrary {
     #[serde(default)]
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub structs: BTreeMap<String, BTreeMap<String, Field>>,
+
+    #[serde(default)]
+    pub lua_versions: Vec<lua_versions::LuaVersion>,
 
     /// Internal, used for the Roblox standard library
     #[serde(default)]
@@ -314,6 +320,11 @@ impl StandardLibrary {
                 }),
         );
 
+        // Intentionally not a merge, didn't seem valuable
+        if !other.lua_versions.is_empty() {
+            self.lua_versions = other.lua_versions;
+        }
+
         self.globals = globals;
     }
 
@@ -338,6 +349,21 @@ impl StandardLibrary {
         }
 
         Some(std)
+    }
+
+    pub fn lua_version(&self) -> (full_moon::LuaVersion, Vec<lua_versions::LuaVersionError>) {
+        let mut errors = Vec::new();
+
+        let mut lua_version = full_moon::LuaVersion::lua51();
+
+        for version in &self.lua_versions {
+            match version.to_lua_version() {
+                Ok(version) => lua_version |= version,
+                Err(error) => errors.push(error),
+            }
+        }
+
+        (lua_version, errors)
     }
 }
 
@@ -768,7 +794,7 @@ impl Serialize for Required {
 
 struct RequiredVisitor;
 
-impl<'de> Visitor<'de> for RequiredVisitor {
+impl Visitor<'_> for RequiredVisitor {
     type Value = Required;
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {

@@ -316,6 +316,7 @@ use_lints! {
     multiple_statements: lints::multiple_statements::MultipleStatementsLint,
     must_use: lints::must_use::MustUseLint,
     parenthese_conditions: lints::parenthese_conditions::ParentheseConditionsLint,
+    restricted_module_paths: lints::restricted_module_paths::RestrictedModulePathsLint,
     shadowing: lints::shadowing::ShadowingLint,
     suspicious_reverse_loop: lints::suspicious_reverse_loop::SuspiciousReverseLoopLint,
     type_check_inside_call: lints::type_check_inside_call::TypeCheckInsideCallLint,
@@ -328,6 +329,7 @@ use_lints! {
     {
         roblox_incorrect_color3_new_bounds: lints::roblox_incorrect_color3_new_bounds::Color3BoundsLint,
         roblox_incorrect_roact_usage: lints::roblox_incorrect_roact_usage::IncorrectRoactUsageLint,
+        roblox_manual_fromscale_or_fromoffset: lints::roblox_manual_fromscale_or_fromoffset::ManualFromScaleOrFromOffsetLint,
         roblox_suspicious_udim2_new: lints::roblox_suspicious_udim2_new::SuspiciousUDim2NewLint,
     },
 }

@@ -94,7 +94,7 @@ fn expression_is_ellipsis(expression: &ast::Expression) -> bool {
     if let ast::Expression::Symbol(symbol) = expression {
         return *symbol.token_type()
             == TokenType::Symbol {
-                symbol: Symbol::Ellipse,
+                symbol: Symbol::Ellipsis,
             };
     }
 

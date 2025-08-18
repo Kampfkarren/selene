@@ -39,10 +39,10 @@ fn get_lua_table_key_format(expression: &ast::Expression) -> String {
             if is_lua_valid_table_key_identifier(&string) {
                 string[1..string.len() - 1].to_string()
             } else {
-                format!("[{}]", string)
+                format!("[{string}]")
             }
         }
-        _ => format!("[{}]", expression),
+        _ => format!("[{expression}]"),
     }
 }
 
@@ -219,7 +219,7 @@ impl<'a> IncorrectRoactUsageVisitor<'a> {
     }
 }
 
-impl<'a> Visitor for IncorrectRoactUsageVisitor<'a> {
+impl Visitor for IncorrectRoactUsageVisitor<'_> {
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
         // Check if caller is Roact.createElement or a variable defined to it
         let mut suffixes = call.suffixes().collect::<Vec<_>>();
