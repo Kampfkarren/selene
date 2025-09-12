@@ -643,17 +643,18 @@ fn start(mut options: opts::Options) {
             continue;
         }
 
-        match fs::metadata(filename) {
+        let filename =
+            pathdiff::diff_paths(filename, &current_dir).unwrap_or_else(|| PathBuf::from(filename));
+
+        match fs::metadata(&filename) {
             Ok(metadata) => {
                 if metadata.is_file() {
                     let checker = Arc::clone(&checker);
-                    let filename = filename.to_owned();
-
                     if !options.no_exclude && exclude_set.is_match(&filename) {
                         continue;
                     }
 
-                    pool.execute(move || read_file(&checker, lua_version, Path::new(&filename)));
+                    pool.execute(move || read_file(&checker, lua_version, &filename));
                 } else if metadata.is_dir() {
                     for pattern in &options.pattern {
                         let glob = match glob::glob(&format!(
