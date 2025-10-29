@@ -3,6 +3,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.29.0...HEAD)
 
+- Added `buffer.readbits` and `buffer.writebits` to the Luau standard library
+
 ## [0.29.0](https://github.com/Kampfkarren/selene/releases/tag/0.29.0) - 2025-07-23
 - Added `Instance.fromExisting` to the Roblox standard library
 - Added new [`roblox_manual_fromscale_or_fromoffset` lint](https://kampfkarren.github.io/selene/lints/roblox_manual_fromscale_or_fromoffset.html), which will warn when the arguments could be simplified to `UDim2.fromScale` or `UDim2.fromOffset`.
