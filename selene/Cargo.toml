@@ -35,6 +35,7 @@ tracy-client = { version = "0.14.1", optional = true }
 threadpool = "1.8"
 toml.workspace = true
 ureq = { version = "2.6.2", features = ["json"], optional = true }
+pathdiff = "0.2.3"
 
 [dev-dependencies]
 pretty_assertions = "1.3"

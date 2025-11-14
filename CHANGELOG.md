@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.29.0...HEAD)
+### Fixed
+- Fixed exclude not working with absolute path in some cases ([#593](https://github.com/Kampfkarren/selene/issues/593))
 
 ## [0.29.0](https://github.com/Kampfkarren/selene/releases/tag/0.29.0) - 2025-07-23
 - Added `Instance.fromExisting` to the Roblox standard library
