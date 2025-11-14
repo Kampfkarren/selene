@@ -58,6 +58,16 @@
                     "description": "Specifies the path of selene. If not specified, selene will automatically download from the GitHub releases.",
                     "scope": "machine-overridable"
                 },
+                "selene.configPath": {
+                    "title": "Path",
+                    "type": [
+                        "string",
+                        null
+                    ],
+                    "default": null,
+                    "description": "Specifies the path to the selene configuration file. If not specified, selene will automatically attempt to find the configuration file at project root.",
+                    "scope": "machine-overridable"
+                },
                 "selene.run": {
                     "title": "Run",
                     "type": "string",
