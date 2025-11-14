@@ -11,7 +11,7 @@ license = "MPL-2.0"
 repository = "https://github.com/Kampfkarren/selene"
 
 [workspace.dependencies]
-full_moon = "1.2.0"
+full_moon = "2.0.0"
 toml = "0.7.2"
 
 # Do not update this without confirming profiling uses the same version of tracy-client as selene
