@@ -329,6 +329,7 @@ use_lints! {
     {
         roblox_incorrect_color3_new_bounds: lints::roblox_incorrect_color3_new_bounds::Color3BoundsLint,
         roblox_incorrect_roact_usage: lints::roblox_incorrect_roact_usage::IncorrectRoactUsageLint,
+        roblox_react_exhaustive_deps: lints::roblox_react_exhaustive_deps::ReactExhaustiveDepsLint,
         roblox_manual_fromscale_or_fromoffset: lints::roblox_manual_fromscale_or_fromoffset::ManualFromScaleOrFromOffsetLint,
         roblox_suspicious_udim2_new: lints::roblox_suspicious_udim2_new::SuspiciousUDim2NewLint,
     },

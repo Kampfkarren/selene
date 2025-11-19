@@ -1,0 +1,16 @@
+error[roblox_react_exhaustive_deps]: React Hook useEffect has missing dependencies: props.user.age, props.user.name
+   ┌─ property_access.lua:19:10
+   │
+19 │     end, {})
+   │          ^^
+   │
+   = Either include them (props.user.age, props.user.name) in the dependency array or remove the dependency
+
+error[roblox_react_exhaustive_deps]: React Hook useEffect has missing dependency: props.data.value
+   ┌─ property_access.lua:36:10
+   │
+36 │     end, { count })
+   │          ^^^^^^^^^
+   │
+   = Either include 'props.data.value' in the dependency array or remove the dependency
+
