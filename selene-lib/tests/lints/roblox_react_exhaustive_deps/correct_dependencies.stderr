@@ -1,0 +1,19 @@
+error[roblox_react_exhaustive_deps]: React Hook useEffect has missing dependency: props.value
+   ┌─ correct_dependencies.lua:33:21
+   │  
+33 │       React.useEffect(function()
+   │ ╭─────────────────────^
+34 │ │         print(props.value)
+35 │ │     end)
+   │ ╰───────^
+   │  
+   = Either include 'props.value' in the dependency array or remove the dependency
+
+error[roblox_react_exhaustive_deps]: React Hook useEffect has missing dependency: t
+   ┌─ correct_dependencies.lua:52:10
+   │
+52 │     end, {})
+   │          ^^
+   │
+   = Either include 't' in the dependency array or remove the dependency
+

@@ -1,0 +1,24 @@
+error[roblox_react_exhaustive_deps]: React Hook useMemo has missing dependency: props.value
+   ┌─ use_memo.lua:11:10
+   │
+11 │     end, {})
+   │          ^^
+   │
+   = Either include 'props.value' in the dependency array or remove the dependency
+
+error[roblox_react_exhaustive_deps]: React Hook useMemo has unnecessary dependency: unused
+   ┌─ use_memo.lua:29:10
+   │
+29 │     end, { unused })
+   │          ^^^^^^^^^^
+   │
+   = Remove 'unused' from the dependency array
+
+error[roblox_react_exhaustive_deps]: React Hook useMemo has missing dependencies: props.multiplier, props.value, result
+   ┌─ use_memo.lua:39:10
+   │
+39 │     end, { base })
+   │          ^^^^^^^^
+   │
+   = Either include them (props.multiplier, props.value, result) in the dependency array or remove the dependency
+

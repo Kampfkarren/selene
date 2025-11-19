@@ -1,0 +1,32 @@
+error[roblox_react_exhaustive_deps]: React Hook useEffect has unnecessary dependency: props.value
+   ┌─ unnecessary_dependencies.lua:11:10
+   │
+11 │     end, { props.value })
+   │          ^^^^^^^^^^^^^^^
+   │
+   = Remove 'props.value' from the dependency array
+
+error[roblox_react_exhaustive_deps]: React Hook useEffect has unnecessary dependencies: props.id, props.name, props.value
+   ┌─ unnecessary_dependencies.lua:18:10
+   │
+18 │     end, { props.value, props.name, props.id })
+   │          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = Remove them (props.id, props.name, props.value) from the dependency array
+
+error[roblox_react_exhaustive_deps]: React Hook useEffect has unnecessary dependency: props.value
+   ┌─ unnecessary_dependencies.lua:27:10
+   │
+27 │     end, { count, props.value })
+   │          ^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = Remove 'props.value' from the dependency array
+
+error[roblox_react_exhaustive_deps]: React Hook useEffect has unnecessary dependencies: a, b
+   ┌─ unnecessary_dependencies.lua:37:10
+   │
+37 │     end, { a, b })
+   │          ^^^^^^^^
+   │
+   = Remove them (a, b) from the dependency array
+

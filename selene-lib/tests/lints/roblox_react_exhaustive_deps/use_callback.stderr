@@ -1,0 +1,25 @@
+error[roblox_react_exhaustive_deps]: React Hook useCallback has missing dependency: props.value
+   ┌─ use_callback.lua:11:10
+   │
+11 │     end, {})
+   │          ^^
+   │
+   = Either include 'props.value' in the dependency array or remove the dependency
+
+error[roblox_react_exhaustive_deps]: React Hook useCallback has unnecessary dependency: value
+   ┌─ use_callback.lua:30:10
+   │
+30 │     end, { value })
+   │          ^^^^^^^^^
+   │
+   = Remove 'value' from the dependency array
+
+error[roblox_react_exhaustive_deps]: React Hook useCallback has missing dependencies: count, props.value, and unnecessary dependency: unused
+   ┌─ use_callback.lua:41:10
+   │
+41 │     end, { unused })
+   │          ^^^^^^^^^^
+   │
+   = Either include them (count, props.value) in the dependency array or remove the dependency
+   = Remove 'unused' from the dependency array
+
