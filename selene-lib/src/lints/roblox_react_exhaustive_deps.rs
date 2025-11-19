@@ -93,11 +93,11 @@ impl HookType {
 fn is_react_hook_call(prefix: &ast::Prefix, suffixes: &[&ast::Suffix]) -> Option<HookType> {
     if_chain! {
         if let ast::Prefix::Name(prefix_token) = prefix;
-        if ["React", "Roact"].contains(&prefix_token.token().to_string().as_str());
+        if ["React", "Roact"].contains(&&*prefix_token.token().to_string());
         if suffixes.len() == 1;
         if let ast::Suffix::Index(ast::Index::Dot { name, .. }) = suffixes[0];
         then {
-            match name.token().to_string().as_str() {
+            match &*name.token().to_string() {
                 "useEffect" => Some(HookType::UseEffect),
                 "useCallback" => Some(HookType::UseCallback),
                 "useMemo" => Some(HookType::UseMemo),
@@ -517,7 +517,7 @@ fn collect_variables_from_function_call(
         ast::Prefix::Name(name) => {
             let var_name = name.token().to_string();
             // Check if it's an external variable
-            if !["true", "false", "nil", "self"].contains(&var_name.as_str()) {
+            if !["true", "false", "nil", "self"].contains(&&*var_name) {
                 variables.insert(var_name);
             }
         }
@@ -713,7 +713,7 @@ impl<'a> Visitor for ReactExhaustiveDepsVisitor<'a> {
                               "pairs", "ipairs", "next", "tonumber", "tostring",
                               "table", "string", "math", "coroutine", "debug",
                               "require", "game", "workspace", "script", "task",
-                              "_G", "_VERSION"].contains(&var.as_str())
+                              "_G", "_VERSION"].contains(&&**var)
                         })
                         .collect();
 
