@@ -234,7 +234,7 @@ impl<'a> VariableCollector<'a> {
         match var {
             ast::Var::Name(name) => {
                 let var_name = name.token().to_string();
-                
+
                 // Check if this variable is defined in the current scope or parent scopes
                 if self.is_external_variable(&var_name) {
                     self.variables.insert(var_name);
@@ -534,8 +534,11 @@ fn collect_variables_from_function_call(
                 ast::Call::AnonymousCall(args) => match args {
                     ast::FunctionArgs::Parentheses { arguments, .. } => {
                         for arg in arguments {
-                            variables
-                                .extend(collect_referenced_variables(arg, scope_id, scope_manager));
+                            variables.extend(collect_referenced_variables(
+                                arg,
+                                scope_id,
+                                scope_manager,
+                            ));
                         }
                     }
                     ast::FunctionArgs::TableConstructor(table) => {
@@ -576,8 +579,11 @@ fn collect_variables_from_function_call(
                 ast::Call::MethodCall(method) => {
                     if let ast::FunctionArgs::Parentheses { arguments, .. } = method.args() {
                         for arg in arguments {
-                            variables
-                                .extend(collect_referenced_variables(arg, scope_id, scope_manager));
+                            variables.extend(collect_referenced_variables(
+                                arg,
+                                scope_id,
+                                scope_manager,
+                            ));
                         }
                     }
                 }
@@ -585,8 +591,11 @@ fn collect_variables_from_function_call(
             },
             ast::Suffix::Index(index) => match index {
                 ast::Index::Brackets { expression, .. } => {
-                    variables
-                        .extend(collect_referenced_variables(expression, scope_id, scope_manager));
+                    variables.extend(collect_referenced_variables(
+                        expression,
+                        scope_id,
+                        scope_manager,
+                    ));
                 }
                 _ => {}
             },
@@ -634,31 +643,31 @@ impl<'a> Visitor for ReactExhaustiveDepsVisitor<'a> {
             ))) = call_suffix;
             then {
                 let args: Vec<_> = arguments.iter().collect();
-                
+
                 // Get callback and deps based on hook type
                 let callback_pos = hook_type.callback_position();
                 let deps_pos = hook_type.deps_position();
-                
+
                 if args.len() <= callback_pos {
                     return;
                 }
-                
+
                 let callback = args[callback_pos];
                 let deps_arg = if args.len() > deps_pos {
                     Some(args[deps_pos])
                 } else {
                     None
                 };
-                
+
                 // Extract the function body to analyze
                 let callback_body = match strip_parentheses(callback) {
                     ast::Expression::Function(func) => func.1.block(),
                     _ => return, // Not a function literal
                 };
-                
+
                 // Collect variables referenced in the callback
                 let callback_range: (usize, usize) = range(callback);
-                
+
                 // We need a valid scope ID - if we don't have one, skip this analysis
                 let scope_id = match self.current_scope_id {
                     Some(id) => id,
@@ -670,13 +679,13 @@ impl<'a> Visitor for ReactExhaustiveDepsVisitor<'a> {
                         }
                     }
                 };
-                
+
                 let referenced_vars = visit_block_for_variables(
                     callback_body,
                     scope_id,
                     self.scope_manager,
                 );
-                
+
                 // Extract declared dependencies
                 let declared_deps = if let Some(deps_expr) = deps_arg {
                     match strip_parentheses(deps_expr) {
@@ -688,44 +697,44 @@ impl<'a> Visitor for ReactExhaustiveDepsVisitor<'a> {
                 } else {
                     Some(Vec::new()) // No deps array means empty dependencies
                 };
-                
+
                 if let Some(declared_deps) = declared_deps {
                     let declared_set: HashSet<String> = declared_deps
                         .iter()
                         .map(|(name, _)| name.clone())
                         .collect();
-                    
+
                     // Filter out variables that should be ignored
                     let filtered_referenced: HashSet<String> = referenced_vars
                         .into_iter()
                         .filter(|var| {
                             // Ignore built-in globals
-                            !["print", "warn", "error", "assert", "type", "typeof", 
+                            !["print", "warn", "error", "assert", "type", "typeof",
                               "pairs", "ipairs", "next", "tonumber", "tostring",
                               "table", "string", "math", "coroutine", "debug",
                               "require", "game", "workspace", "script", "task",
                               "_G", "_VERSION"].contains(&var.as_str())
                         })
                         .collect();
-                    
+
                     // Find missing dependencies
                     let mut missing: Vec<String> = filtered_referenced
                         .difference(&declared_set)
                         .cloned()
                         .collect();
                     missing.sort();
-                    
+
                     // Find unnecessary dependencies
                     let mut unnecessary: Vec<String> = declared_set
                         .difference(&filtered_referenced)
                         .cloned()
                         .collect();
                     unnecessary.sort();
-                    
+
                     // Report if there are issues
                     if !missing.is_empty() || !unnecessary.is_empty() {
                         let deps_range = deps_arg.map(|expr| range(expr));
-                        
+
                         let mut message = format!("React Hook {} has", hook_type.name());
                         if !missing.is_empty() {
                             message.push_str(&format!(
@@ -744,9 +753,9 @@ impl<'a> Visitor for ReactExhaustiveDepsVisitor<'a> {
                                 unnecessary.join(", ")
                             ));
                         }
-                        
+
                         let label_range = deps_range.unwrap_or(callback_range);
-                        
+
                         let mut notes = Vec::new();
                         if !missing.is_empty() {
                             notes.push(format!(
@@ -768,7 +777,7 @@ impl<'a> Visitor for ReactExhaustiveDepsVisitor<'a> {
                                 }
                             ));
                         }
-                        
+
                         self.issues.push(Diagnostic::new_complete(
                             "roblox_react_exhaustive_deps",
                             message,
@@ -853,4 +862,3 @@ mod tests {
         );
     }
 }
-
