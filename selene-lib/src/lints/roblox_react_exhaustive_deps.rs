@@ -669,15 +669,8 @@ impl<'a> Visitor for ReactExhaustiveDepsVisitor<'a> {
                 let callback_range: (usize, usize) = range(callback);
 
                 // We need a valid scope ID - if we don't have one, skip this analysis
-                let scope_id = match self.current_scope_id {
-                    Some(id) => id,
-                    None => {
-                        // Try to use the initial scope if available
-                        match self.scope_manager.initial_scope {
-                            Some(id) => id,
-                            None => return,
-                        }
-                    }
+                let Some(scope_id) = self.current_scope_id.or(self.scope_manager.initial_scope) else {
+                    return;
                 };
 
                 let referenced_vars = visit_block_for_variables(
