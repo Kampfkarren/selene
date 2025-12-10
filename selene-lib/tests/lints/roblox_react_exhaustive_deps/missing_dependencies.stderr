@@ -1,0 +1,48 @@
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependency: props.value
+   ┌─ missing_dependencies.lua:11:10
+   │
+11 │     end, {})
+   │          ^^
+   │
+   = help: either include 'props.value' in the dependency array or remove the dependency
+
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependencies: count, props.name, props.value
+   ┌─ missing_dependencies.lua:22:10
+   │
+22 │     end, {})
+   │          ^^
+   │
+   = help: either include them (count, props.name, props.value) in the dependency array or remove the dependency
+
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependencies: name, props.value
+   ┌─ missing_dependencies.lua:34:10
+   │
+34 │     end, { count })
+   │          ^^^^^^^^^
+   │
+   = help: either include them (name, props.value) in the dependency array or remove the dependency
+
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependency: spawn
+   ┌─ missing_dependencies.lua:44:10
+   │
+44 │     end, {})
+   │          ^^
+   │
+   = help: either include 'spawn' in the dependency array or remove the dependency
+
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependency: props.data.value
+   ┌─ missing_dependencies.lua:51:10
+   │
+51 │     end, {})
+   │          ^^
+   │
+   = help: either include 'props.data.value' in the dependency array or remove the dependency
+
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependency: props.value
+   ┌─ missing_dependencies.lua:62:10
+   │
+62 │     end, {})
+   │          ^^
+   │
+   = help: either include 'props.value' in the dependency array or remove the dependency
+

@@ -1,0 +1,32 @@
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependency: setState
+   ┌─ known_stable_vars.lua:17:10
+   │
+17 │     end, {})
+   │          ^^
+   │
+   = help: either include 'setState' in the dependency array or remove the dependency
+
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependency: state
+   ┌─ known_stable_vars.lua:27:10
+   │
+27 │     end, {})
+   │          ^^
+   │
+   = help: either include 'state' in the dependency array or remove the dependency
+
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependency: ref.current
+   ┌─ known_stable_vars.lua:37:10
+   │
+37 │     end, {})
+   │          ^^
+   │
+   = help: either include 'ref.current' in the dependency array or remove the dependency
+
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependency: setBinding
+   ┌─ known_stable_vars.lua:47:10
+   │
+47 │     end, {})
+   │          ^^
+   │
+   = help: either include 'setBinding' in the dependency array or remove the dependency
+
