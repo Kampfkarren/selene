@@ -847,4 +847,40 @@ mod tests {
             "use_memo",
         );
     }
+
+    #[test]
+    fn test_known_stable_vars() {
+        test_lint(
+            ReactExhaustiveDepsLint::new(()).unwrap(),
+            "roblox_react_exhaustive_deps",
+            "known_stable_vars",
+        );
+    }
+
+    #[test]
+    fn test_implicit_self() {
+        test_lint(
+            ReactExhaustiveDepsLint::new(()).unwrap(),
+            "roblox_react_exhaustive_deps",
+            "implicit_self",
+        );
+    }
+
+    #[test]
+    fn test_complex_deps() {
+        test_lint(
+            ReactExhaustiveDepsLint::new(()).unwrap(),
+            "roblox_react_exhaustive_deps",
+            "complex_deps",
+        );
+    }
+
+    #[test]
+    fn test_outer_scope() {
+        test_lint(
+            ReactExhaustiveDepsLint::new(()).unwrap(),
+            "roblox_react_exhaustive_deps",
+            "outer_scope",
+        );
+    }
 }

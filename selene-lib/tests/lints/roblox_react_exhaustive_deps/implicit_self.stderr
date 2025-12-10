@@ -1,0 +1,27 @@
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependency: a, and unnecessary dependency: a.b.c
+   ┌─ implicit_self.lua:15:10
+   │
+15 │     end, { a.b.c })
+   │          ^^^^^^^^^
+   │
+   = help: either include 'a' in the dependency array or remove the dependency
+   = help: remove 'a.b.c' from the dependency array
+
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependency: a, and unnecessary dependency: a.b.c
+   ┌─ implicit_self.lua:25:10
+   │
+25 │     end, { a.b.c })
+   │          ^^^^^^^^^
+   │
+   = help: either include 'a' in the dependency array or remove the dependency
+   = help: remove 'a.b.c' from the dependency array
+
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependency: a, and unnecessary dependency: a.b
+   ┌─ implicit_self.lua:34:10
+   │
+34 │     end, { a.b })
+   │          ^^^^^^^
+   │
+   = help: either include 'a' in the dependency array or remove the dependency
+   = help: remove 'a.b' from the dependency array
+

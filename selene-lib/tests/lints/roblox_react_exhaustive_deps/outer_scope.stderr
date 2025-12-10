@@ -1,0 +1,16 @@
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependencies: moduleVar, reactiveVar
+   ┌─ outer_scope.lua:18:10
+   │
+18 │     end, {})
+   │          ^^
+   │
+   = help: either include them (moduleVar, reactiveVar) in the dependency array or remove the dependency
+
+error[roblox_react_exhaustive_deps]: react hook useEffect has missing dependency: outerVar
+   ┌─ outer_scope.lua:40:14
+   │
+40 │         end, { innerVar })
+   │              ^^^^^^^^^^^^
+   │
+   = help: either include 'outerVar' in the dependency array or remove the dependency
+
