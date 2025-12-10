@@ -50,6 +50,7 @@ struct ReactExhaustiveDepsVisitor<'a> {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(clippy::enum_variant_names)]
 enum HookType {
     UseEffect,
     UseCallback,
@@ -363,14 +364,9 @@ fn visit_block_for_variables(
         variables.extend(collect_variables_from_stmt(stmt, scope_id, scope_manager));
     }
 
-    if let Some(last_stmt) = block.last_stmt() {
-        match last_stmt {
-            ast::LastStmt::Return(return_stmt) => {
-                for expr in return_stmt.returns() {
-                    variables.extend(collect_referenced_variables(expr, scope_id, scope_manager));
-                }
-            }
-            _ => {}
+    if let Some(ast::LastStmt::Return(return_stmt)) = block.last_stmt() {
+        for expr in return_stmt.returns() {
+            variables.extend(collect_referenced_variables(expr, scope_id, scope_manager));
         }
     }
 
@@ -589,16 +585,13 @@ fn collect_variables_from_function_call(
                 }
                 _ => {}
             },
-            ast::Suffix::Index(index) => match index {
-                ast::Index::Brackets { expression, .. } => {
-                    variables.extend(collect_referenced_variables(
-                        expression,
-                        scope_id,
-                        scope_manager,
-                    ));
-                }
-                _ => {}
-            },
+            ast::Suffix::Index(ast::Index::Brackets { expression, .. }) => {
+                variables.extend(collect_referenced_variables(
+                    expression,
+                    scope_id,
+                    scope_manager,
+                ));
+            }
             _ => {}
         }
     }
@@ -661,7 +654,7 @@ impl<'a> Visitor for ReactExhaustiveDepsVisitor<'a> {
 
                 // Extract the function body to analyze
                 let callback_body = match strip_parentheses(callback) {
-                    ast::Expression::Function(func) => func.1.block(),
+                    ast::Expression::Function(func) => func.body().block(),
                     _ => return, // Not a function literal
                 };
 
@@ -733,7 +726,7 @@ impl<'a> Visitor for ReactExhaustiveDepsVisitor<'a> {
 
                     // Report if there are issues
                     if !missing.is_empty() || !unnecessary.is_empty() {
-                        let deps_range = deps_arg.map(|expr| range(expr));
+                        let deps_range = deps_arg.map(range);
 
                         let mut message = format!("React Hook {} has", hook_type.name());
                         if !missing.is_empty() {
