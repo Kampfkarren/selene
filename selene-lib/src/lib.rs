@@ -112,11 +112,15 @@ impl LintVariation {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "kebab-case")]
-#[derive(Default)]
 pub enum RobloxStdSource {
-    #[default]
     Floating,
     Pinned,
+}
+
+impl Default for RobloxStdSource {
+    fn default() -> Self {
+        Self::Floating
+    }
 }
 
 macro_rules! use_lints {
@@ -325,7 +329,6 @@ use_lints! {
     {
         roblox_incorrect_color3_new_bounds: lints::roblox_incorrect_color3_new_bounds::Color3BoundsLint,
         roblox_incorrect_roact_usage: lints::roblox_incorrect_roact_usage::IncorrectRoactUsageLint,
-        roblox_react_exhaustive_deps: lints::roblox_react_exhaustive_deps::ReactExhaustiveDepsLint,
         roblox_manual_fromscale_or_fromoffset: lints::roblox_manual_fromscale_or_fromoffset::ManualFromScaleOrFromOffsetLint,
         roblox_suspicious_udim2_new: lints::roblox_suspicious_udim2_new::SuspiciousUDim2NewLint,
     },
