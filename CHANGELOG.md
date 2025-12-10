@@ -2,6 +2,7 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.29.0...HEAD)
+- Added new [`roblox_react_exhaustive_deps` lint](https://kampfkarren.github.io/selene/lints/roblox_react_exhaustive_deps.html), which will warn when React hook dependencies are missing or unnecessary.
 
 ## [0.29.0](https://github.com/Kampfkarren/selene/releases/tag/0.29.0) - 2025-07-23
 - Added `Instance.fromExisting` to the Roblox standard library
