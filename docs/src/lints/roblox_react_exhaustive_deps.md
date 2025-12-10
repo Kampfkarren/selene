@@ -68,6 +68,8 @@ This lint checks the following React/Roact hooks:
 ## Remarks
 This lint works with both the legacy Roact API (using `Roact.useEffect`) and the new React-like API (using `React.useEffect`).
 
+This lint is only active when using the Roblox standard library.
+
 The lint analyzes variable references within the hook callback and compares them against the declared dependency array. It will:
 
 1. Report missing dependencies that are used in the callback but not listed
@@ -80,8 +82,6 @@ The lint analyzes variable references within the hook callback and compares them
 - It doesn't detect dependencies in nested function definitions
 - Complex dependency expressions (computed property access with brackets) may not be analyzed correctly
 - setState functions and refs are currently not detected as stable (unlike in React)
-
-This lint is only active when using the Roblox standard library.
 
 ## Configuration
 This lint does not have any configuration options.

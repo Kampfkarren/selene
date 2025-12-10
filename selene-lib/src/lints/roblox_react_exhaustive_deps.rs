@@ -721,7 +721,7 @@ impl<'a> Visitor for ReactExhaustiveDepsVisitor<'a> {
                     if !missing.is_empty() || !unnecessary.is_empty() {
                         let deps_range = deps_arg.map(range);
 
-                        let mut message = format!("React Hook {} has", hook_type.name());
+                        let mut message = format!("react hook {} has", hook_type.name());
                         if !missing.is_empty() {
                             message.push_str(&format!(
                                 " missing dependenc{}: {}",
@@ -745,7 +745,7 @@ impl<'a> Visitor for ReactExhaustiveDepsVisitor<'a> {
                         let mut notes = Vec::new();
                         if !missing.is_empty() {
                             notes.push(format!(
-                                "Either include {} in the dependency array or remove the dependency",
+                                "help: either include {} in the dependency array or remove the dependency",
                                 if missing.len() == 1 {
                                     format!("'{}'", missing[0])
                                 } else {
@@ -755,7 +755,7 @@ impl<'a> Visitor for ReactExhaustiveDepsVisitor<'a> {
                         }
                         if !unnecessary.is_empty() {
                             notes.push(format!(
-                                "Remove {} from the dependency array",
+                                "help: remove {} from the dependency array",
                                 if unnecessary.len() == 1 {
                                     format!("'{}'", unnecessary[0])
                                 } else {
