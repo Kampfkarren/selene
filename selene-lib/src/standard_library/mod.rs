@@ -819,18 +819,13 @@ impl Visitor<'_> for RequiredVisitor {
     }
 }
 
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Hash, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum Observes {
+    #[default]
     ReadWrite,
     Read,
     Write,
-}
-
-impl Default for Observes {
-    fn default() -> Self {
-        Self::ReadWrite
-    }
 }
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
