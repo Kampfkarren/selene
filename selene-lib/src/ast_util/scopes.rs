@@ -421,6 +421,7 @@ impl ScopeVisitor {
         match suffix {
             ast::Suffix::Call(call) => self.visit_call(call),
             ast::Suffix::Index(index) => self.visit_index(index),
+            #[cfg(feature = "roblox")]
             ast::Suffix::TypeInstantiation(type_instantiation) => {
                 self.visit_type_instantiation(type_instantiation)
             }
