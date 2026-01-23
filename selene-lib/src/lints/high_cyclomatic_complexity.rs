@@ -143,6 +143,8 @@ fn count_suffix_complexity(suffix: &ast::Suffix, starting_complexity: u16) -> u1
             }
             _ => {}
         },
+        #[cfg(feature = "roblox")]
+        ast::Suffix::TypeInstantiation(_) => {}
         _ => {}
     }
 

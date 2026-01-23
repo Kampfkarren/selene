@@ -27,7 +27,7 @@ impl LuaVersion {
         }
     }
 
-    pub fn to_lua_version(&self) -> Result<full_moon::ast::LuaVersion, LuaVersionError> {
+    pub fn to_lua_version(&self) -> Result<full_moon::ast::LuaVersion, LuaVersionError<'_>> {
         match self {
             Self::Lua51 => Ok(full_moon::ast::LuaVersion::lua51()),
 

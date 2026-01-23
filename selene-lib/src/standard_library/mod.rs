@@ -351,7 +351,7 @@ impl StandardLibrary {
         Some(std)
     }
 
-    pub fn lua_version(&self) -> (full_moon::LuaVersion, Vec<lua_versions::LuaVersionError>) {
+    pub fn lua_version(&self) -> (full_moon::LuaVersion, Vec<lua_versions::LuaVersionError<'_>>) {
         let mut errors = Vec::new();
 
         let mut lua_version = full_moon::LuaVersion::lua51();

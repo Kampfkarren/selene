@@ -250,6 +250,9 @@ fn get_name_path_from_call(call: &ast::FunctionCall) -> Option<Vec<String>> {
                 }
             }
 
+            #[cfg(feature = "roblox")]
+            ast::Suffix::TypeInstantiation(_) => {}
+
             _ => {}
         }
     }
@@ -418,6 +421,7 @@ impl ScopeVisitor {
         match suffix {
             ast::Suffix::Call(call) => self.visit_call(call),
             ast::Suffix::Index(index) => self.visit_index(index),
+            ast::Suffix::TypeInstantiation(type_instantiation) => self.visit_type_instantiation(type_instantiation),
             _ => {}
         }
     }
@@ -714,6 +718,11 @@ impl ScopeVisitor {
                 }
 
                 ast::Suffix::Index(ast::Index::Dot { name, .. }) => Some(name),
+
+                #[cfg(feature = "roblox")]
+                ast::Suffix::TypeInstantiation(_) => {
+                    return;
+                }
 
                 _ => {
                     return;

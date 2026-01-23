@@ -352,6 +352,9 @@ globals:
     args:
       - type: table
     must_use: true
+  require:
+    args:
+      - type: any
   string.dump:
     removed: true
   string.pack:
