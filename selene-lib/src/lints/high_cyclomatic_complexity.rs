@@ -451,7 +451,7 @@ mod tests {
             HighCyclomaticComplexityLint::new(HighCyclomaticComplexityConfig::default()).unwrap(),
             "high_cyclomatic_complexity",
             "complex_var_expressions",
-            TestUtilConfig::luau()
+            TestUtilConfig::luau(),
         );
     }
 
