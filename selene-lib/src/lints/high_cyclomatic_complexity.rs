@@ -436,10 +436,11 @@ mod tests {
     #[cfg(feature = "roblox")]
     #[cfg_attr(debug_assertions, ignore)] // Remove these with the full_moon parser rewrite
     fn test_high_cyclomatic_complexity() {
-        test_lint(
+        test_lint_config(
             HighCyclomaticComplexityLint::new(HighCyclomaticComplexityConfig::default()).unwrap(),
             "high_cyclomatic_complexity",
             "high_cyclomatic_complexity",
+            TestUtilConfig::luau(),
         );
     }
 
