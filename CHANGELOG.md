@@ -1,7 +1,11 @@
 # Changelog
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.29.0...HEAD)
+## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.30.0..HEAD)
+
+## [0.30.0](https://github.com/Kampfkarren/selene/releases/tag/0.30.0) - 2026-01-22
+- Updated internal parser, giving support for several recent Luau features.
+- `require` now accepts strings in Luau.
 
 ## [0.29.0](https://github.com/Kampfkarren/selene/releases/tag/0.29.0) - 2025-07-23
 - Added `Instance.fromExisting` to the Roblox standard library

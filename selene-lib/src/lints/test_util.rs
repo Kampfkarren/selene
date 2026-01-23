@@ -25,6 +25,16 @@ pub struct TestUtilConfig {
     pub __non_exhaustive: (),
 }
 
+impl TestUtilConfig {
+    #[cfg(feature = "roblox")]
+    pub fn luau() -> Self {
+        Self {
+            standard_library: StandardLibrary::from_name("luau").unwrap(),
+            __non_exhaustive: (),
+        }
+    }
+}
+
 impl Default for TestUtilConfig {
     fn default() -> Self {
         TestUtilConfig {
@@ -58,7 +68,9 @@ pub fn test_lint_config_with_output<
     let lua_source =
         fs::read_to_string(path_base.with_extension("lua")).expect("Cannot find lua file");
 
-    let ast = full_moon::parse(&lua_source).expect("Cannot parse lua file");
+    let ast = full_moon::parse_fallible(&lua_source, config.standard_library.lua_version().0)
+        .into_result()
+        .expect("Cannot parse lua file");
     let mut diagnostics = lint.pass(
         &ast,
         &Context {

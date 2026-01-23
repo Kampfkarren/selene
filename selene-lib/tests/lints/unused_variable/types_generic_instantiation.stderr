@@ -1,0 +1,6 @@
+error[unused_variable]: value is assigned a value, but never used
+  ┌─ types_generic_instantiation.lua:4:7
+  │
+4 │ local value = f<<types.something>>()
+  │       ^^^^^
+

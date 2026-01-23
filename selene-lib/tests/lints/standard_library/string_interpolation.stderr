@@ -2,7 +2,7 @@ error[incorrect_standard_library_use]: use of standard_library function `collect
   ┌─ string_interpolation.lua:2:16
   │
 2 │ collectgarbage(`ohno`)
-  │                ^^^^^^ expected `"collect", "count", "restart", "setpause", "setstepmul", "step", "stop"`, received `string`
+  │                ^^^^^^ expected `"count"`, received `string`
 
 error[incorrect_standard_library_use]: use of standard_library function `math.floor` is incorrect
   ┌─ string_interpolation.lua:7:12

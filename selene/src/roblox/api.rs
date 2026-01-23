@@ -116,33 +116,6 @@ impl<'de> Visitor<'de> for ApiValueTypeVisitor {
     }
 }
 
-#[derive(Debug, Deserialize)]
-pub enum ApiGroupType {
-    #[serde(alias = "Array")]
-    #[serde(alias = "Dictionary")]
-    #[serde(alias = "Map")]
-    Table,
-    Tuple,
-    Variant,
-
-    #[serde(other)]
-    Unknown,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum ApiPrimitiveType {
-    Bool,
-    Double,
-    Float,
-    Int,
-    Int64,
-    String,
-
-    #[serde(other)]
-    Unknown,
-}
-
 #[derive(Debug)]
 pub enum ApiDataType {
     CFrame,

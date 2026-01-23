@@ -250,6 +250,9 @@ fn get_name_path_from_call(call: &ast::FunctionCall) -> Option<Vec<String>> {
                 }
             }
 
+            #[cfg(feature = "roblox")]
+            ast::Suffix::TypeInstantiation(_) => {}
+
             _ => {}
         }
     }
@@ -338,9 +341,8 @@ impl ScopeVisitor {
                 self.read_expression(lhs);
                 self.read_expression(rhs);
             }
-
             ast::Expression::Function(function_box) => {
-                self.read_name(&function_box.0);
+                self.read_name(function_box.function_token());
             }
 
             ast::Expression::FunctionCall(call) => {
@@ -419,6 +421,10 @@ impl ScopeVisitor {
         match suffix {
             ast::Suffix::Call(call) => self.visit_call(call),
             ast::Suffix::Index(index) => self.visit_index(index),
+            #[cfg(feature = "roblox")]
+            ast::Suffix::TypeInstantiation(type_instantiation) => {
+                self.visit_type_instantiation(type_instantiation)
+            }
             _ => {}
         }
     }
@@ -716,6 +722,11 @@ impl ScopeVisitor {
 
                 ast::Suffix::Index(ast::Index::Dot { name, .. }) => Some(name),
 
+                #[cfg(feature = "roblox")]
+                ast::Suffix::TypeInstantiation(_) => {
+                    return;
+                }
+
                 _ => {
                     return;
                 }
@@ -876,9 +887,8 @@ impl Visitor for ScopeVisitor {
             _ => {}
         }
     }
-
     #[cfg(feature = "roblox")]
-    fn visit_compound_assignment(&mut self, compound_assignment: &ast::luau::CompoundAssignment) {
+    fn visit_compound_assignment(&mut self, compound_assignment: &ast::CompoundAssignment) {
         self.read_var(compound_assignment.lhs());
         self.read_expression(compound_assignment.rhs());
     }

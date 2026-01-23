@@ -1,0 +1,6 @@
+error[unused_variable]: f is defined, but never used
+  ┌─ attributes.lua:2:16
+  │
+2 │ local function f() end
+  │                ^
+

@@ -198,7 +198,21 @@ impl Lint for UnusedVariableLint {
 
 #[cfg(test)]
 mod tests {
-    use super::{super::test_util::test_lint, *};
+    use super::{
+        super::test_util::{test_lint, test_lint_config, TestUtilConfig},
+        *,
+    };
+
+    #[cfg(feature = "roblox")]
+    #[test]
+    fn test_attributes() {
+        test_lint_config(
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
+            "unused_variable",
+            "attributes",
+            TestUtilConfig::luau(),
+        );
+    }
 
     #[test]
     fn test_blocks() {
@@ -351,10 +365,22 @@ mod tests {
     #[cfg(feature = "roblox")]
     #[test]
     fn test_types() {
-        test_lint(
+        test_lint_config(
             UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "types",
+            TestUtilConfig::luau(),
+        );
+    }
+
+    #[cfg(feature = "roblox")]
+    #[test]
+    fn test_types_generic_instantiation() {
+        test_lint_config(
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
+            "unused_variable",
+            "types_generic_instantiation",
+            TestUtilConfig::luau(),
         );
     }
 

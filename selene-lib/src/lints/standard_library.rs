@@ -909,20 +909,22 @@ mod tests {
     #[cfg(feature = "roblox")]
     #[test]
     fn test_if_expressions() {
-        test_lint(
+        test_lint_config(
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "if_expressions",
+            TestUtilConfig::luau(),
         );
     }
 
     #[cfg(feature = "roblox")]
     #[test]
     fn test_string_interpolation() {
-        test_lint(
+        test_lint_config(
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "string_interpolation",
+            TestUtilConfig::luau(),
         );
     }
 }
