@@ -913,7 +913,7 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "if_expressions",
-            TestUtilConfig::luau()
+            TestUtilConfig::luau(),
         );
     }
 
@@ -924,7 +924,7 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "string_interpolation",
-            TestUtilConfig::luau()
+            TestUtilConfig::luau(),
         );
     }
 }

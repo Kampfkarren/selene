@@ -81,7 +81,7 @@ mod tests {
             UndefinedVariableLint::new(()).unwrap(),
             "undefined_variable",
             "compound_assignments",
-            TestUtilConfig::luau()
+            TestUtilConfig::luau(),
         );
     }
 
@@ -137,7 +137,7 @@ mod tests {
             UndefinedVariableLint::new(()).unwrap(),
             "undefined_variable",
             "string_interpolation",
-            TestUtilConfig::luau()
+            TestUtilConfig::luau(),
         );
     }
 }

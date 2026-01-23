@@ -198,7 +198,10 @@ impl Lint for UnusedVariableLint {
 
 #[cfg(test)]
 mod tests {
-    use super::{super::test_util::{TestUtilConfig, test_lint, test_lint_config}, *};
+    use super::{
+        super::test_util::{test_lint, test_lint_config, TestUtilConfig},
+        *,
+    };
 
     #[test]
     fn test_attributes() {
@@ -206,7 +209,7 @@ mod tests {
             UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "attributes",
-            TestUtilConfig::luau()
+            TestUtilConfig::luau(),
         );
     }
 
@@ -365,7 +368,7 @@ mod tests {
             UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "types",
-            TestUtilConfig::luau()
+            TestUtilConfig::luau(),
         );
     }
 
@@ -376,7 +379,7 @@ mod tests {
             UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
             "unused_variable",
             "types_generic_instantiation",
-            TestUtilConfig::luau()
+            TestUtilConfig::luau(),
         );
     }
 
