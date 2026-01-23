@@ -203,6 +203,7 @@ mod tests {
         *,
     };
 
+    #[cfg(feature = "roblox")]
     #[test]
     fn test_attributes() {
         test_lint_config(
