@@ -601,9 +601,9 @@ globals:
     args:
       - type: table
         observes: write
-      - type: any
       - required: false
-        type: any
+        type: number
+      - type: any
   table.maxn:
     args:
       - type: table
