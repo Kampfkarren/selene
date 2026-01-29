@@ -451,7 +451,8 @@ globals:
       - type: number
       - type: number
       - type: number
-      - required: false
+      - observes: write
+        required: false
         type: table
   table.pack:
     args:
