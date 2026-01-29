@@ -492,6 +492,7 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   string.char:
     args:
       - required: string.char should be used with an argument despite it not throwing
