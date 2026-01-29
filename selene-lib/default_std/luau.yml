@@ -112,6 +112,13 @@ globals:
       - type:
           display: buffer
     must_use: true
+  buffer.readbits:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: number
+    must_use: true
   buffer.readf32:
     args:
       - type:
@@ -172,6 +179,14 @@ globals:
       - type:
           display: buffer
     must_use: true
+  buffer.writebits:
+    args:
+      - type:
+          display: buffer
+        observes: write
+      - type: number
+      - type: number
+      - type: number
   buffer.writef32:
     args:
       - type:
