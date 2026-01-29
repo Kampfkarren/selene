@@ -538,7 +538,8 @@ globals:
     args:
       - type: number
       - type: number
-      - type: number
+      - required: false
+        type: number
     must_use: true
   vector.cross:
     args:
