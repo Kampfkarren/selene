@@ -43,7 +43,7 @@ globals:
   coroutine.wrap:
     args:
       - type: function
-    must-use: true
+    must_use: true
   coroutine.yield:
     args:
       - required: false
