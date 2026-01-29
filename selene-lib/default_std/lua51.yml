@@ -592,7 +592,6 @@ globals:
   table.getn:
     args:
       - type: table
-      - type: number
     deprecated:
       message: "`table.getn` has been superseded by #."
       replace:
