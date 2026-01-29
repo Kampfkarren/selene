@@ -263,6 +263,7 @@ globals:
           display: thread
   coroutine.isyieldable:
     args: []
+    must_use: true
   debug.debug:
     removed: true
   debug.getfenv:
