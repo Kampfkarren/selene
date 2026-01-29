@@ -420,6 +420,7 @@ globals:
   table.clear:
     args:
       - type: table
+        observes: write
   table.clone:
     args:
       - type: table
