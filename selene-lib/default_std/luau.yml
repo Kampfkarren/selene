@@ -85,6 +85,7 @@ globals:
       - type: number
       - type:
           display: buffer
+        observes: write
       - required: false
         type: number
       - required: false
@@ -97,6 +98,7 @@ globals:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
       - required: false
