@@ -320,6 +320,18 @@ globals:
       - type: number
       - type: number
     must_use: true
+  math.isfinite:
+    args:
+      - type: number
+    must_use: true
+  math.isinf:
+    args:
+      - type: number
+    must_use: true
+  math.isnan:
+    args:
+      - type: number
+    must_use: true
   math.lerp:
     args:
       - type: number
