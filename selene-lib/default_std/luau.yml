@@ -560,6 +560,14 @@ globals:
       - type:
           display: vector
     must_use: true
+  vector.lerp:
+    args:
+      - type:
+          display: vector
+      - type:
+          display: vector
+      - type: number
+    must_use: true
   vector.magnitude:
     args:
       - type:
