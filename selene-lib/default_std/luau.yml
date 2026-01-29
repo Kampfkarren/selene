@@ -174,36 +174,42 @@ globals:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   buffer.writef64:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   buffer.writei8:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   buffer.writei16:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   buffer.writei32:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   buffer.writestring:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: string
       - required: false
@@ -212,18 +218,21 @@ globals:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   buffer.writeu16:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   buffer.writeu32:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   collectgarbage:
