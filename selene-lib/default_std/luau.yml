@@ -282,9 +282,9 @@ globals:
   debug.info:
     args:
       - type: any
-      - type: any
       - required: false
-        type: string
+        type: number
+      - type: string
     must_use: true
   debug.setfenv:
     removed: true
