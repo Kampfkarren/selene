@@ -501,8 +501,7 @@ globals:
   utf8.offset:
     args:
       - type: string
-      - required: false
-        type: number
+      - type: number
       - required: false
         type: number
     must_use: true
