@@ -1,0 +1,24 @@
+error[variable_naming]: variable `doThing` does not match pattern `^[a-z][a-z0-9_]*$`
+  ┌─ functions.lua:2:10
+  │
+2 │ function doThing() end
+  │          ^^^^^^^
+
+error[variable_naming]: variable `_helper` does not match pattern `^[a-z][a-z0-9_]*$`
+  ┌─ functions.lua:3:16
+  │
+3 │ local function _helper() end
+  │                ^^^^^^^
+
+error[variable_naming]: variable `DoThing` does not match pattern `^[a-z][a-z0-9_]*$`
+  ┌─ functions.lua:6:10
+  │
+6 │ function DoThing() end
+  │          ^^^^^^^
+
+error[variable_naming]: function `DoThing` does not match pattern `^_?[a-z][a-zA-Z0-9]*$`
+  ┌─ functions.lua:6:10
+  │
+6 │ function DoThing() end
+  │          ^^^^^^^
+
