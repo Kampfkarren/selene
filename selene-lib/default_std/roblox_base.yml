@@ -573,7 +573,7 @@ globals:
     args: []
   require:
     args:
-      - type: number
+      - type: any
   SharedTable.clear:
     args:
       - type:
