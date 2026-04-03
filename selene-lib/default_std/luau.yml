@@ -321,6 +321,8 @@ globals:
       - type: number
       - type: number
     must_use: true
+  math.e:
+    property: read-only
   math.isfinite:
     args:
       - type: number
@@ -353,6 +355,8 @@ globals:
       - type: number
       - type: number
     must_use: true
+  math.nan:
+    property: read-only
   math.noise:
     args:
       - type: number
@@ -361,6 +365,8 @@ globals:
       - required: false
         type: number
     must_use: true
+  math.phi:
+    property: read-only
   math.round:
     args:
       - type: number
@@ -369,6 +375,10 @@ globals:
     args:
       - type: number
     must_use: true
+  math.sqrt2:
+    property: read-only
+  math.tau:
+    property: read-only
   module:
     removed: true
   os.execute:
