@@ -632,6 +632,7 @@ globals:
   type:
     args:
       - type: any
+    must_use: true
   unpack:
     args:
       - type: table

@@ -470,6 +470,7 @@ globals:
   typeof:
     args:
       - type: any
+    must_use: true
   utf8.char:
     args:
       - required: utf8.char should be used with an argument despite it not throwing
