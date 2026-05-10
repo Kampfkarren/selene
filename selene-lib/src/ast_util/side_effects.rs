@@ -103,6 +103,8 @@ impl HasSideEffects for ast::Suffix {
         match self {
             ast::Suffix::Call(_) => true,
             ast::Suffix::Index(_) => false,
+            #[cfg(feature = "roblox")]
+            ast::Suffix::TypeInstantiation(_) => false,
             _ => true,
         }
     }

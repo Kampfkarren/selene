@@ -91,7 +91,7 @@ pub fn validate_config(
     config_path: &Path,
     config_contents: &str,
     directory: &Path,
-) -> Result<(), InvalidConfigError> {
+) -> Result<(), Box<InvalidConfigError>> {
     let config_path_absolute = match config_path.canonicalize() {
         Ok(path) => path,
         Err(_) => config_path.to_path_buf(),
@@ -100,14 +100,14 @@ pub fn validate_config(
     let config = match toml::from_str::<CheckerConfig<toml::Value>>(config_contents) {
         Ok(config) => config,
         Err(error) => {
-            return Err(InvalidConfigError {
+            return Err(Box::new(InvalidConfigError {
                 source: config_path.to_path_buf(),
                 range: error.span().map(Into::into),
                 error: StandardLibraryError::Toml {
                     source: error,
                     path: config_path.to_path_buf(),
                 },
-            });
+            }));
         }
     };
 
@@ -127,47 +127,47 @@ pub fn validate_config(
     };
 
     match error {
-        StandardLibraryError::BaseStd { .. } => Err(InvalidConfigError {
+        StandardLibraryError::BaseStd { .. } => Err(Box::new(InvalidConfigError {
             error,
             source: config_path_absolute,
             range: std_range,
-        }),
+        })),
 
-        StandardLibraryError::NotFound { .. } => Err(InvalidConfigError {
+        StandardLibraryError::NotFound { .. } => Err(Box::new(InvalidConfigError {
             source: config_path_absolute,
             range: std_range,
             error,
-        }),
+        })),
 
-        StandardLibraryError::Io { ref path, .. } => Err(InvalidConfigError {
+        StandardLibraryError::Io { ref path, .. } => Err(Box::new(InvalidConfigError {
             source: path.clone(),
             range: None,
             error,
-        }),
+        })),
 
-        StandardLibraryError::Roblox(..) => Err(InvalidConfigError {
+        StandardLibraryError::Roblox(..) => Err(Box::new(InvalidConfigError {
             source: config_path_absolute,
             range: std_range,
             error,
-        }),
+        })),
 
         StandardLibraryError::Toml {
             ref source,
             ref path,
-        } => Err(InvalidConfigError {
+        } => Err(Box::new(InvalidConfigError {
             source: path.clone(),
             range: source.span().map(Into::into),
             error,
-        }),
+        })),
 
         StandardLibraryError::Yml {
             ref source,
             ref path,
-        } => Err(InvalidConfigError {
+        } => Err(Box::new(InvalidConfigError {
             source: path.clone(),
             range: source.location().map(Into::into),
             error,
-        }),
+        })),
     }
 }
 

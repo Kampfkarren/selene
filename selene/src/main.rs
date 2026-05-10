@@ -440,7 +440,6 @@ fn start(mut options: opts::Options) {
 
                 (config_contents, config_path)
             };
-
             if let Err(error) = validate_config::validate_config(
                 config_path,
                 &config_contents,
@@ -448,7 +447,7 @@ fn start(mut options: opts::Options) {
             ) {
                 match options.display_style() {
                     opts::DisplayStyle::Json2 => {
-                        json_output::print_json(json_output::JsonOutput::InvalidConfig(error));
+                        json_output::print_json(json_output::JsonOutput::InvalidConfig(*error));
                     }
 
                     opts::DisplayStyle::Rich => {

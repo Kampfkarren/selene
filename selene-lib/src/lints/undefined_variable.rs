@@ -77,10 +77,11 @@ mod tests {
     #[test]
     #[cfg(feature = "roblox")]
     fn test_compound_assignments() {
-        test_lint(
+        test_lint_config(
             UndefinedVariableLint::new(()).unwrap(),
             "undefined_variable",
             "compound_assignments",
+            TestUtilConfig::luau(),
         );
     }
 
@@ -132,10 +133,11 @@ mod tests {
     #[cfg(feature = "roblox")]
     #[test]
     fn test_string_interpolation() {
-        test_lint(
+        test_lint_config(
             UndefinedVariableLint::new(()).unwrap(),
             "undefined_variable",
             "string_interpolation",
+            TestUtilConfig::luau(),
         );
     }
 }

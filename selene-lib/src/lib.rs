@@ -110,17 +110,12 @@ impl LintVariation {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum RobloxStdSource {
+    #[default]
     Floating,
     Pinned,
-}
-
-impl Default for RobloxStdSource {
-    fn default() -> Self {
-        Self::Floating
-    }
 }
 
 macro_rules! use_lints {

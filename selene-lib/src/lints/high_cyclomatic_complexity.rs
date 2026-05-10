@@ -143,6 +143,8 @@ fn count_suffix_complexity(suffix: &ast::Suffix, starting_complexity: u16) -> u1
             }
             _ => {}
         },
+        #[cfg(feature = "roblox")]
+        ast::Suffix::TypeInstantiation(_) => {}
         _ => {}
     }
 
@@ -359,6 +361,16 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
                 // not a dynamic branch point itself
             }
 
+            #[cfg(feature = "roblox")]
+            ast::Stmt::ExportedTypeFunction(_) => {
+                // doesn't contain branch points in type declarations
+            }
+
+            #[cfg(feature = "roblox")]
+            ast::Stmt::TypeFunction(_) => {
+                // doesn't contain branch points in type declarations
+            }
+
             _ => {}
         }
     }
@@ -401,7 +413,7 @@ impl Visitor for HighCyclomaticComplexityVisitor {
 
     fn visit_expression(&mut self, expression: &ast::Expression) {
         if let ast::Expression::Function(function_box) = expression {
-            let function_body = &function_box.1;
+            let function_body = function_box.body();
             let complexity = count_block_complexity(function_body.block(), 1);
             if complexity > self.config.maximum_complexity {
                 self.positions.push((
@@ -418,16 +430,17 @@ impl Visitor for HighCyclomaticComplexityVisitor {
 
 #[cfg(test)]
 mod tests {
-    use super::{super::test_util::test_lint, *};
+    use super::{super::test_util::*, *};
 
     #[test]
     #[cfg(feature = "roblox")]
     #[cfg_attr(debug_assertions, ignore)] // Remove these with the full_moon parser rewrite
     fn test_high_cyclomatic_complexity() {
-        test_lint(
+        test_lint_config(
             HighCyclomaticComplexityLint::new(HighCyclomaticComplexityConfig::default()).unwrap(),
             "high_cyclomatic_complexity",
             "high_cyclomatic_complexity",
+            TestUtilConfig::luau(),
         );
     }
 
@@ -435,10 +448,11 @@ mod tests {
     #[cfg(feature = "roblox")]
     #[cfg_attr(debug_assertions, ignore)]
     fn test_complex_var_expressions() {
-        test_lint(
+        test_lint_config(
             HighCyclomaticComplexityLint::new(HighCyclomaticComplexityConfig::default()).unwrap(),
             "high_cyclomatic_complexity",
             "complex_var_expressions",
+            TestUtilConfig::luau(),
         );
     }
 
