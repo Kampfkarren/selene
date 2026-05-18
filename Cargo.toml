@@ -16,3 +16,6 @@ toml = "0.7.2"
 
 # Do not update this without confirming profiling uses the same version of tracy-client as selene
 profiling = "1.0.7"
+
+[patch.crates-io]
+getrandom = { git = "https://github.com/rust-random/getrandom", tag = "v0.2.15" }
