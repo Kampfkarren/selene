@@ -5,6 +5,7 @@ All notable changes to the "selene-vscode" extension will be documented in this 
 If you want to stay up to date with selene itself, you can find the changelog in [selene's CHANGELOG.md](https://github.com/Kampfkarren/selene/blob/master/CHANGELOG.md).
 
 ## Unreleased
+- Fixed an issue where the extension wouldn't respect the config file's exclude paths.
 
 ## [1.5.1]
 - selene now works with the Luau language ID.

@@ -49,3 +49,14 @@ export async function seleneCommand(
         })
     })
 }
+
+export type Config = {
+    std?: string
+    exclude?: string[]
+    config?: {
+        [key: string]: unknown
+    }
+    lints?: {
+        [key: string]: "allow" | "warn" | "deny"
+    }
+}
