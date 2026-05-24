@@ -1,7 +1,7 @@
 # Configuration
 selene is meant to be easily configurable. You can specify configurations for the entire project as well as for individual lints.
 
-Configuration files are placed in the directory you are running selene in and are named **selene.toml**. As the name suggests, the configurations use the [Tom's Obvious, Minimal Language (TOML)](https://github.com/toml-lang/toml) format. It is recommended you quickly brush up on the syntax, though it is very easy.
+Configuration files apply to the directory (and subdirectories) in which they are placed. So, to control how selene behaves when it lints scripts in, say, `~/myScripts` and below, place the configuration file within (the top-level of) `~/myScripts`. Each configuration file is to be called **selene.toml**. As the file suffix suggests, configuration files use the [Tom's Obvious, Minimal Language (TOML)](https://github.com/toml-lang/toml) format. It is recommended you quickly brush up on the syntax, though it is very easy.
 
 ## Changing the severity of lints
 You can change the severity of lints by entering the following into selene.toml:
@@ -13,13 +13,13 @@ lint_2 = "severity"
 ...
 ```
 
-Where "severity" is one of the following:
+where "severity" is one of the following:
 
-- `"allow"` - Don't check for this lint
-- `"warn"` - Warn for this lint
-- `"deny"` - Error for this lint
+- `"allow"` - don't check for this lint;
+- `"warn"` - produce a warning when this lint is transgressed;
+- `"deny"` - produce an error message when this lint is transgressed.
 
-Note that "deny" and "warn" are effectively the same, only warn will give orange text while error gives red text, and they both have different counters.
+`deny` and `warn` are near-identical in effect. The only difference are: errors are printed in red, and warnings in orange; errors increment the error counter, warnings, the warning counter.
 
 ## Configuring specific lints
 You can configure specific lints by entering the following into selene.toml:
