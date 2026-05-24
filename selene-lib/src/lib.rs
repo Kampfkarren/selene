@@ -319,6 +319,7 @@ use_lints! {
     undefined_variable: lints::undefined_variable::UndefinedVariableLint,
     unscoped_variables: lints::unscoped_variables::UnscopedVariablesLint,
     unused_variable: lints::unused_variable::UnusedVariableLint,
+    variable_naming: lints::variable_naming::VariableNamingLint,
 
     #[cfg(feature = "roblox")]
     {
@@ -328,3 +329,4 @@ use_lints! {
         roblox_suspicious_udim2_new: lints::roblox_suspicious_udim2_new::SuspiciousUDim2NewLint,
     },
 }
+
