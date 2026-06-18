@@ -320,9 +320,9 @@ impl StandardLibrary {
                 }),
         );
 
-        // Intentionally not a merge, didn't seem valuable
+        // Merge Lua versions instead of replacing them
         if !other.lua_versions.is_empty() {
-            self.lua_versions = other.lua_versions;
+            self.lua_versions.extend(other.lua_versions);
         }
 
         self.globals = globals;
