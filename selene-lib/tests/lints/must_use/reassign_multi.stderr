@@ -1,0 +1,12 @@
+error[must_use]: unused return value of `math.max` must be used
+  ┌─ reassign_multi.lua:6:1
+  │
+6 │ b.max(x, y)
+  │ ^^^^^
+
+error[must_use]: unused return value of `math.max` must be used
+   ┌─ reassign_multi.lua:13:1
+   │
+13 │ d.max(x, y)
+   │ ^^^^^
+

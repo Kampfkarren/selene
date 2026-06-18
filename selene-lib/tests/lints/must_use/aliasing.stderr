@@ -1,0 +1,12 @@
+error[must_use]: unused return value of `math.max` must be used
+  ┌─ aliasing.lua:4:1
+  │
+4 │ math2.max(x, y)
+  │ ^^^^^^^^^
+
+error[must_use]: unused return value of `math.max` must be used
+  ┌─ aliasing.lua:8:1
+  │
+8 │ math_global.max(x, y)
+  │ ^^^^^^^^^^^^^^^
+

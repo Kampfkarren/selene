@@ -44,7 +44,7 @@ pub fn name_path(expression: &ast::Expression) -> Option<Vec<String>> {
                 name_path_from_prefix_suffix(expression.prefix(), expression.suffixes())
             }
 
-            ast::Var::Name(name) => Some(vec![name.to_string()]),
+            ast::Var::Name(name) => Some(vec![name.token().to_string()]),
 
             _ => None,
         }

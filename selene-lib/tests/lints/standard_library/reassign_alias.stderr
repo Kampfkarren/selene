@@ -1,0 +1,6 @@
+error[incorrect_standard_library_use]: standard library function `z2.ecs.create_entity` requires 0 parameters, 1 passed
+  ┌─ reassign_alias.lua:5:12
+  │
+5 │ local id = ecs.create_entity(3)
+  │            ^^^^^^^^^^^^^^^^^^^^
+
