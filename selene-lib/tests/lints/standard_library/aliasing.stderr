@@ -1,0 +1,18 @@
+error[incorrect_standard_library_use]: standard library function `z2.ecs.create_entity` requires 0 parameters, 1 passed
+  ┌─ aliasing.lua:7:11
+  │
+7 │ local e = ecs2.create_entity(3)
+  │           ^^^^^^^^^^^^^^^^^^^^^
+
+error[incorrect_standard_library_use]: standard library global `z2.ecs` does not contain the field `create_enztity`
+  ┌─ aliasing.lua:9:11
+  │
+9 │ local g = ecs2.create_enztity()
+  │           ^^^^^^^^^^^^^^^^^^^
+
+error[incorrect_standard_library_use]: standard library function `z2.ecs.create_entity` requires 0 parameters, 1 passed
+   ┌─ aliasing.lua:13:11
+   │
+13 │ local h = ecs_global.create_entity(3)
+   │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+

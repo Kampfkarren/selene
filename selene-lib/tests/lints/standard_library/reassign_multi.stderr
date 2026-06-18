@@ -1,0 +1,12 @@
+error[incorrect_standard_library_use]: standard library function `z2.ecs.create_entity` requires 0 parameters, 1 passed
+  ┌─ reassign_multi.lua:6:12
+  │
+6 │ local id = b.create_entity(3)
+  │            ^^^^^^^^^^^^^^^^^^
+
+error[incorrect_standard_library_use]: standard library function `z2.ecs.create_entity` requires 0 parameters, 1 passed
+   ┌─ reassign_multi.lua:13:13
+   │
+13 │ local id2 = d.create_entity(3)
+   │             ^^^^^^^^^^^^^^^^^^
+

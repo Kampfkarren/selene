@@ -13,7 +13,7 @@ use id_arena::{Arena, Id};
 
 use crate::ast_util::extract_static_token;
 
-use super::expression_to_ident;
+use super::{expression_to_ident, name_paths::name_path};
 
 type Range = (usize, usize);
 
@@ -70,6 +70,32 @@ impl ScopeManager {
         }
 
         VariableInScope::NotFound
+    }
+
+    pub fn resolve_name_path(
+        &self,
+        byte: usize,
+        name_path: &[String],
+    ) -> Option<Vec<String>> {
+        let (head, tail) = name_path.split_first()?;
+        let Some(reference) = self.reference_at_byte(byte) else {
+            return Some(name_path.to_vec());
+        };
+        let Some(variable_id) = reference.resolved else {
+            return Some(name_path.to_vec());
+        };
+        let variable = self.variables.get(variable_id)?;
+
+        if variable.name != *head {
+            return None;
+        }
+
+        let mut resolved = match variable.value.as_ref()? {
+            AssignedValue::StaticTable { .. } => return None,
+            AssignedValue::Reference(name_path) => name_path.clone(),
+        };
+        resolved.extend_from_slice(tail);
+        Some(resolved)
     }
 }
 
@@ -150,6 +176,7 @@ pub struct Variable {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum AssignedValue {
     StaticTable { has_fields: bool },
+    Reference(Vec<String>),
 }
 
 #[derive(Debug)]
@@ -198,6 +225,22 @@ fn create_scope<N: Node>(node: N) -> Option<Scope> {
 fn range<N: Node>(node: N) -> (usize, usize) {
     let (start, end) = node.range().unwrap();
     (start.bytes(), end.bytes())
+}
+
+// Lua assignments can have fewer RHS expressions than LHS names, so scope analysis pads the
+// missing RHS slots with None to keep name/expression pairing consistent.
+fn padded_expressions<'a, T>(
+    expressions: T,
+    count: usize,
+) -> Vec<Option<&'a ast::Expression>>
+where
+    T: Iterator<Item = &'a ast::Expression>,
+{
+    expressions
+        .map(Some)
+        .chain(std::iter::repeat(None))
+        .take(count)
+        .collect()
 }
 
 fn get_name_path_from_call(call: &ast::FunctionCall) -> Option<Vec<String>> {
@@ -263,16 +306,6 @@ fn get_name_path_from_call(call: &ast::FunctionCall) -> Option<Vec<String>> {
     Some(path)
 }
 
-fn get_assigned_value(expression: &ast::Expression) -> Option<AssignedValue> {
-    if let ast::Expression::TableConstructor(table_constructor) = expression {
-        return Some(AssignedValue::StaticTable {
-            has_fields: !table_constructor.fields().is_empty(),
-        });
-    }
-
-    None
-}
-
 impl ScopeVisitor {
     fn from_ast(ast: &ast::Ast) -> Self {
         if let Some(scope) = create_scope(ast.nodes()) {
@@ -327,6 +360,103 @@ impl ScopeVisitor {
         }
 
         None
+    }
+
+    fn get_assigned_value(&self, expression: &ast::Expression) -> Option<AssignedValue> {
+        if let ast::Expression::TableConstructor(table_constructor) = expression {
+            return Some(AssignedValue::StaticTable {
+                has_fields: !table_constructor.fields().is_empty(),
+            });
+        }
+
+        let name_path = name_path(expression)?;
+        let (head, tail) = name_path.split_first()?;
+
+        let Some(reference) = self
+            .scope_manager
+            .reference_at_byte(expression.start_position()?.bytes())
+        else {
+            return Some(AssignedValue::Reference(name_path));
+        };
+
+        let Some(variable_id) = reference.resolved else {
+            return Some(AssignedValue::Reference(name_path));
+        };
+
+        let variable = self.scope_manager.variables.get(variable_id)?;
+
+        if variable.name != *head {
+            return None;
+        }
+
+        match variable.value.as_ref()? {
+            AssignedValue::StaticTable { has_fields } if tail.is_empty() => Some(
+                AssignedValue::StaticTable {
+                    has_fields: *has_fields,
+                },
+            ),
+            AssignedValue::StaticTable { .. } => None,
+            AssignedValue::Reference(resolved) => {
+                let mut resolved = resolved.clone();
+                resolved.extend_from_slice(tail);
+                Some(AssignedValue::Reference(resolved))
+            }
+        }
+    }
+
+    fn update_assigned_value(
+        &mut self,
+        variable_id: Id<Variable>,
+        value: Option<AssignedValue>,
+    ) {
+        self.scope_manager.variables.get_mut(variable_id).unwrap().value = value;
+    }
+
+    fn bind_declared_names<'a, I, E>(
+        &mut self,
+        names: I,
+        expressions: E,
+        definition_range: Range,
+    ) where
+        I: Iterator<Item = &'a TokenReference>,
+        E: Iterator<Item = &'a ast::Expression>,
+    {
+        let names = names.collect::<Vec<_>>();
+        let expressions = padded_expressions(expressions, names.len());
+
+        // Local-like declarations evaluate all RHS expressions before any of the new names enter
+        // scope, so alias/value tracking has to be resolved before defining the new bindings.
+        let values = expressions
+            .iter()
+            .copied()
+            .map(|expression| {
+                if let Some(expression) = expression {
+                    self.read_expression(expression);
+                }
+
+                expression.and_then(|expression| self.get_assigned_value(expression))
+            })
+            .collect::<Vec<_>>();
+
+        for ((name_token, expression), value) in names
+            .into_iter()
+            .zip(expressions.iter().copied())
+            .zip(values.into_iter())
+        {
+            self.define_name_full_with_variable(
+                &name_token.token().to_string(),
+                range(name_token),
+                definition_range,
+                Variable {
+                    value,
+                    ..Default::default()
+                },
+            );
+
+            if let Some(expression) = expression {
+                self.write_name(name_token, Some(range(expression)));
+            }
+        }
     }
 
     fn read_expression(&mut self, expression: &ast::Expression) {
@@ -576,24 +706,17 @@ impl ScopeVisitor {
         self.define_name_full_with_variable(name, range, definition_range, Variable::default())
     }
 
-    fn try_hoist(&mut self) {
-        let latest_reference_id = *self.current_scope().references.last().unwrap();
-        let (name, identifier, write_expr) = {
-            let reference = self
-                .scope_manager
-                .references
-                .get(latest_reference_id)
-                .unwrap();
-
-            (
-                reference.name.to_owned(),
-                reference.identifier,
-                reference.identifier, // This is the write_expr, but it's not great
-            )
-        };
-
+    fn hoist_name(&mut self, name: String, identifier: Range, write_expr: Range, value: Option<AssignedValue>) {
         if self.find_variable(&name).is_none() {
-            let id = self.define_name_full(&name, identifier, write_expr);
+            let id = self.define_name_full_with_variable(
+                &name,
+                identifier,
+                write_expr,
+                Variable {
+                    value,
+                    ..Default::default()
+                },
+            );
 
             for (_, reference) in &mut self.scope_manager.references {
                 if reference.read && reference.name == name && reference.resolved.is_none() {
@@ -601,6 +724,32 @@ impl ScopeVisitor {
                 }
             }
         }
+    }
+
+    // Returns the most recent bare-name write target so it can be hoisted after RHS analysis.
+    fn current_pending_hoist(&self) -> Option<(String, Range, Range)> {
+        let latest_reference_id = *self
+            .scope_manager
+            .scopes
+            .get(self.current_scope_id())?
+            .references
+            .last()?;
+        let reference = self.scope_manager.references.get(latest_reference_id)?;
+
+        Some((
+            reference.name.to_owned(),
+            reference.identifier,
+            reference.identifier, // This is the write_expr, but it's not great
+        ))
+    }
+
+    // Hoists the current bare-name write target, optionally attaching an alias/value snapshot.
+    fn hoist_pending(&mut self, value: Option<AssignedValue>) {
+        let Some((name, identifier, write_expr)) = self.current_pending_hoist() else {
+            return;
+        };
+
+        self.hoist_name(name, identifier, write_expr, value);
     }
 
     fn reference_variable(&mut self, name: &str, mut reference: Reference) {
@@ -643,6 +792,10 @@ impl ScopeVisitor {
 
     fn process_function_call_finish(&mut self, call: &ast::FunctionCall) {
         let name_path = match get_name_path_from_call(call) {
+            Some(name_path) => name_path,
+            None => return,
+        };
+        let name_path = match self.scope_manager.resolve_name_path(range(call).0, &name_path) {
             Some(name_path) => name_path,
             None => return,
         };
@@ -772,10 +925,15 @@ impl ScopeVisitor {
 
 impl Visitor for ScopeVisitor {
     fn visit_assignment(&mut self, assignment: &ast::Assignment) {
-        let mut expressions = assignment.expressions().iter();
+        let expressions =
+            padded_expressions(assignment.expressions().iter(), assignment.variables().iter().count());
 
-        for var in assignment.variables() {
-            let expression = expressions.next();
+        // Lua evaluates all RHS expressions before updating any LHS variables, so alias/value
+        // tracking has to mirror that ordering for multi-assignments like `a, b = b, a`.
+        let mut pending_value_updates = Vec::new();
+        let mut pending_hoists = Vec::new();
+
+        for (var, expression) in assignment.variables().iter().zip(expressions.iter().copied()) {
             if let Some(expression) = expression {
                 self.read_expression(expression);
             }
@@ -809,64 +967,43 @@ impl Visitor for ScopeVisitor {
                 _ => continue,
             };
 
+            let existing_variable = self.find_variable(&name.token().to_string()).map(|(id, _)| id);
+            let assigned_value = expression.and_then(|expression| self.get_assigned_value(expression));
+
             self.write_name(name, expression.map(range));
             if let ast::Var::Name(_) = var {
-                self.try_hoist();
+                if let Some(variable_id) = existing_variable {
+                    pending_value_updates.push((variable_id, assigned_value));
+                } else if let Some((name, identifier, write_expr)) = self.current_pending_hoist() {
+                    pending_hoists.push((name, identifier, write_expr, assigned_value));
+                }
             }
+        }
+
+        for (name, identifier, write_expr, value) in pending_hoists {
+            self.hoist_name(name, identifier, write_expr, value);
+        }
+
+        for (variable_id, value) in pending_value_updates {
+            self.update_assigned_value(variable_id, value);
         }
     }
 
     fn visit_local_assignment(&mut self, local_assignment: &ast::LocalAssignment) {
-        let mut expressions = local_assignment.expressions().iter();
-
-        for name_token in local_assignment.names() {
-            let expression = expressions.next();
-
-            if let Some(expression) = expression {
-                self.read_expression(expression);
-            }
-
-            self.define_name_full_with_variable(
-                &name_token.token().to_string(),
-                range(name_token),
-                range(local_assignment),
-                Variable {
-                    value: expression.and_then(get_assigned_value),
-                    ..Default::default()
-                },
-            );
-
-            if let Some(expression) = expression {
-                self.write_name(name_token, Some(range(expression)));
-            }
-        }
+        self.bind_declared_names(
+            local_assignment.names().iter(),
+            local_assignment.expressions().iter(),
+            range(local_assignment),
+        );
     }
 
     #[cfg(feature = "roblox")]
     fn visit_const_assignment(&mut self, const_assignment: &ConstAssignment) {
-        let mut expressions = const_assignment.expressions().iter();
-
-        for name_token in const_assignment.names() {
-            let expression = expressions.next();
-
-            if let Some(expression) = expression {
-                self.read_expression(expression);
-            }
-
-            self.define_name_full_with_variable(
-                &name_token.token().to_string(),
-                range(name_token),
-                range(const_assignment),
-                Variable {
-                    value: expression.and_then(get_assigned_value),
-                    ..Default::default()
-                },
-            );
-
-            if let Some(expression) = expression {
-                self.write_name(name_token, Some(range(expression)));
-            }
-        }
+        self.bind_declared_names(
+            const_assignment.names().iter(),
+            const_assignment.expressions().iter(),
+            range(const_assignment),
+        );
     }
 
     fn visit_block(&mut self, block: &ast::Block) {
@@ -984,7 +1121,7 @@ impl Visitor for ScopeVisitor {
         self.read_name(base);
 
         if !is_longer_expression {
-            self.try_hoist();
+            self.hoist_pending(None);
         }
 
         if let Some(name) = name.method_name() {

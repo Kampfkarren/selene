@@ -63,4 +63,24 @@ mod tests {
     fn test_must_use() {
         test_lint(MustUseLint::new(()).unwrap(), "must_use", "must_use");
     }
+
+    #[test]
+    fn test_must_use_aliasing() {
+        test_lint(MustUseLint::new(()).unwrap(), "must_use", "aliasing");
+    }
+
+    #[test]
+    fn test_must_use_reassign() {
+        test_lint(MustUseLint::new(()).unwrap(), "must_use", "reassign");
+    }
+
+    #[test]
+    fn test_must_use_reassign_alias() {
+        test_lint(MustUseLint::new(()).unwrap(), "must_use", "reassign_alias");
+    }
+
+    #[test]
+    fn test_must_use_reassign_multi() {
+        test_lint(MustUseLint::new(()).unwrap(), "must_use", "reassign_multi");
+    }
 }
