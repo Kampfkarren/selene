@@ -368,9 +368,9 @@ dependencies = [
 
 [[package]]
 name = "full_moon"
-version = "2.1.1"
+version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40373a6bf84c41c6124c01cbedf5ab53d0d468adf1c0d7efd4c3273531fbb609"
+checksum = "a083d6f598bbe9d70e694f2a5cf78f0354678a8c13528da2df6467b089586404"
 dependencies = [
  "bytecount",
  "cfg-if",
@@ -919,7 +919,7 @@ dependencies = [
 
 [[package]]
 name = "selene"
-version = "0.30.1"
+version = "0.31.0"
 dependencies = [
  "atty",
  "cfg-if",
@@ -949,7 +949,7 @@ dependencies = [
 
 [[package]]
 name = "selene-lib"
-version = "0.30.1"
+version = "0.31.0"
 dependencies = [
  "codespan",
  "codespan-reporting",

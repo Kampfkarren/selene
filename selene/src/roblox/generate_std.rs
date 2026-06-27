@@ -222,6 +222,34 @@ impl RobloxGenerator {
                 })),
             );
 
+            self.std.globals.insert(
+                format!("Enum.{}.FromName", enuhm.name),
+                Field::from_field_kind(FieldKind::Function(FunctionBehavior {
+                    arguments: vec![Argument {
+                        argument_type: ArgumentType::String,
+                        required: Required::NotRequired,
+                        observes: Observes::ReadWrite,
+                        deprecated: None,
+                    }],
+                    method: true,
+                    must_use: true,
+                })),
+            );
+
+            self.std.globals.insert(
+                format!("Enum.{}.FromValue", enuhm.name),
+                Field::from_field_kind(FieldKind::Function(FunctionBehavior {
+                    arguments: vec![Argument {
+                        argument_type: ArgumentType::Number,
+                        required: Required::NotRequired,
+                        observes: Observes::ReadWrite,
+                        deprecated: None,
+                    }],
+                    method: true,
+                    must_use: true,
+                })),
+            );
+
             for item in &enuhm.items {
                 self.std.globals.insert(
                     format!("Enum.{}.{}", enuhm.name, item.name),

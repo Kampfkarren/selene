@@ -314,6 +314,17 @@ fn count_block_complexity(block: &ast::Block, starting_complexity: u16) -> u16 {
             // visit_local_function tracks this
             ast::Stmt::LocalFunction(_) => {}
 
+            #[cfg(feature = "roblox")]
+            ast::Stmt::ConstAssignment(const_assignment) => {
+                for expression in const_assignment.expressions() {
+                    complexity = count_expression_complexity(expression, complexity);
+                }
+            }
+            #[cfg(feature = "roblox")]
+            ast::Stmt::ConstFunction(_) => {
+                // visit_function_declaration already tracks this
+            }
+
             ast::Stmt::NumericFor(numeric_for) => {
                 complexity += 1;
                 complexity = count_expression_complexity(numeric_for.start(), complexity);

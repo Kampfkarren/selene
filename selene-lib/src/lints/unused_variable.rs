@@ -223,6 +223,17 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "roblox")]
+    #[test]
+    fn test_consts() {
+        test_lint_config(
+            UnusedVariableLint::new(UnusedVariableConfig::default()).unwrap(),
+            "unused_variable",
+            "consts",
+            TestUtilConfig::luau(),
+        );
+    }
+
     #[test]
     fn test_locals() {
         test_lint(

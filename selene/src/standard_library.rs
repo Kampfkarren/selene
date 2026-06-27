@@ -27,7 +27,7 @@ pub enum StandardLibraryError {
     Roblox(color_eyre::eyre::Report),
 
     Toml {
-        source: toml::de::Error,
+        source: Box<toml::de::Error>,
         path: PathBuf,
     },
 
@@ -163,7 +163,7 @@ fn from_name<V>(
 
             let v1_library: v1::StandardLibrary =
                 toml::from_str(&content).map_err(|error| StandardLibraryError::Toml {
-                    source: error,
+                    source: Box::new(error),
                     path: toml_file.clone(),
                 })?;
 

@@ -707,6 +707,12 @@ structs:
       property: read-only
     Value:
       property: read-only
+    EnumType:
+      property: read-only
+    IsA:
+      args:
+        - type: string
+      method: true
   Event:
     Connect:
       args:

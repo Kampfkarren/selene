@@ -1,0 +1,24 @@
+error[unused_variable]: constA is assigned a value, but never used
+  ┌─ consts.lua:2:7
+  │
+2 │ const constA = 1
+  │       ^^^^^^
+
+error[unused_variable]: constA is assigned a value, but never used
+  ┌─ consts.lua:3:7
+  │
+3 │ const constA, constB = 1,2
+  │       ^^^^^^
+
+error[unused_variable]: constB is assigned a value, but never used
+  ┌─ consts.lua:3:15
+  │
+3 │ const constA, constB = 1,2
+  │               ^^^^^^
+
+error[unused_variable]: constI is assigned a value, but never used
+   ┌─ consts.lua:20:7
+   │
+20 │ const constI = { constH }
+   │       ^^^^^^
+

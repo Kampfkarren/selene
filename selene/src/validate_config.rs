@@ -104,7 +104,7 @@ pub fn validate_config(
                 source: config_path.to_path_buf(),
                 range: error.span().map(Into::into),
                 error: StandardLibraryError::Toml {
-                    source: error,
+                    source: Box::new(error),
                     path: config_path.to_path_buf(),
                 },
             }));
