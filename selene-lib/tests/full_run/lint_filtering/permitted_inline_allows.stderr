@@ -1,0 +1,24 @@
+error[invalid_lint_filter]: lint `undefined_variable` may not be silenced with an `allow(...)` filter
+  ┌─ permitted_inline_allows.lua:7:1
+  │
+7 │ -- selene: allow(undefined_variable)
+  │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[undefined_variable]: `undefined_global_b` is not defined
+  ┌─ permitted_inline_allows.lua:8:7
+  │
+8 │ print(undefined_global_b())
+  │       ^^^^^^^^^^^^^^^^^^
+
+error[invalid_lint_filter]: lint `undefined_variable` may not be silenced with an `allow(...)` filter
+   ┌─ permitted_inline_allows.lua:13:1
+   │
+13 │ -- selene: allow(unused_variable, undefined_variable)
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[undefined_variable]: `undefined_global_c` is not defined
+   ┌─ permitted_inline_allows.lua:14:18
+   │
+14 │ local unused_c = undefined_global_c()
+   │                  ^^^^^^^^^^^^^^^^^^
+

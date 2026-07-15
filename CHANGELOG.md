@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.31.0...HEAD)
+### Added
+- Added a new `permitted-inline-allows` configuration option that restricts which lints may be silenced with an inline `-- selene: allow(...)` (or file-wide `--# selene: allow(...)`) filter. When set, an `allow(...)` for any other lint produces an `invalid_lint_filter` diagnostic and is ignored, so the underlying lint still fires. Only the `allow` variation is restricted; `deny`/`warn` are unaffected.
 
 ## [0.31.0](https://github.com/Kampfkarren/selene/releases/tag/0.31.0) - 2026-05-20
 ### Fixed
