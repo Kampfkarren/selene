@@ -98,3 +98,33 @@ You can filter multiple lints in two ways:
 
 -- selene: allow(lint_one, lint_two)
 ```
+
+## Restricting which lints can be silenced inline
+By default, any lint can be silenced with an inline `allow(...)` filter. In larger codebases you may want to guarantee that only a specific set of lints can be silenced this way. For example, you might permit `unused_variable` to be silenced while ensuring `undefined_variable` can never be locally suppressed and must instead be fixed.
+
+The `permitted-inline-allows` option restricts which lints may be silenced with an inline `-- selene: allow(...)` (or file-wide `--# selene: allow(...)`) filter:
+
+```toml
+# Only these lints may be silenced with an `allow(...)` filter.
+# Omit the option entirely to keep the default behavior (any lint may be silenced).
+permitted-inline-allows = ["unused_variable"]
+```
+
+With this configuration, an `allow(...)` naming any other lint is reported as an `invalid_lint_filter` error, and the underlying lint still fires:
+
+```lua
+-- selene: allow(undefined_variable)
+foo()
+```
+
+```
+error[invalid_lint_filter]: lint `undefined_variable` may not be silenced with an `allow(...)` filter
+  ┌─ code.lua:1:1
+  │
+1 │ -- selene: allow(undefined_variable)
+  │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[undefined_variable]: `foo` is not defined
+```
+
+Only the `allow` variation is restricted; `deny` and `warn` filters, which raise a lint's severity, are always permitted. Each lint in a multi-lint filter such as `allow(unused_variable, undefined_variable)` is evaluated independently.

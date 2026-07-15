@@ -34,10 +34,10 @@ struct Filter {
     range: (usize, usize),
 }
 
-#[derive(Default)]
-struct FilterVisitor {
+struct FilterVisitor<'a> {
     comments_checked: HashSet<(usize, usize)>,
     ranges: Vec<Result<Filter, Diagnostic>>,
+    permitted_inline_allows: Option<&'a HashSet<String>>,
 }
 
 pub fn parse_comment(comment_original: &str) -> Option<Vec<FilterConfiguration>> {
@@ -90,7 +90,7 @@ pub fn parse_comment(comment_original: &str) -> Option<Vec<FilterConfiguration>>
     )
 }
 
-impl NodeVisitor for FilterVisitor {
+impl NodeVisitor for FilterVisitor<'_> {
     fn visit_node(&mut self, node: &dyn Node, visitor_type: VisitorType) {
         if NODES_TO_IGNORE.contains(&visitor_type) {
             return;
@@ -130,35 +130,61 @@ impl NodeVisitor for FilterVisitor {
                     )
                 });
 
-                self.ranges
-                    .extend(configurations.into_iter().map(|configuration| {
-                        if lint_exists(&configuration.lint) {
-                            Ok(Filter {
-                                configuration,
-                                comment_range: (
-                                    trivia.start_position().bytes(),
-                                    trivia.end_position().bytes(),
-                                ),
-                                range: (range.0.bytes(), range.1.bytes()),
-                            })
-                        } else {
-                            Err(Diagnostic::new(
-                                "invalid_lint_filter",
-                                format!("no lint named `{}` exists", configuration.lint),
-                                Label::new((
-                                    trivia_start_position.bytes(),
-                                    trivia_end_position.bytes(),
-                                )),
-                            ))
-                        }
-                    }));
+                let permitted_inline_allows = self.permitted_inline_allows;
+
+                for configuration in configurations {
+                    let comment_range = (
+                        trivia.start_position().bytes(),
+                        trivia.end_position().bytes(),
+                    );
+
+                    // When an allowlist is configured, only the listed lints may
+                    // be silenced with an `allow(...)` filter. `deny`/`warn` raise
+                    // a lint's severity and are never restricted.
+                    let disallowed_allow = configuration.variation == LintVariation::Allow
+                        && permitted_inline_allows
+                            .map(|allowed| !allowed.contains(&configuration.lint))
+                            .unwrap_or(false);
+
+                    let filter = if !lint_exists(&configuration.lint) {
+                        Err(Diagnostic::new(
+                            "invalid_lint_filter",
+                            format!("no lint named `{}` exists", configuration.lint),
+                            Label::new(comment_range),
+                        ))
+                    } else if disallowed_allow {
+                        Err(Diagnostic::new(
+                            "invalid_lint_filter",
+                            format!(
+                                "lint `{}` may not be silenced with an `allow(...)` filter",
+                                configuration.lint
+                            ),
+                            Label::new(comment_range),
+                        ))
+                    } else {
+                        Ok(Filter {
+                            configuration,
+                            comment_range,
+                            range: (range.0.bytes(), range.1.bytes()),
+                        })
+                    };
+
+                    self.ranges.push(filter);
+                }
             }
         }
     }
 }
 
-fn get_filter_ranges(ast: &Ast) -> Vec<Result<Filter, Diagnostic>> {
-    let mut filter_visitor = FilterVisitor::default();
+fn get_filter_ranges(
+    ast: &Ast,
+    permitted_inline_allows: Option<&HashSet<String>>,
+) -> Vec<Result<Filter, Diagnostic>> {
+    let mut filter_visitor = FilterVisitor {
+        comments_checked: HashSet::new(),
+        ranges: Vec::new(),
+        permitted_inline_allows,
+    };
     filter_visitor.visit_nodes(ast);
     filter_visitor.ranges
 }
@@ -188,8 +214,9 @@ pub fn filter_diagnostics(
     ast: &Ast,
     mut diagnostics: Vec<CheckerDiagnostic>,
     invalid_lint_filter_severity: Severity,
+    permitted_inline_allows: Option<&HashSet<String>>,
 ) -> Vec<CheckerDiagnostic> {
-    let filter_ranges = get_filter_ranges(ast);
+    let filter_ranges = get_filter_ranges(ast, permitted_inline_allows);
     let (mut filters, mut failures) = (Vec::new(), Vec::new());
     let mut new_diagnostics;
 
@@ -351,7 +378,7 @@ mod tests {
         test_util::{test_full_run, test_full_run_config},
         CheckerConfig, LintVariation,
     };
-    use std::collections::HashMap;
+    use std::collections::{HashMap, HashSet};
 
     #[test]
     fn test_lint_filtering() {
@@ -379,6 +406,18 @@ mod tests {
                     map.insert("unused_variable".to_owned(), LintVariation::Allow);
                     map
                 },
+                ..CheckerConfig::default()
+            },
+        );
+    }
+
+    #[test]
+    fn test_permitted_inline_allows() {
+        test_full_run_config(
+            "lint_filtering",
+            "permitted_inline_allows",
+            CheckerConfig {
+                permitted_inline_allows: Some(HashSet::from(["unused_variable".to_owned()])),
                 ..CheckerConfig::default()
             },
         );

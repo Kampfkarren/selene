@@ -3,7 +3,11 @@
     feature = "force_exhaustive_checks",
     feature(non_exhaustive_omitted_patterns_lint)
 )]
-use std::{collections::HashMap, error::Error, fmt};
+use std::{
+    collections::{HashMap, HashSet},
+    error::Error,
+    fmt,
+};
 
 use full_moon::ast::Ast;
 use serde::{
@@ -68,6 +72,15 @@ pub struct CheckerConfig<V> {
     pub std: Option<String>,
     pub exclude: Vec<String>,
 
+    /// When set, only these lints may be silenced with an inline
+    /// `-- selene: allow(...)` (or file-wide `--# selene: allow(...)`) filter.
+    /// Any other lint named in an `allow(...)` filter produces an
+    /// `invalid_lint_filter` diagnostic and is ignored, so the underlying lint
+    /// still fires. `None` (the default) preserves the original behavior where
+    /// any lint may be silenced inline. Only the `allow` variation is
+    /// restricted; `deny`/`warn` are unaffected.
+    pub permitted_inline_allows: Option<HashSet<String>>,
+
     // Not locked behind Roblox feature so that selene.toml for Roblox will
     // run even without it.
     pub roblox_std_source: RobloxStdSource,
@@ -86,6 +99,7 @@ impl<V> Default for CheckerConfig<V> {
             lints: HashMap::new(),
             std: None,
             exclude: Vec::new(),
+            permitted_inline_allows: None,
 
             roblox_std_source: RobloxStdSource::default(),
         }
@@ -264,6 +278,7 @@ macro_rules! use_lints {
                     ast,
                     diagnostics,
                     self.get_lint_severity(&self.invalid_lint_filter, "invalid_lint_filter"),
+                    self.config.permitted_inline_allows.as_ref(),
                 );
 
                 diagnostics

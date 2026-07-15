@@ -69,3 +69,12 @@ It is possible to exclude files from being linted using the exclude option:
 ```toml
 exclude = ["external/*", "*.spec.lua"]
 ```
+
+### Restricting which lints can be silenced inline
+By default, any lint can be silenced with an inline `-- selene: allow(...)` filter. You can restrict this to a specific set of lints with the `permitted-inline-allows` option:
+
+```toml
+permitted-inline-allows = ["unused_variable"]
+```
+
+With this set, an `allow(...)` naming any other lint is reported as an `invalid_lint_filter` error and is ignored, so the underlying lint still fires. Only the `allow` variation is affected; `deny` and `warn` are always permitted. See [Filtering](./filtering.md#restricting-which-lints-can-be-silenced-inline) for more details.
