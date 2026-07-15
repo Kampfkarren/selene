@@ -1,7 +1,7 @@
 use std::{
     ffi::OsString,
     fmt, fs,
-    io::{self, Read, Write},
+    io::{self, IsTerminal, Read, Write},
     path::{Path, PathBuf},
     sync::{
         atomic::{AtomicUsize, Ordering},
@@ -62,7 +62,7 @@ fn get_color() -> ColorChoice {
     match opts.color {
         opts::Color::Always => ColorChoice::Always,
         opts::Color::Auto => {
-            if atty::is(atty::Stream::Stdout) {
+            if io::stdout().is_terminal() {
                 ColorChoice::Auto
             } else {
                 ColorChoice::Never
