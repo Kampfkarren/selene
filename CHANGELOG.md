@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.31.0...HEAD)
+### Changed
+- Updated dependencies to address RustSec advisories (`rustls`, `ring`, `rustls-webpki`, `chrono`, `tracing-subscriber`) and replaced the unmaintained `atty` crate with `std::io::IsTerminal`.
 
 ## [0.31.0](https://github.com/Kampfkarren/selene/releases/tag/0.31.0) - 2026-05-20
 ### Fixed
