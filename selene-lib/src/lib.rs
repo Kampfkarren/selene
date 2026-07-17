@@ -225,9 +225,24 @@ macro_rules! use_lints {
             }
 
             pub fn test_on(&self, ast: &Ast) -> Vec<CheckerDiagnostic> {
-                let mut diagnostics = Vec::new();
+                self.run_lints(ast, &AstContext::from_ast(ast))
+            }
 
-                let ast_context = AstContext::from_ast(ast);
+            /// Like [`Self::test_on`], but threads opaque, caller-provided
+            /// per-check data through to the lints. Each lint retrieves it (by
+            /// type) via `ast_context.caller_data::<T>()`. This lets an embedder
+            /// hand structured per-file context to a lint without encoding it in
+            /// the source or AST.
+            pub fn test_on_with(
+                &self,
+                ast: &Ast,
+                caller_data: Box<dyn std::any::Any>,
+            ) -> Vec<CheckerDiagnostic> {
+                self.run_lints(ast, &AstContext::from_ast_with_data(ast, caller_data))
+            }
+
+            fn run_lints(&self, ast: &Ast, ast_context: &AstContext) -> Vec<CheckerDiagnostic> {
+                let mut diagnostics = Vec::new();
 
                 macro_rules! check_lint {
                     ($name:ident) => {
@@ -235,7 +250,7 @@ macro_rules! use_lints {
 
                         let lint_pass = {
                             profiling::scope!(&format!("lint: {}", stringify!($name)));
-                            lint.pass(ast, &self.context, &ast_context)
+                            lint.pass(ast, &self.context, ast_context)
                         };
 
                         diagnostics.extend(&mut lint_pass.into_iter().map(|diagnostic| {

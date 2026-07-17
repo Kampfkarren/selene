@@ -47,6 +47,29 @@ The implementation of `pass` is completely up to you, but there are a few common
 - Creating a visitor over the ast provided and creating diagnostics based off of that. See [`divide_by_zero`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/lints/divide_by_zero.rs) and [`suspicious_reverse_loop`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/lints/suspicious_reverse_loop.rs) for straight forward examples.
 - Using the `ScopeManager` struct to lint based off of usage of variables and references. See [`shadowing`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/lints/shadowing.rs) and [`global_usage`](https://github.com/Kampfkarren/selene/blob/master/selene-lib/src/lints/global_usage.rs).
 
+### Receiving data from the caller
+
+Most lints work purely from the `ast`, `context`, and `ast_context`. Occasionally a program that embeds `selene-lib` as a library needs to hand a lint some structured, per-check information that isn't part of the source being linted — for example, metadata about the file that only the caller knows.
+
+For this, a caller runs the checker with `Checker::test_on_with` instead of `test_on`, attaching an arbitrary `'static` value:
+
+```rs
+let diagnostics = checker.test_on_with(&ast, Box::new(MyData { /* ... */ }));
+```
+
+Inside `pass`, the lint retrieves it by type from the `ast_context`:
+
+```rs
+fn pass(&self, ast: &Ast, _: &Context, ast_context: &AstContext) -> Vec<Diagnostic> {
+    if let Some(data) = ast_context.caller_data::<MyData>() {
+        // use the caller-provided data
+    }
+    // ...
+}
+```
+
+`caller_data::<T>()` returns `None` when the checker was run with the plain `test_on`, or when the value supplied was not of type `T`, so a lint that reads it should handle the absent case. The value is opaque to `selene-lib` — only the caller and the lint need to agree on its type.
+
 ### Getting selene to recognize the new lint
 
 Now that we have our lint, we have to make sure selene actually knows to use it. There are two places you need to update.
