@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.31.0...HEAD)
+### Added
+- `selene-lib`: added `Checker::test_on_with`, letting a library caller pass opaque, per-check data to lints. Lints retrieve it by type via `AstContext::caller_data`, providing a structured channel for handing per-file context to a lint without encoding it in the source or AST.
 
 ## [0.31.0](https://github.com/Kampfkarren/selene/releases/tag/0.31.0) - 2026-05-20
 ### Fixed

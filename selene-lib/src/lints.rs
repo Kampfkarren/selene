@@ -1,4 +1,5 @@
 use crate::{ast_util::scopes::ScopeManager, standard_library::StandardLibrary};
+use std::any::Any;
 use std::convert::TryInto;
 
 use codespan_reporting::diagnostic::{
@@ -235,15 +236,72 @@ impl Context {
     }
 }
 
-#[derive(Debug)]
 pub struct AstContext {
     pub scope_manager: ScopeManager,
+
+    // Optional opaque, caller-provided per-check data. A library caller can
+    // attach an arbitrary `'static` value via `Checker::test_on_with`, and a
+    // lint reads it back (by type) with `caller_data::<T>()`. This lets an
+    // embedder hand structured per-file context to a lint without smuggling it
+    // through the source/AST. `None` on the plain `test_on` path.
+    caller_data: Option<Box<dyn Any>>,
+}
+
+impl std::fmt::Debug for AstContext {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("AstContext")
+            .field("scope_manager", &self.scope_manager)
+            .field(
+                "caller_data",
+                &self.caller_data.as_ref().map(|_| "<opaque>"),
+            )
+            .finish()
+    }
 }
 
 impl AstContext {
     pub fn from_ast(ast: &Ast) -> Self {
         Self {
             scope_manager: ScopeManager::new(ast),
+            caller_data: None,
         }
+    }
+
+    /// Build an `AstContext` carrying opaque, caller-provided per-check data.
+    /// Lints retrieve it (by type) with [`AstContext::caller_data`].
+    pub fn from_ast_with_data(ast: &Ast, caller_data: Box<dyn Any>) -> Self {
+        Self {
+            scope_manager: ScopeManager::new(ast),
+            caller_data: Some(caller_data),
+        }
+    }
+
+    /// Downcast the caller-provided opaque data to `T`, returning `None` when no
+    /// data was supplied or it was not of type `T`.
+    pub fn caller_data<T: Any>(&self) -> Option<&T> {
+        self.caller_data
+            .as_ref()
+            .and_then(|data| data.downcast_ref::<T>())
+    }
+}
+
+#[cfg(test)]
+mod caller_data_tests {
+    use super::AstContext;
+
+    #[test]
+    fn caller_data_roundtrips_and_is_type_checked() {
+        let ast = full_moon::parse("local x = 1").unwrap();
+
+        // Plain context carries no caller data.
+        let ctx = AstContext::from_ast(&ast);
+        assert!(ctx.caller_data::<i32>().is_none());
+
+        // Data provided by the caller is retrievable by its type.
+        let ctx = AstContext::from_ast_with_data(&ast, Box::new(42_i32));
+        assert_eq!(ctx.caller_data::<i32>(), Some(&42));
+
+        // A mismatched type yields None rather than a wrong value.
+        assert!(ctx.caller_data::<String>().is_none());
     }
 }
