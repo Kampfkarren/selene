@@ -112,7 +112,7 @@
         "vscode-test": "^1.3.0"
     },
     "dependencies": {
-        "fs-write-stream-atomic": "^1.0.10",
+        "fs-write-stream-atomic": "npm:@stackline/fs-write-stream-atomic@1.0.0",
         "request": "^2.88.2",
         "request-promise-native": "^1.0.8",
         "semver": "^7.3.8",
