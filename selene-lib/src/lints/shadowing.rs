@@ -83,7 +83,10 @@ struct Shadow {
 
 #[cfg(test)]
 mod tests {
-    use super::{super::test_util::test_lint, *};
+    use super::{
+        super::test_util::{test_lint, test_lint_config, TestUtilConfig},
+        *,
+    };
 
     #[test]
     fn test_shadowing() {
@@ -100,6 +103,17 @@ mod tests {
             ShadowingLint::new(ShadowingConfig::default()).unwrap(),
             "shadowing",
             "empty_else",
+        );
+    }
+
+    #[cfg(feature = "roblox")]
+    #[test]
+    fn test_if_local() {
+        test_lint_config(
+            ShadowingLint::new(ShadowingConfig::default()).unwrap(),
+            "shadowing",
+            "if_local",
+            TestUtilConfig::luau(),
         );
     }
 }

@@ -445,7 +445,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
 
         let (function_args, call_is_method) = match call_suffix {
             ast::Suffix::Call(call) => match call {
-                ast::Call::AnonymousCall(args) => (args, false),
+                ast::Call::AnonymousCall(args) => (&**args, false),
                 ast::Call::MethodCall(method_call) => (method_call.args(), true),
                 _ => return,
             },

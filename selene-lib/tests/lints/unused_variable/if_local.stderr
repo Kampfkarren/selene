@@ -1,0 +1,18 @@
+error[unused_variable]: unusedPlayer is assigned a value, but never used
+  ┌─ if_local.lua:1:10
+  │
+1 │ if local unusedPlayer = getPlayer() then
+  │          ^^^^^^^^^^^^
+
+error[unused_variable]: unusedGuest is assigned a value, but never used
+  ┌─ if_local.lua:7:14
+  │
+7 │ elseif const unusedGuest = getGuest() then
+  │              ^^^^^^^^^^^
+
+error[unused_variable]: unusedX is assigned a value, but never used
+   ┌─ if_local.lua:11:24
+   │
+11 │ local value = if local unusedX = getValue() then 1 else 2
+   │                        ^^^^^^^
+

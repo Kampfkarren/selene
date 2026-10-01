@@ -64,9 +64,8 @@ impl Visitor for Color3BoundsVisitor {
             if let ast::Suffix::Index(ast::Index::Dot { name, .. }) = index_suffix;
             if name.token().to_string() == "new";
 
-            if let ast::Suffix::Call(ast::Call::AnonymousCall(
-                ast::FunctionArgs::Parentheses { arguments, .. }
-            )) = call_suffix;
+            if let ast::Suffix::Call(ast::Call::AnonymousCall(function_args)) = call_suffix;
+            if let ast::FunctionArgs::Parentheses { arguments, .. } = &**function_args;
 
             then {
                 for argument in arguments {

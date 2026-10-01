@@ -256,9 +256,8 @@ impl Visitor for IncorrectRoactUsageVisitor<'_> {
         };
 
         let ((name, class), arguments) = if_chain! {
-            if let Some(ast::Suffix::Call(ast::Call::AnonymousCall(
-                ast::FunctionArgs::Parentheses { arguments, .. }
-            ))) = call_suffix;
+            if let Some(ast::Suffix::Call(ast::Call::AnonymousCall(function_args))) = call_suffix;
+            if let ast::FunctionArgs::Parentheses { arguments, .. } = &**function_args;
             if !arguments.is_empty();
             let mut iter = arguments.iter();
 
@@ -294,7 +293,7 @@ impl Visitor for IncorrectRoactUsageVisitor<'_> {
                         self.invalid_properties.push(InvalidProperty {
                             class_name: name.clone(),
                             property_name,
-                            property_value: value.clone(),
+                            property_value: (**value).clone(),
                             create_element_expression: create_element_expression.clone().to_owned(),
                             range: range(key),
                         });

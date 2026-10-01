@@ -1,0 +1,120 @@
+error[undefined_variable]: `getPlayer` is not defined
+  ┌─ if_local.lua:1:19
+  │
+1 │ if local player = getPlayer() then
+  │                   ^^^^^^^^^
+
+error[undefined_variable]: `getPlayer` is not defined
+  ┌─ if_local.lua:5:19
+  │
+5 │ if const player = getPlayer() then
+  │                   ^^^^^^^^^
+
+error[undefined_variable]: `getAdmin` is not defined
+  ┌─ if_local.lua:9:18
+  │
+9 │ if local admin = getAdmin() then
+  │                  ^^^^^^^^
+
+error[undefined_variable]: `getGuest` is not defined
+   ┌─ if_local.lua:11:22
+   │
+11 │ elseif const guest = getGuest() then
+   │                      ^^^^^^^^
+
+error[undefined_variable]: `admin` is not defined
+   ┌─ if_local.lua:12:8
+   │
+12 │     print(admin, guest)
+   │           ^^^^^
+
+error[undefined_variable]: `admin` is not defined
+   ┌─ if_local.lua:14:8
+   │
+14 │     print(admin, guest)
+   │           ^^^^^
+
+error[undefined_variable]: `guest` is not defined
+   ┌─ if_local.lua:14:15
+   │
+14 │     print(admin, guest)
+   │                  ^^^^^
+
+error[undefined_variable]: `player` is not defined
+   ┌─ if_local.lua:17:7
+   │
+17 │ print(player, admin, guest)
+   │       ^^^^^^
+
+error[undefined_variable]: `admin` is not defined
+   ┌─ if_local.lua:17:15
+   │
+17 │ print(player, admin, guest)
+   │               ^^^^^
+
+error[undefined_variable]: `guest` is not defined
+   ┌─ if_local.lua:17:22
+   │
+17 │ print(player, admin, guest)
+   │                      ^^^^^
+
+error[undefined_variable]: `getValue` is not defined
+   ┌─ if_local.lua:19:23
+   │
+19 │ if local x: number? = getValue() then
+   │                       ^^^^^^^^
+
+error[undefined_variable]: `getPlayer` is not defined
+   ┌─ if_local.lua:33:32
+   │
+33 │ local name = if local player = getPlayer() then player.Name else player
+   │                                ^^^^^^^^^
+
+error[undefined_variable]: `player` is not defined
+   ┌─ if_local.lua:33:66
+   │
+33 │ local name = if local player = getPlayer() then player.Name else player
+   │                                                                  ^^^^^^
+
+error[undefined_variable]: `getAdmin` is not defined
+   ┌─ if_local.lua:34:32
+   │
+34 │ local label = if local admin = getAdmin() then admin.title elseif const guest = getGuest() then admin or guest else guest
+   │                                ^^^^^^^^
+
+error[undefined_variable]: `getGuest` is not defined
+   ┌─ if_local.lua:34:81
+   │
+34 │ local label = if local admin = getAdmin() then admin.title elseif const guest = getGuest() then admin or guest else guest
+   │                                                                                 ^^^^^^^^
+
+error[undefined_variable]: `admin` is not defined
+   ┌─ if_local.lua:34:97
+   │
+34 │ local label = if local admin = getAdmin() then admin.title elseif const guest = getGuest() then admin or guest else guest
+   │                                                                                                 ^^^^^
+
+error[undefined_variable]: `guest` is not defined
+   ┌─ if_local.lua:34:117
+   │
+34 │ local label = if local admin = getAdmin() then admin.title elseif const guest = getGuest() then admin or guest else guest
+   │                                                                                                                     ^^^^^
+
+error[undefined_variable]: `getValue` is not defined
+   ┌─ if_local.lua:35:36
+   │
+35 │ local typed = if local x: number = getValue() then x else 0
+   │                                    ^^^^^^^^
+
+error[undefined_variable]: `getPlayer` is not defined
+   ┌─ if_local.lua:37:36
+   │
+37 │ local callback = if local player = getPlayer()
+   │                                    ^^^^^^^^^
+
+error[undefined_variable]: `player` is not defined
+   ┌─ if_local.lua:42:10
+   │
+42 │         return player
+   │                ^^^^^^
+
