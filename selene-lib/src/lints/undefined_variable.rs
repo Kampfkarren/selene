@@ -86,6 +86,17 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "roblox")]
+    fn test_if_local() {
+        test_lint_config(
+            UndefinedVariableLint::new(()).unwrap(),
+            "undefined_variable",
+            "if_local",
+            TestUtilConfig::luau(),
+        );
+    }
+
+    #[test]
     fn test_function_overriding() {
         test_lint(
             UndefinedVariableLint::new(()).unwrap(),

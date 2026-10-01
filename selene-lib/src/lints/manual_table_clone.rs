@@ -144,9 +144,12 @@ impl ManualTableCloneVisitor<'_> {
                     let suffix = suffixes[0];
 
                     let inner_expression = match suffix {
-                        ast::Suffix::Call(ast::Call::AnonymousCall(
-                            ast::FunctionArgs::Parentheses { arguments, .. },
-                        )) => {
+                        ast::Suffix::Call(ast::Call::AnonymousCall(function_args)) => {
+                            let ast::FunctionArgs::Parentheses { arguments, .. } = &**function_args
+                            else {
+                                return None;
+                            };
+
                             if arguments.len() != 1 {
                                 return None;
                             }

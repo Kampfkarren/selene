@@ -1,4 +1,7 @@
-use std::{borrow::Cow, collections::HashSet};
+use std::{
+    borrow::Cow,
+    collections::{HashMap, HashSet},
+};
 
 use full_moon::{
     ast::{self, VarExpression},
@@ -8,7 +11,7 @@ use full_moon::{
 };
 
 #[cfg(feature = "roblox")]
-use full_moon::ast::luau::{ConstAssignment, ConstFunction};
+use full_moon::ast::luau::{ConstAssignment, ConstFunction, IfConditionBinding};
 use id_arena::{Arena, Id};
 
 use crate::ast_util::extract_static_token;
@@ -168,6 +171,8 @@ struct ScopeVisitor {
 
     // sigh
     else_blocks: HashSet<Range>,
+
+    if_expression_binding_scopes: HashMap<Range, Id<Scope>>,
 }
 
 #[derive(Debug)]
@@ -292,6 +297,7 @@ impl ScopeVisitor {
                 scope_stack: vec![id],
 
                 else_blocks: HashSet::new(),
+                if_expression_binding_scopes: HashMap::new(),
             };
 
             output.visit_ast(ast);
@@ -374,12 +380,20 @@ impl ScopeVisitor {
             #[cfg(feature = "roblox")]
             ast::Expression::IfExpression(if_expression) => {
                 self.read_expression(if_expression.condition());
-                self.read_expression(if_expression.if_expression());
+                self.read_if_expression_branch(
+                    if_expression.binding(),
+                    if_expression.condition(),
+                    if_expression.if_expression(),
+                );
 
                 if let Some(else_if_expressions) = if_expression.else_if_expressions() {
                     for else_if_expression in else_if_expressions {
                         self.read_expression(else_if_expression.condition());
-                        self.read_expression(else_if_expression.expression());
+                        self.read_if_expression_branch(
+                            else_if_expression.binding(),
+                            else_if_expression.condition(),
+                            else_if_expression.expression(),
+                        );
                     }
                 }
 
@@ -536,6 +550,54 @@ impl ScopeVisitor {
                 },
             );
         }
+    }
+
+    #[cfg(feature = "roblox")]
+    fn read_if_expression_branch(
+        &mut self,
+        binding: Option<&IfConditionBinding>,
+        condition: &ast::Expression,
+        expression: &ast::Expression,
+    ) {
+        let Some(binding) = binding else {
+            self.read_expression(expression);
+            return;
+        };
+
+        let expression_range = range(expression);
+
+        if let Some(&scope_id) = self.if_expression_binding_scopes.get(&expression_range) {
+            self.scope_stack.push(scope_id);
+        } else {
+            self.open_scope(expression);
+            self.define_if_condition_binding(binding, condition);
+            self.if_expression_binding_scopes
+                .insert(expression_range, self.current_scope_id());
+        }
+
+        self.read_expression(expression);
+        self.close_scope();
+    }
+
+    #[cfg(feature = "roblox")]
+    fn define_if_condition_binding(
+        &mut self,
+        binding: &IfConditionBinding,
+        condition: &ast::Expression,
+    ) {
+        let name = binding.name();
+
+        self.define_name_full_with_variable(
+            &name.token().to_string(),
+            range(name),
+            (range(binding).0, range(condition).1),
+            Variable {
+                value: get_assigned_value(condition),
+                ..Default::default()
+            },
+        );
+
+        self.write_name(name, Some(range(condition)));
     }
 
     fn define_name(&mut self, token: &TokenReference, definition_range: Range) {
@@ -935,6 +997,30 @@ impl Visitor for ScopeVisitor {
         self.close_scope(); // close the if or other elseif blocks' scope
         self.read_expression(else_if.condition());
         self.open_scope(else_if);
+
+        #[cfg(feature = "roblox")]
+        if let Some(binding) = else_if.binding() {
+            self.define_if_condition_binding(binding, else_if.condition());
+        }
+    }
+
+    fn visit_expression(&mut self, expression: &ast::Expression) {
+        if let Some(&scope_id) = expression
+            .range()
+            .and_then(|_| self.if_expression_binding_scopes.get(&range(expression)))
+        {
+            self.scope_stack.push(scope_id);
+        }
+    }
+
+    fn visit_expression_end(&mut self, expression: &ast::Expression) {
+        if expression.range().is_some()
+            && self
+                .if_expression_binding_scopes
+                .contains_key(&range(expression))
+        {
+            self.close_scope();
+        }
     }
 
     fn visit_function_args(&mut self, args: &ast::FunctionArgs) {
@@ -1033,6 +1119,11 @@ impl Visitor for ScopeVisitor {
     fn visit_if(&mut self, if_block: &ast::If) {
         self.read_expression(if_block.condition());
         self.open_scope(if_block.block());
+
+        #[cfg(feature = "roblox")]
+        if let Some(binding) = if_block.binding() {
+            self.define_if_condition_binding(binding, if_block.condition());
+        }
 
         if let Some(else_block) = if_block.else_block() {
             if else_block.range().is_some() {

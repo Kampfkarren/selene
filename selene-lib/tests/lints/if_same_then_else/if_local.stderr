@@ -1,0 +1,9 @@
+error[if_same_then_else]: this has the same block as a previous if
+   ┌─ if_local.lua:18:2
+   │
+14 │     print(admin)
+   │     ------------ note: same as this
+   ·
+18 │     print(admin)
+   │     ^^^^^^^^^^^^
+

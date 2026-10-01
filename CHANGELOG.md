@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.31.0...HEAD)
+### Added
+- Updated internal parser, adding support for Luau `if local` and `if const` bindings.
 
 ## [0.31.0](https://github.com/Kampfkarren/selene/releases/tag/0.31.0) - 2026-05-20
 ### Fixed

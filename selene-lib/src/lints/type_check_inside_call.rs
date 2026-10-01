@@ -58,7 +58,8 @@ impl Visitor for TypeCheckInsideCallVisitor {
 
             // Check that we're calling it with an argument
             if let ast::Suffix::Call(call) = call.suffixes().next().unwrap();
-            if let ast::Call::AnonymousCall(ast::FunctionArgs::Parentheses { arguments, .. }) = call;
+            if let ast::Call::AnonymousCall(function_args) = call;
+            if let ast::FunctionArgs::Parentheses { arguments, .. } = &**function_args;
 
             // Check that the argument, if it's there, is in the form of x == y
             if let Some(ast::Expression::BinaryOperator { binop: ast::BinOp::TwoEqual(_), rhs, .. })

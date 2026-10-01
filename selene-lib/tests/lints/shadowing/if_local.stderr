@@ -1,0 +1,9 @@
+error[shadowing]: shadowing variable `player`
+  ┌─ if_local.lua:3:10
+  │
+1 │ local player = getPlayer()
+  │       ------ previously defined here
+2 │ 
+3 │ if local player = getPlayer() then
+  │          ^^^^^^
+

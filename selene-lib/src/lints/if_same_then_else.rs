@@ -47,6 +47,26 @@ impl Lint for IfSameThenElseLint {
     }
 }
 
+#[cfg(feature = "roblox")]
+fn if_has_binding(if_block: &ast::If) -> bool {
+    if_block.binding().is_some()
+}
+
+#[cfg(not(feature = "roblox"))]
+fn if_has_binding(_: &ast::If) -> bool {
+    false
+}
+
+#[cfg(feature = "roblox")]
+fn else_if_has_binding(else_if: &ast::ElseIf) -> bool {
+    else_if.binding().is_some()
+}
+
+#[cfg(not(feature = "roblox"))]
+fn else_if_has_binding(_: &ast::ElseIf) -> bool {
+    false
+}
+
 struct IfSameThenElseVisitor {
     positions: Vec<((u32, u32), (u32, u32))>,
 }
@@ -59,10 +79,14 @@ impl Visitor for IfSameThenElseVisitor {
             .unwrap_or_default();
 
         let mut blocks = Vec::with_capacity(2 + else_ifs.len());
-        blocks.push(if_block.block());
+
+        if !if_has_binding(if_block) {
+            blocks.push(if_block.block());
+        }
 
         'blocks: for block in else_ifs
             .iter()
+            .filter(|else_if| !else_if_has_binding(else_if))
             .map(|else_if| else_if.block())
             .chain(if_block.else_block())
         {
@@ -84,7 +108,10 @@ impl Visitor for IfSameThenElseVisitor {
 
 #[cfg(test)]
 mod tests {
-    use super::{super::test_util::test_lint, *};
+    use super::{
+        super::test_util::{test_lint, test_lint_config, TestUtilConfig},
+        *,
+    };
 
     #[test]
     fn test_if_same_then_else() {
@@ -92,6 +119,17 @@ mod tests {
             IfSameThenElseLint::new(()).unwrap(),
             "if_same_then_else",
             "if_same_then_else",
+        );
+    }
+
+    #[cfg(feature = "roblox")]
+    #[test]
+    fn test_if_local() {
+        test_lint_config(
+            IfSameThenElseLint::new(()).unwrap(),
+            "if_same_then_else",
+            "if_local",
+            TestUtilConfig::luau(),
         );
     }
 }
