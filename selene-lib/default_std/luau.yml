@@ -85,6 +85,7 @@ globals:
       - type: number
       - type:
           display: buffer
+        observes: write
       - required: false
         type: number
       - required: false
@@ -97,6 +98,7 @@ globals:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
       - required: false
@@ -109,6 +111,13 @@ globals:
     args:
       - type:
           display: buffer
+    must_use: true
+  buffer.readbits:
+    args:
+      - type:
+          display: buffer
+      - type: number
+      - type: number
     must_use: true
   buffer.readf32:
     args:
@@ -170,40 +179,54 @@ globals:
       - type:
           display: buffer
     must_use: true
+  buffer.writebits:
+    args:
+      - type:
+          display: buffer
+        observes: write
+      - type: number
+      - type: number
+      - type: number
   buffer.writef32:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   buffer.writef64:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   buffer.writei8:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   buffer.writei16:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   buffer.writei32:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   buffer.writestring:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: string
       - required: false
@@ -212,18 +235,21 @@ globals:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   buffer.writeu16:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   buffer.writeu32:
     args:
       - type:
           display: buffer
+        observes: write
       - type: number
       - type: number
   collectgarbage:
@@ -237,6 +263,7 @@ globals:
           display: thread
   coroutine.isyieldable:
     args: []
+    must_use: true
   debug.debug:
     removed: true
   debug.getfenv:
@@ -256,9 +283,9 @@ globals:
   debug.info:
     args:
       - type: any
-      - type: any
       - required: false
-        type: string
+        type: number
+      - type: string
     must_use: true
   debug.setfenv:
     removed: true
@@ -294,6 +321,20 @@ globals:
       - type: number
       - type: number
     must_use: true
+  math.e:
+    property: read-only
+  math.isfinite:
+    args:
+      - type: number
+    must_use: true
+  math.isinf:
+    args:
+      - type: number
+    must_use: true
+  math.isnan:
+    args:
+      - type: number
+    must_use: true
   math.lerp:
     args:
       - type: number
@@ -314,6 +355,8 @@ globals:
       - type: number
       - type: number
     must_use: true
+  math.nan:
+    property: read-only
   math.noise:
     args:
       - type: number
@@ -322,6 +365,8 @@ globals:
       - required: false
         type: number
     must_use: true
+  math.phi:
+    property: read-only
   math.round:
     args:
       - type: number
@@ -330,6 +375,10 @@ globals:
     args:
       - type: number
     must_use: true
+  math.sqrt2:
+    property: read-only
+  math.tau:
+    property: read-only
   module:
     removed: true
   os.execute:
@@ -382,6 +431,7 @@ globals:
   table.clear:
     args:
       - type: table
+        observes: write
   table.clone:
     args:
       - type: table
@@ -412,7 +462,8 @@ globals:
       - type: number
       - type: number
       - type: number
-      - required: false
+      - observes: write
+        required: false
         type: table
   table.pack:
     args:
@@ -429,6 +480,7 @@ globals:
   typeof:
     args:
       - type: any
+    must_use: true
   utf8.char:
     args:
       - required: utf8.char should be used with an argument despite it not throwing
@@ -461,8 +513,7 @@ globals:
   utf8.offset:
     args:
       - type: string
-      - required: false
-        type: number
+      - type: number
       - required: false
         type: number
     must_use: true
@@ -499,7 +550,8 @@ globals:
     args:
       - type: number
       - type: number
-      - type: number
+      - required: false
+        type: number
     must_use: true
   vector.cross:
     args:
@@ -519,6 +571,14 @@ globals:
     args:
       - type:
           display: vector
+    must_use: true
+  vector.lerp:
+    args:
+      - type:
+          display: vector
+      - type:
+          display: vector
+      - type: number
     must_use: true
   vector.magnitude:
     args:

@@ -43,6 +43,7 @@ globals:
   coroutine.wrap:
     args:
       - type: function
+    must_use: true
   coroutine.yield:
     args:
       - required: false
@@ -492,6 +493,7 @@ globals:
         type: number
       - required: false
         type: number
+    must_use: true
   string.char:
     args:
       - required: string.char should be used with an argument despite it not throwing
@@ -591,7 +593,6 @@ globals:
   table.getn:
     args:
       - type: table
-      - type: number
     deprecated:
       message: "`table.getn` has been superseded by #."
       replace:
@@ -601,9 +602,9 @@ globals:
     args:
       - type: table
         observes: write
-      - type: any
       - required: false
-        type: any
+        type: number
+      - type: any
   table.maxn:
     args:
       - type: table
@@ -631,6 +632,7 @@ globals:
   type:
     args:
       - type: any
+    must_use: true
   unpack:
     args:
       - type: table
