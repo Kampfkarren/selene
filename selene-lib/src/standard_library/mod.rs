@@ -444,6 +444,11 @@ pub struct Field {
     #[serde(flatten)]
     pub field_kind: FieldKind,
 
+    /// Whether a struct-valued field can be overwritten.
+    #[serde(default)]
+    #[serde(skip_serializing_if = "is_false")]
+    pub writable: bool,
+
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deprecated: Option<Deprecated>,
@@ -453,6 +458,7 @@ impl Field {
     pub const fn from_field_kind(field_kind: FieldKind) -> Self {
         Self {
             field_kind,
+            writable: false,
             deprecated: None,
         }
     }
@@ -928,5 +934,21 @@ mod tests {
             deprecated.try_instead(&string_vec(vec!["a", "b", "c"])),
             Some("print(a, b, c)".to_owned())
         );
+    }
+
+    #[test]
+    fn struct_writability_roundtrip() {
+        let default: Field = serde_yaml::from_str("struct: Item").unwrap();
+        assert!(!default.writable);
+
+        for writable in [false, true] {
+            let field: Field =
+                serde_yaml::from_str(&format!("struct: Item\nwritable: {writable}")).unwrap();
+            assert_eq!(field.field_kind, FieldKind::Struct("Item".to_owned()));
+            assert_eq!(field.writable, writable);
+            let yaml = serde_yaml::to_string(&field).unwrap();
+            assert_eq!(yaml.contains("writable:"), writable);
+            assert_eq!(serde_yaml::from_str::<Field>(&yaml).unwrap(), field);
+        }
     }
 }

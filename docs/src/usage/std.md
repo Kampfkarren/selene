@@ -162,6 +162,17 @@ globals:
 
 Specifies that the field is an instance of a [struct](#structs). The value is the name of the struct.
 
+Struct fields cannot be overwritten by default. Set `writable: true` to allow assigning a new value to the field while keeping the struct's member definitions:
+
+```yaml
+globals:
+  workspace.CurrentCamera:
+    struct: Camera
+    writable: true
+```
+
+This allows `workspace.CurrentCamera = camera`. It does not change the writability of the camera's members, which is specified by each member's definition.
+
 ### Tables
 ```yaml
 ---

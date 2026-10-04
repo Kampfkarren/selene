@@ -1,0 +1,19 @@
+globals:
+  mutable:
+    struct: Item
+    writable: true
+  root:
+    struct: Container
+structs:
+  Container:
+    Mutable:
+      struct: Item
+      writable: true
+    ReadOnly:
+      struct: Item
+  Item:
+    Value:
+      property: read-only
+    Method:
+      method: true
+      args: []

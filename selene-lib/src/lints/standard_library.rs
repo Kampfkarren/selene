@@ -306,6 +306,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                                         }
                                     }
                                     FieldKind::Any => continue,
+                                    FieldKind::Struct(_) if field.writable => continue,
                                     _ => {}
                                 };
 
@@ -346,6 +347,7 @@ impl Visitor for StandardLibraryVisitor<'_> {
                                 }
                             }
                             FieldKind::Any => continue,
+                            FieldKind::Struct(_) if global.writable => continue,
                             _ => {}
                         };
 
@@ -903,6 +905,15 @@ mod tests {
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "writing",
+        );
+    }
+
+    #[test]
+    fn test_writable_structs() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "writable_structs",
         );
     }
 

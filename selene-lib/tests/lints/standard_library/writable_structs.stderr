@@ -1,0 +1,18 @@
+error[incorrect_standard_library_use]: standard library global `root.Mutable.Value` is not writable
+  ┌─ writable_structs.lua:4:1
+  │
+4 │ root.Mutable.Value = nil
+  │ ^^^^^^^^^^^^^^^^^^
+
+error[incorrect_standard_library_use]: standard library global `root.Mutable.Method` is not writable
+  ┌─ writable_structs.lua:5:1
+  │
+5 │ root.Mutable.Method = nil
+  │ ^^^^^^^^^^^^^^^^^^^
+
+error[incorrect_standard_library_use]: standard library global `root.ReadOnly` is not writable
+  ┌─ writable_structs.lua:6:1
+  │
+6 │ root.ReadOnly = nil
+  │ ^^^^^^^^^^^^^
+

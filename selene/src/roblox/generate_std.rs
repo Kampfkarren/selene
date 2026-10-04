@@ -147,18 +147,21 @@ impl RobloxGenerator {
                             None => &empty,
                         };
 
-                        let default_field = Some(Field::from_field_kind(FieldKind::Property(
-                            if tags.contains(&"ReadOnly".to_string()) {
+                        let read_only = tags.contains(&"ReadOnly".to_string());
+                        let default_field =
+                            Some(Field::from_field_kind(FieldKind::Property(if read_only {
                                 PropertyWritability::ReadOnly
                             } else {
                                 PropertyWritability::OverrideFields
-                            },
-                        )));
+                            })));
 
                         match &value_type {
                             ApiValueType::Class { name } => {
                                 self.write_class_struct(api, name);
-                                Some(Field::from_field_kind(FieldKind::Struct(name.to_owned())))
+                                let mut field =
+                                    Field::from_field_kind(FieldKind::Struct(name.to_owned()));
+                                field.writable = !read_only;
+                                Some(field)
                             }
 
                             ApiValueType::DataType { value } => {
@@ -363,6 +366,84 @@ impl RobloxGenerator {
                     properties,
                 },
             );
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use selene_lib::lints::{standard_library::StandardLibraryLint, AstContext, Context, Lint};
+
+    #[test]
+    fn class_property_writability() {
+        let property = |name: &str, class: &str, read_only: bool| ApiMember::Property {
+            name: name.to_owned(),
+            tags: read_only.then(|| vec!["ReadOnly".to_owned()]),
+            security: ApiPropertySecurity::default(),
+            value_type: ApiValueType::Class {
+                name: class.to_owned(),
+            },
+        };
+        let api = ApiDump {
+            classes: vec![
+                ApiClass {
+                    name: "Instance".to_owned(),
+                    superclass: "<<<ROOT>>>".to_owned(),
+                    tags: vec![],
+                    members: vec![ApiMember::Function {
+                        name: "Destroy".to_owned(),
+                        tags: None,
+                        parameters: vec![],
+                    }],
+                },
+                ApiClass {
+                    name: "Workspace".to_owned(),
+                    superclass: "Instance".to_owned(),
+                    tags: vec![],
+                    members: vec![
+                        property("CurrentCamera", "Camera", false),
+                        property("Terrain", "Terrain", true),
+                    ],
+                },
+                ApiClass {
+                    name: "Camera".to_owned(),
+                    superclass: "Instance".to_owned(),
+                    tags: vec![],
+                    members: vec![property("CameraSubject", "Instance", false)],
+                },
+                ApiClass {
+                    name: "Terrain".to_owned(),
+                    superclass: "Instance".to_owned(),
+                    tags: vec![],
+                    members: vec![],
+                },
+            ],
+            enums: vec![],
+        };
+        let mut generator = RobloxGenerator {
+            std: StandardLibrary::default(),
+        };
+        generator.write_class(&api, "workspace", "Workspace");
+
+        let yaml = serde_yaml::to_string(&generator.std).unwrap();
+        let context = Context {
+            standard_library: serde_yaml::from_str(&yaml).unwrap(),
+            user_set_standard_library: None,
+        };
+        let lint = StandardLibraryLint::new(()).unwrap();
+        for (source, should_lint) in [
+            ("workspace.CurrentCamera = nil", false),
+            ("workspace.CurrentCamera.CameraSubject = nil", false),
+            ("workspace.CurrentCamera:Destroy()", false),
+            ("workspace.Terrain = nil", true),
+            ("workspace.CurrentCamera.Destroy = nil", true),
+            ("workspace.CurrentCamera.Child = nil", true),
+            ("workspace = nil", true),
+        ] {
+            let ast = full_moon::parse(source).unwrap();
+            let diagnostics = lint.pass(&ast, &context, &AstContext::from_ast(&ast));
+            assert_eq!(diagnostics.len(), usize::from(should_lint), "{source}");
         }
     }
 }
