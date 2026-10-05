@@ -40,6 +40,10 @@ ureq = { version = "2.6.2", features = ["json"], optional = true }
 pretty_assertions = "1.3"
 
 [features]
-default = ["roblox"]
+default = ["lua52", "lua53", "lua54", "luajit", "roblox"]
 tracy-profiling = ["profiling/profile-with-tracy", "tracy-client"]
+lua52 = ["selene-lib/lua52", "full_moon/lua52"]
+lua53 = ["selene-lib/lua53", "full_moon/lua53"]
+lua54 = ["selene-lib/lua54", "full_moon/lua54"]
+luajit = ["selene-lib/luajit", "full_moon/luajit"]
 roblox = ["selene-lib/roblox", "full_moon/roblox", "ureq"]
