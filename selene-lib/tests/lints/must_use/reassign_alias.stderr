@@ -1,0 +1,6 @@
+error[must_use]: unused return value of `math.max` must be used
+  ┌─ reassign_alias.lua:5:1
+  │
+5 │ math2.max(x, y)
+  │ ^^^^^^^^^
+

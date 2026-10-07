@@ -210,6 +210,11 @@ pub struct StandardLibraryVisitor<'std> {
 }
 
 impl StandardLibraryVisitor<'_> {
+    fn resolved_name_path(&self, byte: usize, name_path: Vec<String>) -> Option<Vec<String>> {
+        self.scope_manager
+            .resolve_name_path(byte, &name_path)
+    }
+
     fn lint_invalid_field_access(
         &mut self,
         mut name_path: Vec<String>,
@@ -367,30 +372,17 @@ impl Visitor for StandardLibraryVisitor<'_> {
     }
 
     fn visit_expression(&mut self, expression: &ast::Expression) {
-        if let Some(reference) = self
-            .scope_manager
-            .reference_at_byte(expression.start_position().unwrap().bytes())
-        {
-            if reference.resolved.is_some() {
-                return;
-            }
-        }
-
         if let Some(name_path) = name_path(expression) {
+            let Some(name_path) =
+                self.resolved_name_path(expression.start_position().unwrap().bytes(), name_path)
+            else {
+                return;
+            };
             self.lint_invalid_field_access(name_path, expression.range().unwrap());
         }
     }
 
     fn visit_function_call(&mut self, call: &ast::FunctionCall) {
-        if let Some(reference) = self
-            .scope_manager
-            .reference_at_byte(call.start_position().unwrap().bytes())
-        {
-            if reference.resolved.is_some() {
-                return;
-            }
-        }
-
         let mut keep_going = true;
         let mut suffixes: Vec<&ast::Suffix> = call
             .suffixes()
@@ -402,6 +394,11 @@ impl Visitor for StandardLibraryVisitor<'_> {
                 Some(name_path) => name_path,
                 None => return,
             };
+        name_path = match self.resolved_name_path(call.start_position().unwrap().bytes(), name_path)
+        {
+            Some(name_path) => name_path,
+            None => return,
+        };
 
         let call_suffix = suffixes.pop().unwrap();
 
@@ -738,11 +735,47 @@ mod tests {
     }
 
     #[test]
+    fn test_aliasing() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "aliasing",
+        );
+    }
+
+    #[test]
     fn test_assert() {
         test_lint(
             StandardLibraryLint::new(()).unwrap(),
             "standard_library",
             "assert",
+        );
+    }
+
+    #[test]
+    fn test_reassign() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "reassign",
+        );
+    }
+
+    #[test]
+    fn test_reassign_alias() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "reassign_alias",
+        );
+    }
+
+    #[test]
+    fn test_reassign_multi() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "reassign_multi",
         );
     }
 

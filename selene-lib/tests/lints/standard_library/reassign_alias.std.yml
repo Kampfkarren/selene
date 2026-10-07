@@ -1,0 +1,4 @@
+---
+globals:
+  z2.ecs.create_entity:
+    args: []
