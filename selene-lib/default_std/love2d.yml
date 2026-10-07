@@ -1,0 +1,7913 @@
+---
+name: love2d
+globals:
+  _G:
+    property: new-fields
+  _VERSION:
+    property: read-only
+  love:
+    property: read-only
+  arg:
+    property: new-fields
+  assert:
+    args:
+      - type: any
+      - required: A failed assertion without a message is unhelpful to users.
+        type: string
+  collectgarbage:
+    args:
+      - required: false
+        type:
+          - collect
+          - count
+          - restart
+          - setpause
+          - setstepmul
+          - step
+          - stop
+  coroutine.create:
+    args:
+      - type: function
+    must_use: true
+  coroutine.resume:
+    args:
+      - type:
+          display: coroutine
+      - required: false
+        type: "..."
+  coroutine.running:
+    args: []
+    must_use: true
+  coroutine.status:
+    args:
+      - type:
+          display: coroutine
+    must_use: true
+  coroutine.wrap:
+    args:
+      - type: function
+  coroutine.yield:
+    args:
+      - required: false
+        type: "..."
+  debug.debug:
+    args: []
+  debug.getfenv:
+    args:
+      - type: function
+    must_use: true
+  debug.gethook:
+    args:
+      - required: false
+        type: any
+    must_use: true
+  debug.getinfo:
+    args:
+      - type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+    must_use: true
+  debug.getlocal:
+    args:
+      - type: any
+      - type: any
+      - required: false
+        type: any
+    must_use: true
+  debug.getmetatable:
+    args:
+      - type: any
+    must_use: true
+  debug.getregistry:
+    args: []
+    must_use: true
+  debug.getupvalue:
+    args:
+      - type: function
+      - type: number
+    must_use: true
+  debug.setfenv:
+    args:
+      - type: any
+      - type: table
+  debug.sethook:
+    args:
+      - type: any
+      - type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+  debug.setlocal:
+    args:
+      - type: any
+      - type: any
+      - type: any
+      - required: false
+        type: any
+  debug.setmetatable:
+    args:
+      - type: any
+      - type: table
+  debug.setupvalue:
+    args:
+      - type: function
+      - type: number
+      - type: string
+  debug.traceback:
+    args:
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+    must_use: true
+  dofile:
+    args:
+      - required: false
+        type: string
+  error:
+    args:
+      - required: Erroring without a message is unhelpful to users.
+        type: string
+      - required: false
+        type: number
+  getfenv:
+    args:
+      - required: false
+        type: any
+    must_use: true
+  getmetatable:
+    args:
+      - type: table
+    must_use: true
+  io.close:
+    args:
+      - required: false
+        type:
+          display: file
+  io.flush:
+    args: []
+  io.input:
+    args:
+      - required: false
+        type:
+          display: file
+  io.lines:
+    args:
+      - type: string
+  io.open:
+    args:
+      - type: string
+      - required: false
+        type:
+          - r
+          - rb
+          - w
+          - wb
+          - a
+          - ab
+          - r+
+          - rb+
+          - w+
+          - wb+
+          - a+
+          - ab+
+  io.output:
+    args:
+      - required: false
+        type:
+          display: file
+  io.popen:
+    args:
+      - type: string
+      - required: false
+        type:
+          - r
+          - rb
+          - w
+          - wb
+          - a
+          - ab
+          - r+
+          - rb+
+          - w+
+          - wb+
+          - a+
+          - ab+
+  io.read:
+    args:
+      - type: "..."
+  io.stderr:
+    property: read-only
+  io.stdin:
+    property: read-only
+  io.stdout:
+    property: read-only
+  io.tmpfile:
+    args: []
+  io.type:
+    args:
+      - type:
+          display: potentially file-like object
+  io.write:
+    args:
+      - type: "..."
+  ipairs:
+    args:
+      - type: table
+    must_use: true
+  load:
+    args:
+      - type: function
+      - required: false
+        type: string
+  loadfile:
+    args:
+      - required: false
+        type: string
+  loadstring:
+    args:
+      - type: string
+      - required: false
+        type: string
+  math.abs:
+    args:
+      - type: number
+    must_use: true
+  math.acos:
+    args:
+      - type: number
+    must_use: true
+  math.asin:
+    args:
+      - type: number
+    must_use: true
+  math.atan:
+    args:
+      - type: number
+    must_use: true
+  math.atan2:
+    args:
+      - type: number
+      - type: number
+    must_use: true
+  math.ceil:
+    args:
+      - type: number
+    must_use: true
+  math.cos:
+    args:
+      - type: number
+    must_use: true
+  math.cosh:
+    args:
+      - type: number
+    must_use: true
+  math.deg:
+    args:
+      - type: number
+    must_use: true
+  math.exp:
+    args:
+      - type: number
+    must_use: true
+  math.floor:
+    args:
+      - type: number
+    must_use: true
+  math.fmod:
+    args:
+      - type: number
+      - type: number
+    must_use: true
+  math.frexp:
+    args:
+      - type: number
+    must_use: true
+  math.huge:
+    property: read-only
+  math.ldexp:
+    args:
+      - type: number
+      - type: number
+    must_use: true
+  math.log:
+    args:
+      - type: number
+    must_use: true
+  math.log10:
+    args:
+      - type: number
+    must_use: true
+  math.max:
+    args:
+      - type: number
+      - required: use of max only makes sense with more than 1 parameter
+        type: "..."
+    must_use: true
+  math.min:
+    args:
+      - type: number
+      - required: use of min only makes sense with more than 1 parameter
+        type: "..."
+    must_use: true
+  math.modf:
+    args:
+      - type: number
+    must_use: true
+  math.pi:
+    property: read-only
+  math.pow:
+    args:
+      - type: number
+      - type: number
+    must_use: true
+  math.rad:
+    args:
+      - type: number
+    must_use: true
+  math.random:
+    args:
+      - required: false
+        type: number
+      - required: false
+        type: number
+    must_use: true
+  math.randomseed:
+    args:
+      - type: number
+  math.sin:
+    args:
+      - type: number
+    must_use: true
+  math.sinh:
+    args:
+      - type: number
+    must_use: true
+  math.sqrt:
+    args:
+      - type: number
+    must_use: true
+  math.tan:
+    args:
+      - type: number
+    must_use: true
+  math.tanh:
+    args:
+      - type: number
+    must_use: true
+  module:
+    args:
+      - type: string
+      - type: "..."
+  newproxy:
+    args:
+      - required: false
+        type: bool
+    must_use: true
+  next:
+    args:
+      - type: table
+      - required: false
+        type: number
+  os.clock:
+    args: []
+    must_use: true
+  os.date:
+    args:
+      - required: false
+        type: string
+      - required: false
+        type: number
+    must_use: true
+  os.difftime:
+    args:
+      - type: number
+      - type: number
+    must_use: true
+  os.execute:
+    args:
+      - required: false
+        type: string
+  os.exit:
+    args:
+      - required: false
+        type: number
+  os.getenv:
+    args:
+      - type: string
+  os.remove:
+    args:
+      - type: string
+  os.rename:
+    args:
+      - type: string
+      - type: string
+  os.setlocale:
+    args:
+      - type: string
+      - required: false
+        type:
+          - all
+          - collate
+          - ctype
+          - monetary
+          - numeric
+          - time
+  os.time:
+    args:
+      - required: false
+        type: table
+    must_use: true
+  os.tmpname:
+    args: []
+    must_use: true
+  package.cpath:
+    property: full-write
+  package.loaded:
+    property: new-fields
+  package.loaders:
+    property: new-fields
+  package.loadlib:
+    args:
+      - type: string
+      - type: string
+  package.path:
+    property: full-write
+  package.preload:
+    property: new-fields
+  package.seeall:
+    args:
+      - type: table
+  pairs:
+    args:
+      - type: table
+    must_use: true
+  pcall:
+    args:
+      - type: function
+      - required: false
+        type: "..."
+  print:
+    args:
+      - required: false
+        type: "..."
+  rawequal:
+    args:
+      - type: any
+      - type: any
+    must_use: true
+  rawget:
+    args:
+      - type: any
+      - type: any
+    must_use: true
+  rawset:
+    args:
+      - type: any
+      - type: any
+      - type: any
+  require:
+    args:
+      - type: string
+  select:
+    args:
+      - type: any
+      - type: "..."
+    must_use: true
+  setfenv:
+    args:
+      - type: any
+      - type: table
+  setmetatable:
+    args:
+      - type: table
+      - required: false
+        type: table
+  string.byte:
+    args:
+      - type: string
+      - required: false
+        type: number
+      - required: false
+        type: number
+  string.char:
+    args:
+      - required: string.char should be used with an argument despite it not throwing
+        type: number
+      - required: false
+        type: "..."
+    must_use: true
+  string.dump:
+    args:
+      - type: function
+    must_use: true
+  string.find:
+    args:
+      - type: string
+      - type: string
+      - required: false
+        type: number
+      - required: false
+        type: bool
+    must_use: true
+  string.format:
+    args:
+      - type: string
+      - required: string.format should only be used for strings that need formatting
+        type: "..."
+    must_use: true
+  string.gmatch:
+    args:
+      - type: string
+      - type: string
+    must_use: true
+  string.gsub:
+    args:
+      - type: string
+      - type: string
+      - type: any
+      - required: false
+        type: number
+    must_use: true
+  string.len:
+    args:
+      - type: string
+    must_use: true
+  string.lower:
+    args:
+      - type: string
+    must_use: true
+  string.match:
+    args:
+      - type: string
+      - type: string
+      - required: false
+        type: number
+    must_use: true
+  string.rep:
+    args:
+      - type: string
+      - type: number
+    must_use: true
+  string.reverse:
+    args:
+      - type: string
+    must_use: true
+  string.sub:
+    args:
+      - type: string
+      - type: number
+      - required: false
+        type: number
+    must_use: true
+  string.upper:
+    args:
+      - type: string
+    must_use: true
+  table.concat:
+    args:
+      - type: table
+      - required: false
+        type: string
+      - required: false
+        type: number
+      - required: false
+        type: number
+    must_use: true
+  table.foreach:
+    args:
+      - type: table
+      - type: function
+    deprecated:
+      message: use a for loop instead.
+  table.foreachi:
+    args:
+      - type: table
+      - type: function
+    deprecated:
+      message: use a for loop instead.
+  table.getn:
+    args:
+      - type: table
+      - type: number
+    deprecated:
+      message: "`table.getn` has been superseded by #."
+      replace:
+        - "#%1"
+    must_use: true
+  table.insert:
+    args:
+      - type: table
+        observes: write
+      - type: any
+      - required: false
+        type: any
+  table.maxn:
+    args:
+      - type: table
+    must_use: true
+  table.remove:
+    args:
+      - type: table
+      - required: false
+        type: number
+  table.sort:
+    args:
+      - type: table
+      - required: false
+        type: function
+  tonumber:
+    args:
+      - type: any
+      - required: false
+        type: number
+    must_use: true
+  tostring:
+    args:
+      - type: any
+    must_use: true
+  type:
+    args:
+      - type: any
+  unpack:
+    args:
+      - type: table
+      - required: false
+        type: number
+      - required: false
+        type: number
+    must_use: true
+  xpcall:
+    args:
+      - type: function
+      - required: false
+        type: "..."
+  love.audio.getActiveEffects:
+    args: []
+  love.audio.getActiveSourceCount:
+    args: []
+  love.audio.getDistanceModel:
+    args: []
+  love.audio.getDopplerScale:
+    args: []
+  love.audio.getEffect:
+    args:
+      - type: string
+  love.audio.getMaxSceneEffects:
+    args: []
+  love.audio.getMaxSourceEffects:
+    args: []
+  love.audio.getOrientation:
+    args: []
+  love.audio.getPosition:
+    args: []
+  love.audio.getRecordingDevices:
+    args: []
+  love.audio.getVelocity:
+    args: []
+  love.audio.getVolume:
+    args: []
+  love.audio.isEffectsSupported:
+    args: []
+  love.audio.newQueueableSource:
+    args:
+      - type: number
+      - type: number
+      - type: number
+      - required: false
+        type: number
+    must_use: true
+  love.audio.newSource:
+    args:
+      - type: any
+      - required: false
+        type:
+          - "static"
+          - "stream"
+          - "queue"
+    must_use: true
+  love.audio.pause:
+    args:
+      - required: false
+        type: any
+      - required: false
+        type: "..."
+  love.audio.play:
+    args:
+      - type: any
+      - required: false
+        type:
+          display: Source
+      - required: false
+        type: "..."
+  love.audio.setDistanceModel:
+    args:
+      - type:
+          - "none"
+          - "inverse"
+          - "inverseclamped"
+          - "linear"
+          - "linearclamped"
+          - "exponent"
+          - "exponentclamped"
+  love.audio.setDopplerScale:
+    args:
+      - type: number
+  love.audio.setEffect:
+    args:
+      - type: string
+      - required: false
+        type: any
+  love.audio.setMixWithSystem:
+    args:
+      - type: bool
+  love.audio.setOrientation:
+    args:
+      - type: number
+      - type: number
+  love.audio.setPosition:
+    args:
+      - type: number
+      - type: number
+      - type: number
+  love.audio.setVelocity:
+    args:
+      - type: number
+      - type: number
+      - type: number
+  love.audio.setVolume:
+    args:
+      - type: number
+  love.audio.stop:
+    args:
+      - required: false
+        type: any
+      - required: false
+        type:
+          display: Source
+      - required: false
+        type: "..."
+  love.conf:
+    args:
+      - type: table
+  love.data.compress:
+    args:
+      - type:
+          - "data"
+          - "string"
+      - type:
+          - "lz4"
+          - "zlib"
+          - "gzip"
+          - "deflate"
+      - type: any
+      - required: false
+        type: number
+  love.data.decode:
+    args:
+      - type:
+          - "data"
+          - "string"
+      - type:
+          - "base64"
+          - "hex"
+      - type: any
+  love.data.decompress:
+    args:
+      - type:
+          - "data"
+          - "string"
+      - type: any
+      - required: false
+        type: any
+  love.data.encode:
+    args:
+      - type:
+          - "data"
+          - "string"
+      - type:
+          - "base64"
+          - "hex"
+      - type: any
+      - required: false
+        type: number
+  love.data.getPackedSize:
+    args:
+      - type: string
+  love.data.hash:
+    args:
+      - type:
+          - "md5"
+          - "sha1"
+          - "sha224"
+          - "sha256"
+          - "sha384"
+          - "sha512"
+      - type: any
+  love.data.newByteData:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+    must_use: true
+  love.data.newDataView:
+    args:
+      - type:
+          display: Data
+      - type: number
+      - type: number
+    must_use: true
+  love.data.pack:
+    args:
+      - type:
+          - "data"
+          - "string"
+      - type: string
+      - type: any
+      - required: false
+        type: "..."
+  love.data.unpack:
+    args:
+      - type: string
+      - type: any
+      - required: false
+        type: number
+  love.directorydropped:
+    args:
+      - type: string
+  love.displayrotated:
+    args:
+      - type: number
+      - type:
+          - "unknown"
+          - "landscape"
+          - "landscapeflipped"
+          - "portrait"
+          - "portraitflipped"
+  love.draw:
+    args: []
+  love.errorhandler:
+    args:
+      - type: string
+  love.event.clear:
+    args: []
+  love.event.poll:
+    args: []
+  love.event.pump:
+    args: []
+  love.event.push:
+    args:
+      - type:
+          - "focus"
+          - "joystickpressed"
+          - "joystickreleased"
+          - "keypressed"
+          - "keyreleased"
+          - "mousepressed"
+          - "mousereleased"
+          - "quit"
+          - "resize"
+          - "visible"
+          - "mousefocus"
+          - "threaderror"
+          - "joystickadded"
+          - "joystickremoved"
+          - "joystickaxis"
+          - "joystickhat"
+          - "gamepadpressed"
+          - "gamepadreleased"
+          - "gamepadaxis"
+          - "textinput"
+          - "mousemoved"
+          - "lowmemory"
+          - "textedited"
+          - "wheelmoved"
+          - "touchpressed"
+          - "touchreleased"
+          - "touchmoved"
+          - "directorydropped"
+          - "filedropped"
+          - "jp"
+          - "jr"
+          - "kp"
+          - "kr"
+          - "mp"
+          - "mr"
+          - "q"
+          - "f"
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: "..."
+  love.event.quit:
+    args:
+      - required: false
+        type: any
+  love.event.wait:
+    args: []
+  love.filedropped:
+    args:
+      - type:
+          display: DroppedFile
+  love.filesystem.append:
+    args:
+      - type: string
+      - type: any
+      - required: false
+        type: number
+  love.filesystem.areSymlinksEnabled:
+    args: []
+  love.filesystem.createDirectory:
+    args:
+      - type: string
+  love.filesystem.getAppdataDirectory:
+    args: []
+  love.filesystem.getCRequirePath:
+    args: []
+  love.filesystem.getDirectoryItems:
+    args:
+      - type: string
+      - required: false
+        type: function
+  love.filesystem.getIdentity:
+    args: []
+  love.filesystem.getInfo:
+    args:
+      - type: string
+      - required: false
+        type: any
+      - required: false
+        type: table
+  love.filesystem.getRealDirectory:
+    args:
+      - type: string
+  love.filesystem.getRequirePath:
+    args: []
+  love.filesystem.getSaveDirectory:
+    args: []
+  love.filesystem.getSource:
+    args: []
+  love.filesystem.getSourceBaseDirectory:
+    args: []
+  love.filesystem.getUserDirectory:
+    args: []
+  love.filesystem.getWorkingDirectory:
+    args: []
+  love.filesystem.init:
+    args:
+      - type: string
+  love.filesystem.isFused:
+    args: []
+  love.filesystem.lines:
+    args:
+      - type: string
+  love.filesystem.load:
+    args:
+      - type: string
+  love.filesystem.mount:
+    args:
+      - type: any
+      - type: string
+      - required: false
+        type: any
+      - required: false
+        type: bool
+  love.filesystem.newFile:
+    args:
+      - type: string
+      - required: false
+        type:
+          - "r"
+          - "w"
+          - "a"
+          - "c"
+    must_use: true
+  love.filesystem.newFileData:
+    args:
+      - type: any
+      - required: false
+        type: string
+    must_use: true
+  love.filesystem.read:
+    args:
+      - type: any
+      - required: false
+        type: any
+      - required: false
+        type: number
+  love.filesystem.remove:
+    args:
+      - type: string
+  love.filesystem.setCRequirePath:
+    args:
+      - type: string
+  love.filesystem.setIdentity:
+    args:
+      - type: string
+  love.filesystem.setRequirePath:
+    args:
+      - type: string
+  love.filesystem.setSource:
+    args:
+      - type: string
+  love.filesystem.setSymlinksEnabled:
+    args:
+      - type: bool
+  love.filesystem.unmount:
+    args:
+      - type: string
+  love.filesystem.write:
+    args:
+      - type: string
+      - type: any
+      - required: false
+        type: number
+  love.focus:
+    args:
+      - type: bool
+  love.font.newBMFontRasterizer:
+    args:
+      - type: any
+      - type: string
+      - required: false
+        type: number
+    must_use: true
+  love.font.newGlyphData:
+    args:
+      - type:
+          display: Rasterizer
+      - type: number
+  love.font.newImageRasterizer:
+    args:
+      - type:
+          display: ImageData
+      - type: string
+      - required: false
+        type: number
+      - required: false
+        type: number
+    must_use: true
+  love.font.newRasterizer:
+    args:
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: number
+    must_use: true
+  love.font.newTrueTypeRasterizer:
+    args:
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: number
+    must_use: true
+  love.gamepadaxis:
+    args:
+      - type:
+          display: Joystick
+      - type:
+          - "leftx"
+          - "lefty"
+          - "rightx"
+          - "righty"
+          - "triggerleft"
+          - "triggerright"
+      - type: number
+  love.gamepadpressed:
+    args:
+      - type:
+          display: Joystick
+      - type:
+          - "a"
+          - "b"
+          - "x"
+          - "y"
+          - "back"
+          - "guide"
+          - "start"
+          - "leftstick"
+          - "rightstick"
+          - "leftshoulder"
+          - "rightshoulder"
+          - "dpup"
+          - "dpdown"
+          - "dpleft"
+          - "dpright"
+  love.gamepadreleased:
+    args:
+      - type:
+          display: Joystick
+      - type:
+          - "a"
+          - "b"
+          - "x"
+          - "y"
+          - "back"
+          - "guide"
+          - "start"
+          - "leftstick"
+          - "rightstick"
+          - "leftshoulder"
+          - "rightshoulder"
+          - "dpup"
+          - "dpdown"
+          - "dpleft"
+          - "dpright"
+  love.getVersion:
+    args: []
+  love.graphics.applyTransform:
+    args:
+      - type:
+          display: Transform
+  love.graphics.arc:
+    args:
+      - type:
+          - "fill"
+          - "line"
+      - type: any
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.graphics.captureScreenshot:
+    args:
+      - type: any
+  love.graphics.circle:
+    args:
+      - type:
+          - "fill"
+          - "line"
+      - type: number
+      - type: number
+      - type: number
+      - required: false
+        type: number
+  love.graphics.clear:
+    args:
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: "..."
+  love.graphics.discard:
+    args:
+      - required: false
+        type: any
+      - required: false
+        type: bool
+  love.graphics.draw:
+    args:
+      - type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.graphics.drawInstanced:
+    args:
+      - type:
+          display: Mesh
+      - type: number
+      - required: false
+        type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.graphics.drawLayer:
+    args:
+      - type:
+          display: Texture
+      - type: number
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.graphics.ellipse:
+    args:
+      - type:
+          - "fill"
+          - "line"
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - required: false
+        type: number
+  love.graphics.flushBatch:
+    args: []
+  love.graphics.getBackgroundColor:
+    args: []
+  love.graphics.getBlendMode:
+    args: []
+  love.graphics.getCanvas:
+    args: []
+  love.graphics.getCanvasFormats:
+    args:
+      - required: false
+        type: bool
+  love.graphics.getColor:
+    args: []
+  love.graphics.getColorMask:
+    args: []
+  love.graphics.getDPIScale:
+    args: []
+  love.graphics.getDefaultFilter:
+    args: []
+  love.graphics.getDepthMode:
+    args: []
+  love.graphics.getDimensions:
+    args: []
+  love.graphics.getFont:
+    args: []
+  love.graphics.getFrontFaceWinding:
+    args: []
+  love.graphics.getHeight:
+    args: []
+  love.graphics.getImageFormats:
+    args: []
+  love.graphics.getLineJoin:
+    args: []
+  love.graphics.getLineStyle:
+    args: []
+  love.graphics.getLineWidth:
+    args: []
+  love.graphics.getMeshCullMode:
+    args: []
+  love.graphics.getPixelDimensions:
+    args: []
+  love.graphics.getPixelHeight:
+    args: []
+  love.graphics.getPixelWidth:
+    args: []
+  love.graphics.getPointSize:
+    args: []
+  love.graphics.getRendererInfo:
+    args: []
+  love.graphics.getScissor:
+    args: []
+  love.graphics.getShader:
+    args: []
+  love.graphics.getStackDepth:
+    args: []
+  love.graphics.getStats:
+    args:
+      - required: false
+        type: table
+  love.graphics.getStencilTest:
+    args: []
+  love.graphics.getSupported:
+    args: []
+  love.graphics.getSystemLimits:
+    args: []
+  love.graphics.getTextureTypes:
+    args: []
+  love.graphics.getWidth:
+    args: []
+  love.graphics.intersectScissor:
+    args:
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+  love.graphics.inverseTransformPoint:
+    args:
+      - type: number
+      - type: number
+  love.graphics.isActive:
+    args: []
+  love.graphics.isGammaCorrect:
+    args: []
+  love.graphics.isWireframe:
+    args: []
+  love.graphics.line:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: "..."
+  love.graphics.newArrayImage:
+    args:
+      - type: table
+      - required: false
+        type: table
+    must_use: true
+  love.graphics.newCanvas:
+    args:
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: any
+      - required: false
+        type: table
+    must_use: true
+  love.graphics.newCubeImage:
+    args:
+      - type: any
+      - required: false
+        type: table
+    must_use: true
+  love.graphics.newFont:
+    args:
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: number
+    must_use: true
+  love.graphics.newImage:
+    args:
+      - type: any
+      - required: false
+        type: table
+    must_use: true
+  love.graphics.newImageFont:
+    args:
+      - type: any
+      - type: string
+      - required: false
+        type: number
+    must_use: true
+  love.graphics.newMesh:
+    args:
+      - type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type:
+          - "dynamic"
+          - "static"
+          - "stream"
+    must_use: true
+  love.graphics.newParticleSystem:
+    args:
+      - type: any
+      - required: false
+        type: number
+    must_use: true
+  love.graphics.newQuad:
+    args:
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - type: any
+      - required: false
+        type: number
+    must_use: true
+  love.graphics.newShader:
+    args:
+      - type: string
+      - required: false
+        type: string
+    must_use: true
+  love.graphics.newSpriteBatch:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type:
+          - "dynamic"
+          - "static"
+          - "stream"
+    must_use: true
+  love.graphics.newText:
+    args:
+      - type:
+          display: Font
+      - required: false
+        type: any
+    must_use: true
+  love.graphics.newVideo:
+    args:
+      - type: any
+      - required: false
+        type: any
+    must_use: true
+  love.graphics.newVolumeImage:
+    args:
+      - type: table
+      - required: false
+        type: table
+    must_use: true
+  love.graphics.origin:
+    args: []
+  love.graphics.points:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: "..."
+  love.graphics.polygon:
+    args:
+      - type:
+          - "fill"
+          - "line"
+      - required: false
+        type: any
+      - required: false
+        type: "..."
+  love.graphics.pop:
+    args: []
+  love.graphics.present:
+    args: []
+  love.graphics.print:
+    args:
+      - type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.graphics.printf:
+    args:
+      - type: any
+      - type: any
+      - type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.graphics.push:
+    args:
+      - required: false
+        type:
+          - "transform"
+          - "all"
+  love.graphics.rectangle:
+    args:
+      - type:
+          - "fill"
+          - "line"
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.graphics.replaceTransform:
+    args:
+      - type:
+          display: Transform
+  love.graphics.reset:
+    args: []
+  love.graphics.rotate:
+    args:
+      - type: number
+  love.graphics.scale:
+    args:
+      - type: number
+      - required: false
+        type: number
+  love.graphics.setBackgroundColor:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.graphics.setBlendMode:
+    args:
+      - type:
+          - "alpha"
+          - "replace"
+          - "screen"
+          - "add"
+          - "subtract"
+          - "multiply"
+          - "lighten"
+          - "darken"
+          - "additive"
+          - "subtractive"
+          - "multiplicative"
+          - "premultiplied"
+      - required: false
+        type:
+          - "alphamultiply"
+          - "premultiplied"
+  love.graphics.setCanvas:
+    args:
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: "..."
+  love.graphics.setColor:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.graphics.setColorMask:
+    args:
+      - required: false
+        type: bool
+      - required: false
+        type: bool
+      - required: false
+        type: bool
+      - required: false
+        type: bool
+  love.graphics.setDefaultFilter:
+    args:
+      - type:
+          - "linear"
+          - "nearest"
+      - required: false
+        type:
+          - "linear"
+          - "nearest"
+      - required: false
+        type: number
+  love.graphics.setDepthMode:
+    args:
+      - required: false
+        type:
+          - "equal"
+          - "notequal"
+          - "less"
+          - "lequal"
+          - "gequal"
+          - "greater"
+          - "never"
+          - "always"
+      - required: false
+        type: bool
+  love.graphics.setFont:
+    args:
+      - type:
+          display: Font
+  love.graphics.setFrontFaceWinding:
+    args:
+      - type:
+          - "cw"
+          - "ccw"
+  love.graphics.setLineJoin:
+    args:
+      - type:
+          - "miter"
+          - "none"
+          - "bevel"
+  love.graphics.setLineStyle:
+    args:
+      - type:
+          - "rough"
+          - "smooth"
+  love.graphics.setLineWidth:
+    args:
+      - type: number
+  love.graphics.setMeshCullMode:
+    args:
+      - type:
+          - "back"
+          - "front"
+          - "none"
+  love.graphics.setNewFont:
+    args:
+      - required: false
+        type: any
+      - required: false
+        type: number
+  love.graphics.setPointSize:
+    args:
+      - type: number
+  love.graphics.setScissor:
+    args:
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.graphics.setShader:
+    args:
+      - required: false
+        type:
+          display: Shader
+  love.graphics.setStencilTest:
+    args:
+      - required: false
+        type:
+          - "equal"
+          - "notequal"
+          - "less"
+          - "lequal"
+          - "gequal"
+          - "greater"
+          - "never"
+          - "always"
+      - required: false
+        type: number
+  love.graphics.setWireframe:
+    args:
+      - type: bool
+  love.graphics.shear:
+    args:
+      - type: number
+      - type: number
+  love.graphics.stencil:
+    args:
+      - type: function
+      - required: false
+        type:
+          - "replace"
+          - "increment"
+          - "decrement"
+          - "incrementwrap"
+          - "decrementwrap"
+          - "invert"
+      - required: false
+        type: number
+      - required: false
+        type: bool
+  love.graphics.transformPoint:
+    args:
+      - type: number
+      - type: number
+  love.graphics.translate:
+    args:
+      - type: number
+      - type: number
+  love.graphics.validateShader:
+    args:
+      - type: bool
+      - type: string
+      - required: false
+        type: string
+  love.handlers:
+    property: new-fields
+  love.hasDeprecationOutput:
+    args: []
+  love.image.isCompressed:
+    args:
+      - type: any
+  love.image.newCompressedData:
+    args:
+      - type: any
+    must_use: true
+  love.image.newImageData:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: any
+      - required: false
+        type: string
+    must_use: true
+  love.isVersionCompatible:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.joystick.getGamepadMappingString:
+    args:
+      - type: string
+  love.joystick.getJoystickCount:
+    args: []
+  love.joystick.getJoysticks:
+    args: []
+  love.joystick.loadGamepadMappings:
+    args:
+      - type: string
+  love.joystick.saveGamepadMappings:
+    args:
+      - required: false
+        type: string
+  love.joystick.setGamepadMapping:
+    args:
+      - type: string
+      - type: any
+      - type:
+          - "axis"
+          - "button"
+          - "hat"
+      - type: number
+      - required: false
+        type:
+          - "c"
+          - "d"
+          - "l"
+          - "ld"
+          - "lu"
+          - "r"
+          - "rd"
+          - "ru"
+          - "u"
+  love.joystickadded:
+    args:
+      - type:
+          display: Joystick
+  love.joystickaxis:
+    args:
+      - type:
+          display: Joystick
+      - type: number
+      - type: number
+  love.joystickhat:
+    args:
+      - type:
+          display: Joystick
+      - type: number
+      - type:
+          - "c"
+          - "d"
+          - "l"
+          - "ld"
+          - "lu"
+          - "r"
+          - "rd"
+          - "ru"
+          - "u"
+  love.joystickpressed:
+    args:
+      - type:
+          display: Joystick
+      - type: number
+  love.joystickreleased:
+    args:
+      - type:
+          display: Joystick
+      - type: number
+  love.joystickremoved:
+    args:
+      - type:
+          display: Joystick
+  love.keyboard.getKeyFromScancode:
+    args:
+      - type:
+          - "a"
+          - "b"
+          - "c"
+          - "d"
+          - "e"
+          - "f"
+          - "g"
+          - "h"
+          - "i"
+          - "j"
+          - "k"
+          - "l"
+          - "m"
+          - "n"
+          - "o"
+          - "p"
+          - "q"
+          - "r"
+          - "s"
+          - "t"
+          - "u"
+          - "v"
+          - "w"
+          - "x"
+          - "y"
+          - "z"
+          - "1"
+          - "2"
+          - "3"
+          - "4"
+          - "5"
+          - "6"
+          - "7"
+          - "8"
+          - "9"
+          - "0"
+          - "return"
+          - "escape"
+          - "backspace"
+          - "tab"
+          - "space"
+          - "-"
+          - "="
+          - "["
+          - "]"
+          - "\\"
+          - "nonus#"
+          - ";"
+          - "'"
+          - "`"
+          - ","
+          - "."
+          - "/"
+          - "capslock"
+          - "f1"
+          - "f2"
+          - "f3"
+          - "f4"
+          - "f5"
+          - "f6"
+          - "f7"
+          - "f8"
+          - "f9"
+          - "f10"
+          - "f11"
+          - "f12"
+          - "f13"
+          - "f14"
+          - "f15"
+          - "f16"
+          - "f17"
+          - "f18"
+          - "f19"
+          - "f20"
+          - "f21"
+          - "f22"
+          - "f23"
+          - "f24"
+          - "lctrl"
+          - "lshift"
+          - "lalt"
+          - "lgui"
+          - "rctrl"
+          - "rshift"
+          - "ralt"
+          - "rgui"
+          - "printscreen"
+          - "scrolllock"
+          - "pause"
+          - "insert"
+          - "home"
+          - "numlock"
+          - "pageup"
+          - "delete"
+          - "end"
+          - "pagedown"
+          - "right"
+          - "left"
+          - "down"
+          - "up"
+          - "nonusbackslash"
+          - "application"
+          - "execute"
+          - "help"
+          - "menu"
+          - "select"
+          - "stop"
+          - "again"
+          - "undo"
+          - "cut"
+          - "copy"
+          - "paste"
+          - "find"
+          - "kp/"
+          - "kp*"
+          - "kp-"
+          - "kp+"
+          - "kp="
+          - "kpenter"
+          - "kp1"
+          - "kp2"
+          - "kp3"
+          - "kp4"
+          - "kp5"
+          - "kp6"
+          - "kp7"
+          - "kp8"
+          - "kp9"
+          - "kp0"
+          - "kp."
+          - "international1"
+          - "international2"
+          - "international3"
+          - "international4"
+          - "international5"
+          - "international6"
+          - "international7"
+          - "international8"
+          - "international9"
+          - "lang1"
+          - "lang2"
+          - "lang3"
+          - "lang4"
+          - "lang5"
+          - "mute"
+          - "volumeup"
+          - "volumedown"
+          - "audionext"
+          - "audioprev"
+          - "audiostop"
+          - "audioplay"
+          - "audiomute"
+          - "mediaselect"
+          - "www"
+          - "mail"
+          - "calculator"
+          - "computer"
+          - "acsearch"
+          - "achome"
+          - "acback"
+          - "acforward"
+          - "acstop"
+          - "acrefresh"
+          - "acbookmarks"
+          - "power"
+          - "brightnessdown"
+          - "brightnessup"
+          - "displayswitch"
+          - "kbdillumtoggle"
+          - "kbdillumdown"
+          - "kbdillumup"
+          - "eject"
+          - "sleep"
+          - "alterase"
+          - "sysreq"
+          - "cancel"
+          - "clear"
+          - "prior"
+          - "return2"
+          - "separator"
+          - "out"
+          - "oper"
+          - "clearagain"
+          - "crsel"
+          - "exsel"
+          - "kp00"
+          - "kp000"
+          - "thsousandsseparator"
+          - "decimalseparator"
+          - "currencyunit"
+          - "currencysubunit"
+          - "app1"
+          - "app2"
+          - "unknown"
+  love.keyboard.getScancodeFromKey:
+    args:
+      - type:
+          - "a"
+          - "b"
+          - "c"
+          - "d"
+          - "e"
+          - "f"
+          - "g"
+          - "h"
+          - "i"
+          - "j"
+          - "k"
+          - "l"
+          - "m"
+          - "n"
+          - "o"
+          - "p"
+          - "q"
+          - "r"
+          - "s"
+          - "t"
+          - "u"
+          - "v"
+          - "w"
+          - "x"
+          - "y"
+          - "z"
+          - "0"
+          - "1"
+          - "2"
+          - "3"
+          - "4"
+          - "5"
+          - "6"
+          - "7"
+          - "8"
+          - "9"
+          - "space"
+          - "!"
+          - "\""
+          - "#"
+          - "$"
+          - "&"
+          - "'"
+          - "("
+          - ")"
+          - "*"
+          - "+"
+          - ","
+          - "-"
+          - "."
+          - "/"
+          - ":"
+          - ";"
+          - "<"
+          - "="
+          - ">"
+          - "?"
+          - "@"
+          - "["
+          - "\\"
+          - "]"
+          - "^"
+          - "_"
+          - "`"
+          - "kp0"
+          - "kp1"
+          - "kp2"
+          - "kp3"
+          - "kp4"
+          - "kp5"
+          - "kp6"
+          - "kp7"
+          - "kp8"
+          - "kp9"
+          - "kp."
+          - "kp/"
+          - "kp*"
+          - "kp-"
+          - "kp+"
+          - "kpenter"
+          - "kp="
+          - "up"
+          - "down"
+          - "right"
+          - "left"
+          - "home"
+          - "end"
+          - "pageup"
+          - "pagedown"
+          - "insert"
+          - "backspace"
+          - "tab"
+          - "clear"
+          - "return"
+          - "delete"
+          - "f1"
+          - "f2"
+          - "f3"
+          - "f4"
+          - "f5"
+          - "f6"
+          - "f7"
+          - "f8"
+          - "f9"
+          - "f10"
+          - "f11"
+          - "f12"
+          - "f13"
+          - "f14"
+          - "f15"
+          - "numlock"
+          - "capslock"
+          - "scrollock"
+          - "rshift"
+          - "lshift"
+          - "rctrl"
+          - "lctrl"
+          - "ralt"
+          - "lalt"
+          - "rmeta"
+          - "lmeta"
+          - "lsuper"
+          - "rsuper"
+          - "mode"
+          - "compose"
+          - "pause"
+          - "escape"
+          - "help"
+          - "print"
+          - "sysreq"
+          - "break"
+          - "menu"
+          - "power"
+          - "euro"
+          - "undo"
+          - "www"
+          - "mail"
+          - "calculator"
+          - "appsearch"
+          - "apphome"
+          - "appback"
+          - "appforward"
+          - "apprefresh"
+          - "appbookmarks"
+  love.keyboard.hasKeyRepeat:
+    args: []
+  love.keyboard.hasScreenKeyboard:
+    args: []
+  love.keyboard.hasTextInput:
+    args: []
+  love.keyboard.isDown:
+    args:
+      - type: any
+      - required: false
+        type: "..."
+  love.keyboard.isScancodeDown:
+    args:
+      - type:
+          - "a"
+          - "b"
+          - "c"
+          - "d"
+          - "e"
+          - "f"
+          - "g"
+          - "h"
+          - "i"
+          - "j"
+          - "k"
+          - "l"
+          - "m"
+          - "n"
+          - "o"
+          - "p"
+          - "q"
+          - "r"
+          - "s"
+          - "t"
+          - "u"
+          - "v"
+          - "w"
+          - "x"
+          - "y"
+          - "z"
+          - "1"
+          - "2"
+          - "3"
+          - "4"
+          - "5"
+          - "6"
+          - "7"
+          - "8"
+          - "9"
+          - "0"
+          - "return"
+          - "escape"
+          - "backspace"
+          - "tab"
+          - "space"
+          - "-"
+          - "="
+          - "["
+          - "]"
+          - "\\"
+          - "nonus#"
+          - ";"
+          - "'"
+          - "`"
+          - ","
+          - "."
+          - "/"
+          - "capslock"
+          - "f1"
+          - "f2"
+          - "f3"
+          - "f4"
+          - "f5"
+          - "f6"
+          - "f7"
+          - "f8"
+          - "f9"
+          - "f10"
+          - "f11"
+          - "f12"
+          - "f13"
+          - "f14"
+          - "f15"
+          - "f16"
+          - "f17"
+          - "f18"
+          - "f19"
+          - "f20"
+          - "f21"
+          - "f22"
+          - "f23"
+          - "f24"
+          - "lctrl"
+          - "lshift"
+          - "lalt"
+          - "lgui"
+          - "rctrl"
+          - "rshift"
+          - "ralt"
+          - "rgui"
+          - "printscreen"
+          - "scrolllock"
+          - "pause"
+          - "insert"
+          - "home"
+          - "numlock"
+          - "pageup"
+          - "delete"
+          - "end"
+          - "pagedown"
+          - "right"
+          - "left"
+          - "down"
+          - "up"
+          - "nonusbackslash"
+          - "application"
+          - "execute"
+          - "help"
+          - "menu"
+          - "select"
+          - "stop"
+          - "again"
+          - "undo"
+          - "cut"
+          - "copy"
+          - "paste"
+          - "find"
+          - "kp/"
+          - "kp*"
+          - "kp-"
+          - "kp+"
+          - "kp="
+          - "kpenter"
+          - "kp1"
+          - "kp2"
+          - "kp3"
+          - "kp4"
+          - "kp5"
+          - "kp6"
+          - "kp7"
+          - "kp8"
+          - "kp9"
+          - "kp0"
+          - "kp."
+          - "international1"
+          - "international2"
+          - "international3"
+          - "international4"
+          - "international5"
+          - "international6"
+          - "international7"
+          - "international8"
+          - "international9"
+          - "lang1"
+          - "lang2"
+          - "lang3"
+          - "lang4"
+          - "lang5"
+          - "mute"
+          - "volumeup"
+          - "volumedown"
+          - "audionext"
+          - "audioprev"
+          - "audiostop"
+          - "audioplay"
+          - "audiomute"
+          - "mediaselect"
+          - "www"
+          - "mail"
+          - "calculator"
+          - "computer"
+          - "acsearch"
+          - "achome"
+          - "acback"
+          - "acforward"
+          - "acstop"
+          - "acrefresh"
+          - "acbookmarks"
+          - "power"
+          - "brightnessdown"
+          - "brightnessup"
+          - "displayswitch"
+          - "kbdillumtoggle"
+          - "kbdillumdown"
+          - "kbdillumup"
+          - "eject"
+          - "sleep"
+          - "alterase"
+          - "sysreq"
+          - "cancel"
+          - "clear"
+          - "prior"
+          - "return2"
+          - "separator"
+          - "out"
+          - "oper"
+          - "clearagain"
+          - "crsel"
+          - "exsel"
+          - "kp00"
+          - "kp000"
+          - "thsousandsseparator"
+          - "decimalseparator"
+          - "currencyunit"
+          - "currencysubunit"
+          - "app1"
+          - "app2"
+          - "unknown"
+      - required: false
+        type: "..."
+  love.keyboard.setKeyRepeat:
+    args:
+      - type: bool
+  love.keyboard.setTextInput:
+    args:
+      - type: bool
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.keypressed:
+    args:
+      - type:
+          - "a"
+          - "b"
+          - "c"
+          - "d"
+          - "e"
+          - "f"
+          - "g"
+          - "h"
+          - "i"
+          - "j"
+          - "k"
+          - "l"
+          - "m"
+          - "n"
+          - "o"
+          - "p"
+          - "q"
+          - "r"
+          - "s"
+          - "t"
+          - "u"
+          - "v"
+          - "w"
+          - "x"
+          - "y"
+          - "z"
+          - "0"
+          - "1"
+          - "2"
+          - "3"
+          - "4"
+          - "5"
+          - "6"
+          - "7"
+          - "8"
+          - "9"
+          - "space"
+          - "!"
+          - "\""
+          - "#"
+          - "$"
+          - "&"
+          - "'"
+          - "("
+          - ")"
+          - "*"
+          - "+"
+          - ","
+          - "-"
+          - "."
+          - "/"
+          - ":"
+          - ";"
+          - "<"
+          - "="
+          - ">"
+          - "?"
+          - "@"
+          - "["
+          - "\\"
+          - "]"
+          - "^"
+          - "_"
+          - "`"
+          - "kp0"
+          - "kp1"
+          - "kp2"
+          - "kp3"
+          - "kp4"
+          - "kp5"
+          - "kp6"
+          - "kp7"
+          - "kp8"
+          - "kp9"
+          - "kp."
+          - "kp/"
+          - "kp*"
+          - "kp-"
+          - "kp+"
+          - "kpenter"
+          - "kp="
+          - "up"
+          - "down"
+          - "right"
+          - "left"
+          - "home"
+          - "end"
+          - "pageup"
+          - "pagedown"
+          - "insert"
+          - "backspace"
+          - "tab"
+          - "clear"
+          - "return"
+          - "delete"
+          - "f1"
+          - "f2"
+          - "f3"
+          - "f4"
+          - "f5"
+          - "f6"
+          - "f7"
+          - "f8"
+          - "f9"
+          - "f10"
+          - "f11"
+          - "f12"
+          - "f13"
+          - "f14"
+          - "f15"
+          - "numlock"
+          - "capslock"
+          - "scrollock"
+          - "rshift"
+          - "lshift"
+          - "rctrl"
+          - "lctrl"
+          - "ralt"
+          - "lalt"
+          - "rmeta"
+          - "lmeta"
+          - "lsuper"
+          - "rsuper"
+          - "mode"
+          - "compose"
+          - "pause"
+          - "escape"
+          - "help"
+          - "print"
+          - "sysreq"
+          - "break"
+          - "menu"
+          - "power"
+          - "euro"
+          - "undo"
+          - "www"
+          - "mail"
+          - "calculator"
+          - "appsearch"
+          - "apphome"
+          - "appback"
+          - "appforward"
+          - "apprefresh"
+          - "appbookmarks"
+      - type: any
+      - required: false
+        type: bool
+  love.keyreleased:
+    args:
+      - type:
+          - "a"
+          - "b"
+          - "c"
+          - "d"
+          - "e"
+          - "f"
+          - "g"
+          - "h"
+          - "i"
+          - "j"
+          - "k"
+          - "l"
+          - "m"
+          - "n"
+          - "o"
+          - "p"
+          - "q"
+          - "r"
+          - "s"
+          - "t"
+          - "u"
+          - "v"
+          - "w"
+          - "x"
+          - "y"
+          - "z"
+          - "0"
+          - "1"
+          - "2"
+          - "3"
+          - "4"
+          - "5"
+          - "6"
+          - "7"
+          - "8"
+          - "9"
+          - "space"
+          - "!"
+          - "\""
+          - "#"
+          - "$"
+          - "&"
+          - "'"
+          - "("
+          - ")"
+          - "*"
+          - "+"
+          - ","
+          - "-"
+          - "."
+          - "/"
+          - ":"
+          - ";"
+          - "<"
+          - "="
+          - ">"
+          - "?"
+          - "@"
+          - "["
+          - "\\"
+          - "]"
+          - "^"
+          - "_"
+          - "`"
+          - "kp0"
+          - "kp1"
+          - "kp2"
+          - "kp3"
+          - "kp4"
+          - "kp5"
+          - "kp6"
+          - "kp7"
+          - "kp8"
+          - "kp9"
+          - "kp."
+          - "kp/"
+          - "kp*"
+          - "kp-"
+          - "kp+"
+          - "kpenter"
+          - "kp="
+          - "up"
+          - "down"
+          - "right"
+          - "left"
+          - "home"
+          - "end"
+          - "pageup"
+          - "pagedown"
+          - "insert"
+          - "backspace"
+          - "tab"
+          - "clear"
+          - "return"
+          - "delete"
+          - "f1"
+          - "f2"
+          - "f3"
+          - "f4"
+          - "f5"
+          - "f6"
+          - "f7"
+          - "f8"
+          - "f9"
+          - "f10"
+          - "f11"
+          - "f12"
+          - "f13"
+          - "f14"
+          - "f15"
+          - "numlock"
+          - "capslock"
+          - "scrollock"
+          - "rshift"
+          - "lshift"
+          - "rctrl"
+          - "lctrl"
+          - "ralt"
+          - "lalt"
+          - "rmeta"
+          - "lmeta"
+          - "lsuper"
+          - "rsuper"
+          - "mode"
+          - "compose"
+          - "pause"
+          - "escape"
+          - "help"
+          - "print"
+          - "sysreq"
+          - "break"
+          - "menu"
+          - "power"
+          - "euro"
+          - "undo"
+          - "www"
+          - "mail"
+          - "calculator"
+          - "appsearch"
+          - "apphome"
+          - "appback"
+          - "appforward"
+          - "apprefresh"
+          - "appbookmarks"
+      - type:
+          - "a"
+          - "b"
+          - "c"
+          - "d"
+          - "e"
+          - "f"
+          - "g"
+          - "h"
+          - "i"
+          - "j"
+          - "k"
+          - "l"
+          - "m"
+          - "n"
+          - "o"
+          - "p"
+          - "q"
+          - "r"
+          - "s"
+          - "t"
+          - "u"
+          - "v"
+          - "w"
+          - "x"
+          - "y"
+          - "z"
+          - "1"
+          - "2"
+          - "3"
+          - "4"
+          - "5"
+          - "6"
+          - "7"
+          - "8"
+          - "9"
+          - "0"
+          - "return"
+          - "escape"
+          - "backspace"
+          - "tab"
+          - "space"
+          - "-"
+          - "="
+          - "["
+          - "]"
+          - "\\"
+          - "nonus#"
+          - ";"
+          - "'"
+          - "`"
+          - ","
+          - "."
+          - "/"
+          - "capslock"
+          - "f1"
+          - "f2"
+          - "f3"
+          - "f4"
+          - "f5"
+          - "f6"
+          - "f7"
+          - "f8"
+          - "f9"
+          - "f10"
+          - "f11"
+          - "f12"
+          - "f13"
+          - "f14"
+          - "f15"
+          - "f16"
+          - "f17"
+          - "f18"
+          - "f19"
+          - "f20"
+          - "f21"
+          - "f22"
+          - "f23"
+          - "f24"
+          - "lctrl"
+          - "lshift"
+          - "lalt"
+          - "lgui"
+          - "rctrl"
+          - "rshift"
+          - "ralt"
+          - "rgui"
+          - "printscreen"
+          - "scrolllock"
+          - "pause"
+          - "insert"
+          - "home"
+          - "numlock"
+          - "pageup"
+          - "delete"
+          - "end"
+          - "pagedown"
+          - "right"
+          - "left"
+          - "down"
+          - "up"
+          - "nonusbackslash"
+          - "application"
+          - "execute"
+          - "help"
+          - "menu"
+          - "select"
+          - "stop"
+          - "again"
+          - "undo"
+          - "cut"
+          - "copy"
+          - "paste"
+          - "find"
+          - "kp/"
+          - "kp*"
+          - "kp-"
+          - "kp+"
+          - "kp="
+          - "kpenter"
+          - "kp1"
+          - "kp2"
+          - "kp3"
+          - "kp4"
+          - "kp5"
+          - "kp6"
+          - "kp7"
+          - "kp8"
+          - "kp9"
+          - "kp0"
+          - "kp."
+          - "international1"
+          - "international2"
+          - "international3"
+          - "international4"
+          - "international5"
+          - "international6"
+          - "international7"
+          - "international8"
+          - "international9"
+          - "lang1"
+          - "lang2"
+          - "lang3"
+          - "lang4"
+          - "lang5"
+          - "mute"
+          - "volumeup"
+          - "volumedown"
+          - "audionext"
+          - "audioprev"
+          - "audiostop"
+          - "audioplay"
+          - "audiomute"
+          - "mediaselect"
+          - "www"
+          - "mail"
+          - "calculator"
+          - "computer"
+          - "acsearch"
+          - "achome"
+          - "acback"
+          - "acforward"
+          - "acstop"
+          - "acrefresh"
+          - "acbookmarks"
+          - "power"
+          - "brightnessdown"
+          - "brightnessup"
+          - "displayswitch"
+          - "kbdillumtoggle"
+          - "kbdillumdown"
+          - "kbdillumup"
+          - "eject"
+          - "sleep"
+          - "alterase"
+          - "sysreq"
+          - "cancel"
+          - "clear"
+          - "prior"
+          - "return2"
+          - "separator"
+          - "out"
+          - "oper"
+          - "clearagain"
+          - "crsel"
+          - "exsel"
+          - "kp00"
+          - "kp000"
+          - "thsousandsseparator"
+          - "decimalseparator"
+          - "currencyunit"
+          - "currencysubunit"
+          - "app1"
+          - "app2"
+          - "unknown"
+  love.load:
+    args:
+      - type: table
+      - type: table
+  love.lowmemory:
+    args: []
+  love.math.colorFromBytes:
+    args:
+      - type: number
+      - type: number
+      - type: number
+      - required: false
+        type: number
+  love.math.colorToBytes:
+    args:
+      - type: number
+      - type: number
+      - type: number
+      - required: false
+        type: number
+  love.math.gammaToLinear:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.math.getRandomSeed:
+    args: []
+  love.math.getRandomState:
+    args: []
+  love.math.isConvex:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: "..."
+  love.math.linearToGamma:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.math.newBezierCurve:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: "..."
+    must_use: true
+  love.math.newRandomGenerator:
+    args:
+      - required: false
+        type: number
+      - required: false
+        type: number
+    must_use: true
+  love.math.newTransform:
+    args:
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+    must_use: true
+  love.math.noise:
+    args:
+      - type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.math.random:
+    args:
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.math.randomNormal:
+    args:
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.math.setRandomSeed:
+    args:
+      - type: number
+      - required: false
+        type: number
+  love.math.setRandomState:
+    args:
+      - type: string
+  love.math.triangulate:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+  love.mouse.getCursor:
+    args: []
+  love.mouse.getPosition:
+    args: []
+  love.mouse.getRelativeMode:
+    args: []
+  love.mouse.getSystemCursor:
+    args:
+      - type:
+          - "image"
+          - "arrow"
+          - "ibeam"
+          - "wait"
+          - "waitarrow"
+          - "crosshair"
+          - "sizenwse"
+          - "sizenesw"
+          - "sizewe"
+          - "sizens"
+          - "sizeall"
+          - "no"
+          - "hand"
+  love.mouse.getX:
+    args: []
+  love.mouse.getY:
+    args: []
+  love.mouse.isCursorSupported:
+    args: []
+  love.mouse.isDown:
+    args:
+      - type: number
+      - required: false
+        type: "..."
+  love.mouse.isGrabbed:
+    args: []
+  love.mouse.isVisible:
+    args: []
+  love.mouse.newCursor:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+    must_use: true
+  love.mouse.setCursor:
+    args:
+      - required: false
+        type:
+          display: Cursor
+  love.mouse.setGrabbed:
+    args:
+      - type: bool
+  love.mouse.setPosition:
+    args:
+      - type: number
+      - type: number
+  love.mouse.setRelativeMode:
+    args:
+      - type: bool
+  love.mouse.setVisible:
+    args:
+      - type: bool
+  love.mouse.setX:
+    args:
+      - type: number
+  love.mouse.setY:
+    args:
+      - type: number
+  love.mousefocus:
+    args:
+      - type: bool
+  love.mousemoved:
+    args:
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - type: bool
+  love.mousepressed:
+    args:
+      - type: number
+      - type: number
+      - type: number
+      - type: bool
+      - type: number
+  love.mousereleased:
+    args:
+      - type: number
+      - type: number
+      - type: number
+      - type: bool
+      - type: number
+  love.physics.getDistance:
+    args:
+      - type:
+          display: Fixture
+      - type:
+          display: Fixture
+  love.physics.getMeter:
+    args: []
+  love.physics.newBody:
+    args:
+      - type:
+          display: World
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type:
+          - "static"
+          - "dynamic"
+          - "kinematic"
+    must_use: true
+  love.physics.newChainShape:
+    args:
+      - type: bool
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: "..."
+    must_use: true
+  love.physics.newCircleShape:
+    args:
+      - type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+    must_use: true
+  love.physics.newDistanceJoint:
+    args:
+      - type:
+          display: Body
+      - type:
+          display: Body
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - required: false
+        type: bool
+    must_use: true
+  love.physics.newEdgeShape:
+    args:
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+    must_use: true
+  love.physics.newFixture:
+    args:
+      - type:
+          display: Body
+      - type:
+          display: Shape
+      - required: false
+        type: number
+    must_use: true
+  love.physics.newFrictionJoint:
+    args:
+      - type:
+          display: Body
+      - type:
+          display: Body
+      - type: number
+      - type: number
+      - required: false
+        type: any
+      - required: false
+        type: number
+      - required: false
+        type: bool
+    must_use: true
+  love.physics.newGearJoint:
+    args:
+      - type:
+          display: Joint
+      - type:
+          display: Joint
+      - required: false
+        type: number
+      - required: false
+        type: bool
+    must_use: true
+  love.physics.newMotorJoint:
+    args:
+      - type:
+          display: Body
+      - type:
+          display: Body
+      - required: false
+        type: number
+      - required: false
+        type: bool
+    must_use: true
+  love.physics.newMouseJoint:
+    args:
+      - type:
+          display: Body
+      - type: number
+      - type: number
+    must_use: true
+  love.physics.newPolygonShape:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: "..."
+    must_use: true
+  love.physics.newPrismaticJoint:
+    args:
+      - type:
+          display: Body
+      - type:
+          display: Body
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - required: false
+        type: any
+      - required: false
+        type: number
+      - required: false
+        type: bool
+      - required: false
+        type: number
+    must_use: true
+  love.physics.newPulleyJoint:
+    args:
+      - type:
+          display: Body
+      - type:
+          display: Body
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - required: false
+        type: number
+      - required: false
+        type: bool
+    must_use: true
+  love.physics.newRectangleShape:
+    args:
+      - type: number
+      - type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+    must_use: true
+  love.physics.newRevoluteJoint:
+    args:
+      - type:
+          display: Body
+      - type:
+          display: Body
+      - type: number
+      - type: number
+      - required: false
+        type: any
+      - required: false
+        type: number
+      - required: false
+        type: bool
+      - required: false
+        type: number
+    must_use: true
+  love.physics.newRopeJoint:
+    args:
+      - type:
+          display: Body
+      - type:
+          display: Body
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - required: false
+        type: bool
+    must_use: true
+  love.physics.newWeldJoint:
+    args:
+      - type:
+          display: Body
+      - type:
+          display: Body
+      - type: number
+      - type: number
+      - required: false
+        type: any
+      - required: false
+        type: number
+      - required: false
+        type: bool
+      - required: false
+        type: number
+    must_use: true
+  love.physics.newWheelJoint:
+    args:
+      - type:
+          display: Body
+      - type:
+          display: Body
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - required: false
+        type: any
+      - required: false
+        type: number
+      - required: false
+        type: bool
+    must_use: true
+  love.physics.newWorld:
+    args:
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: bool
+    must_use: true
+  love.physics.setMeter:
+    args:
+      - type: number
+  love.quit:
+    args: []
+  love.resize:
+    args:
+      - type: number
+      - type: number
+  love.run:
+    args: []
+  love.setDeprecationOutput:
+    args:
+      - type: bool
+  love.sound.newDecoder:
+    args:
+      - type: any
+      - required: false
+        type: number
+    must_use: true
+  love.sound.newSoundData:
+    args:
+      - type: any
+      - required: false
+        type: number
+      - required: false
+        type: number
+      - required: false
+        type: number
+    must_use: true
+  love.system.getClipboardText:
+    args: []
+  love.system.getOS:
+    args: []
+  love.system.getPowerInfo:
+    args: []
+  love.system.getProcessorCount:
+    args: []
+  love.system.hasBackgroundMusic:
+    args: []
+  love.system.openURL:
+    args:
+      - type: string
+  love.system.setClipboardText:
+    args:
+      - type: string
+  love.system.vibrate:
+    args:
+      - required: false
+        type: number
+  love.textedited:
+    args:
+      - type: string
+      - type: number
+      - type: number
+  love.textinput:
+    args:
+      - type: string
+  love.thread.getChannel:
+    args:
+      - type: string
+  love.thread.newChannel:
+    args: []
+    must_use: true
+  love.thread.newThread:
+    args:
+      - type: any
+    must_use: true
+  love.threaderror:
+    args:
+      - type:
+          display: Thread
+      - type: string
+  love.timer.getAverageDelta:
+    args: []
+  love.timer.getDelta:
+    args: []
+  love.timer.getFPS:
+    args: []
+  love.timer.getTime:
+    args: []
+  love.timer.sleep:
+    args:
+      - type: number
+  love.timer.step:
+    args: []
+  love.touch.getPosition:
+    args:
+      - type: any
+  love.touch.getPressure:
+    args:
+      - type: any
+  love.touch.getTouches:
+    args: []
+  love.touchmoved:
+    args:
+      - type: any
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+  love.touchpressed:
+    args:
+      - type: any
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+  love.touchreleased:
+    args:
+      - type: any
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+      - type: number
+  love.update:
+    args:
+      - type: number
+  love.video.newVideoStream:
+    args:
+      - type: any
+    must_use: true
+  love.visible:
+    args:
+      - type: bool
+  love.wheelmoved:
+    args:
+      - type: number
+      - type: number
+  love.window.close:
+    args: []
+  love.window.fromPixels:
+    args:
+      - type: number
+      - required: false
+        type: number
+  love.window.getDPIScale:
+    args: []
+  love.window.getDesktopDimensions:
+    args:
+      - required: false
+        type: number
+  love.window.getDisplayCount:
+    args: []
+  love.window.getDisplayName:
+    args:
+      - required: false
+        type: number
+  love.window.getDisplayOrientation:
+    args:
+      - required: false
+        type: number
+  love.window.getFullscreen:
+    args: []
+  love.window.getFullscreenModes:
+    args:
+      - required: false
+        type: number
+  love.window.getIcon:
+    args: []
+  love.window.getMode:
+    args: []
+  love.window.getPosition:
+    args: []
+  love.window.getSafeArea:
+    args: []
+  love.window.getTitle:
+    args: []
+  love.window.getVSync:
+    args: []
+  love.window.hasFocus:
+    args: []
+  love.window.hasMouseFocus:
+    args: []
+  love.window.isDisplaySleepEnabled:
+    args: []
+  love.window.isMaximized:
+    args: []
+  love.window.isMinimized:
+    args: []
+  love.window.isOpen:
+    args: []
+  love.window.isVisible:
+    args: []
+  love.window.maximize:
+    args: []
+  love.window.minimize:
+    args: []
+  love.window.requestAttention:
+    args:
+      - required: false
+        type: bool
+  love.window.restore:
+    args: []
+  love.window.setDisplaySleepEnabled:
+    args:
+      - type: bool
+  love.window.setFullscreen:
+    args:
+      - type: bool
+      - required: false
+        type:
+          - "desktop"
+          - "exclusive"
+          - "normal"
+  love.window.setIcon:
+    args:
+      - type:
+          display: ImageData
+  love.window.setMode:
+    args:
+      - type: number
+      - type: number
+      - type: table
+  love.window.setPosition:
+    args:
+      - type: number
+      - type: number
+      - required: false
+        type: number
+  love.window.setTitle:
+    args:
+      - type: string
+  love.window.setVSync:
+    args:
+      - type: number
+  love.window.showMessageBox:
+    args:
+      - type: string
+      - type: string
+      - required: false
+        type: any
+      - required: false
+        type: any
+      - required: false
+        type: bool
+  love.window.toPixels:
+    args:
+      - type: number
+      - required: false
+        type: number
+  love.window.updateMode:
+    args:
+      - type: number
+      - type: number
+      - type: table
+structs:
+  BezierCurve:
+    evaluate:
+      args:
+        - type: number
+      method: true
+    getControlPoint:
+      args:
+        - type: number
+      method: true
+    getControlPointCount:
+      args: []
+      method: true
+    getDegree:
+      args: []
+      method: true
+    getDerivative:
+      args: []
+      method: true
+    getSegment:
+      args:
+        - type: number
+        - type: number
+      method: true
+    insertControlPoint:
+      args:
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    release:
+      args: []
+      method: true
+    removeControlPoint:
+      args:
+        - type: number
+      method: true
+    render:
+      args:
+        - required: false
+          type: number
+      method: true
+    renderSegment:
+      args:
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    rotate:
+      args:
+        - type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    scale:
+      args:
+        - type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    setControlPoint:
+      args:
+        - type: number
+        - type: number
+        - type: number
+      method: true
+    translate:
+      args:
+        - type: number
+        - type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Body:
+    applyAngularImpulse:
+      args:
+        - type: number
+      method: true
+    applyForce:
+      args:
+        - type: number
+        - type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    applyLinearImpulse:
+      args:
+        - type: number
+        - type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    applyTorque:
+      args:
+        - type: number
+      method: true
+    destroy:
+      args: []
+      method: true
+    getAngle:
+      args: []
+      method: true
+    getAngularDamping:
+      args: []
+      method: true
+    getAngularVelocity:
+      args: []
+      method: true
+    getContacts:
+      args: []
+      method: true
+    getFixtures:
+      args: []
+      method: true
+    getGravityScale:
+      args: []
+      method: true
+    getInertia:
+      args: []
+      method: true
+    getJoints:
+      args: []
+      method: true
+    getLinearDamping:
+      args: []
+      method: true
+    getLinearVelocity:
+      args: []
+      method: true
+    getLinearVelocityFromLocalPoint:
+      args:
+        - type: number
+        - type: number
+      method: true
+    getLinearVelocityFromWorldPoint:
+      args:
+        - type: number
+        - type: number
+      method: true
+    getLocalCenter:
+      args: []
+      method: true
+    getLocalPoint:
+      args:
+        - type: number
+        - type: number
+      method: true
+    getLocalPoints:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - required: false
+          type: "..."
+      method: true
+    getLocalVector:
+      args:
+        - type: number
+        - type: number
+      method: true
+    getMass:
+      args: []
+      method: true
+    getMassData:
+      args: []
+      method: true
+    getPosition:
+      args: []
+      method: true
+    getTransform:
+      args: []
+      method: true
+    getType:
+      args: []
+      method: true
+    getUserData:
+      args: []
+      method: true
+    getWorld:
+      args: []
+      method: true
+    getWorldCenter:
+      args: []
+      method: true
+    getWorldPoint:
+      args:
+        - type: number
+        - type: number
+      method: true
+    getWorldPoints:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+      method: true
+    getWorldVector:
+      args:
+        - type: number
+        - type: number
+      method: true
+    getX:
+      args: []
+      method: true
+    getY:
+      args: []
+      method: true
+    isActive:
+      args: []
+      method: true
+    isAwake:
+      args: []
+      method: true
+    isBullet:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    isFixedRotation:
+      args: []
+      method: true
+    isSleepingAllowed:
+      args: []
+      method: true
+    isTouching:
+      args:
+        - type:
+            display: Body
+      method: true
+    release:
+      args: []
+      method: true
+    resetMassData:
+      args: []
+      method: true
+    setActive:
+      args:
+        - type: bool
+      method: true
+    setAngle:
+      args:
+        - type: number
+      method: true
+    setAngularDamping:
+      args:
+        - type: number
+      method: true
+    setAngularVelocity:
+      args:
+        - type: number
+      method: true
+    setAwake:
+      args:
+        - type: bool
+      method: true
+    setBullet:
+      args:
+        - type: bool
+      method: true
+    setFixedRotation:
+      args:
+        - type: bool
+      method: true
+    setGravityScale:
+      args:
+        - type: number
+      method: true
+    setInertia:
+      args:
+        - type: number
+      method: true
+    setLinearDamping:
+      args:
+        - type: number
+      method: true
+    setLinearVelocity:
+      args:
+        - type: number
+        - type: number
+      method: true
+    setMass:
+      args:
+        - type: number
+      method: true
+    setMassData:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+      method: true
+    setPosition:
+      args:
+        - type: number
+        - type: number
+      method: true
+    setSleepingAllowed:
+      args:
+        - type: bool
+      method: true
+    setTransform:
+      args:
+        - type: number
+        - type: number
+        - type: number
+      method: true
+    setType:
+      args:
+        - type:
+            - "static"
+            - "dynamic"
+            - "kinematic"
+      method: true
+    setUserData:
+      args:
+        - type: any
+      method: true
+    setX:
+      args:
+        - type: number
+      method: true
+    setY:
+      args:
+        - type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  ByteData:
+    clone:
+      args: []
+      method: true
+    getFFIPointer:
+      args: []
+      method: true
+    getPointer:
+      args: []
+      method: true
+    getSize:
+      args: []
+      method: true
+    getString:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Canvas:
+    generateMipmaps:
+      args: []
+      method: true
+    getDepth:
+      args: []
+      method: true
+    getDepthSampleMode:
+      args: []
+      method: true
+    getDimensions:
+      args: []
+      method: true
+    getDPIScale:
+      args: []
+      method: true
+    getFilter:
+      args: []
+      method: true
+    getFormat:
+      args: []
+      method: true
+    getHeight:
+      args: []
+      method: true
+    getLayerCount:
+      args: []
+      method: true
+    getMipmapCount:
+      args: []
+      method: true
+    getMipmapFilter:
+      args: []
+      method: true
+    getMipmapMode:
+      args: []
+      method: true
+    getMSAA:
+      args: []
+      method: true
+    getPixelDimensions:
+      args: []
+      method: true
+    getPixelHeight:
+      args: []
+      method: true
+    getPixelWidth:
+      args: []
+      method: true
+    getTextureType:
+      args: []
+      method: true
+    getWidth:
+      args: []
+      method: true
+    getWrap:
+      args: []
+      method: true
+    isReadable:
+      args: []
+      method: true
+    newImageData:
+      args:
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+      must_use: true
+    release:
+      args: []
+      method: true
+    renderTo:
+      args:
+        - type: function
+        - required: false
+          type: "..."
+      method: true
+    setDepthSampleMode:
+      args:
+        - type:
+            - "equal"
+            - "notequal"
+            - "less"
+            - "lequal"
+            - "gequal"
+            - "greater"
+            - "never"
+            - "always"
+      method: true
+    setFilter:
+      args:
+        - type:
+            - "linear"
+            - "nearest"
+        - required: false
+          type:
+            - "linear"
+            - "nearest"
+        - required: false
+          type: number
+      method: true
+    setMipmapFilter:
+      args:
+        - required: false
+          type:
+            - "linear"
+            - "nearest"
+        - required: false
+          type: number
+      method: true
+    setWrap:
+      args:
+        - type:
+            - "clamp"
+            - "repeat"
+            - "mirroredrepeat"
+            - "clampzero"
+        - required: false
+          type:
+            - "clamp"
+            - "repeat"
+            - "mirroredrepeat"
+            - "clampzero"
+        - required: false
+          type:
+            - "clamp"
+            - "repeat"
+            - "mirroredrepeat"
+            - "clampzero"
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  ChainShape:
+    computeAABB:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    computeMass:
+      args:
+        - type: number
+      method: true
+    getChildCount:
+      args: []
+      method: true
+    getChildEdge:
+      args:
+        - type: number
+      method: true
+    getNextVertex:
+      args: []
+      method: true
+    getPoint:
+      args:
+        - type: number
+      method: true
+    getPoints:
+      args: []
+      method: true
+    getPreviousVertex:
+      args: []
+      method: true
+    getRadius:
+      args: []
+      method: true
+    getType:
+      args: []
+      method: true
+    getVertexCount:
+      args: []
+      method: true
+    rayCast:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    release:
+      args: []
+      method: true
+    setNextVertex:
+      args:
+        - type: number
+        - type: number
+      method: true
+    setPreviousVertex:
+      args:
+        - type: number
+        - type: number
+      method: true
+    testPoint:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Channel:
+    clear:
+      args: []
+      method: true
+    demand:
+      args:
+        - required: false
+          type: number
+      method: true
+    getCount:
+      args: []
+      method: true
+    hasRead:
+      args:
+        - type: number
+      method: true
+    peek:
+      args: []
+      method: true
+    performAtomic:
+      args:
+        - type: function
+        - required: false
+          type: "..."
+      method: true
+    pop:
+      args: []
+      method: true
+    push:
+      args:
+        - type: any
+      method: true
+    release:
+      args: []
+      method: true
+    supply:
+      args:
+        - type: any
+        - required: false
+          type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  CircleShape:
+    computeAABB:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    computeMass:
+      args:
+        - type: number
+      method: true
+    getChildCount:
+      args: []
+      method: true
+    getPoint:
+      args: []
+      method: true
+    getRadius:
+      args: []
+      method: true
+    getType:
+      args: []
+      method: true
+    rayCast:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    release:
+      args: []
+      method: true
+    setPoint:
+      args:
+        - type: number
+        - type: number
+      method: true
+    setRadius:
+      args:
+        - type: number
+      method: true
+    testPoint:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  CompressedData:
+    clone:
+      args: []
+      method: true
+    getFFIPointer:
+      args: []
+      method: true
+    getFormat:
+      args: []
+      method: true
+    getPointer:
+      args: []
+      method: true
+    getSize:
+      args: []
+      method: true
+    getString:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  CompressedImageData:
+    clone:
+      args: []
+      method: true
+    getDimensions:
+      args:
+        - required: false
+          type: number
+      method: true
+    getFFIPointer:
+      args: []
+      method: true
+    getFormat:
+      args: []
+      method: true
+    getHeight:
+      args:
+        - required: false
+          type: number
+      method: true
+    getMipmapCount:
+      args: []
+      method: true
+    getPointer:
+      args: []
+      method: true
+    getSize:
+      args: []
+      method: true
+    getString:
+      args: []
+      method: true
+    getWidth:
+      args:
+        - required: false
+          type: number
+      method: true
+    release:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Contact:
+    getChildren:
+      args: []
+      method: true
+    getFixtures:
+      args: []
+      method: true
+    getFriction:
+      args: []
+      method: true
+    getNormal:
+      args: []
+      method: true
+    getPositions:
+      args: []
+      method: true
+    getRestitution:
+      args: []
+      method: true
+    isEnabled:
+      args: []
+      method: true
+    isTouching:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    resetFriction:
+      args: []
+      method: true
+    resetRestitution:
+      args: []
+      method: true
+    setEnabled:
+      args:
+        - type: bool
+      method: true
+    setFriction:
+      args:
+        - type: number
+      method: true
+    setRestitution:
+      args:
+        - type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Cursor:
+    getType:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Data:
+    clone:
+      args: []
+      method: true
+    getFFIPointer:
+      args: []
+      method: true
+    getPointer:
+      args: []
+      method: true
+    getSize:
+      args: []
+      method: true
+    getString:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Decoder:
+    clone:
+      args: []
+      method: true
+    decode:
+      args: []
+      method: true
+    getBitDepth:
+      args: []
+      method: true
+    getChannelCount:
+      args: []
+      method: true
+    getDuration:
+      args: []
+      method: true
+    getSampleRate:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    seek:
+      args:
+        - type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  DistanceJoint:
+    destroy:
+      args: []
+      method: true
+    getAnchors:
+      args: []
+      method: true
+    getBodies:
+      args: []
+      method: true
+    getCollideConnected:
+      args: []
+      method: true
+    getDampingRatio:
+      args: []
+      method: true
+    getFrequency:
+      args: []
+      method: true
+    getLength:
+      args: []
+      method: true
+    getReactionForce:
+      args:
+        - type: number
+      method: true
+    getReactionTorque:
+      args:
+        - type: number
+      method: true
+    getType:
+      args: []
+      method: true
+    getUserData:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setDampingRatio:
+      args:
+        - type: number
+      method: true
+    setFrequency:
+      args:
+        - type: number
+      method: true
+    setLength:
+      args:
+        - type: number
+      method: true
+    setUserData:
+      args:
+        - type: any
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Drawable:
+    release:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  DroppedFile:
+    close:
+      args: []
+      method: true
+    flush:
+      args: []
+      method: true
+    getBuffer:
+      args: []
+      method: true
+    getFilename:
+      args: []
+      method: true
+    getMode:
+      args: []
+      method: true
+    getSize:
+      args: []
+      method: true
+    isEOF:
+      args: []
+      method: true
+    isOpen:
+      args: []
+      method: true
+    lines:
+      args: []
+      method: true
+    open:
+      args:
+        - type:
+            - "r"
+            - "w"
+            - "a"
+            - "c"
+      method: true
+    read:
+      args:
+        - required: false
+          type: any
+        - required: false
+          type: number
+      method: true
+    release:
+      args: []
+      method: true
+    seek:
+      args:
+        - type: number
+      method: true
+    setBuffer:
+      args:
+        - type:
+            - "none"
+            - "line"
+            - "full"
+        - required: false
+          type: number
+      method: true
+    tell:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+    write:
+      args:
+        - type: any
+        - required: false
+          type: number
+      method: true
+  EdgeShape:
+    computeAABB:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    computeMass:
+      args:
+        - type: number
+      method: true
+    getChildCount:
+      args: []
+      method: true
+    getNextVertex:
+      args: []
+      method: true
+    getPoints:
+      args: []
+      method: true
+    getPreviousVertex:
+      args: []
+      method: true
+    getRadius:
+      args: []
+      method: true
+    getType:
+      args: []
+      method: true
+    rayCast:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    release:
+      args: []
+      method: true
+    setNextVertex:
+      args:
+        - type: number
+        - type: number
+      method: true
+    setPreviousVertex:
+      args:
+        - type: number
+        - type: number
+      method: true
+    testPoint:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  File:
+    close:
+      args: []
+      method: true
+    flush:
+      args: []
+      method: true
+    getBuffer:
+      args: []
+      method: true
+    getFilename:
+      args: []
+      method: true
+    getMode:
+      args: []
+      method: true
+    getSize:
+      args: []
+      method: true
+    isEOF:
+      args: []
+      method: true
+    isOpen:
+      args: []
+      method: true
+    lines:
+      args: []
+      method: true
+    open:
+      args:
+        - type:
+            - "r"
+            - "w"
+            - "a"
+            - "c"
+      method: true
+    read:
+      args:
+        - required: false
+          type: any
+        - required: false
+          type: number
+      method: true
+    release:
+      args: []
+      method: true
+    seek:
+      args:
+        - type: number
+      method: true
+    setBuffer:
+      args:
+        - type:
+            - "none"
+            - "line"
+            - "full"
+        - required: false
+          type: number
+      method: true
+    tell:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+    write:
+      args:
+        - type: any
+        - required: false
+          type: number
+      method: true
+  FileData:
+    clone:
+      args: []
+      method: true
+    getExtension:
+      args: []
+      method: true
+    getFFIPointer:
+      args: []
+      method: true
+    getFilename:
+      args: []
+      method: true
+    getPointer:
+      args: []
+      method: true
+    getSize:
+      args: []
+      method: true
+    getString:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Fixture:
+    destroy:
+      args: []
+      method: true
+    getBody:
+      args: []
+      method: true
+    getBoundingBox:
+      args:
+        - required: false
+          type: number
+      method: true
+    getCategory:
+      args: []
+      method: true
+    getDensity:
+      args: []
+      method: true
+    getFilterData:
+      args: []
+      method: true
+    getFriction:
+      args: []
+      method: true
+    getGroupIndex:
+      args: []
+      method: true
+    getMask:
+      args: []
+      method: true
+    getMassData:
+      args: []
+      method: true
+    getRestitution:
+      args: []
+      method: true
+    getShape:
+      args: []
+      method: true
+    getUserData:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    isSensor:
+      args: []
+      method: true
+    rayCast:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    release:
+      args: []
+      method: true
+    setCategory:
+      args:
+        - required: false
+          type: "..."
+      method: true
+    setDensity:
+      args:
+        - type: number
+      method: true
+    setFilterData:
+      args:
+        - type: number
+        - type: number
+        - type: number
+      method: true
+    setFriction:
+      args:
+        - type: number
+      method: true
+    setGroupIndex:
+      args:
+        - type: number
+      method: true
+    setMask:
+      args:
+        - required: false
+          type: "..."
+      method: true
+    setRestitution:
+      args:
+        - type: number
+      method: true
+    setSensor:
+      args:
+        - type: bool
+      method: true
+    setUserData:
+      args:
+        - type: any
+      method: true
+    testPoint:
+      args:
+        - type: number
+        - type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Font:
+    getAscent:
+      args: []
+      method: true
+    getBaseline:
+      args: []
+      method: true
+    getDescent:
+      args: []
+      method: true
+    getDPIScale:
+      args: []
+      method: true
+    getFilter:
+      args: []
+      method: true
+    getHeight:
+      args: []
+      method: true
+    getKerning:
+      args:
+        - type: any
+        - type: any
+      method: true
+    getLineHeight:
+      args: []
+      method: true
+    getWidth:
+      args:
+        - type: string
+      method: true
+    getWrap:
+      args:
+        - type: any
+        - type: number
+      method: true
+    hasGlyphs:
+      args:
+        - type: any
+        - required: false
+          type: any
+      method: true
+    release:
+      args: []
+      method: true
+    setFallbacks:
+      args:
+        - type:
+            display: Font
+        - required: false
+          type: "..."
+      method: true
+    setFilter:
+      args:
+        - type:
+            - "linear"
+            - "nearest"
+        - type:
+            - "linear"
+            - "nearest"
+        - required: false
+          type: number
+      method: true
+    setLineHeight:
+      args:
+        - type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  FrictionJoint:
+    destroy:
+      args: []
+      method: true
+    getAnchors:
+      args: []
+      method: true
+    getBodies:
+      args: []
+      method: true
+    getCollideConnected:
+      args: []
+      method: true
+    getMaxForce:
+      args: []
+      method: true
+    getMaxTorque:
+      args: []
+      method: true
+    getReactionForce:
+      args:
+        - type: number
+      method: true
+    getReactionTorque:
+      args:
+        - type: number
+      method: true
+    getType:
+      args: []
+      method: true
+    getUserData:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setMaxForce:
+      args:
+        - type: number
+      method: true
+    setMaxTorque:
+      args:
+        - type: number
+      method: true
+    setUserData:
+      args:
+        - type: any
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  GearJoint:
+    destroy:
+      args: []
+      method: true
+    getAnchors:
+      args: []
+      method: true
+    getBodies:
+      args: []
+      method: true
+    getCollideConnected:
+      args: []
+      method: true
+    getJoints:
+      args: []
+      method: true
+    getRatio:
+      args: []
+      method: true
+    getReactionForce:
+      args:
+        - type: number
+      method: true
+    getReactionTorque:
+      args:
+        - type: number
+      method: true
+    getType:
+      args: []
+      method: true
+    getUserData:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setRatio:
+      args:
+        - type: number
+      method: true
+    setUserData:
+      args:
+        - type: any
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  GlyphData:
+    clone:
+      args: []
+      method: true
+    getAdvance:
+      args: []
+      method: true
+    getBearing:
+      args: []
+      method: true
+    getBoundingBox:
+      args: []
+      method: true
+    getDimensions:
+      args: []
+      method: true
+    getFFIPointer:
+      args: []
+      method: true
+    getFormat:
+      args: []
+      method: true
+    getGlyph:
+      args: []
+      method: true
+    getGlyphString:
+      args: []
+      method: true
+    getHeight:
+      args: []
+      method: true
+    getPointer:
+      args: []
+      method: true
+    getSize:
+      args: []
+      method: true
+    getString:
+      args: []
+      method: true
+    getWidth:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Image:
+    getDepth:
+      args: []
+      method: true
+    getDepthSampleMode:
+      args: []
+      method: true
+    getDimensions:
+      args: []
+      method: true
+    getDPIScale:
+      args: []
+      method: true
+    getFilter:
+      args: []
+      method: true
+    getFormat:
+      args: []
+      method: true
+    getHeight:
+      args: []
+      method: true
+    getLayerCount:
+      args: []
+      method: true
+    getMipmapCount:
+      args: []
+      method: true
+    getMipmapFilter:
+      args: []
+      method: true
+    getPixelDimensions:
+      args: []
+      method: true
+    getPixelHeight:
+      args: []
+      method: true
+    getPixelWidth:
+      args: []
+      method: true
+    getTextureType:
+      args: []
+      method: true
+    getWidth:
+      args: []
+      method: true
+    getWrap:
+      args: []
+      method: true
+    isCompressed:
+      args: []
+      method: true
+    isFormatLinear:
+      args: []
+      method: true
+    isReadable:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    replacePixels:
+      args:
+        - type:
+            display: ImageData
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: bool
+      method: true
+    setDepthSampleMode:
+      args:
+        - type:
+            - "equal"
+            - "notequal"
+            - "less"
+            - "lequal"
+            - "gequal"
+            - "greater"
+            - "never"
+            - "always"
+      method: true
+    setFilter:
+      args:
+        - type:
+            - "linear"
+            - "nearest"
+        - required: false
+          type:
+            - "linear"
+            - "nearest"
+        - required: false
+          type: number
+      method: true
+    setMipmapFilter:
+      args:
+        - required: false
+          type:
+            - "linear"
+            - "nearest"
+        - required: false
+          type: number
+      method: true
+    setWrap:
+      args:
+        - type:
+            - "clamp"
+            - "repeat"
+            - "mirroredrepeat"
+            - "clampzero"
+        - required: false
+          type:
+            - "clamp"
+            - "repeat"
+            - "mirroredrepeat"
+            - "clampzero"
+        - required: false
+          type:
+            - "clamp"
+            - "repeat"
+            - "mirroredrepeat"
+            - "clampzero"
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  ImageData:
+    clone:
+      args: []
+      method: true
+    encode:
+      args:
+        - type: any
+        - required: false
+          type: any
+      method: true
+    getDimensions:
+      args: []
+      method: true
+    getFFIPointer:
+      args: []
+      method: true
+    getFormat:
+      args: []
+      method: true
+    getHeight:
+      args: []
+      method: true
+    getPixel:
+      args:
+        - type: number
+        - type: number
+      method: true
+    getPointer:
+      args: []
+      method: true
+    getSize:
+      args: []
+      method: true
+    getString:
+      args: []
+      method: true
+    getWidth:
+      args: []
+      method: true
+    mapPixel:
+      args:
+        - type: function
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    paste:
+      args:
+        - type:
+            display: ImageData
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+      method: true
+    release:
+      args: []
+      method: true
+    setPixel:
+      args:
+        - type: number
+        - type: number
+        - type: any
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Joint:
+    destroy:
+      args: []
+      method: true
+    getAnchors:
+      args: []
+      method: true
+    getBodies:
+      args: []
+      method: true
+    getCollideConnected:
+      args: []
+      method: true
+    getReactionForce:
+      args:
+        - type: number
+      method: true
+    getReactionTorque:
+      args:
+        - type: number
+      method: true
+    getType:
+      args: []
+      method: true
+    getUserData:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setUserData:
+      args:
+        - type: any
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Joystick:
+    getAxes:
+      args: []
+      method: true
+    getAxis:
+      args:
+        - type: number
+      method: true
+    getAxisCount:
+      args: []
+      method: true
+    getButtonCount:
+      args: []
+      method: true
+    getDeviceInfo:
+      args: []
+      method: true
+    getGamepadAxis:
+      args:
+        - type:
+            - "leftx"
+            - "lefty"
+            - "rightx"
+            - "righty"
+            - "triggerleft"
+            - "triggerright"
+      method: true
+    getGamepadMapping:
+      args:
+        - type: any
+      method: true
+    getGamepadMappingString:
+      args: []
+      method: true
+    getGUID:
+      args: []
+      method: true
+    getHat:
+      args:
+        - type: number
+      method: true
+    getHatCount:
+      args: []
+      method: true
+    getID:
+      args: []
+      method: true
+    getName:
+      args: []
+      method: true
+    getVibration:
+      args: []
+      method: true
+    isConnected:
+      args: []
+      method: true
+    isDown:
+      args:
+        - type: number
+      method: true
+    isGamepad:
+      args: []
+      method: true
+    isGamepadDown:
+      args:
+        - type:
+            - "a"
+            - "b"
+            - "x"
+            - "y"
+            - "back"
+            - "guide"
+            - "start"
+            - "leftstick"
+            - "rightstick"
+            - "leftshoulder"
+            - "rightshoulder"
+            - "dpup"
+            - "dpdown"
+            - "dpleft"
+            - "dpright"
+      method: true
+    isVibrationSupported:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setVibration:
+      args:
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Mesh:
+    attachAttribute:
+      args:
+        - type: string
+        - type:
+            display: Mesh
+        - required: false
+          type:
+            - "pervertex"
+            - "perinstance"
+        - required: false
+          type: string
+      method: true
+    detachAttribute:
+      args:
+        - type: string
+      method: true
+    flush:
+      args: []
+      method: true
+    getDrawMode:
+      args: []
+      method: true
+    getDrawRange:
+      args: []
+      method: true
+    getTexture:
+      args: []
+      method: true
+    getVertex:
+      args:
+        - type: number
+      method: true
+    getVertexAttribute:
+      args:
+        - type: number
+        - type: number
+      method: true
+    getVertexCount:
+      args: []
+      method: true
+    getVertexFormat:
+      args: []
+      method: true
+    getVertexMap:
+      args: []
+      method: true
+    isAttributeEnabled:
+      args:
+        - type: string
+      method: true
+    release:
+      args: []
+      method: true
+    setAttributeEnabled:
+      args:
+        - type: string
+        - type: bool
+      method: true
+    setDrawMode:
+      args:
+        - type:
+            - "fan"
+            - "strip"
+            - "triangles"
+            - "points"
+      method: true
+    setDrawRange:
+      args:
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    setTexture:
+      args:
+        - required: false
+          type:
+            display: Texture
+      method: true
+    setVertex:
+      args:
+        - type: number
+        - type: any
+        - required: false
+          type: any
+        - required: false
+          type: any
+        - required: false
+          type: any
+        - required: false
+          type: any
+        - required: false
+          type: any
+        - required: false
+          type: any
+        - required: false
+          type: any
+        - required: false
+          type: "..."
+      method: true
+    setVertexAttribute:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - required: false
+          type: "..."
+      method: true
+    setVertexMap:
+      args:
+        - type: any
+        - required: false
+          type: any
+        - required: false
+          type: number
+      method: true
+    setVertices:
+      args:
+        - type: any
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  MotorJoint:
+    destroy:
+      args: []
+      method: true
+    getAnchors:
+      args: []
+      method: true
+    getAngularOffset:
+      args: []
+      method: true
+    getBodies:
+      args: []
+      method: true
+    getCollideConnected:
+      args: []
+      method: true
+    getLinearOffset:
+      args: []
+      method: true
+    getReactionForce:
+      args:
+        - type: number
+      method: true
+    getReactionTorque:
+      args:
+        - type: number
+      method: true
+    getType:
+      args: []
+      method: true
+    getUserData:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setAngularOffset:
+      args:
+        - type: number
+      method: true
+    setLinearOffset:
+      args:
+        - type: number
+        - type: number
+      method: true
+    setUserData:
+      args:
+        - type: any
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  MouseJoint:
+    destroy:
+      args: []
+      method: true
+    getAnchors:
+      args: []
+      method: true
+    getBodies:
+      args: []
+      method: true
+    getCollideConnected:
+      args: []
+      method: true
+    getDampingRatio:
+      args: []
+      method: true
+    getFrequency:
+      args: []
+      method: true
+    getMaxForce:
+      args: []
+      method: true
+    getReactionForce:
+      args:
+        - type: number
+      method: true
+    getReactionTorque:
+      args:
+        - type: number
+      method: true
+    getTarget:
+      args: []
+      method: true
+    getType:
+      args: []
+      method: true
+    getUserData:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setDampingRatio:
+      args:
+        - type: number
+      method: true
+    setFrequency:
+      args:
+        - type: number
+      method: true
+    setMaxForce:
+      args:
+        - type: number
+      method: true
+    setTarget:
+      args:
+        - type: number
+        - type: number
+      method: true
+    setUserData:
+      args:
+        - type: any
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Object:
+    release:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  ParticleSystem:
+    clone:
+      args: []
+      method: true
+    emit:
+      args:
+        - type: number
+      method: true
+    getBufferSize:
+      args: []
+      method: true
+    getColors:
+      args: []
+      method: true
+    getCount:
+      args: []
+      method: true
+    getDirection:
+      args: []
+      method: true
+    getEmissionArea:
+      args: []
+      method: true
+    getEmissionRate:
+      args: []
+      method: true
+    getEmitterLifetime:
+      args: []
+      method: true
+    getInsertMode:
+      args: []
+      method: true
+    getLinearAcceleration:
+      args: []
+      method: true
+    getLinearDamping:
+      args: []
+      method: true
+    getOffset:
+      args: []
+      method: true
+    getParticleLifetime:
+      args: []
+      method: true
+    getPosition:
+      args: []
+      method: true
+    getQuads:
+      args: []
+      method: true
+    getRadialAcceleration:
+      args: []
+      method: true
+    getRotation:
+      args: []
+      method: true
+    getSizes:
+      args: []
+      method: true
+    getSizeVariation:
+      args: []
+      method: true
+    getSpeed:
+      args: []
+      method: true
+    getSpin:
+      args: []
+      method: true
+    getSpinVariation:
+      args: []
+      method: true
+    getSpread:
+      args: []
+      method: true
+    getTangentialAcceleration:
+      args: []
+      method: true
+    getTexture:
+      args: []
+      method: true
+    hasRelativeRotation:
+      args: []
+      method: true
+    isActive:
+      args: []
+      method: true
+    isPaused:
+      args: []
+      method: true
+    isStopped:
+      args: []
+      method: true
+    moveTo:
+      args:
+        - type: number
+        - type: number
+      method: true
+    pause:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    reset:
+      args: []
+      method: true
+    setBufferSize:
+      args:
+        - type: number
+      method: true
+    setColors:
+      args:
+        - type: any
+        - required: false
+          type: any
+        - required: false
+          type: any
+        - required: false
+          type: any
+        - required: false
+          type: "..."
+      method: true
+    setDirection:
+      args:
+        - type: number
+      method: true
+    setEmissionArea:
+      args:
+        - type:
+            - "uniform"
+            - "normal"
+            - "ellipse"
+            - "borderellipse"
+            - "borderrectangle"
+            - "none"
+        - type: number
+        - type: number
+        - required: false
+          type: number
+        - required: false
+          type: bool
+      method: true
+    setEmissionRate:
+      args:
+        - type: number
+      method: true
+    setEmitterLifetime:
+      args:
+        - type: number
+      method: true
+    setInsertMode:
+      args:
+        - type:
+            - "top"
+            - "bottom"
+            - "random"
+      method: true
+    setLinearAcceleration:
+      args:
+        - type: number
+        - type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    setLinearDamping:
+      args:
+        - type: number
+        - required: false
+          type: number
+      method: true
+    setOffset:
+      args:
+        - type: number
+        - type: number
+      method: true
+    setParticleLifetime:
+      args:
+        - type: number
+        - required: false
+          type: number
+      method: true
+    setPosition:
+      args:
+        - type: number
+        - type: number
+      method: true
+    setQuads:
+      args:
+        - type: any
+        - required: false
+          type: "..."
+      method: true
+    setRadialAcceleration:
+      args:
+        - type: number
+        - required: false
+          type: number
+      method: true
+    setRelativeRotation:
+      args:
+        - type: bool
+      method: true
+    setRotation:
+      args:
+        - type: number
+        - required: false
+          type: number
+      method: true
+    setSizes:
+      args:
+        - type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    setSizeVariation:
+      args:
+        - type: number
+      method: true
+    setSpeed:
+      args:
+        - type: number
+        - required: false
+          type: number
+      method: true
+    setSpin:
+      args:
+        - type: number
+        - required: false
+          type: number
+      method: true
+    setSpinVariation:
+      args:
+        - type: number
+      method: true
+    setSpread:
+      args:
+        - type: number
+      method: true
+    setTangentialAcceleration:
+      args:
+        - type: number
+        - required: false
+          type: number
+      method: true
+    setTexture:
+      args:
+        - type:
+            display: Texture
+      method: true
+    start:
+      args: []
+      method: true
+    stop:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+    update:
+      args:
+        - type: number
+      method: true
+  PolygonShape:
+    computeAABB:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    computeMass:
+      args:
+        - type: number
+      method: true
+    getChildCount:
+      args: []
+      method: true
+    getPoints:
+      args: []
+      method: true
+    getRadius:
+      args: []
+      method: true
+    getType:
+      args: []
+      method: true
+    rayCast:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    release:
+      args: []
+      method: true
+    testPoint:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  PrismaticJoint:
+    areLimitsEnabled:
+      args: []
+      method: true
+    destroy:
+      args: []
+      method: true
+    getAnchors:
+      args: []
+      method: true
+    getAxis:
+      args: []
+      method: true
+    getBodies:
+      args: []
+      method: true
+    getCollideConnected:
+      args: []
+      method: true
+    getJointSpeed:
+      args: []
+      method: true
+    getJointTranslation:
+      args: []
+      method: true
+    getLimits:
+      args: []
+      method: true
+    getLowerLimit:
+      args: []
+      method: true
+    getMaxMotorForce:
+      args: []
+      method: true
+    getMotorForce:
+      args:
+        - type: number
+      method: true
+    getMotorSpeed:
+      args: []
+      method: true
+    getReactionForce:
+      args:
+        - type: number
+      method: true
+    getReactionTorque:
+      args:
+        - type: number
+      method: true
+    getReferenceAngle:
+      args: []
+      method: true
+    getType:
+      args: []
+      method: true
+    getUpperLimit:
+      args: []
+      method: true
+    getUserData:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    isMotorEnabled:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setLimits:
+      args:
+        - type: number
+        - type: number
+      method: true
+    setLimitsEnabled:
+      args: []
+      method: true
+    setLowerLimit:
+      args:
+        - type: number
+      method: true
+    setMaxMotorForce:
+      args:
+        - type: number
+      method: true
+    setMotorEnabled:
+      args:
+        - type: bool
+      method: true
+    setMotorSpeed:
+      args:
+        - type: number
+      method: true
+    setUpperLimit:
+      args:
+        - type: number
+      method: true
+    setUserData:
+      args:
+        - type: any
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  PulleyJoint:
+    destroy:
+      args: []
+      method: true
+    getAnchors:
+      args: []
+      method: true
+    getBodies:
+      args: []
+      method: true
+    getCollideConnected:
+      args: []
+      method: true
+    getConstant:
+      args: []
+      method: true
+    getGroundAnchors:
+      args: []
+      method: true
+    getLengthA:
+      args: []
+      method: true
+    getLengthB:
+      args: []
+      method: true
+    getMaxLengths:
+      args: []
+      method: true
+    getRatio:
+      args: []
+      method: true
+    getReactionForce:
+      args:
+        - type: number
+      method: true
+    getReactionTorque:
+      args:
+        - type: number
+      method: true
+    getType:
+      args: []
+      method: true
+    getUserData:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setConstant:
+      args:
+        - type: number
+      method: true
+    setMaxLengths:
+      args:
+        - type: number
+        - type: number
+      method: true
+    setRatio:
+      args:
+        - type: number
+      method: true
+    setUserData:
+      args:
+        - type: any
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Quad:
+    getTextureDimensions:
+      args: []
+      method: true
+    getViewport:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setViewport:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  RandomGenerator:
+    getSeed:
+      args: []
+      method: true
+    getState:
+      args: []
+      method: true
+    random:
+      args:
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    randomNormal:
+      args:
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    release:
+      args: []
+      method: true
+    setSeed:
+      args:
+        - type: number
+        - required: false
+          type: number
+      method: true
+    setState:
+      args:
+        - type: string
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Rasterizer:
+    getAdvance:
+      args: []
+      method: true
+    getAscent:
+      args: []
+      method: true
+    getDescent:
+      args: []
+      method: true
+    getGlyphCount:
+      args: []
+      method: true
+    getGlyphData:
+      args:
+        - type: any
+      method: true
+    getHeight:
+      args: []
+      method: true
+    getLineHeight:
+      args: []
+      method: true
+    hasGlyphs:
+      args:
+        - type: any
+        - required: false
+          type: "..."
+      method: true
+    release:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  RecordingDevice:
+    getBitDepth:
+      args: []
+      method: true
+    getChannelCount:
+      args: []
+      method: true
+    getData:
+      args: []
+      method: true
+    getName:
+      args: []
+      method: true
+    getSampleCount:
+      args: []
+      method: true
+    getSampleRate:
+      args: []
+      method: true
+    isRecording:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    start:
+      args:
+        - type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    stop:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  RevoluteJoint:
+    areLimitsEnabled:
+      args: []
+      method: true
+    destroy:
+      args: []
+      method: true
+    getAnchors:
+      args: []
+      method: true
+    getBodies:
+      args: []
+      method: true
+    getCollideConnected:
+      args: []
+      method: true
+    getJointAngle:
+      args: []
+      method: true
+    getJointSpeed:
+      args: []
+      method: true
+    getLimits:
+      args: []
+      method: true
+    getLowerLimit:
+      args: []
+      method: true
+    getMaxMotorTorque:
+      args: []
+      method: true
+    getMotorSpeed:
+      args: []
+      method: true
+    getMotorTorque:
+      args: []
+      method: true
+    getReactionForce:
+      args:
+        - type: number
+      method: true
+    getReactionTorque:
+      args:
+        - type: number
+      method: true
+    getReferenceAngle:
+      args: []
+      method: true
+    getType:
+      args: []
+      method: true
+    getUpperLimit:
+      args: []
+      method: true
+    getUserData:
+      args: []
+      method: true
+    hasLimitsEnabled:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    isMotorEnabled:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setLimits:
+      args:
+        - type: number
+        - type: number
+      method: true
+    setLimitsEnabled:
+      args:
+        - type: bool
+      method: true
+    setLowerLimit:
+      args:
+        - type: number
+      method: true
+    setMaxMotorTorque:
+      args:
+        - type: number
+      method: true
+    setMotorEnabled:
+      args:
+        - type: bool
+      method: true
+    setMotorSpeed:
+      args:
+        - type: number
+      method: true
+    setUpperLimit:
+      args:
+        - type: number
+      method: true
+    setUserData:
+      args:
+        - type: any
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  RopeJoint:
+    destroy:
+      args: []
+      method: true
+    getAnchors:
+      args: []
+      method: true
+    getBodies:
+      args: []
+      method: true
+    getCollideConnected:
+      args: []
+      method: true
+    getMaxLength:
+      args: []
+      method: true
+    getReactionForce:
+      args:
+        - type: number
+      method: true
+    getReactionTorque:
+      args:
+        - type: number
+      method: true
+    getType:
+      args: []
+      method: true
+    getUserData:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setMaxLength:
+      args:
+        - type: number
+      method: true
+    setUserData:
+      args:
+        - type: any
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Shader:
+    getWarnings:
+      args: []
+      method: true
+    hasUniform:
+      args:
+        - type: string
+      method: true
+    release:
+      args: []
+      method: true
+    send:
+      args:
+        - type: string
+        - type: any
+        - required: false
+          type: any
+        - required: false
+          type: any
+        - required: false
+          type: any
+        - required: false
+          type: "..."
+      method: true
+    sendColor:
+      args:
+        - type: string
+        - type: table
+        - required: false
+          type: "..."
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Shape:
+    computeAABB:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    computeMass:
+      args:
+        - type: number
+      method: true
+    getChildCount:
+      args: []
+      method: true
+    getRadius:
+      args: []
+      method: true
+    getType:
+      args: []
+      method: true
+    rayCast:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    release:
+      args: []
+      method: true
+    testPoint:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  SoundData:
+    clone:
+      args: []
+      method: true
+    getBitDepth:
+      args: []
+      method: true
+    getChannelCount:
+      args: []
+      method: true
+    getDuration:
+      args: []
+      method: true
+    getFFIPointer:
+      args: []
+      method: true
+    getPointer:
+      args: []
+      method: true
+    getSample:
+      args:
+        - type: number
+        - required: false
+          type: number
+      method: true
+    getSampleCount:
+      args: []
+      method: true
+    getSampleRate:
+      args: []
+      method: true
+    getSize:
+      args: []
+      method: true
+    getString:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setSample:
+      args:
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Source:
+    clone:
+      args: []
+      method: true
+    getActiveEffects:
+      args: []
+      method: true
+    getAirAbsorption:
+      args: []
+      method: true
+    getAttenuationDistances:
+      args: []
+      method: true
+    getChannelCount:
+      args: []
+      method: true
+    getCone:
+      args: []
+      method: true
+    getDirection:
+      args: []
+      method: true
+    getDuration:
+      args:
+        - required: false
+          type:
+            - "seconds"
+            - "samples"
+      method: true
+    getEffect:
+      args:
+        - type: string
+        - required: false
+          type: table
+      method: true
+    getFilter:
+      args: []
+      method: true
+    getFreeBufferCount:
+      args: []
+      method: true
+    getPitch:
+      args: []
+      method: true
+    getPosition:
+      args: []
+      method: true
+    getRolloff:
+      args: []
+      method: true
+    getType:
+      args: []
+      method: true
+    getVelocity:
+      args: []
+      method: true
+    getVolume:
+      args: []
+      method: true
+    getVolumeLimits:
+      args: []
+      method: true
+    isLooping:
+      args: []
+      method: true
+    isPlaying:
+      args: []
+      method: true
+    isRelative:
+      args: []
+      method: true
+    pause:
+      args: []
+      method: true
+    play:
+      args: []
+      method: true
+    queue:
+      args:
+        - type:
+            display: SoundData
+      method: true
+    release:
+      args: []
+      method: true
+    seek:
+      args:
+        - type: number
+        - required: false
+          type:
+            - "seconds"
+            - "samples"
+      method: true
+    setAirAbsorption:
+      args:
+        - type: number
+      method: true
+    setAttenuationDistances:
+      args:
+        - type: number
+        - type: number
+      method: true
+    setCone:
+      args:
+        - type: number
+        - type: number
+        - required: false
+          type: number
+      method: true
+    setDirection:
+      args:
+        - type: number
+        - type: number
+        - type: number
+      method: true
+    setEffect:
+      args:
+        - type: string
+        - required: false
+          type: any
+      method: true
+    setFilter:
+      args:
+        - required: false
+          type: table
+      method: true
+    setLooping:
+      args:
+        - type: bool
+      method: true
+    setPitch:
+      args:
+        - type: number
+      method: true
+    setPosition:
+      args:
+        - type: number
+        - type: number
+        - type: number
+      method: true
+    setRelative:
+      args:
+        - required: false
+          type: bool
+      method: true
+    setRolloff:
+      args:
+        - type: number
+      method: true
+    setVelocity:
+      args:
+        - type: number
+        - type: number
+        - type: number
+      method: true
+    setVolume:
+      args:
+        - type: number
+      method: true
+    setVolumeLimits:
+      args:
+        - type: number
+        - type: number
+      method: true
+    stop:
+      args: []
+      method: true
+    tell:
+      args:
+        - required: false
+          type:
+            - "seconds"
+            - "samples"
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  SpriteBatch:
+    add:
+      args:
+        - type: any
+        - type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    addLayer:
+      args:
+        - type: number
+        - required: false
+          type: any
+        - required: false
+          type: any
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    attachAttribute:
+      args:
+        - type: string
+        - type:
+            display: Mesh
+      method: true
+    clear:
+      args: []
+      method: true
+    flush:
+      args: []
+      method: true
+    getBufferSize:
+      args: []
+      method: true
+    getColor:
+      args: []
+      method: true
+    getCount:
+      args: []
+      method: true
+    getTexture:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    set:
+      args:
+        - type: number
+        - type: any
+        - type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    setColor:
+      args:
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    setDrawRange:
+      args:
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    setLayer:
+      args:
+        - type: number
+        - type: number
+        - required: false
+          type: any
+        - required: false
+          type: any
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    setTexture:
+      args:
+        - type:
+            display: Texture
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Text:
+    add:
+      args:
+        - type: any
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    addf:
+      args:
+        - type: any
+        - type: number
+        - type:
+            - "center"
+            - "left"
+            - "right"
+            - "justify"
+        - type: number
+        - type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    clear:
+      args: []
+      method: true
+    getDimensions:
+      args:
+        - required: false
+          type: number
+      method: true
+    getFont:
+      args: []
+      method: true
+    getHeight:
+      args:
+        - required: false
+          type: number
+      method: true
+    getWidth:
+      args:
+        - required: false
+          type: number
+      method: true
+    release:
+      args: []
+      method: true
+    set:
+      args:
+        - type: any
+      method: true
+    setf:
+      args:
+        - type: any
+        - type: number
+        - type:
+            - "center"
+            - "left"
+            - "right"
+            - "justify"
+      method: true
+    setFont:
+      args:
+        - type:
+            display: Font
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Texture:
+    getDepth:
+      args: []
+      method: true
+    getDepthSampleMode:
+      args: []
+      method: true
+    getDimensions:
+      args: []
+      method: true
+    getDPIScale:
+      args: []
+      method: true
+    getFilter:
+      args: []
+      method: true
+    getFormat:
+      args: []
+      method: true
+    getHeight:
+      args: []
+      method: true
+    getLayerCount:
+      args: []
+      method: true
+    getMipmapCount:
+      args: []
+      method: true
+    getMipmapFilter:
+      args: []
+      method: true
+    getPixelDimensions:
+      args: []
+      method: true
+    getPixelHeight:
+      args: []
+      method: true
+    getPixelWidth:
+      args: []
+      method: true
+    getTextureType:
+      args: []
+      method: true
+    getWidth:
+      args: []
+      method: true
+    getWrap:
+      args: []
+      method: true
+    isReadable:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setDepthSampleMode:
+      args:
+        - type:
+            - "equal"
+            - "notequal"
+            - "less"
+            - "lequal"
+            - "gequal"
+            - "greater"
+            - "never"
+            - "always"
+      method: true
+    setFilter:
+      args:
+        - type:
+            - "linear"
+            - "nearest"
+        - required: false
+          type:
+            - "linear"
+            - "nearest"
+        - required: false
+          type: number
+      method: true
+    setMipmapFilter:
+      args:
+        - required: false
+          type:
+            - "linear"
+            - "nearest"
+        - required: false
+          type: number
+      method: true
+    setWrap:
+      args:
+        - type:
+            - "clamp"
+            - "repeat"
+            - "mirroredrepeat"
+            - "clampzero"
+        - required: false
+          type:
+            - "clamp"
+            - "repeat"
+            - "mirroredrepeat"
+            - "clampzero"
+        - required: false
+          type:
+            - "clamp"
+            - "repeat"
+            - "mirroredrepeat"
+            - "clampzero"
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Thread:
+    getError:
+      args: []
+      method: true
+    isRunning:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    start:
+      args:
+        - required: false
+          type: "..."
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+    wait:
+      args: []
+      method: true
+  Transform:
+    apply:
+      args:
+        - type:
+            display: Transform
+      method: true
+    clone:
+      args: []
+      method: true
+    getMatrix:
+      args: []
+      method: true
+    inverse:
+      args: []
+      method: true
+    inverseTransformPoint:
+      args:
+        - type: number
+        - type: number
+      method: true
+    isAffine2DTransform:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    reset:
+      args: []
+      method: true
+    rotate:
+      args:
+        - type: number
+      method: true
+    scale:
+      args:
+        - type: number
+        - required: false
+          type: number
+      method: true
+    setMatrix:
+      args:
+        - type: any
+        - type: any
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    setTransformation:
+      args:
+        - type: number
+        - type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true
+    shear:
+      args:
+        - type: number
+        - type: number
+      method: true
+    transformPoint:
+      args:
+        - type: number
+        - type: number
+      method: true
+    translate:
+      args:
+        - type: number
+        - type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  Video:
+    getDimensions:
+      args: []
+      method: true
+    getFilter:
+      args: []
+      method: true
+    getHeight:
+      args: []
+      method: true
+    getSource:
+      args: []
+      method: true
+    getStream:
+      args: []
+      method: true
+    getWidth:
+      args: []
+      method: true
+    isPlaying:
+      args: []
+      method: true
+    pause:
+      args: []
+      method: true
+    play:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    rewind:
+      args: []
+      method: true
+    seek:
+      args:
+        - type: number
+      method: true
+    setFilter:
+      args:
+        - type:
+            - "linear"
+            - "nearest"
+        - type:
+            - "linear"
+            - "nearest"
+        - required: false
+          type: number
+      method: true
+    setSource:
+      args:
+        - required: false
+          type:
+            display: Source
+      method: true
+    tell:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  VideoStream:
+    getFilename:
+      args: []
+      method: true
+    isPlaying:
+      args: []
+      method: true
+    pause:
+      args: []
+      method: true
+    play:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    rewind:
+      args: []
+      method: true
+    seek:
+      args:
+        - type: number
+      method: true
+    tell:
+      args: []
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  WeldJoint:
+    destroy:
+      args: []
+      method: true
+    getAnchors:
+      args: []
+      method: true
+    getBodies:
+      args: []
+      method: true
+    getCollideConnected:
+      args: []
+      method: true
+    getDampingRatio:
+      args: []
+      method: true
+    getFrequency:
+      args: []
+      method: true
+    getReactionForce:
+      args:
+        - type: number
+      method: true
+    getReactionTorque:
+      args:
+        - type: number
+      method: true
+    getReferenceAngle:
+      args: []
+      method: true
+    getType:
+      args: []
+      method: true
+    getUserData:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setDampingRatio:
+      args:
+        - type: number
+      method: true
+    setFrequency:
+      args:
+        - type: number
+      method: true
+    setUserData:
+      args:
+        - type: any
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  WheelJoint:
+    destroy:
+      args: []
+      method: true
+    getAnchors:
+      args: []
+      method: true
+    getAxis:
+      args: []
+      method: true
+    getBodies:
+      args: []
+      method: true
+    getCollideConnected:
+      args: []
+      method: true
+    getJointSpeed:
+      args: []
+      method: true
+    getJointTranslation:
+      args: []
+      method: true
+    getMaxMotorTorque:
+      args: []
+      method: true
+    getMotorSpeed:
+      args: []
+      method: true
+    getMotorTorque:
+      args:
+        - type: number
+      method: true
+    getReactionForce:
+      args:
+        - type: number
+      method: true
+    getReactionTorque:
+      args:
+        - type: number
+      method: true
+    getSpringDampingRatio:
+      args: []
+      method: true
+    getSpringFrequency:
+      args: []
+      method: true
+    getType:
+      args: []
+      method: true
+    getUserData:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    isMotorEnabled:
+      args: []
+      method: true
+    release:
+      args: []
+      method: true
+    setMaxMotorTorque:
+      args:
+        - type: number
+      method: true
+    setMotorEnabled:
+      args:
+        - type: bool
+      method: true
+    setMotorSpeed:
+      args:
+        - type: number
+      method: true
+    setSpringDampingRatio:
+      args:
+        - type: number
+      method: true
+    setSpringFrequency:
+      args:
+        - type: number
+      method: true
+    setUserData:
+      args:
+        - type: any
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+  World:
+    destroy:
+      args: []
+      method: true
+    getBodies:
+      args: []
+      method: true
+    getBodyCount:
+      args: []
+      method: true
+    getCallbacks:
+      args: []
+      method: true
+    getContactCount:
+      args: []
+      method: true
+    getContactFilter:
+      args: []
+      method: true
+    getContacts:
+      args: []
+      method: true
+    getGravity:
+      args: []
+      method: true
+    getJointCount:
+      args: []
+      method: true
+    getJoints:
+      args: []
+      method: true
+    isDestroyed:
+      args: []
+      method: true
+    isLocked:
+      args: []
+      method: true
+    isSleepingAllowed:
+      args: []
+      method: true
+    queryBoundingBox:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: function
+      method: true
+    rayCast:
+      args:
+        - type: number
+        - type: number
+        - type: number
+        - type: number
+        - type: function
+      method: true
+    release:
+      args: []
+      method: true
+    setCallbacks:
+      args:
+        - type: function
+        - type: function
+        - required: false
+          type: function
+        - required: false
+          type: function
+      method: true
+    setContactFilter:
+      args:
+        - type: function
+      method: true
+    setGravity:
+      args:
+        - type: number
+        - type: number
+      method: true
+    setSleepingAllowed:
+      args:
+        - type: bool
+      method: true
+    translateOrigin:
+      args:
+        - type: number
+        - type: number
+      method: true
+    type:
+      args: []
+      method: true
+    typeOf:
+      args:
+        - type: string
+      method: true
+    update:
+      args:
+        - type: number
+        - required: false
+          type: number
+        - required: false
+          type: number
+      method: true

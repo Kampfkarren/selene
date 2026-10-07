@@ -5,6 +5,7 @@ selene provides a robust standard library format to allow for use with environme
 For examples of the standard library format, see:
 - [`lua51.yml`](https://github.com/Kampfkarren/selene/blob/main/selene-lib/default_std/lua51.yml) - The default standard library for Lua 5.1
 - [`lua52.yml`](https://github.com/Kampfkarren/selene/blob/main/selene-lib/default_std/lua52.yml) - A standard library for Lua 5.2's additions and removals. Reference this if your standard library is based off another (it most likely is).
+- [`love2d.yml`](https://github.com/Kampfkarren/selene/blob/main/selene-lib/default_std/love2d.yml) - A standard library for [LÖVE](https://love2d.org/), containing all of Lua 5.1 plus the LÖVE modules, callbacks, object types, and enums.
 - [`roblox.yml`](https://gist.github.com/Kampfkarren/dff2dc17cc30d68a48510da58fff2381) - A standard library for Roblox that incorporates all the advanced features of the format. If you are a Roblox developer, don't use this as anything other than reference--an up to date version of this library is automatically generated.
 
 ## base

@@ -412,6 +412,7 @@ names! {
     "lua52" => "../../default_std/lua52.yml",
     "lua53" => "../../default_std/lua53.yml",
     "luau" => "../../default_std/luau.yml",
+    "love2d" => "../../default_std/love2d.yml",
 }
 
 fn is_default<T>(value: &T) -> bool
@@ -877,6 +878,7 @@ mod tests {
     fn valid_serde() {
         StandardLibrary::from_name("lua51").expect("lua51.toml wasn't found");
         StandardLibrary::from_name("lua52").expect("lua52.toml wasn't found");
+        StandardLibrary::from_name("love2d").expect("love2d.yml wasn't found");
     }
 
     #[test]
