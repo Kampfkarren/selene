@@ -115,9 +115,46 @@ jobs:
       with:
         name: selene-light-linux-aarch64
         path: ./target/aarch64-unknown-linux-gnu/release/selene
+  build_linux_musl:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install musl tools
+      run: sudo apt-get install -y musl-tools
+    - name: Install Rust musl target
+      run: rustup target add x86_64-unknown-linux-musl
+    - name: Build (Default features)
+      run: |
+        cd selene
+        RUSTFLAGS="--cfg getrandom_backend=\"linux_getrandom\"" \
+        cargo build --locked --release --target x86_64-unknown-linux-musl
+    - name: Upload selene-musl
+      uses: actions/upload-artifact@v4
+      with:
+        name: selene-linux-musl
+        path: ./selene/target/x86_64-unknown-linux-musl/release/selene
+
+  build_linux_musl_light:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install musl tools
+      run: sudo apt-get install -y musl-tools
+    - name: Install Rust musl target
+      run: rustup target add x86_64-unknown-linux-musl
+    - name: Build (Lightweight)
+      run: |
+        cd selene
+        RUSTFLAGS="--cfg getrandom_backend=\"linux_getrandom\"" \
+        cargo build --locked --release --no-default-features --target x86_64-unknown-linux-musl
+    - name: Upload selene-light-musl
+      uses: actions/upload-artifact@v4
+      with:
+        name: selene-light-linux-musl
+        path: ./selene/target/x86_64-unknown-linux-musl/release/selene
   release:
     runs-on: ubuntu-latest
-    needs: ['build_windows_light', 'build_windows', 'build_mac', 'build_mac_light', 'build_linux', 'build_linux_light']
+    needs: ['build_windows_light', 'build_windows', 'build_mac', 'build_mac_light', 'build_linux', 'build_linux_light', 'build_linux_musl', 'build_linux_musl_light']
     if: contains(github.event.head_commit.message, '[release]')
     steps:
     - uses: actions/checkout@v4
@@ -127,9 +164,11 @@ jobs:
         path: artifacts
     - run: |
         zip -rj selene-light-linux.zip ./artifacts/selene-light-linux/*
+        zip -rj selene-light-linux-musl.zip ./artifacts/selene-light-linux-musl/*
         zip -rj selene-light-macos.zip ./artifacts/selene-light-macos/*
         zip -rj selene-light-windows.zip ./artifacts/selene-light-windows/*
         zip -rj selene-linux.zip ./artifacts/selene-linux/*
+        zip -rj selene-linux-musl.zip ./artifacts/selene-linux-musl/*
         zip -rj selene-macos.zip ./artifacts/selene-macos/*
         zip -rj selene-windows.zip ./artifacts/selene-windows/*
 
