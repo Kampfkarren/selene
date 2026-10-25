@@ -126,6 +126,10 @@ jobs:
       with:
         path: artifacts
     - run: |
+        # upload-artifact drops file permissions, so restore the executable bit
+        # on the Linux and macOS binaries before zipping them.
+        chmod +x ./artifacts/*/selene
+
         zip -rj selene-light-linux.zip ./artifacts/selene-light-linux/*
         zip -rj selene-light-macos.zip ./artifacts/selene-light-macos/*
         zip -rj selene-light-windows.zip ./artifacts/selene-light-windows/*

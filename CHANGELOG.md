@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.32.0...HEAD)
+### Fixed
+- Linux and macOS release binaries are now executable after unzipping.
 
 ## [0.32.0](https://github.com/Kampfkarren/selene/releases/tag/0.32.0) - 2026-10-01
 ### Added
