@@ -1,4 +1,5 @@
 use super::*;
+use crate::standard_library::LuaVersion;
 use std::convert::Infallible;
 
 use full_moon::{
@@ -35,9 +36,32 @@ impl Lint for BadStringEscapeLint {
     }
 
     fn pass(&self, ast: &Ast, context: &Context, _: &AstContext) -> Vec<Diagnostic> {
+        // the roblox check keeps older roblox std files, which set no lua_versions, working
+        let is_roblox = context.is_roblox();
+        let lua_versions = &context.standard_library.lua_versions;
+        let supports = |versions: &[LuaVersion]| {
+            is_roblox
+                || lua_versions
+                    .iter()
+                    .any(|version| versions.contains(version))
+        };
+
         let mut visitor = BadStringEscapeVisitor {
             sequences: Vec::new(),
-            roblox: context.is_roblox(),
+            // \x and \z arrived in Lua 5.2, \u{} in 5.3; LuaJIT and Luau have all three
+            allows_hex_and_skip: supports(&[
+                LuaVersion::Lua52,
+                LuaVersion::Lua53,
+                LuaVersion::Lua54,
+                LuaVersion::LuaJIT,
+                LuaVersion::Luau,
+            ]),
+            allows_unicode: supports(&[
+                LuaVersion::Lua53,
+                LuaVersion::Lua54,
+                LuaVersion::LuaJIT,
+                LuaVersion::Luau,
+            ]),
         };
 
         visitor.visit_ast(ast);
@@ -95,7 +119,8 @@ impl Lint for BadStringEscapeLint {
 
 struct BadStringEscapeVisitor {
     sequences: Vec<StringEscapeSequence>,
-    roblox: bool,
+    allows_hex_and_skip: bool,
+    allows_unicode: bool,
 }
 
 struct StringEscapeSequence {
@@ -153,7 +178,7 @@ impl Visitor for BadStringEscapeVisitor {
                             }
                         },
                         "z" => {
-                            if !self.roblox {
+                            if !self.allows_hex_and_skip {
                                 self.sequences.push(
                                     StringEscapeSequence{
                                         range: (start, start + 2),
@@ -163,7 +188,7 @@ impl Visitor for BadStringEscapeVisitor {
                             }
                         },
                         "x" => {
-                            if !self.roblox {
+                            if !self.allows_hex_and_skip {
                                 self.sequences.push(
                                     StringEscapeSequence{
                                         range: (start, start + 2),
@@ -183,7 +208,7 @@ impl Visitor for BadStringEscapeVisitor {
                             }
                         },
                         "u{" => {
-                            if !self.roblox {
+                            if !self.allows_unicode {
                                 self.sequences.push(
                                     StringEscapeSequence{
                                         range: (start, start + 2),
@@ -247,6 +272,46 @@ mod tests {
             BadStringEscapeLint::new(()).unwrap(),
             "bad_string_escape",
             "roblox_string_escapes",
+        );
+    }
+
+    #[test]
+    #[cfg(feature = "lua52")]
+    fn test_bad_string_escape_lua52() {
+        test_lint(
+            BadStringEscapeLint::new(()).unwrap(),
+            "bad_string_escape",
+            "lua52_string_escapes",
+        );
+    }
+
+    #[test]
+    #[cfg(feature = "lua53")]
+    fn test_bad_string_escape_lua53() {
+        test_lint(
+            BadStringEscapeLint::new(()).unwrap(),
+            "bad_string_escape",
+            "lua53_string_escapes",
+        );
+    }
+
+    #[test]
+    #[cfg(feature = "luajit")]
+    fn test_bad_string_escape_luajit() {
+        test_lint(
+            BadStringEscapeLint::new(()).unwrap(),
+            "bad_string_escape",
+            "luajit_string_escapes",
+        );
+    }
+
+    #[test]
+    #[cfg(feature = "roblox")]
+    fn test_bad_string_escape_luau() {
+        test_lint(
+            BadStringEscapeLint::new(()).unwrap(),
+            "bad_string_escape",
+            "luau_string_escapes",
         );
     }
 }
