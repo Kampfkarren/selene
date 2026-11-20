@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.32.0...HEAD)
+### Fixed
+- `bad_string_escape` now allows `\x`, `\z` and `\u{}` escapes in every Lua version that supports them (Lua 5.2+, LuaJIT, Luau) instead of only in Roblox.
 
 ## [0.32.0](https://github.com/Kampfkarren/selene/releases/tag/0.32.0) - 2026-10-01
 ### Added
