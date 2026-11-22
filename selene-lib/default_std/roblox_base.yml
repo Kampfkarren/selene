@@ -395,6 +395,8 @@ globals:
         type: number
       - required: false
         type: number
+      - required: false
+        type: number
     must_use: true
   Random.new:
     args:
