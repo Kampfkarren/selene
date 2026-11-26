@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.32.0...HEAD)
+### Added
+- Added [`redundant_math_random_min`](https://kampfkarren.github.io/selene/lints/redundant_math_random_min.html), which checks for `math.random(1, n)` calls that can be written as `math.random(n)`. [(#393)](https://github.com/Kampfkarren/selene/issues/393)
 
 ## [0.32.0](https://github.com/Kampfkarren/selene/releases/tag/0.32.0) - 2026-10-01
 ### Added

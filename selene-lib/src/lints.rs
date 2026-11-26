@@ -27,6 +27,7 @@ pub mod mixed_table;
 pub mod multiple_statements;
 pub mod must_use;
 pub mod parenthese_conditions;
+pub mod redundant_math_random_min;
 pub mod restricted_module_paths;
 pub mod shadowing;
 pub mod standard_library;

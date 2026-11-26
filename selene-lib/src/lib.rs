@@ -311,6 +311,7 @@ use_lints! {
     multiple_statements: lints::multiple_statements::MultipleStatementsLint,
     must_use: lints::must_use::MustUseLint,
     parenthese_conditions: lints::parenthese_conditions::ParentheseConditionsLint,
+    redundant_math_random_min: lints::redundant_math_random_min::RedundantMathRandomMinLint,
     restricted_module_paths: lints::restricted_module_paths::RestrictedModulePathsLint,
     shadowing: lints::shadowing::ShadowingLint,
     suspicious_reverse_loop: lints::suspicious_reverse_loop::SuspiciousReverseLoopLint,
