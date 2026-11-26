@@ -2,6 +2,8 @@
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/Kampfkarren/selene/compare/0.32.0...HEAD)
+### Fixed
+- Fixed selene hanging forever when given an unknown cluster of short flags, such as `-json2`. [(#629)](https://github.com/Kampfkarren/selene/issues/629)
 
 ## [0.32.0](https://github.com/Kampfkarren/selene/releases/tag/0.32.0) - 2026-10-01
 ### Added
