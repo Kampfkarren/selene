@@ -199,11 +199,11 @@ globals:
     args:
       - type: "..."
   io.stderr:
-    property: read-only
+    struct: File
   io.stdin:
-    property: read-only
+    struct: File
   io.stdout:
-    property: read-only
+    struct: File
   io.tmpfile:
     args: []
   io.type:
@@ -644,3 +644,44 @@ globals:
       - type: function
       - required: false
         type: "..."
+structs:
+  File:
+    close:
+      args: []
+      method: true
+    flush:
+      args: []
+      method: true
+    lines:
+      args:
+        - required: false
+          type: "..."
+      method: true
+    read:
+      args:
+        - required: false
+          type: "..."
+      method: true
+    seek:
+      args:
+        - required: false
+          type:
+            - set
+            - cur
+            - end
+        - required: false
+          type: number
+      method: true
+    setvbuf:
+      args:
+        - type:
+            - "no"
+            - full
+            - line
+        - required: false
+          type: number
+      method: true
+    write:
+      args:
+        - type: "..."
+      method: true

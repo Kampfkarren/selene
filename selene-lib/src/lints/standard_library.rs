@@ -796,6 +796,15 @@ mod tests {
     }
 
     #[test]
+    fn test_io_handles() {
+        test_lint(
+            StandardLibraryLint::new(()).unwrap(),
+            "standard_library",
+            "io_handles",
+        );
+    }
+
+    #[test]
     fn test_math_on_types() {
         test_lint(
             StandardLibraryLint::new(()).unwrap(),

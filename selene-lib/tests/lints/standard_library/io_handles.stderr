@@ -1,0 +1,20 @@
+error[incorrect_standard_library_use]: standard library global `io.stdout` does not contain the field `writ`
+   ┌─ io_handles.lua:10:1
+   │
+10 │ io.stdout:writ("typo")
+   │ ^^^^^^^^^^^^^^
+
+error[incorrect_standard_library_use]: standard library function `io.stdout.write` is a method
+   ┌─ io_handles.lua:11:1
+   │
+11 │ io.stdout.write("not a method call")
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = try: io.stdout:write(...)
+
+error[incorrect_standard_library_use]: use of standard_library function `io.stdout.seek` is incorrect
+   ┌─ io_handles.lua:12:16
+   │
+12 │ io.stdout:seek("bogus")
+   │                ^^^^^^^ expected `"set", "cur", "end"`, received `string`
+
