@@ -1,0 +1,24 @@
+error[redundant_math_random_min]: `math.random(1, n)` is the same as `math.random(n)`
+  ┌─ redundant_math_random_min.lua:4:7
+  │
+4 │ print(math.random(1, 5))
+  │       ^^^^^^^^^^^^^^^^^
+  │
+  = try: `math.random(5)`
+
+error[redundant_math_random_min]: `math.random(1, n)` is the same as `math.random(n)`
+  ┌─ redundant_math_random_min.lua:5:7
+  │
+5 │ print(math.random(1, #items))
+  │       ^^^^^^^^^^^^^^^^^^^^^^
+  │
+  = try: `math.random(#items)`
+
+error[redundant_math_random_min]: `math.random(1, n)` is the same as `math.random(n)`
+  ┌─ redundant_math_random_min.lua:6:7
+  │
+6 │ print(math.random(1.0, 10))
+  │       ^^^^^^^^^^^^^^^^^^^^
+  │
+  = try: `math.random(10)`
+

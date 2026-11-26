@@ -31,6 +31,7 @@
   - [multiple_statements](./lints/multiple_statements.md)
   - [must_use](./lints/must_use.md)
   - [parenthese_conditions](./lints/parenthese_conditions.md)
+  - [redundant_math_random_min](./lints/redundant_math_random_min.md)
   - [restricted_module_paths](./lints/restricted_module_paths.md)
   - [roblox_incorrect_color3_new_bounds](./lints/roblox_incorrect_color3_new_bounds.md)
   - [roblox_incorrect_roact_usage](./lints/roblox_incorrect_roact_usage.md)
