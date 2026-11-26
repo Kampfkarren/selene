@@ -787,10 +787,14 @@ fn get_opts_safe(mut args: Vec<OsString>, luacheck: bool) -> Result<opts::Option
                     let bad_arg =
                         &err.info.as_ref().expect("no info for UnknownArgument")[0].to_owned();
 
-                    args = args
-                        .drain(..)
-                        .filter(|arg| arg.to_string_lossy().split('=').next().unwrap() != bad_arg)
-                        .collect();
+                    let args_before = args.len();
+                    args.retain(|arg| arg.to_string_lossy().split('=').next().unwrap() != bad_arg);
+
+                    // clap can report an argument that doesn't appear verbatim, such as `-j`
+                    // for `-json2`. If nothing was removed, retrying would loop forever.
+                    if args.len() == args_before {
+                        break Err(first_error.unwrap_or(err));
+                    }
 
                     if first_error.is_none() {
                         first_error = Some(err);
@@ -840,5 +844,11 @@ mod tests {
         assert!(get_opts_safe(args(vec!["-", "--formatter=plain"]), true).is_ok());
 
         assert!(get_opts_safe(args(vec!["--fail", "files"]), true).is_ok());
+    }
+
+    #[test]
+    fn test_unknown_short_flag_cluster_does_not_hang() {
+        assert!(get_opts_safe(args(vec!["--display-style", "-json2"]), false).is_err());
+        assert!(get_opts_safe(args(vec!["-json2", "file"]), false).is_err());
     }
 }
